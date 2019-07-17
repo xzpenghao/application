@@ -1,0 +1,521 @@
+package com.springboot.component;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.popj.*;
+import com.springboot.popj.pub_data.*;
+import com.springboot.popj.register.HttpRequestMethedEnum;
+import com.springboot.popj.register.JwtAuthenticationRequest;
+import com.springboot.popj.register.User;
+import com.springboot.popj.registration.*;
+import com.springboot.popj.warrant.ParametricData;
+import com.springboot.popj.warrant.RealPropertyCertificate;
+import com.springboot.popj.warrant.ZdInfo;
+import com.springboot.util.HttpClientUtils;
+import com.springboot.util.ParamHttpClientUtil;
+import com.springboot.util.SysPubDataDealUtil;
+import com.sun.org.apache.regexp.internal.RE;
+import io.swagger.models.auth.In;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.*;
+
+@Slf4j
+@Component
+public class RealEstateMortgageComponent {
+
+    @Autowired
+    private HttpClientUtils httpClientUtils;
+    @Value("${httpclient.ip}")
+    private String ip;
+    @Value("${httpclient.seam}")
+    private String seam;
+    @Value("${glHouseBuyer.obligeeDyqr}")
+    private String obligeeDyqr;
+    @Value("${glHouseBuyer.obligeeDyr}")
+    private String obligeeDyr;
+    @Value("${glHouseBuyer.obligeeQlr}")
+    private String obligeeQlr;
+    @Value("${businessType.grMortgageCancellation}")
+    private String grMortgageCancellation;
+    @Value("${businessType.clfFmortgage}")
+    private String clfFmortgage;
+    @Value("${businessType.xjfFmortgage}")
+    private String xjfFmortgage;
+    @Value("${businessType.grMortgageRegistration}")
+    private String grMortgageRegistration;
+    @Value("${businessType.registrationOfTransfer}")
+    private String registrationOfTransfer;
+    @Value("${businessType.forewarningMortgage}")
+    private String forewarningMortgage;
+    @Value("${businessType.transferAndMortgage}")
+    private String transferAndMortgage;
+    @Value("${businessType.vormerkung}")
+    private String vormerkung;
+    @Value("${httpclient.windowAcceptanceIp}")
+    private String windowAcceptanceIp; //一窗受理ip
+    @Value("${httpclient.windowAcceptanceSeam}")
+    private String windowAcceptanceSeam; //一窗受理接口
+
+
+
+
+    /**
+     * 发送登记局数据 返回受理编号
+     * @param commonInterfaceAttributer
+     * @return
+     */
+    public ObjectRestResponse sendRegistrationMortgageRevocation(String commonInterfaceAttributer) throws ParseException {
+        ObjectRestResponse resultRV = new ObjectRestResponse();
+        net.sf.json.JSONObject jsonObject=null;
+        RegistrationBureau   registrationBureauVo=null;
+        //获取json数据转成收件申请
+        SJ_Sjsq sjSjsq= SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer,null,null,null);
+        RegistrationBureau registrationBureau=new RegistrationBureau();
+        registrationBureau.setPid("Proc-180517124140-3MN26M71");//测试数据
+        registrationBureau.setSubmitFlow(true);
+        registrationBureau.setBizType(grMortgageCancellation);
+        registrationBureau.setContactsAdress("北京望京");//测试数据
+        registrationBureau.setOperatorName("admin");//测试后续需要设置
+        registrationBureau.setContacts(sjSjsq.getNotifiedPersonName());
+        registrationBureau.setContactsPhone(sjSjsq.getNotifiedPersonTelephone());
+        registrationBureau.setBusinessAreas("321301");
+        switch (sjSjsq.getBusinessType()){
+            case  "变更登记":
+                registrationBureau.setBizType(grMortgageCancellation);
+                if (null != sjSjsq.getImmovableCurrentMortgageInfoVoList() || sjSjsq.getImmovableCurrentMortgageInfoVoList().size()!=0){
+                    registrationBureauVo= getRevokeBizInfo(sjSjsq.getImmovableCurrentMortgageInfoVoList(),registrationBureau);
+                }
+        }
+//        if (null != sjSjsq.getImmovableCurrentMortgageInfoVoList() || sjSjsq.getImmovableCurrentMortgageInfoVoList().size()!=0){
+//            registrationBureauVo= getImmovableCurrentMortgageInfo(sjSjsq.getImmovableCurrentMortgageInfoVoList(),registrationBureau);
+//        }
+        //整理json数据
+        jsonObject= net.sf.json.JSONObject.fromObject(registrationBureauVo);
+        System.out.println("aa"+jsonObject.toString());
+        //发送到登记局
+        String json = httpClientUtils.getJsonData(jsonObject,"http://" + ip + ":" + seam + "/api/services/app/BdcWorkFlow/CreateFlow");
+        //转成json判断是否成功
+        JSONObject resultObject= (JSONObject) JSONObject.parse(json);
+        String message=resultObject.getString("message");
+        boolean success= (boolean) resultObject.get("success");
+        if (success==false){
+            log.error("登记局受理失败,原因:"+message);
+            return null;
+        }
+        System.out.println("json数据:"+json);
+       //整理受理编号
+        SJ_Sjsq sjsq=new SJ_Sjsq();
+        sjsq.setReceiptNumber(sjSjsq.getReceiptNumber());
+        sjsq.setRegisterNumber(resultObject.getString("slbh"));
+        Map<String,SJ_Sjsq> map=new LinkedHashMap<>();
+        map.put("sjsq", sjsq);
+        //登记局登录
+        System.out.println("jsonobject:"+JSON.toJSONString(map));
+        String token= getToken("test","admin");
+        //返回数据到一窗受理平台保存受理编号和登记编号
+        String resultJson=preservationRegistryData(JSON.toJSONString(map),token);
+//        ObjectRestResponse<Object> objectObjectRestResponse=
+        return null;
+    }
+
+    private String preservationRegistryData(String sjsq,String token){
+        Map<String,String> map=new HashMap<>();
+        map.put("sjsq",sjsq);
+
+        Map<String,String> header = new HashMap<String,String>();
+        header.put("Authorization",token);
+        String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
+                "application/json",
+                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter1",
+                        map,header);
+        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
+        return json;
+    }
+
+
+    private String getToken(String username,String password){
+        Map<String,String> map=new HashMap<>();
+        map.put("username",username);
+        map.put("password",password);
+        Map<String,String> header = new HashMap<String,String>();
+        String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
+                "application/json",
+                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/jwt/token", map,header);
+        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
+        Integer status=jsonObject.getInteger("status");
+        if (status!=200){
+            log.error("用户名或密码错误,找不到对应用户");
+            return null;
+        }
+        String data=jsonObject.getString("data");
+        return data;
+    }
+
+
+    private  RegistrationBureau getImmovableRightInfo(List<SJ_Info_Bdcqlxgxx> sjInfoBdcqlxgxxList, RegistrationBureau registrationBureau){
+//        //不动产权利信息集合
+//        for (SJ_Info_Bdcqlxgxx info:sjInfoBdcqlxgxxList) {
+//            TransferBizInfo transferBizInfo=new TransferBizInfo();
+//            transferBizInfo.setRealEstateId(info.getImmovableCertificateNo());//不动产权证号
+//            transferBizInfo.setLandCertificate(info.getLandCertificateNo());
+//        }
+        return null;
+    }
+    //返回抵押注销数据
+    private RegistrationBureau getRevokeBizInfo(List<Sj_Info_Bdcdyxgxx> sj_info_bdcdyxgxxes,RegistrationBureau registrationBureau){
+        for (Sj_Info_Bdcdyxgxx info:sj_info_bdcdyxgxxes) {
+            RevokeBizInfo revokeBizInfo=new RevokeBizInfo();
+            revokeBizInfo.setRevokeApplyDate(info.getRegistrationDate());//业务登记时间
+            revokeBizInfo.setWarrantId(info.getMortgageCertificateNo());
+            revokeBizInfo.setRevokeReason("抵押注销");
+            registrationBureau.setRevokeBizInfo(revokeBizInfo);
+        }
+        return registrationBureau;
+    }
+
+
+
+    private  RegistrationBureau getImmovableCurrentMortgageInfo(List<Sj_Info_Bdcdyxgxx> sj_info_bdcdyxgxxes,RegistrationBureau registrationBureau){
+        for (Sj_Info_Bdcdyxgxx info:sj_info_bdcdyxgxxes) {
+            MortgageBizInfo mortgageBizInfo=new MortgageBizInfo();
+            mortgageBizInfo.setMortgageApplyDate(info.getRegistrationDate());//登记日期
+            mortgageBizInfo.setMortgageWay(info.getMortgageMode());//抵押方式
+            mortgageBizInfo.setCreditAmount(info.getCreditAmount());//
+            mortgageBizInfo.setEvaluationValue(info.getValuationValue());
+            mortgageBizInfo.setMortgageTerm(info.getMortgagePeriod());
+            mortgageBizInfo.setMortgageStartDate(info.getMortgageStartingDate());
+            mortgageBizInfo.setMortgageEndDate(info.getMortgageEndingDate());
+            mortgageBizInfo.setMortgageReason(info.getMortgageReason());
+            if (registrationBureau.getBizType().equals(grMortgageCancellation)){
+                RevokeBizInfo revokeBizInfo=new RevokeBizInfo();
+                revokeBizInfo.setRevokeApplyDate(mortgageBizInfo.getMortgageApplyDate());//业务登记时间
+                revokeBizInfo.setWarrantId(info.getMortgageCertificateNo());
+                registrationBureau.setRevokeBizInfo(revokeBizInfo);
+            }
+            if (info.getGlImmovableVoList() != null && info.getGlImmovableVoList().size() != 0) {
+                //调用不动产
+                getRealEstateUnitInfo(info.getGlImmovableVoList());
+            }
+            //抵押权人信息
+            if (info.getGlMortgageHolderVoList() != null && info.getGlMortgageHolderVoList().size() != 0){
+                //调用抵押权人
+                mortgageBizInfo.setMortgageeInfoVoList(getDyqrGlMortgator(info.getGlMortgageHolderVoList()));
+            }
+            if (info.getGlMortgagorVoList() != null && info.getGlMortgagorVoList().size() != 0){
+                //调用抵押人
+                mortgageBizInfo.setMortgagorInfoVoList(getDyrGlMortgator(info.getGlMortgagorVoList()));
+            }
+            registrationBureau.setMortgageBizInfo(mortgageBizInfo);
+        }
+        return registrationBureau;
+    }
+
+
+    //抵押权人
+    public List getDyqrGlMortgator(List<SJ_Qlr_Gl> sjQlrGlList){
+        List<DyqrGlMortgator> dyqrGlMortgators=new ArrayList<>();
+        for (SJ_Qlr_Gl holder:sjQlrGlList) {
+            DyqrGlMortgator dyqrGlMortgator=new DyqrGlMortgator();
+            dyqrGlMortgator.setMortgageeId(holder.getRelatedPerson().getObligeeDocumentNumber());
+            dyqrGlMortgator.setMortgageeIdType(getZjlb(holder.getRelatedPerson().getObligeeDocumentType()));
+            dyqrGlMortgator.setMortgageeName(holder.getObligeeName());
+            dyqrGlMortgators.add(dyqrGlMortgator);
+        }
+        return  dyqrGlMortgators;
+    }
+
+    //不动产单元信息列表
+    public List<RealEstateUnitInfo> getRealEstateUnitInfo(List<SJ_Bdc_Gl> sjQlrGlList){
+        List<RealEstateUnitInfo> realEstateUnitInfoList=new ArrayList<>();
+        for (SJ_Bdc_Gl sjQlrGl:sjQlrGlList) {
+            RealEstateUnitInfo realEstateUnitInfo=new RealEstateUnitInfo();
+            realEstateUnitInfo.setRealEstateUnitId(sjQlrGl.getFwInfo().getImmovableUnitNumber());//不动产单元号
+            realEstateUnitInfo.setHouseholdId(sjQlrGl.getFwInfo().getHouseNumber());//户编号
+            realEstateUnitInfoList.add(realEstateUnitInfo);
+        }
+        return  realEstateUnitInfoList;
+    }
+
+    //抵押人
+    public List<DyrGlMortgator> getDyrGlMortgator(List<SJ_Qlr_Gl> sjQlrGlList){
+        List<DyrGlMortgator> dyqrGlMortgators=new ArrayList<>();
+        for (SJ_Qlr_Gl sjQlrGl:sjQlrGlList) {
+            DyrGlMortgator dyrGlMortgator=new DyrGlMortgator();
+            dyrGlMortgator.setMortgagorId(sjQlrGl.getRelatedPerson().getObligeeDocumentNumber());
+            dyrGlMortgator.setMortgagorIdType(getZjlb(sjQlrGl.getRelatedPerson().getObligeeDocumentType()));
+            dyrGlMortgator.setMortgagorName(sjQlrGl.getObligeeName());
+            dyqrGlMortgators.add(dyrGlMortgator);
+        }
+        return  dyqrGlMortgators;
+    }
+
+
+    /**
+     * 不动产权属信息查询(不动产单元号,不动产证号)
+     * @param parametricData
+     * @return
+     * @throws IOException
+     */
+    public ObjectRestResponse getRealPropertyCertificate(ParametricData parametricData) throws IOException {
+        String json = "";
+        if (StringUtils.isNotEmpty(parametricData.getBdcdyh())) {
+            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH", "BDCDYH=" + parametricData.getBdcdyh());
+        }
+        if (StringUtils.isNotEmpty(parametricData.getBudzh())) {
+            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH", "BDCZH=" + parametricData.getBudzh());
+        }
+        ObjectRestResponse resultRV = new ObjectRestResponse();
+        JSONObject jsonObject = (JSONObject) JSONObject.parse(json);
+        RealPropertyCertificate realPropertyCertificate = new RealPropertyCertificate();
+        realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("realEstateId"));
+        JSONArray glImmovablejsonArray = (JSONArray) jsonObject.get("realEstateUnitInfoVoList");//房屋信息
+        if (null != glImmovablejsonArray ) {
+            for (int i = 0; i < glImmovablejsonArray.size(); i++) {
+                //房屋信息
+                JSONObject glImmovableObject = glImmovablejsonArray.getJSONObject(i);
+                GlImmovable glImmovable = new GlImmovable();
+                glImmovable.setImmovableType("房地");
+                glImmovable.setImmovableId(glImmovableObject.getString("householdId"));
+                FwInfo fwInfo = getFwInfo(glImmovableObject, jsonObject, "无");
+                realPropertyCertificate.setArchitecturalArea(fwInfo.getArchitecturalArea());//建筑面积
+                realPropertyCertificate.setHouseArchitecturalArea(fwInfo.getHouseArchitecturalArea());//套内
+                realPropertyCertificate.setApportionmentArchitecturalArea(fwInfo.getApportionmentArchitecturalArea());//分摊建筑面积
+                realPropertyCertificate.setHouseObtainingWays(glImmovableObject.getString("acquireWay"));//房屋取得方式
+                realPropertyCertificate.setHouseObtainingPrice(glImmovableObject.getString("acquirePrice"));//房屋获取价格
+                realPropertyCertificate.setHousePlanningPurpose(glImmovableObject.getString("plannedUsage"));//房屋规划用途
+                realPropertyCertificate.setHouseType(glImmovableObject.getString("houseType"));//房屋类型
+                realPropertyCertificate.setHouseRightType(glImmovableObject.getString("houseRightType"));//房屋权利类型
+                realPropertyCertificate.setHouseRightNature(glImmovableObject.getString("houseRightNature"));//房屋性质
+                realPropertyCertificate.setLandRightNature(glImmovableObject.getString("landRightNature"));//土地权利性质
+                realPropertyCertificate.setLandUseRightStartingDate(glImmovableObject.getString("landRightStartDate"));//土地起始日期
+                realPropertyCertificate.setLandUseRightEndingDate(glImmovableObject.getString("landRightEndDate"));//土地终止日期
+                realPropertyCertificate.setLandUseRightOwner(glImmovableObject.getString("landRightUser"));//土地使用权人
+                realPropertyCertificate.setLandUseTimeLimit(glImmovableObject.getString("landRightTerm"));//土地使用期限
+                realPropertyCertificate.setLandPurpose(glImmovableObject.getString("landUsage"));//土地用途
+                realPropertyCertificate.setCommonLandArea(glImmovableObject.getString("commonLandArea"));//共有土地面积
+                realPropertyCertificate.setShareLandArea(glImmovableObject.getString("sharedLandArea"));//分摊土地面积
+                realPropertyCertificate.setSingleLandArea(glImmovableObject.getString("singleLandArea"));//独用土地面积
+                realPropertyCertificate.setCertificateType("不动产权证");//类型
+                glImmovable.setFwInfo(fwInfo);
+                realPropertyCertificate.getGlImmovableList().add(glImmovable);
+            }
+        }
+                     //宗地信息
+                   JSONArray zdInfojsonArray = (JSONArray) jsonObject.get("landUnitInfoVoList");
+                   if (null != zdInfojsonArray) {
+                       for (int i = 0; i < zdInfojsonArray.size(); i++) {
+                           JSONObject zdObject = zdInfojsonArray.getJSONObject(i);
+                           realPropertyCertificate.setCertificateType("房产土地证");
+                           GlImmovable glImmovable = getZdInfo(zdObject, jsonObject);
+                           realPropertyCertificate.getGlImmovableList().add(glImmovable);
+                       }
+                   }
+                //权利人信息
+                JSONArray obligeeInfoArray = (JSONArray) jsonObject.get("obligeeInfoVoList");
+                if (null !=obligeeInfoArray) {
+                    for (int j = 0; j < obligeeInfoArray.size(); j++) {
+                        JSONObject glMortgagorObject = obligeeInfoArray.getJSONObject(j);
+                        GlMortgagor glMortgagor = getGlMortgageQlr(glMortgagorObject);
+                        realPropertyCertificate.getGlObjligeeVoList().add(glMortgagor);
+                    }
+        }
+        return  resultRV.data(realPropertyCertificate);
+    }
+
+
+    /**
+     * 抵押证明号获取
+     * @param dyzmh
+     * @return
+     * @throws IOException
+     */
+    public ObjectRestResponse getRealEstateMortgage(String dyzmh) throws IOException {
+        ObjectRestResponse resultRV = new ObjectRestResponse();
+        String json = httpClientUtils.sendGet("http://"+ip+":"+seam+"/api/services/app/BdcQuery/GetBdcInfoByDYZMH","DYZMH="+dyzmh);
+        JSONObject jsonObject= (JSONObject) JSONObject.parse(json);
+        JSONArray mortgageInfojsonArray= (JSONArray) jsonObject.get("mortgageInfoVoList");
+        MortgageService mortgageService=new MortgageService();
+        for (int i = 0; i < mortgageInfojsonArray.size(); i++) {
+            //抵押信息
+            JSONObject mortgageInfo = mortgageInfojsonArray.getJSONObject(i);
+            mortgageService.setAcceptanceNumber(mortgageInfo.getString("dySLBH"));
+            mortgageService.setMortgageMode(mortgageInfo.getString("mortgageType"));//抵押类型
+            mortgageService.setMortgageCertificateNo(mortgageInfo.getString("warrantId"));//抵押证明号
+            mortgageService.setCreditAmount(mortgageInfo.getDouble("creditAmount"));//债权数额
+            mortgageService.setMortgageArea(mortgageInfo.getDouble("mortgageArea"));//抵押面积
+            mortgageService.setMortgageStartingDate(mortgageInfo.getDate("mortgageStartDate"));//权利开始时间
+            mortgageService.setMortgageEndingDate(mortgageInfo.getDate("mortgageEndDate"));//权利结束时间
+            mortgageService.setRemarks(mortgageInfo.getString("mortgageReason"));//抵押原因
+            mortgageService.setValuationValue(mortgageInfo.getDouble("evaluationValue"));//评估价值
+            mortgageService.setDataComeFromMode("接口获取");
+            //抵押权力人
+            JSONArray GlMortgagorjsonArray= (JSONArray) mortgageInfo.get("mortgagorInfoVoList");//
+            for (int j = 0; j < GlMortgagorjsonArray.size(); j++) {
+                JSONObject glMortgagorObject = GlMortgagorjsonArray.getJSONObject(j);
+                GlMortgagor glMortgagor=getGlMortgage(glMortgagorObject,obligeeDyqr);
+                mortgageService.getGlMortgagorVoList().add(glMortgagor);
+            }
+            //抵押人
+            JSONArray GlMortgageHolderjsonArray= (JSONArray) mortgageInfo.get("mortgageeInfoVoList");
+            for (int z = 0; z < GlMortgageHolderjsonArray.size(); z++) {
+                JSONObject glMortgageHolderObject = GlMortgageHolderjsonArray.getJSONObject(z);
+                GlMortgageHolder glMortgageHolder= getGlMortgageHolder(glMortgageHolderObject,obligeeDyr);
+                mortgageService.getGlMortgageHolderVoList().add(glMortgageHolder);
+            }
+        }
+        JSONArray GlImmovablejsonArray= (JSONArray) jsonObject.get("realEstateUnitInfoVoList");
+        if (null != GlImmovablejsonArray ) {
+            for (int i = 0; i < GlImmovablejsonArray.size(); i++) {
+                //房屋信息
+                JSONObject glImmovableObject = GlImmovablejsonArray.getJSONObject(i);
+                GlImmovable glImmovable = new GlImmovable();
+                glImmovable.setImmovableType("房地");
+                FwInfo fwInfo = getFwInfo(glImmovableObject, jsonObject, "是");
+                glImmovable.setFwInfo(fwInfo);
+                mortgageService.getGlImmovableVoList().add(glImmovable);
+            }
+        }
+        //宗地信息
+        JSONArray zdInfojsonArray = (JSONArray) jsonObject.get("landUnitInfoVoList");
+        if (null !=  zdInfojsonArray) {
+            for (int i = 0; i < zdInfojsonArray.size(); i++) {
+                JSONObject zdObject = zdInfojsonArray.getJSONObject(i);
+                GlImmovable glImmovable=getZdInfo(zdObject,jsonObject);
+                mortgageService.getGlImmovableVoList().add(glImmovable);
+            }
+        }
+        return resultRV.data(mortgageService);
+    }
+
+
+    public   String getZjlb(String zjlx){
+        String zjlb = "";
+        switch (zjlx) {
+            case "1":
+                zjlb = "身份证";
+                break;
+            case "7":
+                zjlb = "社会信用统一代码";
+                break;
+            default:
+                zjlb = "其它证件";
+                break;
+        }
+        return zjlb;
+    }
+
+
+    private FwInfo getFwInfo(JSONObject glImmovableObject,JSONObject jsonObject,String dyqk){
+        FwInfo fwInfo=new FwInfo();
+        fwInfo.setHouseholdId(glImmovableObject.getString("householdId"));
+        fwInfo.setHouseLocation(glImmovableObject.getString("sit"));//坐落
+        fwInfo.setHouseholdMark(glImmovableObject.getString("accountId"));//户号
+        fwInfo.setRemarks(glImmovableObject.getString("roomId"));//房间号
+        fwInfo.setUnitMark(glImmovableObject.getString("unitId"));//单元号
+        fwInfo.setProjectName(glImmovableObject.getString("projectName"));//项目名称
+        fwInfo.setArchitecturalArea(glImmovableObject.getString("architectureAera"));//建筑面积
+        fwInfo.setImmovableUnitNumber(glImmovableObject.getString("realEstateUnitId"));//不动产单元号
+        fwInfo.setSeatNumber(glImmovableObject.getString("buildingId"));//幢编号
+        fwInfo.setHouseArchitecturalArea(glImmovableObject.getString("innerArchitectureAera"));//套内
+        fwInfo.setApportionmentArchitecturalArea(glImmovableObject.getString("sharedArchitectureAera"));//分摊
+        fwInfo.setMortgageSituation(dyqk);//不动产抵押情况
+        JSONArray attachmentInfoVoList=jsonObject.getJSONArray("attachmentInfoVoList");
+        if (attachmentInfoVoList==null || attachmentInfoVoList.size()==0){
+            fwInfo.setClosureSituation("无");
+        }else {
+            fwInfo.setClosureSituation("是");
+        }
+        JSONArray dissentInfoVoList=jsonObject.getJSONArray("dissentInfoVoList");
+        if (dissentInfoVoList==null || dissentInfoVoList.size()==0){
+            fwInfo.setObjectionSituation("无");
+        }else {
+            fwInfo.setObjectionSituation("是");
+        }
+        return  fwInfo;
+    }
+
+    private GlImmovable getZdInfo(JSONObject zdObject,JSONObject jsonObject){
+        GlImmovable glImmovable = new GlImmovable();
+        glImmovable.setImmovableType("净地");
+        glImmovable.setImmovableId(zdObject.getString("landId"));
+        ZdInfo zdInfo = new ZdInfo();
+        zdInfo.setParcelType(zdObject.getString("landType"));//宗地类型
+        zdInfo.setParcelUnicode(zdObject.getString("landUnicode"));//宗地统一编码
+        zdInfo.setImmovableUnitNumber(zdObject.getString("realEstateUnitId"));//不动产单元号
+        zdInfo.setCadastralNumber(zdObject.getString("cadastralNumber"));//地籍号
+        zdInfo.setParcelLocation(zdObject.getString("landSit"));//土地坐落
+        zdInfo.setLandUse(zdObject.getString("landUsage"));//土地用途
+        zdInfo.setPrivateLandArea(zdObject.getBigDecimal("singleLandArea"));//独用土地面积
+        zdInfo.setApportionmentLandArea(zdObject.getBigDecimal("sharedLandArea"));//分摊土地面积
+        JSONArray attachmentInfoVoList = jsonObject.getJSONArray("attachmentInfoVoList");//查封的不动产单元号
+        if (attachmentInfoVoList == null || attachmentInfoVoList.size() == 0) {
+            zdInfo.setClosureSituation("无");
+        } else {
+            zdInfo.setClosureSituation("是");
+        }
+        JSONArray dissentInfoVoList = jsonObject.getJSONArray("dissentInfoVoList");//存在异议的不动产单元号
+        if (dissentInfoVoList == null || dissentInfoVoList.size() == 0) {
+            zdInfo.setObjectionSituation("无");
+        } else {
+            zdInfo.setObjectionSituation("是");
+        }
+        glImmovable.setZdInfo(zdInfo);
+        return  glImmovable;
+    }
+
+
+
+
+    private GlMortgagor getGlMortgage(JSONObject glMortgageHolderObject,String obligeeType){
+        GlMortgagor glMortgagor=new GlMortgagor();
+        glMortgagor.setObligeeName(glMortgageHolderObject.getString("mortgagorName"));
+        glMortgagor.setObligeeType(obligeeType);
+        RelatedPerson relatedPerson=new RelatedPerson();
+        System.out.print(glMortgageHolderObject.getString("mortgagorIdType"));
+        relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("mortgagorIdType")));
+        relatedPerson.setObligeeName(glMortgageHolderObject.getString("mortgagorName"));
+        relatedPerson.setObligeeDocumentNumber(glMortgageHolderObject.getString("mortgagorId"));
+        glMortgagor.setRelatedPerson(relatedPerson);
+        return glMortgagor;
+    }
+
+    private GlMortgagor getGlMortgageQlr(JSONObject glMortgageHolderObject){
+        GlMortgagor glMortgagor=new GlMortgagor();
+        glMortgagor.setObligeeName(glMortgageHolderObject.getString("obligeeName"));
+        glMortgagor.setObligeeType(obligeeQlr);
+        RelatedPerson relatedPerson=new RelatedPerson();
+        System.out.print(glMortgageHolderObject.getString("obligeeIdType"));
+        relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("obligeeIdType")));
+        relatedPerson.setObligeeName(glMortgageHolderObject.getString("obligeeName"));
+        relatedPerson.setObligeeDocumentNumber(glMortgageHolderObject.getString("obligeeId"));
+        glMortgagor.setRelatedPerson(relatedPerson);
+        return glMortgagor;
+    }
+
+
+
+    private GlMortgageHolder getGlMortgageHolder(JSONObject glMortgageHolderObject,String obligeeType){
+        GlMortgageHolder glMortgageHolder=new GlMortgageHolder();
+        glMortgageHolder.setObligeeName(glMortgageHolderObject.getString("mortgageeName"));
+        glMortgageHolder.setObligeeType(obligeeType);
+        RelatedPerson relatedPerson=new RelatedPerson();
+        System.out.print(glMortgageHolderObject.getString("mortgageeIdType"));
+        relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("mortgageeIdType")));
+        relatedPerson.setObligeeName(glMortgageHolderObject.getString("mortgageeName"));
+        relatedPerson.setObligeeDocumentNumber(glMortgageHolderObject.getString("mortgageeId"));
+        glMortgageHolder.setRelatedPerson(relatedPerson);
+        return glMortgageHolder;
+    }
+
+
+
+}

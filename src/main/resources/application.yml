@@ -1,0 +1,156 @@
+
+server:
+  port: 7777
+  max-http-header-size: 4048576
+spring:
+  redis:
+    password: 123456
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  application:
+    name: ace-jszw
+  main:
+    allow-bean-definition-overriding: true
+  thymeleaf:
+    enabled: true
+    encoding: UTF-8
+    mode: HTML5
+    prefix: classpath:templates/
+    suffix: .html
+  datasource:
+    druid:
+      stat-view-servlet:
+        login-username: test
+        login-password: test
+
+    dynamic:
+      druid:
+        filters: stat
+        maxActive: 20
+        initialSize: 1
+        maxWait: 60000
+        minIdle: 1
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: select 'x' from dual
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxOpenPreparedStatements: 20
+      datasource:
+        admin:
+          url: jdbc:mysql://172.18.0.147:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          username: consignee
+          password: ztgeo
+          driver-class-name: com.mysql.jdbc.Driver
+          druid: #这里可以重写默认值
+            initial-size: 6
+        auth:
+          url: jdbc:mysql://172.18.0.147:3306/ag-auth?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          username: consignee
+          password: ztgeo
+          driver-class-name: com.mysql.jdbc.Driver
+          druid:
+            initial-size: 6
+      primary: admin
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: non_null
+
+jwt:  #jwt生成相关秘钥
+  token-header: Authorization
+  expire: 3600
+  rsa-secret: xx1WET12^%3^(WE45
+  user-service: ace-admin
+
+url:
+  ignore: /jwt/**,/webjars/**,/swagger-ui.html,/swagger-resources/**,/api/customDict/**,/api/test/**,/cache/**,/cache.**,/activity/**,/activity/modeler.html,/service/model/**,/service/editor/**,/api/sysManager/**,/api/biz/**  # 暂时将swagger解开限制
+
+auth:
+  serviceId: ace-auth
+  user:
+    token-header: Authorization
+    limit-expire: 1440 # 一天过去,单位分钟
+
+redis:
+  aec-key: xx288&^^%$!@#4dc  #用于redis key的加解密操作 防止共秘钥被破解
+  aec-iv: 0123456789abcdef
+  pool:
+    maxActive: 300
+    maxIdle: 100
+    maxWait: 1000
+  host: 127.0.0.1
+  port: 6379
+#  password: ztgeoredis
+  timeout: 2000
+  sysName: ace-pubserver
+  enable: true
+  database: 0
+# 配置数据库
+mybatis:
+  mapper-locations: "classpath*:mapper/*.xml"
+  configuration:
+    map-underscore-to-camel-case: true
+# 配置swagger
+swagger:
+  enabled: true
+  base-package: com.ztgeo.general
+  title: wh-ztgeo-rec-project
+  version: 1.0.0.SNAPSHOT
+  description: 中天基础框架
+  contact:
+    name: wei
+
+#jasypt:
+#  encryptor:
+#    password: BdaObXaELAA
+immovable:
+  type: 房地
+glHouseSeller:
+  obligeeType: 售房者
+glHouseBuyer:
+  obligeeType: 购房者
+  obligeeDyqr: 抵押权人
+  obligeeDyr: 抵押人
+  obligeeQlr: 权利人
+httpclient:
+  seam: 23335
+  ip: 172.18.0.147
+  windowAcceptanceIp: 10.3.2.203
+  windowAcceptanceSeam: 7779
+businessType:
+  clfFmortgage: MORTGAGE_NEW_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
+  xjfFmortgage: MORTGAGE_OLD_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）
+  grMortgageRegistration: MORTGAGE_PERSONAL #抵押登记(个人)
+  grMortgageCancellation: DYZX  #（抵押注销(个人)）
+  registrationOfTransfer: ZYDJ  #（转移登记）
+  forewarningMortgage: YGDY     #（预告抵押）
+  transferAndMortgage: ZY_DY         #（转移及抵押，（组合业务，转移+抵押））；
+  vormerkung: YGDJ         #预告登记
+
+
+
+webplus:
+  ftpAddress: 10.3.2.203
+  ftpPort: 21
+  ftpUsername: forftp
+  ftpPassword: 123456
+
+logging:
+  level:
+    com.ztgeo.general: debug
+
+# 跨服务数据合并 用于允许 字段的获取方式
+merge:
+  enabled: true
+  guavaCacheNumMaxSize: 1000
+  guavaCacheRefreshWriteTime: 10 # min
+  guavaCacheRefreshThreadPoolSize: 10
+  aop:
+    enabled: true
+
+mapper:
+  mappers: com.github.wxiaoqi.security.common.mapper.CommonMapper
+
