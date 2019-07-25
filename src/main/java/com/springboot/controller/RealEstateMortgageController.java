@@ -1,7 +1,9 @@
 package com.springboot.controller;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.component.RealEstateMortgageComponent;
+import com.springboot.popj.GetReceiving;
 import com.springboot.popj.warrant.ParametricData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +14,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.ParseException;
 
 @Slf4j
@@ -28,15 +31,19 @@ public class RealEstateMortgageController {
     private String obligeeQlr;
     @Autowired
     private RealEstateMortgageComponent realEstateMortgageComponent;
+    @Autowired
+    private AnonymousInnerComponent anonymousInner;
+
+
 
 
 
 
     @RequestMapping(value = "/getRealEstateMortgage", method = RequestMethod.POST)
     @ApiOperation("不动产抵押信息")
-    public ObjectRestResponse getRealEstateMortgage(@RequestParam("dyzmh") String dyzmh) throws IOException {
+    public ObjectRestResponse getRealEstateMortgage(@RequestParam("dyzmh") String dyzmh,@RequestParam(value = "qlrmc",required = false) String qlrmc) throws IOException {
         System.out.println(dyzmh);
-        return  realEstateMortgageComponent.getRealEstateMortgage(dyzmh);
+        return  realEstateMortgageComponent.getRealEstateMortgage(dyzmh,qlrmc);
     }
 
     @RequestMapping(value = "/getRealPropertyCertificate", method = RequestMethod.POST)
@@ -50,6 +57,12 @@ public class RealEstateMortgageController {
     @ApiOperation("发送数据到登记局进行审批操作返回受理编号")
     public ObjectRestResponse sendRegistrationMortgageRevocation(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws ParseException {
         return  realEstateMortgageComponent.sendRegistrationMortgageRevocation(commonInterfaceAttributer);
+    }
+
+    @RequestMapping(value = "/getReceiving",method =RequestMethod.POST)
+    @ApiOperation(value = "登记局返回成功数据")
+    public void getReceiving(@RequestBody GetReceiving getReceiving, OutputStream resp) throws  IOException{
+         anonymousInner.GetReceiving(getReceiving,resp);
     }
 
 

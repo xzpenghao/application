@@ -6,7 +6,15 @@ package com.springboot.popj.warrant;
 public class ParametricData {
     private String bdcdyh;//不动产单元号
     private String budzh;//不动产证号
-    private String dyzmh;//抵押证明号
+    private String obligeeName;//权利人姓名
+
+    public String getObligeeName() {
+        return obligeeName;
+    }
+
+    public void setObligeeName(String obligeeName) {
+        this.obligeeName = obligeeName;
+    }
 
     public String getBdcdyh() {
         return bdcdyh;
@@ -24,11 +32,4 @@ public class ParametricData {
         this.budzh = budzh;
     }
 
-    public String getDyzmh() {
-        return dyzmh;
-    }
-
-    public void setDyzmh(String dyzmh) {
-        this.dyzmh = dyzmh;
-    }
 }

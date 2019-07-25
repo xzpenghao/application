@@ -46,13 +46,13 @@ spring:
           driver-class-name: com.mysql.jdbc.Driver
           druid: #这里可以重写默认值
             initial-size: 6
-        auth:
-          url: jdbc:mysql://172.18.0.147:3306/ag-auth?useUnicode=true&characterEncoding=UTF8&useSSL=true
-          username: consignee
-          password: ztgeo
-          driver-class-name: com.mysql.jdbc.Driver
-          druid:
-            initial-size: 6
+#        auth:
+#          url: jdbc:mysql://172.18.0.147:3306/ag-auth?useUnicode=true&characterEncoding=UTF8&useSSL=true
+#          username: consignee
+#          password: ztgeo
+#          driver-class-name: com.mysql.jdbc.Driver
+#          druid:
+#            initial-size: 6
       primary: admin
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -141,6 +141,11 @@ webplus:
 logging:
   level:
     com.ztgeo.general: debug
+
+service:
+  bdcbljgtjfw: ImmovableHandleResultService  #不动产办理结果提交服务
+  bdcdbjghqfw: ImmovableBookingResultService #不动产登簿结果获取服务
+  dydzzmzxfw: MortgageElectronicCertCancellation #抵押电子证明注销服务
 
 # 跨服务数据合并 用于允许 字段的获取方式
 merge:
