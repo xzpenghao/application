@@ -1,7 +1,9 @@
 package com.springboot.component;
 
+import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.Msgagger;
 import com.springboot.popj.GetReceiving;
+import com.springboot.popj.MortgageService;
 import com.springboot.popj.ReturnVo;
 import com.springboot.popj.pub_data.RespServiceData;
 import com.springboot.popj.pub_data.SJ_Info_Handle_Result;
@@ -54,13 +56,17 @@ public class AnonymousInnerComponent {
 
         ExecutorService executor = Executors.newCachedThreadPool();
         ReturnVo returnVo = new ReturnVo();
+        Map<String, String> mapParmeter = new HashMap<>();
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception { //建议抛出异常
-                Map<String, String> mapParmeter = new HashMap<>();
                 try {
-                    if (getReceiving.getMessageType().equals(Msgagger.VERIFYNOTICE)){
+                    System.out.println("执行主线程");
+                    String token = realEstateMortgageComponent.getToken("tsdjj", "123456");//获得token
+                    if (getReceiving.getMessageType().equals(Msgagger.VERIFYNOTICE)){//审核
+                        System.out.println("进入审核");
                         //发送登记局获取数据整理发送一窗受理
-                        String json = httpClientUtils.getJsonData(JSONObject.fromObject(getReceiving.getSlbh()),"http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetVerifyInfo");
+                        String json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetVerifyInfo","slbh="+getReceiving.getSlbh());
+                        System.out.println(json);
                         JSONObject jsonObject=JSONObject.fromObject(json);
                         JSONArray verfyInfoArray=jsonObject.getJSONArray("verifyInfoVoList");
                         List<SJ_Info_Handle_Result> handleResultVoList=new ArrayList<>();
@@ -69,31 +75,54 @@ public class AnonymousInnerComponent {
                             JSONObject verfyInfoObject=verfyInfoArray.getJSONObject(i);
                             SJ_Info_Handle_Result handleResult=new SJ_Info_Handle_Result();
                             handleResult.setHandleText(verfyInfoObject.getString("verifyOpinion"));
-                            handleResult.setHandleResult("某某"+verfyInfoObject.getString("registerSubType")+"审核"+ Msgagger.ADOPT);
-                            handleResult.setProvideUnit("不动产登记局");
+                            handleResult.setHandleResult(verfyInfoObject.getString("registerSubType")+ Msgagger.ADOPT);
+                            handleResult.setProvideUnit(Msgagger.REGISTRATION);
+                            handleResult.setDataComeFromMode(Msgagger.SUCCESSFUL_INTERFACE);
                             handleResultVoList.add(handleResult);
                         }
                         RespServiceData respServiceData=new RespServiceData();
                         respServiceData.setServiceCode(immovableHandleResultService);
                         respServiceData.setServiceDataInfos(handleResultVoList);
                         serviceDatas.add(respServiceData);
-                        mapParmeter.put("serviceDatas",JSONObject.fromObject(serviceDatas).toString());
+                        JSONArray jsonArray=JSONArray.fromObject(serviceDatas);
+                        System.out.println("servicedatas"+jsonArray);
+                        mapParmeter.put("serviceDatas",jsonArray.toString());
                         mapParmeter.put("registerNumber", jsonObject.getString("slbh"));//受理编号)
-                    }else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)){
+                    }else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)){//登簿审核
+                        System.out.println("进入登簿");
                         //发送登记局获取数据整理发送一窗受理
-                        String json = httpClientUtils.getJsonData(JSONObject.fromObject(getReceiving.getSlbh()),"http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo");
+                        String json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo","slbh="+getReceiving.getSlbh());
                         JSONObject jsonObject=JSONObject.fromObject(json);
                         mapParmeter.put("immovableSite",jsonObject.getString("sit"));
                         mapParmeter.put("registerNumber",jsonObject.getString("slbh"));
+                        //登簿返回信息
                         JSONArray ficateInfoArray=jsonObject.getJSONArray("certificateInfoVoList");
+                        List<SJ_Info_Handle_Result> handleResultVoList=new ArrayList<>();
+                        List<RespServiceData> respServiceDataList=new ArrayList<>();
                         for (int i=0;i<ficateInfoArray.size();i++){
+                            RespServiceData respServiceData=new RespServiceData();
                             JSONObject verfyInfoObject=ficateInfoArray.getJSONObject(i);
-
+                            String serviceCode= getRegistrationSubcategory(verfyInfoObject.getString("registerSubType"));//登记小类
+                            respServiceData.setServiceCode(serviceCode);
+                            SJ_Info_Handle_Result handleResult=new SJ_Info_Handle_Result();
+                            handleResult.setHandleResult(verfyInfoObject.getString("registerSubType")+"登簿成功");
+                            handleResult.setHandleText(Msgagger.SUCCESSFUL_REGISTRATION);
+                            handleResult.setProvideUnit(Msgagger.REGISTRATION);
+                            handleResult.setDataComeFromMode(Msgagger.SUCCESSFUL_INTERFACE);
+                            handleResultVoList.add(handleResult);
+                            respServiceData.setServiceDataInfos(handleResultVoList);
+                            RespServiceData RealEstateBookData=new RespServiceData();
+                            RespServiceData getRealEstateBooking=getRealEstateBooking(verfyInfoObject.getString("certificateType"),
+                                    verfyInfoObject.getString("certificateId"),RealEstateBookData);
+                            respServiceDataList.add(respServiceData);//登簿返回信息
+                            respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
                         }
-                    }else {
+//                        respServiceDataList.add(getRealEstateBooking(handleResultVoList,respServiceDataList));
+                        JSONArray jsonArray=JSONArray.fromObject(respServiceDataList);
+                        mapParmeter.put("serviceDatas",jsonArray.toString());
+                    }else if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)){
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
                     }
-                    String token = realEstateMortgageComponent.getToken("tsdjj", "123456");//获得token
                     System.out.println(token);
                     //返回数据到一窗受理平台保存受理编号和登记编号
                     String resultJson = preservationRegistryData(mapParmeter, token);
@@ -106,38 +135,48 @@ public class AnonymousInnerComponent {
         });
         executor.execute(future);
         long t = System.currentTimeMillis();
-        try {
+//        try {
             returnVo.setCode(200);
             returnVo.setMessage("受理成功");
-//                    JSONObject.fromObject(returnVo);
-//                    Thread.sleep(1000);
-            outputStream.write(returnVo.toString().getBytes());
+            JSONObject object=JSONObject.fromObject(returnVo);
+            outputStream.write(object.toString().getBytes());
             outputStream.flush();
+            outputStream.close();
             System.out.println(JSONObject.fromObject(returnVo));
             // 创建数据
-            String result = future.get(); //取得结果，同时设置超时执行时间为5秒。
+//            String result = future.get(); //取得结果，同时设置超时执行时间为5秒。
             System.err.println("result is " + JSONObject.fromObject(returnVo) + ", time is " + (System.currentTimeMillis() - t));
-
-
-//            ps.print(returnVo.toString());
-//            return  returnVo.toString();
-        } catch (InterruptedException e) {
-            future.cancel(true);
-            System.err.println("Interrupte time is " + (System.currentTimeMillis() - t));
-        } catch (ExecutionException e) {
-            future.cancel(true);
-            System.err.println("Throw Exception time is " + (System.currentTimeMillis() - t));
-        } finally {
-            outputStream.close();
             executor.shutdown();
-        }
     }
+
+    /**
+     * 通过类型，证号查询登记局数据
+     * @return
+     */
+    private RespServiceData  getRealEstateBooking(String certificateType,String certificateId,RespServiceData respServiceData)  throws IOException{
+        ObjectRestResponse resultRV = new ObjectRestResponse();
+      switch (certificateType){
+          case  "DYZMH":
+               resultRV=realEstateMortgageComponent.getRealEstateMortgage(certificateId,null,false);
+               List<MortgageService> mortgageServiceList=(List<MortgageService>) resultRV.getData();
+               respServiceData.setServiceCode("MortgageElectronicCertCancellation");
+               respServiceData.setServiceDataInfos(mortgageServiceList);
+              break;
+      }
+      return respServiceData;
+
+
+
+    }
+
+
+
 
     public String getRegistrationSubcategory(String registrationName){
         String serviceCode="";
         //判断模糊小类输出serviceCode
         if (registrationName.equals("抵押权注销登记")){
-            serviceCode="MortgageElectronicCertCancellation";
+            serviceCode=Msgagger.DBSERVICECODE;
         }else if (registrationName.equals("一般抵押权")){
             serviceCode="";
         }else if (registrationName.equals("")){

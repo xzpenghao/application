@@ -69,6 +69,8 @@ public class RealEstateMortgageComponent {
 
 
 
+
+
     /**
      * 发送登记局数据 返回受理编号
      * @param commonInterfaceAttributer
@@ -124,10 +126,15 @@ public class RealEstateMortgageComponent {
         String resultJson=preservationRegistryData(mapParmeter,token);
         JSONObject resultSlObject= (JSONObject) JSONObject.parse(resultJson);
         if (resultSlObject.getString("status").equals("200")){
-            log.error(Msgagger.AUTOINTECECG);
+            resultRV.data("流程提交成功");
+            log.info(Msgagger.AUTOINTECECG);
+        }else {
+            resultRV.setStatus(resultSlObject.getInteger("status"));
+            resultRV.data(resultSlObject.getString("data"));
+            log.error(Msgagger.AUTOINTECEBAD);
         }
-        log.error(Msgagger.AUTOINTECEBAD);
-        return JSONObject.parseObject(resultJson,ObjectRestResponse.class);
+
+        return resultRV;
     }
 
     private String preservationRegistryData(Map<String,String> map,String token){
@@ -352,13 +359,13 @@ public class RealEstateMortgageComponent {
      * @return
      * @throws IOException
      */
-    public ObjectRestResponse getRealEstateMortgage(String dyzmh,String mortgagorName) throws IOException {
+    public ObjectRestResponse getRealEstateMortgage(String dyzmh,String mortgagorName,boolean containHistroy) throws IOException {
         ObjectRestResponse resultRV = new ObjectRestResponse();
         String json="";
         if (StringUtils.isNotEmpty(mortgagorName)) {
-             json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByDYZMH", "DYZMH=" + dyzmh + "&mortgagorName=" + mortgagorName);
+             json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByDYZMH", "DYZMH=" + dyzmh + "&mortgagorName=" + mortgagorName +"&containHistory="+containHistroy);
         }else {
-            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByDYZMH", "DYZMH="+dyzmh);
+            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByDYZMH", "DYZMH="+dyzmh+"&containHistory="+containHistroy);
         }
         JSONArray jsonArray=JSONArray.parseArray(json);
         List<MortgageService> mortgageServiceList=new ArrayList<>();
