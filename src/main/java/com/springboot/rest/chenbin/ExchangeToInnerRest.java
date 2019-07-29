@@ -8,6 +8,8 @@ import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +23,7 @@ public class ExchangeToInnerRest {
     @Autowired
     private ExchangeToInnerService exchangeToInnerService;
 
+    @RequestMapping(value = "YGYD2Inner",method = RequestMethod.POST)
     public ObjectRestResponse<String> YGYD2Inner(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer){
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try{
