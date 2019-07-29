@@ -4,21 +4,19 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.config.Msgagger;
 import com.springboot.popj.*;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.HttpRequestMethedEnum;
-import com.springboot.popj.register.JwtAuthenticationRequest;
-import com.springboot.popj.register.User;
 import com.springboot.popj.registration.*;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.popj.warrant.ZdInfo;
+import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.ParamHttpClientUtil;
 import com.springboot.util.SysPubDataDealUtil;
-import com.sun.org.apache.regexp.internal.RE;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +32,18 @@ import java.util.*;
 public class RealEstateMortgageComponent {
 
     @Autowired
+    private HttpCallComponent httpCallComponent;
+
+    @Autowired
     private HttpClientUtils httpClientUtils;
     @Value("${httpclient.ip}")
     private String ip;
     @Value("${httpclient.seam}")
     private String seam;
+    @Value("${businessType.areaNo}")
+    private String areaNo;
+    @Value("${businessType.dealPerson}")
+    private String dealPerson;
     @Value("${glHouseBuyer.obligeeDyqr}")
     private String obligeeDyqr;
     @Value("${glHouseBuyer.obligeeDyr}")
@@ -70,7 +75,6 @@ public class RealEstateMortgageComponent {
 
 
 
-
     /**
      * 发送登记局数据 返回受理编号
      * @param commonInterfaceAttributer
@@ -78,19 +82,11 @@ public class RealEstateMortgageComponent {
      */
     public ObjectRestResponse sendRegistrationMortgageRevocation(String commonInterfaceAttributer) throws ParseException {
         ObjectRestResponse resultRV = new ObjectRestResponse();
-        net.sf.json.JSONObject jsonObject=null;
+//        net.sf.json.JSONObject jsonObject=null;
         RegistrationBureau   registrationBureauVo=null;
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq= SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer,null,null,null);
-        RegistrationBureau registrationBureau=new RegistrationBureau();
-        registrationBureau.setPid("Proc-190724112944-7G1WKMM6");//测试数据
-        registrationBureau.setSubmitFlow(true);
-        registrationBureau.setBizType(grMortgageCancellation);//#（抵押注销(个人)）
-        registrationBureau.setContactsAdress("北京望京");//测试数据
-        registrationBureau.setOperatorName("admin");//测试后续需要设置
-        registrationBureau.setContacts(sjSjsq.getNotifiedPersonName());
-        registrationBureau.setContactsPhone(sjSjsq.getNotifiedPersonTelephone());
-        registrationBureau.setBusinessAreas("321301");
+        RegistrationBureau registrationBureau= BusinessDealBaseUtil.dealBaseInfo(sjSjsq,"Proc-190724112944-7G1WKMM6",true,grMortgageCancellation,dealPerson,areaNo);
         switch (sjSjsq.getBusinessType()){
             case  "注销登记":
                 registrationBureau.setBizType(grMortgageCancellation);
@@ -102,12 +98,13 @@ public class RealEstateMortgageComponent {
 //            registrationBureauVo= getImmovableCurrentMortgageInfo(sjSjsq.getImmovableCurrentMortgageInfoVoList(),registrationBureau);
 //        }
         //整理json数据
-        jsonObject= net.sf.json.JSONObject.fromObject(registrationBureauVo);
-        System.out.println("aa"+jsonObject.toString());
-        //发送到登记局
-        String json = httpClientUtils.getJsonData(jsonObject,"http://" + ip + ":" + seam + "/api/services/app/BdcWorkFlow/CreateFlow");
-        //转成json判断是否成功
-        JSONObject resultObject= (JSONObject) JSONObject.parse(json);
+//        jsonObject= net.sf.json.JSONObject.fromObject(registrationBureauVo);
+//        System.out.println("aa"+jsonObject.toString());
+//        //发送到登记局
+//        String json = httpClientUtils.getJsonData(jsonObject,"http://" + ip + ":" + seam + "/api/services/app/BdcWorkFlow/CreateFlow");
+//        //转成json判断是否成功
+//        JSONObject resultObject= (JSONObject) JSONObject.parse(json);
+        JSONObject resultObject= httpCallComponent.callRegistrationBureauForRegister(registrationBureauVo);
         String message=resultObject.getString("message");
         boolean success= (boolean) resultObject.get("success");
         if (success==false){
@@ -115,58 +112,49 @@ public class RealEstateMortgageComponent {
             resultRV.setStatus(20500);
             return  resultRV.data(message);
         }
-        System.out.println("json数据:"+json);
+        System.out.println("json数据:"+resultObject.toJSONString());
         Map<String,String> mapParmeter=new HashMap<>();
         mapParmeter.put("receiptNumber",sjSjsq.getReceiptNumber());
         mapParmeter.put("registerNumber",resultObject.getString("slbh"));
         //登记局登录
         System.out.println("jsonobject:"+JSON.toJSONString(mapParmeter));
-        String token= getToken("tsdjj","123456");
+        String token = httpCallComponent.getToken("tsdjj","123456");
         //返回数据到一窗受理平台保存受理编号和登记编号
-        String resultJson=preservationRegistryData(mapParmeter,token);
-        JSONObject resultSlObject= (JSONObject) JSONObject.parse(resultJson);
-        if (resultSlObject.getString("status").equals("200")){
-            resultRV.data("流程提交成功");
-            log.info(Msgagger.AUTOINTECECG);
-        }else {
-            resultRV.setStatus(resultSlObject.getInteger("status"));
-            resultRV.data(resultSlObject.getString("data"));
-            log.error(Msgagger.AUTOINTECEBAD);
-        }
-
+        String resultJson = httpCallComponent.preservationRegistryData(mapParmeter,token);
+        resultRV = httpCallComponent.adaptationPreservationReturn(resultJson);
         return resultRV;
     }
 
-    private String preservationRegistryData(Map<String,String> map,String token){
-        Map<String,String> header = new HashMap<String,String>();
-        header.put("Authorization",token);
-        String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
-                "application/json",
-                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter1",
-                        map,header);
-        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
-        System.out.println("chenbin返回信息为："+jsonObject);
-        return json;
-    }
-
-
-    public String getToken(String username,String password){
-        Map<String,String> map=new HashMap<>();
-        map.put("username",username);
-        map.put("password",password);
-        Map<String,String> header = new HashMap<String,String>();
-        String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
-                "application/json",
-                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/jwt/token", map,header);
-        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
-        Integer status=jsonObject.getInteger("status");
-        if (status!=200){
-            log.error("用户名或密码错误,找不到对应用户");
-            return null;
-        }
-        String data=jsonObject.getString("data");
-        return data;
-    }
+//    private String preservationRegistryData(Map<String,String> map,String token){
+//        Map<String,String> header = new HashMap<String,String>();
+//        header.put("Authorization",token);
+//        String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
+//                "application/json",
+//                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter1",
+//                        map,header);
+//        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
+//        System.out.println("chenbin返回信息为："+jsonObject);
+//        return json;
+//    }
+//
+//
+//    public String getToken(String username,String password){
+//        Map<String,String> map=new HashMap<>();
+//        map.put("username",username);
+//        map.put("password",password);
+//        Map<String,String> header = new HashMap<String,String>();
+//        String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
+//                "application/json",
+//                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/jwt/token", map,header);
+//        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
+//        Integer status=jsonObject.getInteger("status");
+//        if (status!=200){
+//            log.error("用户名或密码错误,找不到对应用户");
+//            return null;
+//        }
+//        String data=jsonObject.getString("data");
+//        return data;
+//    }
 
 
     private  RegistrationBureau getImmovableRightInfo(List<SJ_Info_Bdcqlxgxx> sjInfoBdcqlxgxxList, RegistrationBureau registrationBureau){

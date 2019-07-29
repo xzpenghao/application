@@ -21,62 +21,14 @@ public class SysPubDataDealUtil {
 
     public static SJ_Sjsq parseReceiptData(String receiptData, String serviceCode, String serviceDataTo, String receiptNumber) throws ParseException {
         JSONReceiptData sjsq_JSON_str = JSON.parseObject(receiptData, JSONReceiptData.class);//json转实体类
-         System.out.println(JSONObject.toJSONString(sjsq_JSON_str));
-        String JSON_serviceDatas = sjsq_JSON_str.getServiceDatas();
-        sjsq_JSON_str.setServiceDatas(null);
-        SJ_Sjsq sjsq = copyJSONReceiptDataToSjsq(sjsq_JSON_str);//信息拷贝至收件申请对象中
-       System.out.println("2:"+ JSONObject.toJSONString(sjsq));
-        if(sjsq==null){
-            throw new ZtgeoBizException(BizOrBizExceptionConstant.RECEIPT_INFO_NULL_ERROR);
-        }
-        if(StringUtils.isNotBlank(receiptNumber) && StringUtils.isBlank(sjsq.getReceiptNumber())){//处理收件编号
-            sjsq.setReceiptNumber(receiptNumber);
-        }
-        if(StringUtils.isBlank(sjsq.getReceiptNumber())){//验证收件编号
-            throw new ZtgeoBizException(BizOrBizExceptionConstant.RECEIPT_NUMBER_NULL_ERROR);
-        }
-        if(JSON_serviceDatas!=null&&JSON_serviceDatas.length()>0) {
-            List<JSONServiceData> serviceDatas = JSONArray.parseArray(JSON_serviceDatas, JSONServiceData.class);
-            for (JSONServiceData serviceData : serviceDatas) {
-                String serviceCode_temp = serviceData.getServiceCode();
-                String serviceDataTo_temp = serviceData.getServiceDataTo();
-                if(serviceCode_temp!=null && serviceCode_temp.length()>0){
-                    serviceCode = serviceCode_temp;
-                }
-                if(serviceDataTo_temp!=null && serviceDataTo_temp.length()>0){
-                    serviceDataTo = serviceDataTo_temp;
-                }
-                String JSON_serviceDataInfos = serviceData.getServiceDataInfos();
-                switch (serviceDataTo) {
-                    //使用操作表作为判断条件
-                    case BizOrBizExceptionConstant.IMMOVABLE_RIGHT_RECEIPT_SERVICE:
-                        dealBdcqlxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    case BizOrBizExceptionConstant.IMMOVABLE_MORTGAGE_RECEIPT_SERVICE:
-                        dealBdcdyxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    case BizOrBizExceptionConstant.TRANSACTION_CONTRACT_RECEIPT_SERVICE:
-                        dealJyhtxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    case BizOrBizExceptionConstant.MORTGAGE_CONTRACT_RECEIPT_SERVICE:
-                        dealDyhtxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    case BizOrBizExceptionConstant.TAXATION_RECEIPT_SERVICE:
-                        dealQsxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    case BizOrBizExceptionConstant.HANDLE_RESULT_SERVICE:
-                        dealHandleResults(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    default:
-                        log.error("入库表标识为：" + serviceDataTo + "的表标识常量未定义");
-                        throw new ZtgeoBizException(BizOrBizExceptionConstant.DATA_TABLE_ERROR_MSG);
-                }
-            }
-        }
+        System.out.println(JSONObject.toJSONString(sjsq_JSON_str));
+        SJ_Sjsq sjsq = parseReceiptData(sjsq_JSON_str,serviceCode,serviceDataTo,receiptNumber);
         return sjsq;
     }
 
     public static SJ_Sjsq parseReceiptData(JSONReceiptData sjsq_JSON_str,String serviceCode,String serviceDataTo,String receiptNumber){
+        String sc_temp = serviceCode;
+        String sdt_temp = serviceDataTo;
         String JSON_serviceDatas = sjsq_JSON_str.getServiceDatas();
         sjsq_JSON_str.setServiceDatas(null);
         SJ_Sjsq sjsq = copyJSONReceiptDataToSjsq(sjsq_JSON_str);//信息拷贝至收件申请对象中
@@ -93,6 +45,8 @@ public class SysPubDataDealUtil {
         if(JSON_serviceDatas!=null&&JSON_serviceDatas.length()>0) {
             List<JSONServiceData> serviceDatas = JSONArray.parseArray(JSON_serviceDatas, JSONServiceData.class);
             for (JSONServiceData serviceData : serviceDatas) {
+                serviceCode = sc_temp;
+                serviceDataTo = sdt_temp;
                 String serviceCode_temp = serviceData.getServiceCode();
                 String serviceDataTo_temp = serviceData.getServiceDataTo();
                 if(serviceCode_temp!=null && serviceCode_temp.length()>0){
