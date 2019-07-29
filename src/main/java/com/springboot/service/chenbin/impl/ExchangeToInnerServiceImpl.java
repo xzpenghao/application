@@ -31,6 +31,8 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     @Autowired
     private HttpCallComponent httpCallComponent;
 
+    @Value("chenbin.idType")
+    private String idType;
     @Value("${businessType.areaNo}")
     private String areaNo;
     @Value("${businessType.dealPerson}")
@@ -59,7 +61,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
             throw new ZtgeoBizException("预告预抵业务转内网办件时异常，交易合同信息为空");
         }
         RegistrationBureau registrationBureau= BusinessDealBaseUtil.dealBaseInfo(sjsq,pid,isSubmit,bizType,dealPerson,areaNo);
-        MortgageBizInfo mortgageBizInfo = BusinessDealBaseUtil.getMortgageBizInfoByContract(jyht,dyht);
+        MortgageBizInfo mortgageBizInfo = BusinessDealBaseUtil.getMortgageBizInfoByContract(jyht,dyht,idType);
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
 
         String token = httpCallComponent.getToken(username,password);

@@ -94,6 +94,7 @@ public class HTSoapAnalyzeComponent {
                 glHouseSeller.setObligeeType(obligeeType);
                 glHouseSeller.setObligeeOrder(Integer.parseInt((String) qlrmap.get("XGRSX")));
                 RelatedPerson relatedPerson = new RelatedPerson();
+                relatedPerson.setObligeeName((String) qlrmap.get("XGRMC"));
                 relatedPerson.setObligeeDocumentType(zjlb);
                 relatedPerson.setObligeeDocumentNumber((String)qlrmap.get("ZJHM"));
                 businessContract.getGlHouseSellerVoList().add(glHouseSeller);

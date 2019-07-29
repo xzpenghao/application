@@ -4,7 +4,7 @@ server:
   max-http-header-size: 4048576
 spring:
   redis:
-    password: ztgeoredis
+    password: 123456
   autoconfigure:
     exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   application:
@@ -167,6 +167,7 @@ mapper:
   mappers: com.github.wxiaoqi.security.common.mapper.CommonMapper
 
 chenbin:
+  idType: 身份证,1$社会信用统一代码,8$组织机构代码,6
   registrationBureau:           #登记局
     username: tsdjj             #用户名
     password: 123456            #密码
