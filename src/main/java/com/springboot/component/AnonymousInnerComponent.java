@@ -121,6 +121,7 @@ public class AnonymousInnerComponent {
                         JSONArray jsonArray=JSONArray.fromObject(respServiceDataList);
                         mapParmeter.put("serviceDatas",jsonArray.toString());
                     }else if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)){
+                        System.out.println("执行受理操作");
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
                     }
                     System.out.println(token);
@@ -157,7 +158,7 @@ public class AnonymousInnerComponent {
         ObjectRestResponse resultRV = new ObjectRestResponse();
       switch (certificateType){
           case  "DYZMH":
-               resultRV=realEstateMortgageComponent.getRealEstateMortgage(certificateId,null,false);
+               resultRV=realEstateMortgageComponent.getRealEstateMortgage(certificateId,null,true);
                List<MortgageService> mortgageServiceList=(List<MortgageService>) resultRV.getData();
                respServiceData.setServiceCode("MortgageElectronicCertCancellation");
                respServiceData.setServiceDataInfos(mortgageServiceList);

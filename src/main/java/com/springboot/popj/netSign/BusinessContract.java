@@ -28,9 +28,9 @@ public class BusinessContract {
     private String ext1;                //扩展字段1
     private String ext2;                //扩展字段2
     private String ext3;                //扩展字段3
-    private List<GlImmovable> glImmovableList=new ArrayList<>(); //房屋信息
-    private List<GlHouseSeller> glHouseSellerList=new ArrayList<>(); //权利人信息
-    private List<GlHouseBuyer> glHouseBuyerList=new ArrayList<>();//购房人信息
+    private List<GlImmovable> glImmovableVoList=new ArrayList<>(); //房屋信息
+    private List<GlHouseSeller> glHouseSellerVoList=new ArrayList<>(); //权利人信息
+    private List<GlHouseBuyer> glHouseBuyerVoList=new ArrayList<>();//购房人信息
 
 
     public String getContractId() {
@@ -41,12 +41,12 @@ public class BusinessContract {
         this.contractId = contractId;
     }
 
-    public List<GlHouseBuyer> getGlHouseBuyerList() {
-        return glHouseBuyerList;
+    public List<GlHouseBuyer> getGlHouseBuyerVoList() {
+        return glHouseBuyerVoList;
     }
 
-    public void setGlHouseBuyerList(List<GlHouseBuyer> glHouseBuyerList) {
-        this.glHouseBuyerList = glHouseBuyerList;
+    public void setGlHouseBuyerVoList(List<GlHouseBuyer> glHouseBuyerVoList) {
+        this.glHouseBuyerVoList = glHouseBuyerVoList;
     }
 
     public String getServiceCode() {
@@ -169,19 +169,19 @@ public class BusinessContract {
         this.ext3 = ext3;
     }
 
-    public List<GlImmovable> getGlImmovableList() {
-        return glImmovableList;
+    public List<GlImmovable> getGlImmovableVoList() {
+        return glImmovableVoList;
     }
 
-    public void setGlImmovableList(List<GlImmovable> glImmovableList) {
-        this.glImmovableList = glImmovableList;
+    public void setGlImmovableVoList(List<GlImmovable> glImmovableVoList) {
+        this.glImmovableVoList = glImmovableVoList;
     }
 
-    public List<GlHouseSeller> getGlHouseSellerList() {
-        return glHouseSellerList;
+    public List<GlHouseSeller> getGlHouseSellerVoList() {
+        return glHouseSellerVoList;
     }
 
-    public void setGlHouseSellerList(List<GlHouseSeller> glHouseSellerList) {
-        this.glHouseSellerList = glHouseSellerList;
+    public void setGlHouseSellerVoList(List<GlHouseSeller> glHouseSellerVoList) {
+        this.glHouseSellerVoList = glHouseSellerVoList;
     }
 }

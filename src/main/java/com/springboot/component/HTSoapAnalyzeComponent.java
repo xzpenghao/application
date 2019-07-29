@@ -57,6 +57,7 @@ public class HTSoapAnalyzeComponent {
             Map<String, Object> htfwmap = ParseXML.parseByElement(elem);
             businessContract.setContractId((String) htfwmap.get("HTID"));//合同id
             businessContract.setContractRecordNumber((String) htfwmap.get("SPFHTBAH"));//合同备案号
+            businessContract.setContractRecordTime((String) htfwmap.get("HTBASJ"));//合同备案时间
             businessContract.setContractNumber((String) htfwmap.get("HTBH"));//合同编码
             businessContract.setContractSignTime((String) htfwmap.get("HTQDRQ"));//合同签订时间
             businessContract.setDataJson(htxml);//原始查询数据
@@ -71,7 +72,7 @@ public class HTSoapAnalyzeComponent {
             fwInfo.setApportionmentArchitecturalArea(htfwmap.get("FTJZMJ").toString());//分摊建筑面积
             fwInfo.setBuildingNumber((String) htfwmap.get("LPBH"));//楼盘编号
             fwInfo.setHouseNumber((String) htfwmap.get("FWBH"));//房屋编号
-            businessContract.getGlImmovableList().add(glImmovable);
+            businessContract.getGlImmovableVoList().add(glImmovable);
         }
 
         Document docQLR = DocumentHelper.parseText(qlrxml);//报文转成doc对象
@@ -95,7 +96,7 @@ public class HTSoapAnalyzeComponent {
                 RelatedPerson relatedPerson = new RelatedPerson();
                 relatedPerson.setObligeeDocumentType(zjlb);
                 relatedPerson.setObligeeDocumentNumber((String)qlrmap.get("ZJHM"));
-                businessContract.getGlHouseSellerList().add(glHouseSeller);
+                businessContract.getGlHouseSellerVoList().add(glHouseSeller);
                 glHouseSeller.setRelatedPerson(relatedPerson);
             }else {
                 GlHouseBuyer glHouseBuyer = new GlHouseBuyer();
@@ -105,12 +106,14 @@ public class HTSoapAnalyzeComponent {
                 RelatedPerson relatedPerson = new RelatedPerson();
                 relatedPerson.setObligeeDocumentType(zjlb);
                 relatedPerson.setObligeeDocumentNumber((String)qlrmap.get("ZJHM"));
-                businessContract.getGlHouseBuyerList().add(glHouseBuyer);
+                businessContract.getGlHouseBuyerVoList().add(glHouseBuyer);
                 glHouseBuyer.setRelatedPerson(relatedPerson);
             }
         }
         rv.setMessage("success");
-        rv.setData(businessContract);
+        List<BusinessContract> businessContracts = new ArrayList<BusinessContract>();
+        businessContracts.add(businessContract);
+        rv.setData(businessContracts);
         return rv;
     }
 }

@@ -25,7 +25,7 @@ public class HTInfoGetController {
 
 
     @RequestMapping(value = "/getHTInfo", method = RequestMethod.GET)
-    public ObjectRestResponse getHTInfo(@RequestParam("htbh") String htbh) {
+    public ObjectRestResponse getHTInfo(@RequestParam(value = "htqy",required = false) String htqy,@RequestParam("htbah") String htbh) {
         log.info("进入合同信息获取");
         ObjectRestResponse resultRV = new ObjectRestResponse();
         try{
