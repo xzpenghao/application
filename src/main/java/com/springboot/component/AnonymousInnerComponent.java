@@ -1,6 +1,7 @@
 package com.springboot.component;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.config.Msgagger;
 import com.springboot.popj.GetReceiving;
 import com.springboot.popj.MortgageService;
@@ -37,6 +38,8 @@ public class AnonymousInnerComponent {
 
 
     @Autowired
+    private HttpCallComponent httpCallComponent;
+    @Autowired
     private RealEstateMortgageComponent realEstateMortgageComponent;
     @Value("${httpclient.windowAcceptanceIp}")
     private String windowAcceptanceIp; //一窗受理ip
@@ -61,7 +64,7 @@ public class AnonymousInnerComponent {
             public String call() throws Exception { //建议抛出异常
                 try {
                     System.out.println("执行主线程");
-                    String token = realEstateMortgageComponent.getToken("tsdjj", "123456");//获得token
+                    String token = httpCallComponent.getToken("tsdjj", "123456");//获得token
                     if (getReceiving.getMessageType().equals(Msgagger.VERIFYNOTICE)){//审核
                         System.out.println("进入审核");
                         //发送登记局获取数据整理发送一窗受理
