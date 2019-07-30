@@ -176,3 +176,6 @@ chenbin:
         bizType: MORTGAGE_NEW_TRAILER
         pid: Proc-171013210700-3785RA40
         isSubmit: false
+penghao:
+    mortgageCancellation:       #抵押注销登记
+        pid: Proc-190724112944-7G1WKMM6

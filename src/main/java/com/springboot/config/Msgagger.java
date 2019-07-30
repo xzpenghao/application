@@ -14,5 +14,8 @@ public class Msgagger {
     public final static String SUCCESSFUL_INTERFACE="接口提交";
     public final static String REGISTRATION="不动产登记局";
     public final static String DBSERVICECODE="ImmovableBookingResultService";
+    public final static String CANCELLATION_REGISTRATION="注销登记";
+    public final static String MORTGAGE_CANCELLATION="抵押注销";
+    public final static String MORTGAGE_CERTIFICATE_NULL="预告证明号为空";
 
 }

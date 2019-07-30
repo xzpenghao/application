@@ -65,5 +65,11 @@ public class RealEstateMortgageController {
          anonymousInner.GetReceiving(getReceiving,resp);
     }
 
+    @RequestMapping(value = "/getMortgageCancellation",method =RequestMethod.POST)
+    @ApiOperation(value = "不动产预告证明号")
+    public ObjectRestResponse getMortgageCancellation(String ygzmh) throws  IOException{
+         return   realEstateMortgageComponent.getMortgageCancellation(ygzmh);
+    }
+
 
 }
