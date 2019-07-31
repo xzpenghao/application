@@ -53,7 +53,7 @@ public class AnonymousInnerComponent {
     @Value("${service.bdcbljgtjfw}")
     private String immovableHandleResultService;
     @Autowired
-    private HttpClientUtils  httpClientUtils;
+    private HttpClientUtils httpClientUtils;
 
 
     public void GetReceiving(GetReceiving getReceiving, OutputStream outputStream) throws  IOException{

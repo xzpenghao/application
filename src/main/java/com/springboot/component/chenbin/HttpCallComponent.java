@@ -40,7 +40,7 @@ public class HttpCallComponent {
     public JSONObject callRegistrationBureauForRegister(RegistrationBureau registrationBureauVo){
         //整理json数据
         net.sf.json.JSONObject jsonObject= net.sf.json.JSONObject.fromObject(registrationBureauVo);
-        System.out.println("aa"+jsonObject.toString());
+        System.out.println("最终传入数据为："+jsonObject.toString());
         //发送到登记局
         String json = httpClientUtils.getJsonData(jsonObject,"http://" + ip + ":" + seam + "/api/services/app/BdcWorkFlow/CreateFlow");
         //转成json判断是否成功
