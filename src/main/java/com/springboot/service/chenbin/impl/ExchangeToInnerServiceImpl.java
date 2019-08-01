@@ -35,7 +35,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     @Autowired
     private OtherComponent otherComponent;
 
-    @Value("chenbin.idType")
+    @Value("${chenbin.idType}")
     private String idType;
     @Value("${businessType.areaNo}")
     private String areaNo;
@@ -54,8 +54,9 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     @Override
     public String dealYGYD2Inner(String commonInterfaceAttributer) throws ParseException {
         String result = "处理成功";
+        System.out.println("转JSON前："+commonInterfaceAttributer);
         SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer,null,null,null);
-        System.out.println(JSONObject.toJSONString(sjsq));
+        System.out.println("转JSON后："+JSONObject.toJSONString(sjsq));
         Sj_Info_Jyhtxx jyht = sjsq.getTransactionContractInfo();
         Sj_Info_Dyhtxx dyht = sjsq.getMortgageContractInfo();
         if(jyht==null){
@@ -67,6 +68,8 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         RegistrationBureau registrationBureau= BusinessDealBaseUtil.dealBaseInfo(sjsq,pid,isSubmit,bizType,dealPerson,areaNo);
         MortgageBizInfo mortgageBizInfo = BusinessDealBaseUtil.getMortgageBizInfoByContract(jyht,dyht,idType);
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
+
+//        System.out.println("传入："+JSONObject.toJSONString(registrationBureau));
 
         String token = httpCallComponent.getToken(username,password);
         //操作FTP上传附件

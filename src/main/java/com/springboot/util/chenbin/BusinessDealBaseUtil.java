@@ -24,7 +24,7 @@ public class BusinessDealBaseUtil {
         registrationBureau.setSubmitFlow(isSubmit);
         registrationBureau.setBizType(bizType);//#（抵押注销(个人)）
         registrationBureau.setOperatorName(dealPerson);//测试后续需要设置
-        registrationBureau.setContactsAdress(sjsq.getNotifiedPersonAddress()==null?"测试地址":sjsq.getNotifiedPersonAddress());//测试数据
+        registrationBureau.setContactsAdress(StringUtils.isBlank(sjsq.getImmovableSite())?"测试地址":sjsq.getImmovableSite());//测试数据
         registrationBureau.setContacts(sjsq.getNotifiedPersonName());
         registrationBureau.setContactsPhone(sjsq.getNotifiedPersonTelephone());
         registrationBureau.setBusinessAreas(StringUtils.isNotBlank(sjsq.getDistrictCode()) ? sjsq.getDistrictCode() : areaNo);
@@ -160,11 +160,15 @@ public class BusinessDealBaseUtil {
             return "1";//或者抛异常
         }
         String idd = "99";
-        String[] idTypes = idTypess.split("$");
-        for(String idType:idTypes){
-            String[] id = idType.split(",");
+        String[] idTypes = idTypess.split("\\$");
+        System.err.println(idTypes);
+        for(int i=0;i<idTypes.length;i++){
+            String idType = idTypes[i];
+            String[] id_ = idType.split(",");
+            String idTypeName = id_[0];
             if(idType.contains(idName)){
-                idd = id[1];
+                System.out.println("为："+id_[1]);
+                idd = id_[1];
             }
         }
         return idd;

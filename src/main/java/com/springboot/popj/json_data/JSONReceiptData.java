@@ -11,6 +11,7 @@ public class JSONReceiptData implements Serializable {
     private String businessType;                               //业务类型
     private String registrationCategory;                       //登记大类（大类字典值）
     private String immovableType;                              //不动产类型
+    private String immovableSite;                              //不动产坐落
     private String notifiedPersonName;                         //通知人名称
     private String notifiedPersonTelephone;                    //通知人电话
     private String notifiedPersonAddress;                      //通知人地址
@@ -60,6 +61,14 @@ public class JSONReceiptData implements Serializable {
 
     public void setImmovableType(String immovableType) {
         this.immovableType = immovableType;
+    }
+
+    public String getImmovableSite() {
+        return immovableSite;
+    }
+
+    public void setImmovableSite(String immovableSite) {
+        this.immovableSite = immovableSite;
     }
 
     public String getNotifiedPersonName() {

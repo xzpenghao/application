@@ -107,6 +107,7 @@ public class HTSoapAnalyzeComponent {
                 RelatedPerson relatedPerson = new RelatedPerson();
                 relatedPerson.setObligeeDocumentType(zjlb);
                 relatedPerson.setObligeeDocumentNumber((String)qlrmap.get("ZJHM"));
+                relatedPerson.setObligeeName((String) qlrmap.get("XGRMC"));
                 businessContract.getGlHouseBuyerVoList().add(glHouseBuyer);
                 glHouseBuyer.setRelatedPerson(relatedPerson);
             }
