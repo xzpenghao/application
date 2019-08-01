@@ -118,8 +118,8 @@ glHouseBuyer:
 httpclient:
   seam: 23335
   ip: 172.18.0.147
-  windowAcceptanceIp: 10.3.2.203
-  windowAcceptanceSeam: 7779
+  windowAcceptanceIp: 10.3.2.206
+  windowAcceptanceSeam: 7780
 businessType:
   clfFmortgage: MORTGAGE_OLD_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
   xjfFmortgage: MORTGAGE_NEW_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）
@@ -142,8 +142,8 @@ webplus:
 
   ftpAddressBdc: 172.18.0.147
   ftpPortBdc: 21
-  ftpUsernameBdc: ftpbdc
-  ftpPasswordBdc: ftpbdc
+  ftpUsernameBdc: TESTFTP
+  ftpPasswordBdc: TESTFTP
 
 logging:
   level:

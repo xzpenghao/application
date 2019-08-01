@@ -33,6 +33,8 @@ public class RegistrationBureau {
     private TransferBizInfo transferBizInfo;//转移登记业务信息
     private AdvanceBizInfo advanceBizInfo;//预告登记业务信息
 
+    private List<ImmovableFile> fileInfoVoList;
+
     public String getPid() {
         return pid;
     }
@@ -159,5 +161,13 @@ public class RegistrationBureau {
 
     public void setAdvanceBizInfo(AdvanceBizInfo advanceBizInfo) {
         this.advanceBizInfo = advanceBizInfo;
+    }
+
+    public List<ImmovableFile> getFileInfoVoList() {
+        return fileInfoVoList;
+    }
+
+    public void setFileInfoVoList(List<ImmovableFile> fileInfoVoList) {
+        this.fileInfoVoList = fileInfoVoList;
     }
 }

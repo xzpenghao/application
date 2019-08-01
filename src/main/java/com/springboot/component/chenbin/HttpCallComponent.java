@@ -73,11 +73,12 @@ public class HttpCallComponent {
         Map<String,String> params = new HashMap<String,String>();
         params.put("receiptNumber",receiptNumber);
         header.put("Authorization",token);
-        String json = HttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpGet,
+        String json = HttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
                 "application/json",
                 "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter4",
                 params,header);
-        List<SJ_Fjfile> fileVoList = JSON.parseArray(json,SJ_Fjfile.class);
+        JSONObject oo = JSONObject.parseObject(json);
+        List<SJ_Fjfile> fileVoList = JSON.parseArray(JSON.toJSONString(oo.get("data")),SJ_Fjfile.class);
         System.out.println("chenbin返回信息为："+json);
         return fileVoList;
     }

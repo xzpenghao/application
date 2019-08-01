@@ -3,11 +3,13 @@ package com.springboot.service.chenbin.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.HttpCallComponent;
+import com.springboot.component.chenbin.OtherComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.popj.pub_data.Sj_Info_Dyhtxx;
 import com.springboot.popj.pub_data.Sj_Info_Jyhtxx;
+import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.popj.registration.MortgageBizInfo;
 import com.springboot.popj.registration.RegistrationBureau;
 import com.springboot.service.chenbin.ExchangeToInnerService;
@@ -30,6 +32,8 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
 
     @Autowired
     private HttpCallComponent httpCallComponent;
+    @Autowired
+    private OtherComponent otherComponent;
 
     @Value("chenbin.idType")
     private String idType;
@@ -66,7 +70,9 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
 
         String token = httpCallComponent.getToken(username,password);
         //操作FTP上传附件
-//        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(),token);
+        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(),token);
+        List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
+        registrationBureau.setFileInfoVoList(fileList);
 
         JSONObject resultObject= httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         if(resultObject!=null){

@@ -2,6 +2,7 @@ package com.springboot.util.chenbin;
 
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.entity.SJ_Fjfile;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.registration.*;
 import com.springboot.util.TimeUtil;
@@ -167,5 +168,17 @@ public class BusinessDealBaseUtil {
             }
         }
         return idd;
+    }
+
+    public static int getFileXh(SJ_Fjfile file,List<SJ_Fjfile> fileVoList){
+        int i = 0;
+        for(SJ_Fjfile fjfile:fileVoList){
+            if(fjfile.getLogicPath().equals(file.getLogicPath()))
+                i++;
+            if(fjfile.getFileId().equals(file.getFileId())){
+                return i;
+            }
+        }
+        return i;
     }
 }
