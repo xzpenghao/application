@@ -2,6 +2,7 @@ package com.springboot.popj.warrant;
 
 import com.springboot.popj.GlImmovable;
 import com.springboot.popj.GlMortgagor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -100,6 +101,13 @@ public class RealPropertyCertificate {
     }
 
     public void setCertificateType(String certificateType) {
+        if(StringUtils.isNotEmpty(certificateType)){
+            if (certificateType.equals("房产证")||certificateType.equals("土地证")){
+                this.certificateType = certificateType;
+            }else{
+                this.certificateType = "不动产权证";
+            }
+        }
         this.certificateType = certificateType;
     }
 

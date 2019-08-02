@@ -80,6 +80,26 @@ public class RealEstateMortgageComponent {
 
 
     /**
+     * 发送登记局数据 返回受理编号  (不动产抵押登记（含两证）
+     * @param commonInterfaceAttributer
+     * @return
+     */
+    public ObjectRestResponse sendBureauByRegistration(String commonInterfaceAttributer) throws ParseException {
+        ObjectRestResponse resultRV = new ObjectRestResponse();
+        RegistrationBureau   registrationBureauVo=null;
+        //获取json数据转成收件申请
+        SJ_Sjsq sjSjsq= SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer,null,null,null);
+        //加载到registrationBureau中
+        RegistrationBureau registrationBureau= BusinessDealBaseUtil.dealBaseInfo(sjSjsq,mortgagePid,true,grMortgageRegistration,dealPerson,areaNo);
+        //加载抵押数据
+        registrationBureau=getImmovableCurrentMortgageInfo(sjSjsq.getImmovableCurrentMortgageInfoVoList(),registrationBureau);
+        JSONObject resultObject= httpCallComponent.callRegistrationBureauForRegister(registrationBureauVo);
+        return getObjectRestResponse(sjSjsq,resultObject);
+    }
+
+
+
+    /**
      * 发送登记局数据 返回受理编号
      * @param commonInterfaceAttributer
      * @return
@@ -97,8 +117,15 @@ public class RealEstateMortgageComponent {
                 if (null != sjSjsq.getImmovableCurrentMortgageInfoVoList() || sjSjsq.getImmovableCurrentMortgageInfoVoList().size()!=0){
                     registrationBureauVo= getRevokeBizInfo(sjSjsq.getImmovableCurrentMortgageInfoVoList(),registrationBureau);
                 }
+                break;
         }
         JSONObject resultObject= httpCallComponent.callRegistrationBureauForRegister(registrationBureauVo);
+        return getObjectRestResponse(sjSjsq,resultObject);
+    }
+
+
+    private ObjectRestResponse getObjectRestResponse(SJ_Sjsq sjSjsq,JSONObject resultObject){
+        ObjectRestResponse resultRV = new ObjectRestResponse();
         String message=resultObject.getString("message");
         boolean success= (boolean) resultObject.get("success");
         if (success==false){
@@ -118,6 +145,7 @@ public class RealEstateMortgageComponent {
         resultRV = httpCallComponent.adaptationPreservationReturn(resultJson);
         return resultRV;
     }
+
 
 //    private String preservationRegistryData(Map<String,String> map,String token){
 //        Map<String,String> header = new HashMap<String,String>();
@@ -173,7 +201,12 @@ public class RealEstateMortgageComponent {
     }
 
 
-
+    /**
+     *  获取不动产抵押数据
+     * @param sj_info_bdcdyxgxxes
+     * @param registrationBureau
+     * @return
+     */
     private  RegistrationBureau getImmovableCurrentMortgageInfo(List<Sj_Info_Bdcdyxgxx> sj_info_bdcdyxgxxes,RegistrationBureau registrationBureau){
         for (Sj_Info_Bdcdyxgxx info:sj_info_bdcdyxgxxes) {
             MortgageBizInfo mortgageBizInfo=new MortgageBizInfo();
@@ -254,12 +287,13 @@ public class RealEstateMortgageComponent {
      * @return
      */
     public  ObjectRestResponse getMortgageCancellation(String ygCancellcation){
+        ObjectRestResponse resultRV = new ObjectRestResponse();
         if (StringUtils.isEmpty(ygCancellcation)){
             throw new ZtgeoBizException(Msgagger.MORTGAGE_CERTIFICATE_NULL);
         }
         String json =httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByYGZMH","YGZMH="+ygCancellcation);
-        ObjectRestResponse resultRV = new ObjectRestResponse();
-        return  resultRV.data(getRealProperty(json,ygCancellcation));
+        System.out.println("aa"+getRealPropertySj(json,ygCancellcation));
+        return  resultRV.data(getRealPropertySj(json,ygCancellcation));
     }
 
     private RealPropertyCertificate getRealProperty(JSONObject jsonObject){
@@ -268,6 +302,11 @@ public class RealEstateMortgageComponent {
             realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("vormerkungId"));
         }else {
             realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("realEstateId"));
+        }
+        if (StringUtils.isEmpty(jsonObject.getString("certificateType"))){
+            realPropertyCertificate.setCertificateType("不动产权证");
+        }else {
+            realPropertyCertificate.setCertificateType(jsonObject.getString("certificateType"));//证书类型
         }
         JSONArray glImmovablejsonArray = (JSONArray) jsonObject.get("realEstateUnitInfoVoList");//房屋信息
         if (null != glImmovablejsonArray ) {
@@ -296,7 +335,6 @@ public class RealEstateMortgageComponent {
                 realPropertyCertificate.setCommonLandArea(glImmovableObject.getString("commonLandArea"));//共有土地面积
                 realPropertyCertificate.setShareLandArea(glImmovableObject.getString("sharedLandArea"));//分摊土地面积
                 realPropertyCertificate.setSingleLandArea(glImmovableObject.getString("singleLandArea"));//独用土地面积
-                realPropertyCertificate.setCertificateType(Msgagger.FANGDI);//类型
                 glImmovable.setFwInfo(fwInfo);
                 realPropertyCertificate.getGlImmovableList().add(glImmovable);
             }
@@ -324,14 +362,22 @@ public class RealEstateMortgageComponent {
     }
 
 
-
-    private Object getRealProperty(String json,String ygCancellcation ){
-
+    /**
+     * 获取不动产权属信息
+     * @param json
+     * @param ygCancellcation
+     * @return
+     */
+    public List<RealPropertyCertificate> getRealPropertySj(String json,String ygCancellcation ){
         List<RealPropertyCertificate> realPropertyCertificateList=new ArrayList<>();
+        //判断预告证明号
         if (StringUtils.isNotEmpty(ygCancellcation)){
             JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
-            return   getRealProperty(jsonObject);
+            RealPropertyCertificate realPropertyCertificate=getRealProperty(jsonObject);
+            realPropertyCertificateList.add(realPropertyCertificate);
+            return  realPropertyCertificateList;
         }
+        //不动产证号和不动产单元号 (返回list)
         JSONArray jsonArray=JSONArray.parseArray(json);
         for (int i=0;i<jsonArray.size();i++) {
             realPropertyCertificateList.add(getRealProperty(jsonArray.getJSONObject(i)));
@@ -366,7 +412,7 @@ public class RealEstateMortgageComponent {
                     "BDCZH=" + parametricData.getBudzh());
         }
         ObjectRestResponse resultRV = new ObjectRestResponse();
-        return  resultRV.data(getRealProperty(json,null));
+        return  resultRV.data(getRealPropertySj(json,null));
     }
 
 

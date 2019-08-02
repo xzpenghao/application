@@ -11,6 +11,7 @@ import com.springboot.popj.pub_data.RespServiceData;
 import com.springboot.popj.pub_data.SJ_Info_Handle_Result;
 import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.popj.register.HttpRequestMethedEnum;
+import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.ParamHttpClientUtil;
 import com.springboot.util.ReturnMsgUtil;
@@ -57,7 +58,6 @@ public class AnonymousInnerComponent {
 
 
     public void GetReceiving(GetReceiving getReceiving, OutputStream outputStream) throws  IOException{
-
         ExecutorService executor = Executors.newCachedThreadPool();
         ReturnVo returnVo = new ReturnVo();
         Map<String, String> mapParmeter = new HashMap<>();
@@ -96,6 +96,22 @@ public class AnonymousInnerComponent {
                         System.out.println("进入登簿");
                         //发送登记局获取数据整理发送一窗受理
                         String json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo","slbh="+getReceiving.getSlbh());
+//                        String json="{\n" +
+//                                "    \"slbh\":\"201908010002\",\n" +
+//                                "    \"sit\":\"上水璞园13#S3#-1-1202上水璞园13#S3#-1-1202\",\n" +
+//                                "    \"certificateInfoVoList\":[\n" +
+//                                "        {\n" +
+//                                "            \"certificateId\":\"苏(2019)徐州市不动产证明第0057390号\",\n" +
+//                                "            \"certificateType\":\"DYZMH\",\n" +
+//                                "            \"registerSubType\":\"一般抵押权\"\n" +
+//                                "        },\n" +
+//                                "        {\n" +
+//                                "            \"certificateId\":\"苏(2019)徐州市不动产证明第0057389号\",\n" +
+//                                "            \"certificateType\":\"YGZMH\",\n" +
+//                                "            \"registerSubType\":\"预购商品房\"\n" +
+//                                "        }\n" +
+//                                "    ]\n" +
+//                                "}";
                         JSONObject jsonObject=JSONObject.fromObject(json);
                         mapParmeter.put("immovableSite",jsonObject.getString("sit"));
                         mapParmeter.put("registerNumber",jsonObject.getString("slbh"));
@@ -103,25 +119,29 @@ public class AnonymousInnerComponent {
                         JSONArray ficateInfoArray=jsonObject.getJSONArray("certificateInfoVoList");
                         List<SJ_Info_Handle_Result> handleResultVoList=new ArrayList<>();
                         List<RespServiceData> respServiceDataList=new ArrayList<>();
+                        List<String> stringList=new ArrayList<>();
+                        //获取受理编号信息
                         for (int i=0;i<ficateInfoArray.size();i++){
-                            RespServiceData respServiceData=new RespServiceData();
                             JSONObject verfyInfoObject=ficateInfoArray.getJSONObject(i);
-                            String serviceCode= getRegistrationSubcategory(verfyInfoObject.getString("registerSubType"));//登记小类
-                            respServiceData.setServiceCode(serviceCode);
+                            stringList.add(verfyInfoObject.getString("registerSubType"));
+                            RespServiceData RealEstateBookData=new RespServiceData();
+                            RespServiceData getRealEstateBooking=getRealEstateBooking(verfyInfoObject.getString("certificateType"),
+                                    verfyInfoObject.getString("certificateId"),RealEstateBookData);
+                            respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
+                        }
+                            RespServiceData respServiceData=new RespServiceData();
+                            respServiceData.setServiceCode(Msgagger.DBSERVICECODE);
+                            //获取登记小类信息
+                            for (String string:stringList) {
                             SJ_Info_Handle_Result handleResult=new SJ_Info_Handle_Result();
-                            handleResult.setHandleResult(verfyInfoObject.getString("registerSubType")+"登簿成功");
-                            handleResult.setHandleText(Msgagger.SUCCESSFUL_REGISTRATION);
+                            handleResult.setHandleResult(string+"登簿成功");
+                            handleResult.setHandleText(Msgagger.SUCCESSFUL_DENGBUCG);
                             handleResult.setProvideUnit(Msgagger.REGISTRATION);
                             handleResult.setDataComeFromMode(Msgagger.SUCCESSFUL_INTERFACE);
                             handleResultVoList.add(handleResult);
                             respServiceData.setServiceDataInfos(handleResultVoList);
-                            RespServiceData RealEstateBookData=new RespServiceData();
-                            RespServiceData getRealEstateBooking=getRealEstateBooking(verfyInfoObject.getString("certificateType"),
-                                    verfyInfoObject.getString("certificateId"),RealEstateBookData);
-                            respServiceDataList.add(respServiceData);//登簿返回信息
-                            respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
                         }
-//                        respServiceDataList.add(getRealEstateBooking(handleResultVoList,respServiceDataList));
+                        respServiceDataList.add(respServiceData);
                         JSONArray jsonArray=JSONArray.fromObject(respServiceDataList);
                         mapParmeter.put("serviceDatas",jsonArray.toString());
                     }else if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)){
@@ -164,14 +184,14 @@ public class AnonymousInnerComponent {
           case  "DYZMH":
                resultRV=realEstateMortgageComponent.getRealEstateMortgage(certificateId,null,true);
                List<MortgageService> mortgageServiceList=(List<MortgageService>) resultRV.getData();
-               respServiceData.setServiceCode("MortgageElectronicCertCancellation");
+               respServiceData.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
                respServiceData.setServiceDataInfos(mortgageServiceList);
               break;
           case "YGZMH":
               resultRV=realEstateMortgageComponent.getMortgageCancellation(certificateId);
-              List<MortgageService> mortgageList=(List<MortgageService>) resultRV.getData();
-              respServiceData.setServiceCode("MortgageElectronicCertCancellation");
-              respServiceData.setServiceDataInfos(mortgageList);
+              List<RealPropertyCertificate> realPropertyCertificateList=(List<RealPropertyCertificate>) resultRV.getData();
+              respServiceData.setServiceCode(Msgagger.YGZMSERVICE_CODE);
+              respServiceData.setServiceDataInfos(realPropertyCertificateList);
               break;
       }
       return respServiceData;
@@ -188,8 +208,8 @@ public class AnonymousInnerComponent {
         //判断模糊小类输出serviceCode
         if (registrationName.equals("抵押权注销登记")){
             serviceCode=Msgagger.DBSERVICECODE;
-        }else if (registrationName.equals("一般抵押权")){
-            serviceCode="";
+        }else if (registrationName.equals("预告证明号登记")){
+            serviceCode="ImmovableElectronicCertificate";
         }else if (registrationName.equals("")){
             serviceCode="";
         }else if (registrationName.equals("")){
