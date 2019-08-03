@@ -27,6 +27,7 @@ public class ExchangeToInnerRest {
     public ObjectRestResponse<String> YGYD2Inner(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer){
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try{
+            log.warn("双预告转入，本次参数为："+commonInterfaceAttributer);
             rv.data(exchangeToInnerService.dealYGYD2Inner(commonInterfaceAttributer));
         }catch (ParseException e1){
             log.error(ErrorDealUtil.getErrorInfo(e1));

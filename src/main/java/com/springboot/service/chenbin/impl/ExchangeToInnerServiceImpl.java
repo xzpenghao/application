@@ -1,5 +1,6 @@
 package com.springboot.service.chenbin.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.HttpCallComponent;
@@ -74,6 +75,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         String token = httpCallComponent.getToken(username,password);
         //操作FTP上传附件
         List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(),token);
+        log.warn("双预告附件信息获取成功，为："+ JSONArray.toJSONString(fileVoList));
         List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
         registrationBureau.setFileInfoVoList(fileList);
 
