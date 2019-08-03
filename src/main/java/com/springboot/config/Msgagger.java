@@ -15,11 +15,13 @@ public class Msgagger {
     public final static String SUCCESSFUL_DENGBUCG="登簿成功";
     public final static String SUCCESSFUL_INTERFACE="接口提交";
     public final static String REGISTRATION="不动产登记局";
+    public final static String DYZXSERVICECODE="MortgageElectronicCertCancellation";
     public final static String DBSERVICECODE="ImmovableBookingResultService";
     public final static String DYZMHSERVICE_CODE="MortgageElectronicCertificate";
     public final static String YGZMSERVICE_CODE="ForecastElectronicCertificationService";
     public final static String CANCELLATION_REGISTRATION="注销登记";
     public final static String MORTGAGE_CANCELLATION="抵押注销";
     public final static String MORTGAGE_CERTIFICATE_NULL="预告证明号为空";
+    public final static String XML_FROMDATA="xml形式获取";
 
 }

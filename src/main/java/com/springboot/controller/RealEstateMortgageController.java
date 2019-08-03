@@ -41,14 +41,14 @@ public class RealEstateMortgageController {
 
     @RequestMapping(value = "/getRealEstateMortgage", method = RequestMethod.POST)
     @ApiOperation("不动产抵押信息")
-    public ObjectRestResponse getRealEstateMortgage(@RequestParam("dyzmh") String dyzmh,@RequestParam(value = "qlrmc",required = false) String qlrmc) throws IOException {
+    public ObjectRestResponse getRealEstateMortgage(@RequestParam("dyzmh") String dyzmh,@RequestParam(value = "qlrmc",required = false) String qlrmc) throws Exception {
         System.out.println(dyzmh);
         return  realEstateMortgageComponent.getRealEstateMortgage(dyzmh,qlrmc,false);
     }
 
     @RequestMapping(value = "/getRealPropertyCertificate", method = RequestMethod.POST)
     @ApiOperation("不动产权属信息")
-    public ObjectRestResponse getRealPropertyCertificate(@RequestBody ParametricData parametricData) throws IOException {
+    public ObjectRestResponse getRealPropertyCertificate(@RequestBody ParametricData parametricData) throws Exception {
         return  realEstateMortgageComponent.getRealPropertyCertificate(parametricData);
     }
 
@@ -67,7 +67,7 @@ public class RealEstateMortgageController {
 
     @RequestMapping(value = "/getMortgageCancellation",method =RequestMethod.POST)
     @ApiOperation(value = "不动产预告证明号")
-    public ObjectRestResponse getMortgageCancellation(String ygzmh) throws  IOException{
+    public ObjectRestResponse getMortgageCancellation(String ygzmh) throws  Exception{
          return   realEstateMortgageComponent.getMortgageCancellation(ygzmh);
     }
 

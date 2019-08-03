@@ -1,5 +1,4 @@
 package com.springboot.util;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -8,28 +7,78 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Component
 public class NetSignUtils {
 
-    private final static String url="http://172.18.0.112:8088/BDC_tongshan/BDCSrv.asmx?wsdl";
+    @Value("${penghao.contractinformation.ip}")
+    private  String ip;//ip
+    @Value("${penghao.contractinformation.port}")
+    private  String port;//端口
+    @Value("${penghao.contractinformation.region}")
+    private  String region;//地区
+
 
 
     public static void main(String[] args) throws Exception {
-        List<String> stringList=new ArrayList<>();
-        String htxx=spfyght("2019062570014");
-        String qlrxx=spfQlrxx("2019062570014");
-        stringList.add(htxx);
-        stringList.add(qlrxx);
+//        List<String> stringList=new ArrayList<>();
+//        String htxx=spfyght("2019062570014");
+//        String qlrxx=spfQlrxx("2019062570014");
+//        stringList.add(htxx);
+//        stringList.add(qlrxx);
+    }
+    /**
+     * 二手房合同信息
+     * @param clhtbah
+     * @return
+     * @throws Exception
+     */
+    public  String esfyght(String clhtbah) throws Exception {
+        //soap服务地址
+        String soapXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                + "<soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+                "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">"
+                + "<soap12:Body>" + "<CLF_FC_CLMMHT>" + "<sParams>" + "CLHTBAH="
+                + clhtbah + "</sParams>" + "</CLF_FC_CLMMHT>" + "</soap12:Body>" + "</soap12:Envelope>";
+
+        return client(soapXml);
+    }
+
+
+    /**
+     * 获取买卖双方信息
+     * @param clhtbah
+     * @return
+     * @throws Exception
+     */
+    public  String esfsfxx(String clhtbah) throws Exception {
+        //soap服务地址
+
+        String soapXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                + "<soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+                "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">"
+                + "<soap12:Body>" + "<FC_GFQLRXX>" + "<sParams>" + "HTBAH="
+                + clhtbah + "</sParams>" + "</FC_GFQLRXX>" + "</soap12:Body>" + "</soap12:Envelope>";
+
+        return client(soapXml);
     }
 
 
 
-    public static String spfyght(String contractNumber) throws Exception {
+    /**
+     * 商品房合同信息
+     * @param contractNumber
+     * @return
+     * @throws Exception
+     */
+    public  String spfyght(String contractNumber) throws Exception {
         //soap服务地址
 
         String soapXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
@@ -41,11 +90,15 @@ public class NetSignUtils {
         return client(soapXml);
     }
 
-
-    public static String spfQlrxx(String contractNumber) throws Exception {
+    /**
+     * 商品房权利人信息
+     * @param contractNumber
+     * @return
+     * @throws Exception
+     */
+    public  String spfQlrxx(String contractNumber) throws Exception {
         //soap服务地址
-        String url = "http://172.18.0.112:8088/BDC_tongshan/BDCSrv.asmx?wsdl";
-
+//        String url = "http://"+ip+":"+port+"/"+region+"/BDCSrv.asmx?wsdl";
         String soapXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
                 + "<soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
                 "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">"
@@ -57,9 +110,10 @@ public class NetSignUtils {
 
 
 
-    private static String client(String soapXml) throws Exception{
+    private  String client(String soapXml) throws Exception{
         //创建httpcleint对象
         CloseableHttpClient httpClient = HttpClients.createDefault();
+        String url="http://"+ip+":"+port+"/"+region+"/BDCSrv.asmx?wsdl";
         //创建http Post请求
         HttpPost httpPost = new HttpPost(url);
         String str="";

@@ -61,6 +61,7 @@ public class AnonymousInnerComponent {
         ExecutorService executor = Executors.newCachedThreadPool();
         ReturnVo returnVo = new ReturnVo();
         Map<String, String> mapParmeter = new HashMap<>();
+        Map<String,Object> map=new HashMap<>();
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception { //建议抛出异常
                 try {
@@ -68,8 +69,9 @@ public class AnonymousInnerComponent {
                     String token = httpCallComponent.getToken(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
                     if (getReceiving.getMessageType().equals(Msgagger.VERIFYNOTICE)){//审核
                         System.out.println("进入审核");
+                        map.put("slbh",getReceiving.getSlbh());
                         //发送登记局获取数据整理发送一窗受理
-                        String json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetVerifyInfo","slbh="+getReceiving.getSlbh());
+                        String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetVerifyInfo",map,null);
                         System.out.println(json);
                         JSONObject jsonObject=JSONObject.fromObject(json);
                         JSONArray verfyInfoArray=jsonObject.getJSONArray("verifyInfoVoList");
@@ -94,24 +96,9 @@ public class AnonymousInnerComponent {
                         mapParmeter.put("registerNumber", jsonObject.getString("slbh"));//受理编号)
                     }else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)){//登簿审核
                         System.out.println("进入登簿");
+                        map.put("slbh",getReceiving.getSlbh());
                         //发送登记局获取数据整理发送一窗受理
-                        String json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo","slbh="+getReceiving.getSlbh());
-//                        String json="{\n" +
-//                                "    \"slbh\":\"201908010002\",\n" +
-//                                "    \"sit\":\"上水璞园13#S3#-1-1202上水璞园13#S3#-1-1202\",\n" +
-//                                "    \"certificateInfoVoList\":[\n" +
-//                                "        {\n" +
-//                                "            \"certificateId\":\"苏(2019)徐州市不动产证明第0057390号\",\n" +
-//                                "            \"certificateType\":\"DYZMH\",\n" +
-//                                "            \"registerSubType\":\"一般抵押权\"\n" +
-//                                "        },\n" +
-//                                "        {\n" +
-//                                "            \"certificateId\":\"苏(2019)徐州市不动产证明第0057389号\",\n" +
-//                                "            \"certificateType\":\"YGZMH\",\n" +
-//                                "            \"registerSubType\":\"预购商品房\"\n" +
-//                                "        }\n" +
-//                                "    ]\n" +
-//                                "}";
+                        String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo",map,null);
                         JSONObject jsonObject=JSONObject.fromObject(json);
                         mapParmeter.put("immovableSite",jsonObject.getString("sit"));
                         mapParmeter.put("registerNumber",jsonObject.getString("slbh"));
@@ -127,6 +114,9 @@ public class AnonymousInnerComponent {
                             RespServiceData RealEstateBookData=new RespServiceData();
                             RespServiceData getRealEstateBooking=getRealEstateBooking(verfyInfoObject.getString("certificateType"),
                                     verfyInfoObject.getString("certificateId"),RealEstateBookData);
+                            if (getRealEstateBooking.getServiceCode().equals(Msgagger.DYZMHSERVICE_CODE)){
+                                getRealEstateBooking.setServiceCode(Msgagger.DYZXSERVICECODE);
+                            }
                             respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
                         }
                             RespServiceData respServiceData=new RespServiceData();
@@ -141,6 +131,7 @@ public class AnonymousInnerComponent {
                             handleResultVoList.add(handleResult);
                             respServiceData.setServiceDataInfos(handleResultVoList);
                         }
+
                         respServiceDataList.add(respServiceData);
                         JSONArray jsonArray=JSONArray.fromObject(respServiceDataList);
                         mapParmeter.put("serviceDatas",jsonArray.toString());
@@ -178,7 +169,7 @@ public class AnonymousInnerComponent {
      * 通过类型，证号查询登记局数据
      * @return
      */
-    private RespServiceData  getRealEstateBooking(String certificateType,String certificateId,RespServiceData respServiceData)  throws IOException{
+    private RespServiceData  getRealEstateBooking(String certificateType,String certificateId,RespServiceData respServiceData)  throws Exception{
         ObjectRestResponse resultRV = new ObjectRestResponse();
       switch (certificateType){
           case  "DYZMH":

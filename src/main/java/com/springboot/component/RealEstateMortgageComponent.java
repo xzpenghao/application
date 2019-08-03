@@ -53,6 +53,8 @@ public class RealEstateMortgageComponent {
     private String obligeeDyr;
     @Value("${glHouseBuyer.obligeeQlr}")
     private String obligeeQlr;
+    @Value("${glHouseBuyer.obligeeYwr}")
+    private String obligeeYwr;
     @Value("${businessType.grMortgageCancellation}")
     private String grMortgageCancellation;//#（抵押注销(个人)）
     @Value("${businessType.clfFmortgage}")
@@ -286,12 +288,14 @@ public class RealEstateMortgageComponent {
      * @param ygCancellcation
      * @return
      */
-    public  ObjectRestResponse getMortgageCancellation(String ygCancellcation){
+    public  ObjectRestResponse getMortgageCancellation(String ygCancellcation) throws Exception{
         ObjectRestResponse resultRV = new ObjectRestResponse();
+        Map<String,Object> map=new HashMap<>();
         if (StringUtils.isEmpty(ygCancellcation)){
             throw new ZtgeoBizException(Msgagger.MORTGAGE_CERTIFICATE_NULL);
         }
-        String json =httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByYGZMH","YGZMH="+ygCancellcation);
+        map.put("YGZMH",ygCancellcation);
+        String json =httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByYGZMH",map,null);
         System.out.println("aa"+getRealPropertySj(json,ygCancellcation));
         return  resultRV.data(getRealPropertySj(json,ygCancellcation));
     }
@@ -308,6 +312,7 @@ public class RealEstateMortgageComponent {
         }else {
             realPropertyCertificate.setCertificateType(jsonObject.getString("certificateType"));//证书类型
         }
+        realPropertyCertificate.setRegistrationDate(jsonObject.getString("registerDate"));
         JSONArray glImmovablejsonArray = (JSONArray) jsonObject.get("realEstateUnitInfoVoList");//房屋信息
         if (null != glImmovablejsonArray ) {
             for (int z = 0; z < glImmovablejsonArray.size(); z++) {
@@ -315,7 +320,7 @@ public class RealEstateMortgageComponent {
                 JSONObject glImmovableObject = glImmovablejsonArray.getJSONObject(z);
                 GlImmovable glImmovable = new GlImmovable();
                 glImmovable.setImmovableType(Msgagger.FANGDI);
-                glImmovable.setImmovableId(glImmovableObject.getString("householdId"));
+               // glImmovable.setImmovableId(glImmovableObject.getString("householdId"));
                 FwInfo fwInfo = getFwInfo(glImmovableObject, jsonObject, "无");
                 realPropertyCertificate.setArchitecturalArea(fwInfo.getArchitecturalArea());//建筑面积
                 realPropertyCertificate.setHouseArchitecturalArea(fwInfo.getHouseArchitecturalArea());//套内
@@ -355,7 +360,16 @@ public class RealEstateMortgageComponent {
             for (int j = 0; j < obligeeInfoArray.size(); j++) {
                 JSONObject glMortgagorObject = obligeeInfoArray.getJSONObject(j);
                 GlMortgagor glMortgagor = getGlMortgageQlr(glMortgagorObject);
-                realPropertyCertificate.getGlObjligeeVoList().add(glMortgagor);
+                realPropertyCertificate.getGlObligeeVoList().add(glMortgagor);
+            }
+        }
+        //义务人
+        JSONArray selerInfoVoArray = (JSONArray) jsonObject.get("salerInfoVoList");
+        if (null !=selerInfoVoArray) {
+            for (int j = 0; j < selerInfoVoArray.size(); j++) {
+                JSONObject selerInfoVoObject = selerInfoVoArray.getJSONObject(j);
+                GlMortgagor glMortgagor = getGlMortgageYwr(selerInfoVoObject);
+                realPropertyCertificate.getGlObligorVoList().add(glMortgagor);
             }
         }
         return  realPropertyCertificate;
@@ -395,22 +409,37 @@ public class RealEstateMortgageComponent {
      * @return
      * @throws IOException
      */
-    public ObjectRestResponse getRealPropertyCertificate(ParametricData parametricData) throws IOException {
+    public ObjectRestResponse getRealPropertyCertificate(ParametricData parametricData) throws Exception {
         String json = "";
-        if (StringUtils.isNotEmpty(parametricData.getBdcdyh()) && StringUtils.isNotEmpty(parametricData.getObligeeName())){
-            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH",
-                    "BDCDYH=" + parametricData.getBdcdyh()+"&obligeeName="+parametricData.getObligeeName());
-        }else if (StringUtils.isNotEmpty(parametricData.getBdcdyh())){
-            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH",
-                    "BDCDYH=" + parametricData.getBdcdyh());
+        Map<String,Object> map=new HashMap<>();
+        if (StringUtils.isNotEmpty(parametricData.getBudzh())){
+            map.put("obligeeName",parametricData.getBudzh());
         }
-        if (StringUtils.isNotEmpty(parametricData.getBudzh()) && StringUtils.isNotEmpty(parametricData.getObligeeName())){
-            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH",
-                    "BDCZH=" + parametricData.getBudzh()+"&obligeeName="+parametricData.getObligeeName());
-        }else if (StringUtils.isNotEmpty(parametricData.getBudzh())){
-            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH",
-                    "BDCZH=" + parametricData.getBudzh());
+        if (StringUtils.isNotEmpty(parametricData.getBdcdyh())){
+            map.put("BDCDYH",parametricData.getBdcdyh());
         }
+        if (StringUtils.isNotEmpty(parametricData.getObligeeName())){
+            map.put("obligeeName",parametricData.getObligeeName());
+        }
+        json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH",map,null);
+//        if (StringUtils.isNotEmpty(parametricData.getBdcdyh()) && StringUtils.isNotEmpty(parametricData.getObligeeName())){
+//            json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH",map,null);
+//        }else if (StringUtils.isNotEmpty(parametricData.getBdcdyh())){
+//            map.put("BDCDYH",parametricData.getBdcdyh());
+//            map.put("obligeeName",parametricData.getObligeeName());
+//            json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH",map,null);
+//        }
+//        if (StringUtils.isNotEmpty(parametricData.getBudzh()) && StringUtils.isNotEmpty(parametricData.getObligeeName())){
+//            map.put("BDCDYH",parametricData.getBdcdyh());
+//            map.put("obligeeName",parametricData.getObligeeName());
+//
+//            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH",
+//                    "BDCZH=" + parametricData.getBudzh()+"&obligeeName="+parametricData.getObligeeName());
+//        }else if (StringUtils.isNotEmpty(parametricData.getBudzh())){
+//            map.put("BDCZH",ygCancellcation);
+//            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH",
+//                    "BDCZH=" + parametricData.getBudzh());
+//        }
         ObjectRestResponse resultRV = new ObjectRestResponse();
         return  resultRV.data(getRealPropertySj(json,null));
     }
@@ -422,14 +451,18 @@ public class RealEstateMortgageComponent {
      * @return
      * @throws IOException
      */
-    public ObjectRestResponse getRealEstateMortgage(String dyzmh,String mortgagorName,boolean containHistroy) throws IOException {
+    public ObjectRestResponse getRealEstateMortgage(String dyzmh,String mortgagorName,boolean containHistroy) throws Exception {
         ObjectRestResponse resultRV = new ObjectRestResponse();
         String json="";
+        Map<String,Object> map=new HashMap<>();
+
         if (StringUtils.isNotEmpty(mortgagorName)) {
-             json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByDYZMH", "DYZMH=" + dyzmh + "&mortgagorName=" + mortgagorName +"&containHistory="+containHistroy);
-        }else {
-            json = httpClientUtils.sendGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByDYZMH", "DYZMH="+dyzmh+"&containHistory="+containHistroy);
+            map.put("obligeeName",mortgagorName);
+        }if (StringUtils.isNotEmpty(dyzmh)){
+            map.put("DYZMH",dyzmh);
         }
+        map.put("containHistroy",containHistroy);
+        json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByDYZMH",map,null);
         JSONArray jsonArray=JSONArray.parseArray(json);
         List<MortgageService> mortgageServiceList=new ArrayList<>();
         if(jsonArray!=null){
@@ -597,6 +630,20 @@ public class RealEstateMortgageComponent {
         glMortgagor.setRelatedPerson(relatedPerson);
         return glMortgagor;
     }
+
+    private GlMortgagor getGlMortgageYwr(JSONObject glMortgageHolderObject){
+        GlMortgagor glMortgagor=new GlMortgagor();
+        glMortgagor.setObligeeName(glMortgageHolderObject.getString("salerName"));
+        glMortgagor.setObligeeType(obligeeYwr);
+        RelatedPerson relatedPerson=new RelatedPerson();
+        System.out.print(glMortgageHolderObject.getString("salerIdType"));
+        relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("salerIdType")));
+        relatedPerson.setObligeeName(glMortgageHolderObject.getString("salerName"));
+        relatedPerson.setObligeeDocumentNumber(glMortgageHolderObject.getString("salerId"));
+        glMortgagor.setRelatedPerson(relatedPerson);
+        return glMortgagor;
+    }
+
 
 
 

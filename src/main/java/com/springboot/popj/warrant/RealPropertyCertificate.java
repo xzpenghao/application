@@ -45,7 +45,7 @@ public class RealPropertyCertificate {
     private String ext2;                         //扩展字段2
     private String ext3;                         //扩展字段3
     private List<GlImmovable> glImmovableList=new ArrayList<>();//不动产类型(房屋信息)
-    private List<GlMortgagor> glObjligeeVoList=new ArrayList<>();//权利人数据
+    private List<GlMortgagor> glObligeeVoList=new ArrayList<>();//权利人数据
     private List<GlMortgagor> glObligorVoList=new ArrayList<>();//义务人数据
 
     public String getAcceptanceNumber() {
@@ -327,12 +327,12 @@ public class RealPropertyCertificate {
         this.glImmovableList = glImmovableList;
     }
 
-    public List<GlMortgagor> getGlObjligeeVoList() {
-        return glObjligeeVoList;
+    public List<GlMortgagor> getGlObligeeVoList() {
+        return glObligeeVoList;
     }
 
-    public void setGlObjligeeVoList(List<GlMortgagor> glObjligeeVoList) {
-        this.glObjligeeVoList = glObjligeeVoList;
+    public void setGlObligeeVoList(List<GlMortgagor> glObjligeeVoList) {
+        this.glObligeeVoList = glObligeeVoList;
     }
 
     public List<GlMortgagor> getGlObligorVoList() {
