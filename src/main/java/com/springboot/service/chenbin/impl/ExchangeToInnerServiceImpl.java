@@ -10,6 +10,7 @@ import com.springboot.entity.SJ_Fjfile;
 import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.popj.pub_data.Sj_Info_Dyhtxx;
 import com.springboot.popj.pub_data.Sj_Info_Jyhtxx;
+import com.springboot.popj.registration.AdvanceBizInfo;
 import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.popj.registration.MortgageBizInfo;
 import com.springboot.popj.registration.RegistrationBureau;
@@ -68,7 +69,13 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         }
         RegistrationBureau registrationBureau= BusinessDealBaseUtil.dealBaseInfo(sjsq,pid,isSubmit,bizType,dealPerson,areaNo);
         MortgageBizInfo mortgageBizInfo = BusinessDealBaseUtil.getMortgageBizInfoByContract(jyht,dyht,idType);
+        AdvanceBizInfo advanceBizInfo = new AdvanceBizInfo();
+//        AdvanceBizInfo advanceBizInfo = BusinessDealBaseUtil.getAdvanceBizInfoByContract(jyht,dyht,idType);
+        advanceBizInfo.setHtbh(mortgageBizInfo.getHtbh());
+        advanceBizInfo.setApplyDate(mortgageBizInfo.getMortgageApplyDate());
+        advanceBizInfo.setRealEstateInfoVoList(mortgageBizInfo.getRealEstateInfoVoList());
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
+        registrationBureau.setAdvanceBizInfo(advanceBizInfo);
 
 //        System.out.println("传入："+JSONObject.toJSONString(registrationBureau));
 
