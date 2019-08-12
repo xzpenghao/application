@@ -3,8 +3,11 @@ package com.springboot.service.chenbin.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.component.chenbin.OtherComponent;
+import com.springboot.config.DJJUser;
+import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.popj.pub_data.SJ_Sjsq;
@@ -19,6 +22,7 @@ import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -53,12 +57,15 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private String pid;
     @Value("${chenbin.registrationBureau.forecast.commercialHouse.isSubmit}")
     private boolean isSubmit;
+    @Autowired
+    private AnonymousInnerComponent anonymousInnerComponent;
+
     @Override
     public String dealYGYD2Inner(String commonInterfaceAttributer) throws ParseException {
         String result = "处理成功";
-        System.out.println("转JSON前："+commonInterfaceAttributer);
+        log.info("转JSON前："+commonInterfaceAttributer);
         SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer,null,null,null);
-        System.out.println("转JSON后："+JSONObject.toJSONString(sjsq));
+        log.info("转JSON后："+JSONObject.toJSONString(sjsq));
         Sj_Info_Jyhtxx jyht = sjsq.getTransactionContractInfo();
         Sj_Info_Dyhtxx dyht = sjsq.getMortgageContractInfo();
         if(jyht==null){
@@ -78,8 +85,11 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         registrationBureau.setAdvanceBizInfo(advanceBizInfo);
 
 //        System.out.println("传入："+JSONObject.toJSONString(registrationBureau));
-
-        String token = httpCallComponent.getToken(username,password);
+        com.alibaba.fastjson.JSONObject  tokenObject = httpCallComponent.getTokenYcsl(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
+        String token=anonymousInnerComponent.getToken(tokenObject,"YGYD2Inner",sjsq.getRegisterNumber(),"预告预抵业务转内网办件",sjsq.getReceiptNumber());
+        if (token==null){
+            return Msgagger.USER_LOGIN_BAD;
+        }
         //操作FTP上传附件
         List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(),token);
         log.warn("双预告附件信息获取成功，为："+ JSONArray.toJSONString(fileVoList));

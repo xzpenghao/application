@@ -78,6 +78,8 @@ public class RealEstateMortgageComponent {
     @Value("${penghao.mortgageCancellation.pid}")
     private String mortgagePid;
 
+    @Autowired
+    private AnonymousInnerComponent anonymousInnerComponent;
 
 
 
@@ -141,7 +143,13 @@ public class RealEstateMortgageComponent {
         mapParmeter.put("registerNumber",resultObject.getString("slbh"));
         //登记局登录
         System.out.println("jsonobject:"+JSON.toJSONString(mapParmeter));
-        String token = httpCallComponent.getToken(DJJUser.USERNAME,DJJUser.PASSWORD);
+        com.alibaba.fastjson.JSONObject  tokenObject = httpCallComponent.getTokenYcsl(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
+        String token=anonymousInnerComponent.getToken(tokenObject,"sendRegistrationMortgageRevocation",sjSjsq.getReceiptNumber(),
+                "登记局受理",sjSjsq.getRegisterNumber());
+        if (token==null){
+            resultRV.setMessage(Msgagger.USER_LOGIN_BAD);
+            return resultRV;
+        }
         //返回数据到一窗受理平台保存受理编号和登记编号
         String resultJson = httpCallComponent.preservationRegistryData(mapParmeter,token);
         resultRV = httpCallComponent.adaptationPreservationReturn(resultJson);
@@ -300,6 +308,16 @@ public class RealEstateMortgageComponent {
         return  resultRV.data(getRealPropertySj(json,ygCancellcation));
     }
 
+    /**
+     * 二手房水电气获取权属信息
+     * @param jsonObject
+     * @return
+     */
+    public  RealPropertyCertificate getRealPropertyCertificatexx(JSONObject jsonObject){
+        return  getRealProperty(jsonObject);
+    }
+
+
     private RealPropertyCertificate getRealProperty(JSONObject jsonObject){
         RealPropertyCertificate realPropertyCertificate = new RealPropertyCertificate();
         if (StringUtils.isEmpty(jsonObject.getString("realEstateId"))){
@@ -310,7 +328,13 @@ public class RealEstateMortgageComponent {
         if (StringUtils.isEmpty(jsonObject.getString("certificateType"))){
             realPropertyCertificate.setCertificateType("不动产权证");
         }else {
-            realPropertyCertificate.setCertificateType(jsonObject.getString("certificateType"));//证书类型
+            if (jsonObject.getString("certificateType").equals("房屋不动产证")){
+                realPropertyCertificate.setCertificateType("不动产权证");
+            }else  if (jsonObject.getString("certificateType").equals("房产证")){
+                realPropertyCertificate.setCertificateType("房产证");
+            }else if (jsonObject.getString("certificateType").equals("土地证")){
+                realPropertyCertificate.setCertificateType("土地证");
+            }
         }
         realPropertyCertificate.setRegistrationDate(jsonObject.getString("registerDate"));
         JSONArray glImmovablejsonArray = (JSONArray) jsonObject.get("realEstateUnitInfoVoList");//房屋信息
@@ -341,7 +365,7 @@ public class RealEstateMortgageComponent {
                 realPropertyCertificate.setShareLandArea(glImmovableObject.getString("sharedLandArea"));//分摊土地面积
                 realPropertyCertificate.setSingleLandArea(glImmovableObject.getString("singleLandArea"));//独用土地面积
                 glImmovable.setFwInfo(fwInfo);
-                realPropertyCertificate.getGlImmovableList().add(glImmovable);
+                realPropertyCertificate.getGlImmovableVoList().add(glImmovable);
             }
         }
         //宗地信息
@@ -349,9 +373,21 @@ public class RealEstateMortgageComponent {
         if (null != zdInfojsonArray) {
             for (int j = 0; j < zdInfojsonArray.size(); j++) {
                 JSONObject zdObject = zdInfojsonArray.getJSONObject(j);
-                realPropertyCertificate.setCertificateType(Msgagger.ZONGDI);
                 GlImmovable glImmovable = getZdInfo(zdObject, jsonObject);
-                realPropertyCertificate.getGlImmovableList().add(glImmovable);
+                realPropertyCertificate.getGlImmovableVoList().add(glImmovable);
+            }
+        }
+        //水电气信息
+        JSONObject sdqObject=(JSONObject) JSONObject.parse(jsonObject.getString("sdqInfo"));
+        if (null != sdqObject){
+            if (StringUtils.isNotEmpty(sdqObject.getString("shhh"))){
+                realPropertyCertificate.setWaterNumber(sdqObject.getString("shhh"));
+                realPropertyCertificate.setElectricNumber(sdqObject.getString("dhhh"));
+                realPropertyCertificate.setGasNumber(sdqObject.getString("qhhh"));
+            }else {
+                realPropertyCertificate.setWaterNumber(sdqObject.getString("xshhh"));
+                realPropertyCertificate.setElectricNumber(sdqObject.getString("xdhhh"));
+                realPropertyCertificate.setGasNumber(sdqObject.getString("xqhhh"));
             }
         }
         //权利人信息
@@ -576,7 +612,7 @@ public class RealEstateMortgageComponent {
     private GlImmovable getZdInfo(JSONObject zdObject,JSONObject jsonObject){
         GlImmovable glImmovable = new GlImmovable();
         glImmovable.setImmovableType(Msgagger.ZONGDI);
-        glImmovable.setImmovableId(zdObject.getString("landId"));
+//        glImmovable.setImmovableId(zdObject.getString("landId"));
         ZdInfo zdInfo = new ZdInfo();
         zdInfo.setParcelType(zdObject.getString("landType"));//宗地类型
         zdInfo.setParcelUnicode(zdObject.getString("landUnicode"));//宗地统一编码
@@ -624,7 +660,9 @@ public class RealEstateMortgageComponent {
         glMortgagor.setObligeeType(obligeeQlr);
         RelatedPerson relatedPerson=new RelatedPerson();
         System.out.print(glMortgageHolderObject.getString("obligeeIdType"));
-        relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("obligeeIdType")));
+        if (StringUtils.isNotEmpty(glMortgageHolderObject.getString("obligeeIdType"))){
+            relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("obligeeIdType")));
+        }
         relatedPerson.setObligeeName(glMortgageHolderObject.getString("obligeeName"));
         relatedPerson.setObligeeDocumentNumber(glMortgageHolderObject.getString("obligeeId"));
         glMortgagor.setRelatedPerson(relatedPerson);
@@ -636,8 +674,9 @@ public class RealEstateMortgageComponent {
         glMortgagor.setObligeeName(glMortgageHolderObject.getString("salerName"));
         glMortgagor.setObligeeType(obligeeYwr);
         RelatedPerson relatedPerson=new RelatedPerson();
-        System.out.print(glMortgageHolderObject.getString("salerIdType"));
-        relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("salerIdType")));
+        if (StringUtils.isNotEmpty(glMortgageHolderObject.getString("salerIdType"))){
+            relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("salerIdType")));
+        }
         relatedPerson.setObligeeName(glMortgageHolderObject.getString("salerName"));
         relatedPerson.setObligeeDocumentNumber(glMortgageHolderObject.getString("salerId"));
         glMortgagor.setRelatedPerson(relatedPerson);

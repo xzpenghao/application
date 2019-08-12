@@ -26,7 +26,9 @@ public class RealPropertyCertificate {
     private String houseType;                           //房屋类型
     private String houseRightType;               //房屋权利类型
     private String houseRightNature;             //房屋权利性质
-
+    private String waterNumber;                  //水号
+    private String electricNumber;               //电号
+    private String gasNumber;                    //气号
     private String landRightType;                //土地权利类型
     private String landRightNature;              //土地权利性质
     private String landUseRightStartingDate;     //土地使用权起始日期
@@ -44,9 +46,41 @@ public class RealPropertyCertificate {
     private String ext1;                         //扩展字段1
     private String ext2;                         //扩展字段2
     private String ext3;                         //扩展字段3
-    private List<GlImmovable> glImmovableList=new ArrayList<>();//不动产类型(房屋信息)
+    private List<GlImmovable> glImmovableVoList=new ArrayList<>();//不动产类型(房屋信息)
     private List<GlMortgagor> glObligeeVoList=new ArrayList<>();//权利人数据
     private List<GlMortgagor> glObligorVoList=new ArrayList<>();//义务人数据
+
+    public List<GlImmovable> getGlImmovableVoList() {
+        return glImmovableVoList;
+    }
+
+    public void setGlImmovableVoList(List<GlImmovable> glImmovableVoList) {
+        this.glImmovableVoList = glImmovableVoList;
+    }
+
+    public String getWaterNumber() {
+        return waterNumber;
+    }
+
+    public void setWaterNumber(String waterNumber) {
+        this.waterNumber = waterNumber;
+    }
+
+    public String getElectricNumber() {
+        return electricNumber;
+    }
+
+    public void setElectricNumber(String electricNumber) {
+        this.electricNumber = electricNumber;
+    }
+
+    public String getGasNumber() {
+        return gasNumber;
+    }
+
+    public void setGasNumber(String gasNumber) {
+        this.gasNumber = gasNumber;
+    }
 
     public String getAcceptanceNumber() {
         return acceptanceNumber;
@@ -319,13 +353,7 @@ public class RealPropertyCertificate {
         this.ext3 = ext3;
     }
 
-    public List<GlImmovable> getGlImmovableList() {
-        return glImmovableList;
-    }
 
-    public void setGlImmovableList(List<GlImmovable> glImmovableList) {
-        this.glImmovableList = glImmovableList;
-    }
 
     public List<GlMortgagor> getGlObligeeVoList() {
         return glObligeeVoList;

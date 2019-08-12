@@ -30,6 +30,7 @@ public class SJ_Sjsq  implements Serializable {
     private String ext3;                                       //扩展字段3
     private String ext4;                                       //扩展字段4
 
+
     private List<SJ_Info_Bdcqlxgxx> immovableRightInfoVoList;     //不动产权利信息集合（可能涉及多证）
     private List<Sj_Info_Bdcdyxgxx> immovableCurrentMortgageInfoVoList;     //不动产抵押信息集合（可能涉及多项抵押）
     private Sj_Info_Dyhtxx mortgageContractInfo;              //抵押业务时银行提供的合同信息

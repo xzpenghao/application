@@ -33,7 +33,7 @@
 
         <!-- targetPackage：生成的实体类所在的包 -->
         <!-- targetProject：生成的实体类所在的硬盘位置 -->
-        <javaModelGenerator targetPackage="com.ztgeo.general.entity.service_data.pub_data"
+        <javaModelGenerator targetPackage="com.springboot.popj"
                             targetProject="src/main/java">
             <!-- enableSubPackages:是否让schema作为包的后缀 -->
             <property name="enableSubPackages" value="false" />
@@ -50,12 +50,12 @@
 
         <!-- targetPackage 和 targetProject：生成的 interface 文件的包和位置 -->
         <javaClientGenerator type="XMLMAPPER"
-                             targetPackage="com.ztgeo.general.mapper.penghao" targetProject="src/main/java">
+                             targetPackage="com.springboot.mapper" targetProject="src/main/java">
             <!-- 针对 oracle 数据库的一个配置，是否把 schema 作为字包名 -->
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
 
-        <table tableName="sj_power_fjtm_position" domainObjectName="SJPowerFjtmPosition"
+        <table tableName="sj_exception_record" domainObjectName="ExceptionRecord"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false">

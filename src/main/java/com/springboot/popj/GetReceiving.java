@@ -4,6 +4,16 @@ public class GetReceiving {
 
     private  String slbh;
     private  String messageType;
+    private  String modelId;
+
+
+    public String getModelId() {
+        return modelId;
+    }
+
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
+    }
 
     public String getSlbh() {
         return slbh;

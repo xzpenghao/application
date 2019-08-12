@@ -40,7 +40,7 @@ public class HttpCallComponent {
     public JSONObject callRegistrationBureauForRegister(RegistrationBureau registrationBureauVo){
         //整理json数据
         net.sf.json.JSONObject jsonObject= net.sf.json.JSONObject.fromObject(registrationBureauVo);
-        log.warn("最终传入数据为："+jsonObject.toString());
+        System.out.println("最终传入数据为："+jsonObject.toString());
         //发送到登记局
         String json = httpClientUtils.getJsonData(jsonObject,"http://" + ip + ":" + seam + "/api/services/app/BdcWorkFlow/CreateFlow");
         //转成json判断是否成功
@@ -60,12 +60,27 @@ public class HttpCallComponent {
         JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
         Integer status=jsonObject.getInteger("status");
         if (status!=200){
+
             log.error("用户名或密码错误,找不到对应用户");
             return null;
         }
         String data=jsonObject.getString("data");
         return data;
     }
+
+    public JSONObject getTokenYcsl(String username,String password){
+        Map<String,String> map=new HashMap<>();
+        map.put("username",username);
+        map.put("password",password);
+        Map<String,String> header = new HashMap<String,String>();
+        String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
+                "application/json",
+                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/jwt/token", map,header);
+        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
+        return jsonObject;
+    }
+
+
 
     //获取当前办件的附件列表信息
     public List<SJ_Fjfile> getFileVoList(String receiptNumber,String token){

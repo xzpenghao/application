@@ -40,7 +40,7 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://172.18.0.147:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://10.3.2.206:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -115,6 +115,7 @@ glHouseBuyer:
   obligeeDyqr: 抵押权人
   obligeeDyr: 抵押人
   obligeeQlr: 权利人
+  obligeeYwr: 义务人
 httpclient:
   seam: 23335
   ip: 172.18.0.147
@@ -142,8 +143,8 @@ webplus:
 
   ftpAddressBdc: 172.18.0.147
   ftpPortBdc: 21
-  ftpUsernameBdc: TESTFTP
-  ftpPasswordBdc: TESTFTP
+  ftpUsernameBdc: bdcda
+  ftpPasswordBdc: bdcda
 
 logging:
   level:
@@ -166,6 +167,10 @@ merge:
 mapper:
   mappers: com.github.wxiaoqi.security.common.mapper.CommonMapper
 
+machine:
+  ip: 10.3.2.203
+  post: 7777
+
 chenbin:
   idType: 身份证,1$社会信用统一代码,8$组织机构代码,6
   registrationBureau:           #登记局
@@ -179,3 +184,7 @@ chenbin:
 penghao:
     mortgageCancellation:       #抵押注销登记
         pid: Proc-190724112944-7G1WKMM6
+    contractinformation:        #合同消息获取
+        ip: 172.18.0.112
+        port: 8088
+        region: BDC_jiawang

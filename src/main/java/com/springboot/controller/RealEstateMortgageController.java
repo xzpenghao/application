@@ -2,6 +2,7 @@ package com.springboot.controller;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.AnonymousInnerComponent;
+import com.springboot.component.EsfRoomComponent;
 import com.springboot.component.RealEstateMortgageComponent;
 import com.springboot.popj.GetReceiving;
 import com.springboot.popj.warrant.ParametricData;
@@ -33,9 +34,15 @@ public class RealEstateMortgageController {
     private RealEstateMortgageComponent realEstateMortgageComponent;
     @Autowired
     private AnonymousInnerComponent anonymousInner;
+    @Autowired
+    private EsfRoomComponent esfRoomComponent;
 
 
-
+    @RequestMapping(value = "/AutoBackfillData", method = RequestMethod.POST)
+    @ApiOperation("二手房水电气回填数据自动接口")
+    public ObjectRestResponse AutoBackfillData(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
+        return esfRoomComponent.getAutoBackfillData(commonInterfaceAttributer);
+    }
 
 
 
@@ -63,6 +70,12 @@ public class RealEstateMortgageController {
     @ApiOperation(value = "登记局返回成功数据")
     public void getReceiving(@RequestBody GetReceiving getReceiving, OutputStream resp) throws  IOException{
          anonymousInner.GetReceiving(getReceiving,resp);
+    }
+
+    @RequestMapping(value = "/getSendRoom",method =RequestMethod.POST)
+    @ApiOperation(value = "登记局返回二手房受理成功数据")
+    public void getSendRoom(@RequestBody GetReceiving getReceiving, OutputStream resp) throws  IOException{
+        anonymousInner.getSendRoom(getReceiving,resp);
     }
 
     @RequestMapping(value = "/getMortgageCancellation",method =RequestMethod.POST)

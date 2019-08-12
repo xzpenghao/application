@@ -12,6 +12,9 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
     private String immovableCertificateNo;       //不动产权证号
     private String houseCertificateNo;           //房产证号
     private String landCertificateNo;            //土地证号
+    private String waterNumber;                  //水号
+    private String electricNumber;               //电号
+    private String gasNumber;                    //气号
     private String registrationDate;             //登记日期
     private String certificateType;              //证书类型(与sjsq中证书类型保持一致）
     private BigDecimal architecturalArea;               //建筑面积
@@ -45,6 +48,31 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
     private List<SJ_Bdc_Gl> glImmovableVoList;          //关联的不动产数据
     private List<SJ_Qlr_Gl> glObligeeVoList;            //关联的权利人数据
     private List<SJ_Qlr_Gl> glObligorVoList;            //关联的义务人数据
+
+
+    public String getWaterNumber() {
+        return waterNumber;
+    }
+
+    public void setWaterNumber(String waterNumber) {
+        this.waterNumber = waterNumber;
+    }
+
+    public String getElectricNumber() {
+        return electricNumber;
+    }
+
+    public void setElectricNumber(String electricNumber) {
+        this.electricNumber = electricNumber;
+    }
+
+    public String getGasNumber() {
+        return gasNumber;
+    }
+
+    public void setGasNumber(String gasNumber) {
+        this.gasNumber = gasNumber;
+    }
 
     public String getAcceptanceNumber() {
         return acceptanceNumber;
