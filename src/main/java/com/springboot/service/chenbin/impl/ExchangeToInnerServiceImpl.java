@@ -64,19 +64,19 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     @Override
     public String dealYGYD2Inner(String commonInterfaceAttributer) throws ParseException {
         String result = "处理成功";
-        log.info("转JSON前："+commonInterfaceAttributer);
-        SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer,null,null,null);
-        log.info("转JSON后："+JSONObject.toJSONString(sjsq));
+        log.info("转JSON前：" + commonInterfaceAttributer);
+        SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        log.info("转JSON后：" + JSONObject.toJSONString(sjsq));
         Sj_Info_Jyhtxx jyht = sjsq.getTransactionContractInfo();
         Sj_Info_Dyhtxx dyht = sjsq.getMortgageContractInfo();
-        if(jyht==null){
+        if (jyht == null) {
             throw new ZtgeoBizException("预告预抵业务转内网办件时异常，交易合同信息为空");
         }
-        if(dyht==null){
+        if (dyht == null) {
             throw new ZtgeoBizException("预告预抵业务转内网办件时异常，交易合同信息为空");
         }
-        RegistrationBureau registrationBureau= BusinessDealBaseUtil.dealBaseInfo(sjsq,pid,isSubmit,bizType,dealPerson,areaNo);
-        MortgageBizInfo mortgageBizInfo = BusinessDealBaseUtil.getMortgageBizInfoByContract(jyht,dyht,idType);
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjsq, pid, isSubmit, bizType, dealPerson, areaNo);
+        MortgageBizInfo mortgageBizInfo = BusinessDealBaseUtil.getMortgageBizInfoByContract(jyht, dyht, idType);
         AdvanceBizInfo advanceBizInfo = new AdvanceBizInfo();
 //        AdvanceBizInfo advanceBizInfo = BusinessDealBaseUtil.getAdvanceBizInfoByContract(jyht,dyht,idType);
         advanceBizInfo.setHtbh(mortgageBizInfo.getHtbh());
@@ -88,36 +88,36 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
 //        System.out.println("传入："+JSONObject.toJSONString(registrationBureau));
 //        com.alibaba.fastjson.JSONObject  tokenObject = httpCallComponent.getTokenYcsl(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
 //        String token=anonymousInnerComponent.getToken(tokenObject,"YGYD2Inner",sjsq.getRegisterNumber(),"预告预抵业务转内网办件",sjsq.getReceiptNumber());
-        String token = httpCallComponent.getToken(username,password);
-        if (StringUtils.isBlank(token)){
+        String token = httpCallComponent.getToken(username, password);
+        if (StringUtils.isBlank(token)) {
             return Msgagger.USER_LOGIN_BAD;
         }
         //操作FTP上传附件
-        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(),token);
-        log.warn("双预告附件信息获取成功，为："+ JSONArray.toJSONString(fileVoList));
+        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
+        log.warn("双预告附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
         List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
         registrationBureau.setFileInfoVoList(fileList);
 
-        JSONObject resultObject= httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
-        if(resultObject!=null){
-            if(!(boolean) resultObject.get("success")){
-                log.error("登记局受理失败,原因:"+resultObject.getString("message"));
-                throw new ZtgeoBizException("登记局受理失败,原因:"+resultObject.getString("message"));
+        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
+        if (resultObject != null) {
+            if (!(boolean) resultObject.get("success")) {
+                log.error("登记局受理失败,原因:" + resultObject.getString("message"));
+                throw new ZtgeoBizException("登记局受理失败,原因:" + resultObject.getString("message"));
             }
         } else {
             throw new ZtgeoBizException("内网接口请求异常，返回数据为空，错误无法判定");
         }
-        Map<String,String> mapParmeter=new HashMap<>();
-        mapParmeter.put("receiptNumber",sjsq.getReceiptNumber());
-        mapParmeter.put("registerNumber",resultObject.getString("slbh"));
+        Map<String, String> mapParmeter = new HashMap<>();
+        mapParmeter.put("receiptNumber", sjsq.getReceiptNumber());
+        mapParmeter.put("registerNumber", resultObject.getString("slbh"));
         //返回数据到一窗受理平台保存受理编号和登记编号
-        String resultJson = httpCallComponent.preservationRegistryData(mapParmeter,token);
+        String resultJson = httpCallComponent.preservationRegistryData(mapParmeter, token);
         ObjectRestResponse<Object> resultRV = httpCallComponent.adaptationPreservationReturn(resultJson);
-        if(resultRV.getStatus()==200){
-            result = (String)resultRV.getData();
-        }else{
-            log.error((String)resultRV.getData());
-            throw new ZtgeoBizException((String)resultRV.getData());
+        if (resultRV.getStatus() == 200) {
+            result = (String) resultRV.getData();
+        } else {
+            log.error((String) resultRV.getData());
+            throw new ZtgeoBizException((String) resultRV.getData());
         }
         return result;
     }

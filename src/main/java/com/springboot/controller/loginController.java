@@ -13,8 +13,8 @@ public class loginController {
     private RealEstateMortgageComponent realEstateMortgageComponent;
 
     @RequestMapping("/login")
-    public  String login(){
-        return  "login";
+    public String login() {
+        return "login";
     }
 
 

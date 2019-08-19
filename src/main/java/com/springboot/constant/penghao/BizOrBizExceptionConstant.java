@@ -59,10 +59,10 @@ public class BizOrBizExceptionConstant {
     public final static String RECEIPT_TRANSACTION_CONTRACT_COUNT_ERROR = "交易合同只能选择一个，这里选择了多个";
     public final static String RECEIPT_MORTGAGE_CONTRACT_COUNT_ERROR = "抵押合同只能选择一个，这里选择了多个";
     public final static String RECEIPT_TAXATION_COUNT_ERROR = "地税收件信息只能存在一个，这里选择了多个";
-    public final static String ACTIVITI_MODEL_FOUND="该模板已经部署不得删除";
-    public final static String SERVICE_NOT_MODULEID="模板Id为空";
-    public final static String SAVED_TASKID_IS_EMPTY="数据保存未传入任务Id，保存失败";
-    public final static String SAVED_TASK_MAPPING_STEP_IS_EMPTY="任务无对应步骤";
+    public final static String ACTIVITI_MODEL_FOUND = "该模板已经部署不得删除";
+    public final static String SERVICE_NOT_MODULEID = "模板Id为空";
+    public final static String SAVED_TASKID_IS_EMPTY = "数据保存未传入任务Id，保存失败";
+    public final static String SAVED_TASK_MAPPING_STEP_IS_EMPTY = "任务无对应步骤";
     public final static String GET_DATA_BUT_SVRCODE_IS_NULL = "传入的服务标识为空";
     public final static String GET_DATA_BUT_SVRDATATO_IS_NULL = "未查询到服务数据表，保存失败";
     public final static String GET_DATA_BUT_RECEIPTNUM_IS_NULL = "传入的收件编号为空";

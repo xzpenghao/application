@@ -15,13 +15,13 @@ public class IDUtil {
     }
 
 
-    public static String getExceptionId(){
+    public static String getExceptionId() {
         String date = TimeUtil.getDateString(new Date());
-        return "EXCE-"+date.replaceAll("-","")+"-"+UUID.randomUUID().toString().substring(0,12).replaceAll("-","").toUpperCase();
+        return "EXCE-" + date.replaceAll("-", "") + "-" + UUID.randomUUID().toString().substring(0, 12).replaceAll("-", "").toUpperCase();
     }
 
-    public static String getFinstId(){
+    public static String getFinstId() {
         String date = TimeUtil.getDateString(new Date());
-        return "FINST-"+date.replaceAll("-","")+"-"+UUID.randomUUID().toString().substring(0,12).replaceAll("-","").toUpperCase();
+        return "FINST-" + date.replaceAll("-", "") + "-" + UUID.randomUUID().toString().substring(0, 12).replaceAll("-", "").toUpperCase();
     }
 }

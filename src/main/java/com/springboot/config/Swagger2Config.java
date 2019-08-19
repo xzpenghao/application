@@ -44,7 +44,4 @@ public class Swagger2Config {
     }
 
 
-
-
-
 }

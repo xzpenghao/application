@@ -29,9 +29,9 @@ public class TestRest {
     @Autowired
     private HttpCallComponent httpCallComponent;
 
-    @RequestMapping(value = "/getFileList",method = RequestMethod.POST)
-    public ObjectRestResponse<List<ImmovableFile>> getFileList(@RequestParam("receiptNumber")String receiptNumber,@RequestParam("token")String token){
-        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(receiptNumber,token);
+    @RequestMapping(value = "/getFileList", method = RequestMethod.POST)
+    public ObjectRestResponse<List<ImmovableFile>> getFileList(@RequestParam("receiptNumber") String receiptNumber, @RequestParam("token") String token) {
+        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(receiptNumber, token);
 
         return new ObjectRestResponse<List<ImmovableFile>>().data(null);
     }

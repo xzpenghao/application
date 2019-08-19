@@ -47,26 +47,27 @@ public class EsfRoomComponent {
 
     /**
      * 二手房水电气回填数据自动接口
+     *
      * @param commonInterfaceAttributer
      * @return
      */
-    public  ObjectRestResponse getAutoBackfillData(String commonInterfaceAttributer) throws ParseException {
+    public ObjectRestResponse getAutoBackfillData(String commonInterfaceAttributer) throws ParseException {
         ObjectRestResponse resultRV = new ObjectRestResponse();
-        SJ_Sjsq sjSjsq= SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer,null,null,null);
-        if (null == sjSjsq){
+        SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        if (null == sjSjsq) {
             throw new ZtgeoBizException(Msgagger.SHZH_BAD);
         }
-        SdqEntry sdqEntry=new SdqEntry();
+        SdqEntry sdqEntry = new SdqEntry();
         List<SJ_Info_Handle_Result> handleResultVoList = sjSjsq.getHandleResultVoList();
-        if(handleResultVoList==null){
+        if (handleResultVoList == null) {
             throw new ZtgeoBizException("服务传入异常，水电气处理结果传入为空");
         }
-        for(SJ_Info_Handle_Result handleResult:handleResultVoList){
+        for (SJ_Info_Handle_Result handleResult : handleResultVoList) {
             String serviceCode = handleResult.getServiceCode();
-            if(StringUtils.isBlank(serviceCode)){
+            if (StringUtils.isBlank(serviceCode)) {
                 throw new ZtgeoBizException("传入服务数据异常，传入的服务标识(serviceCode)为空");
             }
-            switch (serviceCode){
+            switch (serviceCode) {
                 case Msgagger.SHUISERVICE_CODE:
                     sdqEntry.setXshh(handleResult.getAcceptanceNumber());
                     sdqEntry.setGsdw(handleResult.getProvideUnit());
@@ -85,38 +86,38 @@ public class EsfRoomComponent {
         }
 
         sdqEntry.setSlbh(sjSjsq.getRegisterNumber());
-        JSONObject jsonObject=JSONObject.fromObject(sdqEntry);
+        JSONObject jsonObject = JSONObject.fromObject(sdqEntry);
 
-        System.out.println("最终传入数据为："+ com.alibaba.fastjson.JSONObject.toJSONString(jsonObject));
+        System.out.println("最终传入数据为：" + com.alibaba.fastjson.JSONObject.toJSONString(jsonObject));
 
-        String pingtai= HttpClientUtils.getJsonData(jsonObject,"http://"+ip+":"+seam+"/api/services/app/BdcBizNotify/WriteBackSDQ");
-        if(StringUtils.isNotBlank(pingtai)) {
+        String pingtai = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcBizNotify/WriteBackSDQ");
+        if (StringUtils.isNotBlank(pingtai)) {
             JSONObject pingObject = JSONObject.fromObject(pingtai);
             if (!(boolean) pingObject.get("success")) {
-                throw new ZtgeoBizException("不动产接口执行异常，返回数据为："+pingObject.getString("message"));
+                throw new ZtgeoBizException("不动产接口执行异常，返回数据为：" + pingObject.getString("message"));
             }
-        }else{
+        } else {
             throw new ZtgeoBizException("不动产接口返回数据异常，返回数据为空");
         }
 
         //返回数据到一窗受理平台保存受理编号和登记编号
-        String token = httpCallComponent.getToken(username,password);
-        if (StringUtils.isBlank(token)){
+        String token = httpCallComponent.getToken(username, password);
+        if (StringUtils.isBlank(token)) {
             throw new ZtgeoBizException("用户token获取异常,取得的token为空");
         }
 
-        Map<String,String> mapParmeter=new HashMap<>();
-        mapParmeter.put("receiptNumber",sjSjsq.getReceiptNumber());
-        mapParmeter.put("registerNumber",sjSjsq.getRegisterNumber());
+        Map<String, String> mapParmeter = new HashMap<>();
+        mapParmeter.put("receiptNumber", sjSjsq.getReceiptNumber());
+        mapParmeter.put("registerNumber", sjSjsq.getRegisterNumber());
 
         //返回一窗受理平台执行步骤提交
-        String resultJson = httpCallComponent.preservationRegistryDataAndSubmit(mapParmeter,token);
+        String resultJson = httpCallComponent.preservationRegistryDataAndSubmit(mapParmeter, token);
         //解析一窗受理返回结果
         resultRV = httpCallComponent.adaptationPreservationReturn(resultJson);
 
-        if(resultRV.getStatus()!=200){
-            log.error((String)resultRV.getData());
-            throw new ZtgeoBizException((String)resultRV.getData());
+        if (resultRV.getStatus() != 200) {
+            log.error((String) resultRV.getData());
+            throw new ZtgeoBizException((String) resultRV.getData());
         }
 
         resultRV.setData(Msgagger.AUTOINTECECG);

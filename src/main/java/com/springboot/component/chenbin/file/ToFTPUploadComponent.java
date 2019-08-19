@@ -28,7 +28,6 @@ public class ToFTPUploadComponent {
     private String ftpPassword;
 
 
-
     @Value("${webplus.ftpAddress}")
     private String yftpAddress;
     @Value("${webplus.ftpPort}")
@@ -39,14 +38,12 @@ public class ToFTPUploadComponent {
     private String yftpPassword;
 
 
-
     //链接
-    private static  FTPClient ftpClient = new FTPClient();
+    private static FTPClient ftpClient = new FTPClient();
     private static String LOCAL_CHARSET = "GBK";
 
 
-
-    public boolean uploadFile(String ftpPath, InputStream input){
+    public boolean uploadFile(String ftpPath, InputStream input) {
         boolean success = false;
         FTPClient ftp = new FTPClient();
         ftp.setControlEncoding("GBK");
@@ -61,9 +58,9 @@ public class ToFTPUploadComponent {
                 return success;
             }
             ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-            String FTP_BASEPATH1 = ftpPath.substring(0,5);
-            String FTP_BASEPATH2 = ftpPath.substring(0,8);
-            String FTP_BASEPATH3 = ftpPath.substring(0,11);
+            String FTP_BASEPATH1 = ftpPath.substring(0, 5);
+            String FTP_BASEPATH2 = ftpPath.substring(0, 8);
+            String FTP_BASEPATH3 = ftpPath.substring(0, 11);
             String originFileName = ftpPath.substring(12);
             ftp.makeDirectory(FTP_BASEPATH1);
             ftp.changeWorkingDirectory(FTP_BASEPATH1);
@@ -71,7 +68,7 @@ public class ToFTPUploadComponent {
             ftp.changeWorkingDirectory(FTP_BASEPATH2);
             ftp.makeDirectory(FTP_BASEPATH3);
             ftp.changeWorkingDirectory(FTP_BASEPATH3);
-            ftp.storeFile(originFileName,input);
+            ftp.storeFile(originFileName, input);
             input.close();
             ftp.logout();
             success = true;
@@ -88,30 +85,31 @@ public class ToFTPUploadComponent {
         return success;
     }
 
-    public boolean uploadFile(String ftpPath, byte[] input){
-        System.out.println("将要上传的地址为："+ftpPath+"，附件大小为："+input.length);
+    public boolean uploadFile(String ftpPath, byte[] input) {
+        System.out.println("将要上传的地址为：" + ftpPath + "，附件大小为：" + input.length);
         ByteArrayInputStream bais = new ByteArrayInputStream(input);
-        return uploadFile(ftpPath,bais);
+        return uploadFile(ftpPath, bais);
     }
 
-    public Object ycslUpload(byte[] bytes,String fileName,String Type){
+    public Object ycslUpload(byte[] bytes, String fileName, String Type) {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        return upYcslloadFile(bais,fileName,Type);
+        return upYcslloadFile(bais, fileName, Type);
     }
 
 
     /**
      * ftp服务器上
+     *
      * @param
      * @return
      */
-    public  Object upYcslloadFile(InputStream input,String fileName,String fileType){
+    public Object upYcslloadFile(InputStream input, String fileName, String fileType) {
         System.out.println(fileName + "\t" + fileType);
-        Map<String,Object> map= Maps.newHashMap();
-        boolean returnValue  = false;
-        String hz=null;
+        Map<String, Object> map = Maps.newHashMap();
+        boolean returnValue = false;
+        String hz = null;
         //路径年/月/日/entryId名称
-        String path= DateUtils.getNowYear()+ File.separator+DateUtils.getNowMonth()+ File.separator+DateUtils.getNowDay();
+        String path = DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
         try {
             log.info("进入附件处理");
             int reply;
@@ -138,12 +136,12 @@ public class ToFTPUploadComponent {
             //创建目录
             mkDir(path);//创建目录
             ftpClient.changeWorkingDirectory("/" + path);//创建完了目录需要将当前工作目录切换过来，然后直接在下面创建文件
-            System.out.println("aa"+ftpClient.changeWorkingDirectory("/" + path));
+            System.out.println("aa" + ftpClient.changeWorkingDirectory("/" + path));
             if (FTPReply.isPositiveCompletion(ftpClient.sendCommand("OPTS UTF8", "ON"))) {// 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码，否则就使用本地编码（GBK）.
                 LOCAL_CHARSET = "UTF-8";
             }
             System.out.println(ftpClient.printWorkingDirectory());
-            returnValue= ftpClient.storeFile(fileName,input);
+            returnValue = ftpClient.storeFile(fileName, input);
             System.out.println(returnValue);
             FTPFile[] fs = ftpClient.listFiles(fileName);
             if (fs.length == 0) {
@@ -154,13 +152,13 @@ public class ToFTPUploadComponent {
             ftpClient.logout();
             input.close();
         } catch (IOException e) {
-            returnValue=false;
+            returnValue = false;
             e.printStackTrace();
             System.out.print(e.getMessage());
         }
-        if (returnValue==true){
-            map.put("fileName",fileName);
-            map.put("path",path);
+        if (returnValue == true) {
+            map.put("fileName", fileName);
+            map.put("path", path);
 //            return path+File.separator+fileName;
             return map;
         }
@@ -168,14 +166,12 @@ public class ToFTPUploadComponent {
     }
 
 
-
-
-    public boolean uploadFileBDC(String fileName,String fileType, InputStream is) {
+    public boolean uploadFileBDC(String fileName, String fileType, InputStream is) {
         boolean success;
         try {
             String fileName_ftp = fileName + "." + fileType;
             //路径年/月/日/entryId名称
-            String mulu= DateUtils.getNowYear()+ File.separator+DateUtils.getNowMonth()+ File.separator+DateUtils.getNowDay();
+            String mulu = DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
             // 上传文件
             FTPClient ftp = new FTPClient();
             ftp.connect(yftpAddress, Integer.valueOf(yftpPort));
@@ -193,7 +189,7 @@ public class ToFTPUploadComponent {
                 mkDir(mulu);
             }
             ftp.changeWorkingDirectory(mulu);
-            success= ftp.storeFile(fileName_ftp, is);
+            success = ftp.storeFile(fileName_ftp, is);
             ftp.logout();
             is.close();
 //            success = true;
@@ -205,15 +201,10 @@ public class ToFTPUploadComponent {
     }
 
 
-
-
-
-
     /**
      * 选择上传的目录，没有创建目录
      *
-     * @param ftpPath
-     *            需要上传、创建的目录
+     * @param ftpPath 需要上传、创建的目录
      * @return
      */
     public static boolean mkDir(String ftpPath) {
@@ -251,12 +242,6 @@ public class ToFTPUploadComponent {
             return false;
         }
     }
-
-
-
-
-
-
 
 
 }

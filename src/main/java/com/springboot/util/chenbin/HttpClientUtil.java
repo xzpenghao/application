@@ -54,12 +54,12 @@ public class HttpClientUtil {
      * 发送http请求
      *
      * @param requestMethod 请求方式（HttpGet、HttpPost、HttpPut、HttpDelete）
-     * @param url 请求路径
-     * @param params post请求参数
-     * @param header 请求头
+     * @param url           请求路径
+     * @param params        post请求参数
+     * @param header        请求头
      * @return 响应文本
      */
-    public static String sendHttp(HttpRequestMethedEnum requestMethod, String contentType, String url, Map<String,String> params, Map<String, String> header) {
+    public static String sendHttp(HttpRequestMethedEnum requestMethod, String contentType, String url, Map<String, String> params, Map<String, String> header) {
         //1、创建一个HttpClient对象;
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse httpResponse = null;
@@ -84,9 +84,9 @@ public class HttpClientUtil {
                                     ContentType.create(contentType, "UTF-8")
                             )
                     );
-                }else{
+                } else {
                     String get_params = EntityUtils.toString(new UrlEncodedFormEntity(getBasicNameValuePairArray(params), Consts.UTF_8));
-                    request = new HttpGet(url+"?"+get_params);
+                    request = new HttpGet(url + "?" + get_params);
                     request.setConfig(requestConfig);
                     System.out.println(request.getURI());
                     System.out.println("GET请求URL处理成功");
@@ -94,14 +94,14 @@ public class HttpClientUtil {
             }
             //4、调用HttpClient对象的execute方法执行请求;
             httpResponse = httpClient.execute(request);
-            if(httpResponse!=null){
+            if (httpResponse != null) {
                 System.err.println(httpResponse);
                 //5、获取请求响应对象和响应Entity;
                 HttpEntity httpEntity = httpResponse.getEntity();
                 //6、从响应对象中获取响应状态，从响应Entity中获取响应内容;
                 if (httpEntity != null && httpResponse.getStatusLine().getStatusCode() == 200) {
                     responseContent = EntityUtils.toString(httpEntity, "UTF-8");
-                }else{
+                } else {
                     //可以抛自定义异常
                     responseContent = EntityUtils.toString(httpEntity, "UTF-8");
                     if (!request.getMethod().equals("GET")) {
@@ -113,7 +113,7 @@ public class HttpClientUtil {
                         }
                     }
                 }
-            }else{
+            } else {
                 responseContent = "{\"status\":\"20500\",\"data\":\"接口请求异常\"}";
             }
         } catch (IOException e) {
@@ -135,28 +135,28 @@ public class HttpClientUtil {
         return responseContent;
     }
 
-    public static StringEntity getThisStringEntity(Map<String,String> params,String contentType){
+    public static StringEntity getThisStringEntity(Map<String, String> params, String contentType) {
         ContentType c = ContentType.create(contentType, "UTF-8");
         System.out.print(c.getCharset().name());
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-        map2List(nvps,params);
-        NameValuePair []nvpsArray = new NameValuePair[nvps.size()];
-        for(int i=0;i<nvps.size();i++){
+        map2List(nvps, params);
+        NameValuePair[] nvpsArray = new NameValuePair[nvps.size()];
+        for (int i = 0; i < nvps.size(); i++) {
             nvpsArray[i] = nvps.get(i);
         }
         c.withParameters(nvpsArray);
-        return new StringEntity(JSON.toJSONString(params),c);
+        return new StringEntity(JSON.toJSONString(params), c);
     }
 
-    public static List<NameValuePair> getThisNameValuePairArray(Map<String,String> params){
+    public static List<NameValuePair> getThisNameValuePairArray(Map<String, String> params) {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-        map2List(nvps,params);
+        map2List(nvps, params);
         return nvps;
     }
 
-    public static List<BasicNameValuePair> getBasicNameValuePairArray(Map<String,String> params){
+    public static List<BasicNameValuePair> getBasicNameValuePairArray(Map<String, String> params) {
         List<BasicNameValuePair> list = new ArrayList<BasicNameValuePair>();
-        for(String key:params.keySet()){
+        for (String key : params.keySet()) {
             list.add(new BasicNameValuePair(key, params.get(key)));
         }
         return list;
@@ -165,11 +165,11 @@ public class HttpClientUtil {
     /**
      * 参数转换，将map中的参数，转到参数列表中
      *
-     * @param nvps				参数列表
-     * @param map				参数列表（map）
+     * @param nvps 参数列表
+     * @param map  参数列表（map）
      */
     public static void map2List(List<NameValuePair> nvps, Map<String, String> map) {
-        if(map==null) return;
+        if (map == null) return;
         // 拼接参数
         for (Map.Entry<String, String> entry : map.entrySet()) {
             nvps.add(new BasicNameValuePair(entry.getKey(), entry

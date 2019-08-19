@@ -1,4 +1,5 @@
 package com.springboot.component;
+
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -25,16 +26,16 @@ public class BdcFTPDownloadComponent {
     @Value("${webplus.ftpPasswordBdc}")
     private String ftpPassword;
     //链接
-    private static  FTPClient ftpClient = new FTPClient();
+    private static FTPClient ftpClient = new FTPClient();
 
 
     // inputstream转byte[]
     private byte[] is2byte(InputStream is) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int len = 1024;
-        byte tmp [] = new byte[len];
-        int i ;
-        while((i=is.read(tmp, 0, len))>0){
+        byte tmp[] = new byte[len];
+        int i;
+        while ((i = is.read(tmp, 0, len)) > 0) {
             baos.write(tmp, 0, i);
         }
         byte imgs[] = baos.toByteArray();
@@ -42,18 +43,18 @@ public class BdcFTPDownloadComponent {
     }
 
 
-
     /**
-     *  下载ftp不动产登记平台图片
+     * 下载ftp不动产登记平台图片
+     *
      * @param remotePath
      * @param fileName
      * @param bytes
      * @return
      */
-    public  byte[] downFile(String remotePath,String fileName,byte [] bytes) {
+    public byte[] downFile(String remotePath, String fileName, byte[] bytes) {
         try {
             int reply;
-            ftpClient.connect(ftpAddress,Integer.parseInt(ftpPort));
+            ftpClient.connect(ftpAddress, Integer.parseInt(ftpPort));
             // 如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
             ftpClient.login(ftpUsername, ftpPassword);// 登录
             reply = ftpClient.getReplyCode();
@@ -81,11 +82,14 @@ public class BdcFTPDownloadComponent {
     }
 
 
-    /** * 删除文件 *
+    /**
+     * 删除文件 *
+     *
      * @param pathname FTP服务器保存目录 *
      * @param filename 要删除的文件名称 *
-     * @return */
-    public boolean deleteFile(String pathname, String filename){
+     * @return
+     */
+    public boolean deleteFile(String pathname, String filename) {
         boolean flag = false;
         try {
             System.out.println("开始删除文件");
@@ -100,10 +104,10 @@ public class BdcFTPDownloadComponent {
             System.out.println("删除文件失败");
             e.printStackTrace();
         } finally {
-            if(ftpClient.isConnected()){
-                try{
+            if (ftpClient.isConnected()) {
+                try {
                     ftpClient.disconnect();
-                }catch(IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -119,17 +123,17 @@ public class BdcFTPDownloadComponent {
         ftpClient = new FTPClient();
         ftpClient.setControlEncoding("utf-8");
         try {
-            System.out.println("connecting...ftp服务器:"+this.ftpAddress+":"+this.ftpPort);
-            ftpClient.connect(ftpAddress,Integer.parseInt(ftpPort)); //连接ftp服务器
+            System.out.println("connecting...ftp服务器:" + this.ftpAddress + ":" + this.ftpPort);
+            ftpClient.connect(ftpAddress, Integer.parseInt(ftpPort)); //连接ftp服务器
             ftpClient.login(ftpUsername, ftpPassword); //登录ftp服务器
             int replyCode = ftpClient.getReplyCode(); //是否成功登录服务器
-            if(!FTPReply.isPositiveCompletion(replyCode)){
-                System.out.println("connect failed...ftp服务器:"+this.ftpUsername+":"+this.ftpPort);
+            if (!FTPReply.isPositiveCompletion(replyCode)) {
+                System.out.println("connect failed...ftp服务器:" + this.ftpUsername + ":" + this.ftpPort);
             }
-            System.out.println("connect successfu...ftp服务器:"+this.ftpUsername+":"+this.ftpPort);
-        }catch (MalformedURLException e) {
+            System.out.println("connect successfu...ftp服务器:" + this.ftpUsername + ":" + this.ftpPort);
+        } catch (MalformedURLException e) {
             e.printStackTrace();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

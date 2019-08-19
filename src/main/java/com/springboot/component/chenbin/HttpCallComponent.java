@@ -37,99 +37,98 @@ public class HttpCallComponent {
     @Value("${httpclient.windowAcceptanceSeam}")
     private String windowAcceptanceSeam; //一窗受理接口
 
-    public JSONObject callRegistrationBureauForRegister(RegistrationBureau registrationBureauVo){
+    public JSONObject callRegistrationBureauForRegister(RegistrationBureau registrationBureauVo) {
         //整理json数据
-        net.sf.json.JSONObject jsonObject= net.sf.json.JSONObject.fromObject(registrationBureauVo);
-        System.out.println("最终传入数据为："+jsonObject.toString());
+        net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(registrationBureauVo);
+        System.out.println("最终传入数据为：" + jsonObject.toString());
         //发送到登记局
-        String json = httpClientUtils.getJsonData(jsonObject,"http://" + ip + ":" + seam + "/api/services/app/BdcWorkFlow/CreateFlow");
+        String json = httpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcWorkFlow/CreateFlow");
         //转成json判断是否成功
-        JSONObject resultObject= (JSONObject) JSONObject.parse(json);
+        JSONObject resultObject = (JSONObject) JSONObject.parse(json);
         return resultObject;
     }
 
     //获取一窗受理用户token
-    public String getToken(String username,String password){
-        Map<String,String> map=new HashMap<>();
-        map.put("username",username);
-        map.put("password",password);
-        Map<String,String> header = new HashMap<String,String>();
+    public String getToken(String username, String password) {
+        Map<String, String> map = new HashMap<>();
+        map.put("username", username);
+        map.put("password", password);
+        Map<String, String> header = new HashMap<String, String>();
         String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
                 "application/json",
-                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/jwt/token", map,header);
-        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
-        Integer status=jsonObject.getInteger("status");
-        if (status!=200){
+                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/jwt/token", map, header);
+        JSONObject jsonObject = (JSONObject) JSONObject.parse(json);
+        Integer status = jsonObject.getInteger("status");
+        if (status != 200) {
             log.error("用户名或密码错误,找不到对应用户");
             return null;
         }
-        String data=jsonObject.getString("data");
+        String data = jsonObject.getString("data");
         return data;
     }
 
-    public JSONObject getTokenYcsl(String username,String password){
-        Map<String,String> map=new HashMap<>();
-        map.put("username",username);
-        map.put("password",password);
-        Map<String,String> header = new HashMap<String,String>();
+    public JSONObject getTokenYcsl(String username, String password) {
+        Map<String, String> map = new HashMap<>();
+        map.put("username", username);
+        map.put("password", password);
+        Map<String, String> header = new HashMap<String, String>();
         String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
                 "application/json",
-                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/jwt/token", map,header);
-        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
+                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/jwt/token", map, header);
+        JSONObject jsonObject = (JSONObject) JSONObject.parse(json);
         return jsonObject;
     }
 
 
-
     //获取当前办件的附件列表信息
-    public List<SJ_Fjfile> getFileVoList(String receiptNumber,String token){
-        Map<String,String> header = new HashMap<String,String>();
-        Map<String,String> params = new HashMap<String,String>();
-        params.put("receiptNumber",receiptNumber);
-        header.put("Authorization",token);
+    public List<SJ_Fjfile> getFileVoList(String receiptNumber, String token) {
+        Map<String, String> header = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("receiptNumber", receiptNumber);
+        header.put("Authorization", token);
         String json = HttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
                 "application/json",
                 "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter4",
-                params,header);
+                params, header);
         JSONObject oo = JSONObject.parseObject(json);
-        List<SJ_Fjfile> fileVoList = JSON.parseArray(JSON.toJSONString(oo.get("data")),SJ_Fjfile.class);
-        System.out.println("chenbin返回信息为："+json);
+        List<SJ_Fjfile> fileVoList = JSON.parseArray(JSON.toJSONString(oo.get("data")), SJ_Fjfile.class);
+        System.out.println("chenbin返回信息为：" + json);
         return fileVoList;
     }
 
     //转内网收到正确响应后执行向一窗受理的请求
-    public String preservationRegistryData(Map<String,String> map,String token){
-        Map<String,String> header = new HashMap<String,String>();
-        header.put("Authorization",token);
+    public String preservationRegistryData(Map<String, String> map, String token) {
+        Map<String, String> header = new HashMap<String, String>();
+        header.put("Authorization", token);
         String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
                 "application/json",
                 "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter1",
-                map,header);
-        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
-        System.out.println("chenbin返回信息为："+jsonObject);
+                map, header);
+        JSONObject jsonObject = (JSONObject) JSONObject.parse(json);
+        System.out.println("chenbin返回信息为：" + jsonObject);
         return json;
     }
 
     //内网提交数据后执行向一窗受理的请求（带流程提交）
-    public String preservationRegistryDataAndSubmit(Map<String,String> map,String token){
-        Map<String,String> header = new HashMap<String,String>();
-        header.put("Authorization",token);
+    public String preservationRegistryDataAndSubmit(Map<String, String> map, String token) {
+        Map<String, String> header = new HashMap<String, String>();
+        header.put("Authorization", token);
         String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
                 "application/json",
                 "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter2",
-                map,header);
-        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
-        System.out.println("chenbin返回信息为："+jsonObject);
+                map, header);
+        JSONObject jsonObject = (JSONObject) JSONObject.parse(json);
+        System.out.println("chenbin返回信息为：" + jsonObject);
         return json;
     }
 
-    public ObjectRestResponse<Object> adaptationPreservationReturn(String resultJson){
+    public ObjectRestResponse<Object> adaptationPreservationReturn(String resultJson) {
         ObjectRestResponse<Object> resultRV = new ObjectRestResponse<Object>();
-        JSONObject resultSlObject= (JSONObject) JSONObject.parse(resultJson);
-        if (resultSlObject.getString("status").equals("200")){
+        JSONObject resultSlObject = (JSONObject) JSONObject.parse(resultJson);
+        if (resultSlObject.getString("status").equals("200")) {
             resultRV.data("流程提交成功");
             log.info(Msgagger.AUTOINTECECG);
-        }else {
+        } else {
             resultRV.setStatus(resultSlObject.getInteger("status"));
             resultRV.data(resultSlObject.getString("message"));
             log.error(Msgagger.AUTOINTECEBAD);

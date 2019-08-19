@@ -23,21 +23,21 @@ public class ExchangeToInnerRest {
     @Autowired
     private ExchangeToInnerService exchangeToInnerService;
 
-    @RequestMapping(value = "YGYD2Inner",method = RequestMethod.POST)
-    public ObjectRestResponse<String> YGYD2Inner(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer){
+    @RequestMapping(value = "YGYD2Inner", method = RequestMethod.POST)
+    public ObjectRestResponse<String> YGYD2Inner(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
-        try{
-            log.warn("双预告转入，本次参数为："+commonInterfaceAttributer);
+        try {
+            log.warn("双预告转入，本次参数为：" + commonInterfaceAttributer);
             rv.data(exchangeToInnerService.dealYGYD2Inner(commonInterfaceAttributer));
-        }catch (ParseException e1){
+        } catch (ParseException e1) {
             log.error(ErrorDealUtil.getErrorInfo(e1));
             rv.setStatus(20500);
             rv.setData("转内网传入的数据格式不正确");
-        }catch (ZtgeoBizException e2){
+        } catch (ZtgeoBizException e2) {
             log.error(ErrorDealUtil.getErrorInfo(e2));
             rv.setStatus(20500);
             rv.setData(e2.getMessage());
-        }catch (Exception e3){
+        } catch (Exception e3) {
             log.error(ErrorDealUtil.getErrorInfo(e3));
             rv.setStatus(20500);
             rv.setData("转内网出现其它运行时异常，请排查！");
@@ -45,8 +45,8 @@ public class ExchangeToInnerRest {
         return rv;
     }
 
-    @RequestMapping(value = "newWEG2Inner",method = RequestMethod.POST)
-    public ObjectRestResponse<String> newWEG2Inner(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer){
+    @RequestMapping(value = "newWEG2Inner", method = RequestMethod.POST)
+    public ObjectRestResponse<String> newWEG2Inner(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
 
         return rv;

@@ -47,18 +47,17 @@ public class RealEstateMortgageController {
     }
 
 
-
     @RequestMapping(value = "/getRealEstateMortgage", method = RequestMethod.POST)
     @ApiOperation("不动产抵押信息")
-    public ObjectRestResponse getRealEstateMortgage(@RequestParam("dyzmh") String dyzmh,@RequestParam(value = "qlrmc",required = false) String qlrmc) throws Exception {
+    public ObjectRestResponse getRealEstateMortgage(@RequestParam("dyzmh") String dyzmh, @RequestParam(value = "qlrmc", required = false) String qlrmc) throws Exception {
         System.out.println(dyzmh);
-        return  realEstateMortgageComponent.getRealEstateMortgage(dyzmh,qlrmc,false);
+        return realEstateMortgageComponent.getRealEstateMortgage(dyzmh, qlrmc, false);
     }
 
     @RequestMapping(value = "/getRealPropertyCertificate", method = RequestMethod.POST)
     @ApiOperation("不动产权属信息")
     public ObjectRestResponse getRealPropertyCertificate(@RequestBody ParametricData parametricData) throws Exception {
-        return  realEstateMortgageComponent.getRealPropertyCertificate(parametricData);
+        return realEstateMortgageComponent.getRealPropertyCertificate(parametricData);
     }
 
 
@@ -68,38 +67,38 @@ public class RealEstateMortgageController {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
             rv = realEstateMortgageComponent.sendRegistrationMortgageRevocation(commonInterfaceAttributer);
-        }catch (ParseException e1){
+        } catch (ParseException e1) {
             log.error(ErrorDealUtil.getErrorInfo(e1));
             rv.setStatus(20500);
             rv.setData("传入的数据格式不正确");
-        }catch (ZtgeoBizException e2){
+        } catch (ZtgeoBizException e2) {
             log.error(ErrorDealUtil.getErrorInfo(e2));
             rv.setStatus(20500);
             rv.setData(e2.getMessage());
-        }catch (Exception e3){
+        } catch (Exception e3) {
             log.error(ErrorDealUtil.getErrorInfo(e3));
             rv.setStatus(20500);
             rv.setData("内网同步出现其它运行时异常，请排查！");
         }
-        return  rv;
+        return rv;
     }
 
-    @RequestMapping(value = "/getReceiving",method =RequestMethod.POST)
+    @RequestMapping(value = "/getReceiving", method = RequestMethod.POST)
     @ApiOperation(value = "登记局返回成功数据")
-    public void getReceiving(@RequestBody GetReceiving getReceiving, OutputStream resp) throws  IOException{
-         anonymousInner.GetReceiving(getReceiving,resp);
+    public void getReceiving(@RequestBody GetReceiving getReceiving, OutputStream resp) throws IOException {
+        anonymousInner.GetReceiving(getReceiving, resp);
     }
 
-    @RequestMapping(value = "/getSendRoom",method =RequestMethod.POST)
+    @RequestMapping(value = "/getSendRoom", method = RequestMethod.POST)
     @ApiOperation(value = "登记局返回二手房受理成功数据")
-    public void getSendRoom(@RequestBody GetReceiving getReceiving, OutputStream resp) throws  IOException{
-        anonymousInner.getSendRoom(getReceiving,resp);
+    public void getSendRoom(@RequestBody GetReceiving getReceiving, OutputStream resp) throws IOException {
+        anonymousInner.getSendRoom(getReceiving, resp);
     }
 
-    @RequestMapping(value = "/getMortgageCancellation",method =RequestMethod.POST)
+    @RequestMapping(value = "/getMortgageCancellation", method = RequestMethod.POST)
     @ApiOperation(value = "不动产预告证明号")
-    public ObjectRestResponse getMortgageCancellation(String ygzmh) throws  Exception{
-         return   realEstateMortgageComponent.getMortgageCancellation(ygzmh);
+    public ObjectRestResponse getMortgageCancellation(String ygzmh) throws Exception {
+        return realEstateMortgageComponent.getMortgageCancellation(ygzmh);
     }
 
 

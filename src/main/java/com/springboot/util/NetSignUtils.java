@@ -1,4 +1,5 @@
 package com.springboot.util;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -19,12 +20,11 @@ import java.util.List;
 public class NetSignUtils {
 
     @Value("${penghao.contractinformation.ip}")
-    private  String ip;//ip
+    private String ip;//ip
     @Value("${penghao.contractinformation.port}")
-    private  String port;//端口
+    private String port;//端口
     @Value("${penghao.contractinformation.region}")
-    private  String region;//地区
-
+    private String region;//地区
 
 
     public static void main(String[] args) throws Exception {
@@ -34,13 +34,15 @@ public class NetSignUtils {
 //        stringList.add(htxx);
 //        stringList.add(qlrxx);
     }
+
     /**
      * 二手房合同信息
+     *
      * @param clhtbah
      * @return
      * @throws Exception
      */
-    public  String esfyght(String clhtbah) throws Exception {
+    public String esfyght(String clhtbah) throws Exception {
         //soap服务地址
         String soapXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
                 + "<soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
@@ -54,11 +56,12 @@ public class NetSignUtils {
 
     /**
      * 获取买卖双方信息
+     *
      * @param clhtbah
      * @return
      * @throws Exception
      */
-    public  String esfsfxx(String clhtbah) throws Exception {
+    public String esfsfxx(String clhtbah) throws Exception {
         //soap服务地址
 
         String soapXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
@@ -71,32 +74,33 @@ public class NetSignUtils {
     }
 
 
-
     /**
      * 商品房合同信息
+     *
      * @param contractNumber
      * @return
      * @throws Exception
      */
-    public  String spfyght(String contractNumber) throws Exception {
+    public String spfyght(String contractNumber) throws Exception {
         //soap服务地址
 
         String soapXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
                 + "<soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
                 "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">"
                 + "<soap12:Body>" + "<FC_SPFYGHT>" + "<sParams>" + "HTBH="
-                + contractNumber + ",SPFHTBAH="+ contractNumber +"</sParams>" + "</FC_SPFYGHT>" + "</soap12:Body>" + "</soap12:Envelope>";
+                + contractNumber + ",SPFHTBAH=" + contractNumber + "</sParams>" + "</FC_SPFYGHT>" + "</soap12:Body>" + "</soap12:Envelope>";
 
         return client(soapXml);
     }
 
     /**
      * 商品房权利人信息
+     *
      * @param contractNumber
      * @return
      * @throws Exception
      */
-    public  String spfQlrxx(String contractNumber) throws Exception {
+    public String spfQlrxx(String contractNumber) throws Exception {
         //soap服务地址
 //        String url = "http://"+ip+":"+port+"/"+region+"/BDCSrv.asmx?wsdl";
         String soapXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
@@ -109,14 +113,13 @@ public class NetSignUtils {
     }
 
 
-
-    private  String client(String soapXml) throws Exception{
+    private String client(String soapXml) throws Exception {
         //创建httpcleint对象
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        String url="http://"+ip+":"+port+"/"+region+"/BDCSrv.asmx?wsdl";
+        String url = "http://" + ip + ":" + port + "/" + region + "/BDCSrv.asmx?wsdl";
         //创建http Post请求
         HttpPost httpPost = new HttpPost(url);
-        String str="";
+        String str = "";
         // 构建请求配置信息
         RequestConfig config = RequestConfig.custom().setConnectTimeout(1000) // 创建连接的最长时间
                 .setConnectionRequestTimeout(500) // 从连接池中获取到连接的最长时间
@@ -137,7 +140,7 @@ public class NetSignUtils {
             if (response.getStatusLine().getStatusCode() == 200) {
                 String content = EntityUtils.toString(response.getEntity(), "UTF-8");
                 System.out.println(content);
-                return  content;
+                return content;
             } else {
                 System.out.println("调用失败!" + response.getStatusLine().toString());
                 return str;
@@ -154,8 +157,6 @@ public class NetSignUtils {
         }
         return str;
     }
-
-
 
 
 }

@@ -40,8 +40,7 @@ public class HTSoapAnalyzeComponent {
     private RealEstateMortgageComponent realEstateMortgageComponent;
 
 
-
-    public  ObjectRestResponse ersxxSoap(String clhtbah,String htbah) throws  DocumentException {
+    public ObjectRestResponse ersxxSoap(String clhtbah, String htbah) throws DocumentException {
         ObjectRestResponse rv = new ObjectRestResponse();
         Document docHT = DocumentHelper.parseText(clhtbah);//报文转成doc对象
         Element root = docHT.getRootElement();//获取根元素，准备递归解析这个XML树
@@ -80,15 +79,15 @@ public class HTSoapAnalyzeComponent {
             for (Element elemq : elemqs) {
                 Map<String, Object> qlrmap = ParseXML.parseByElement(elemq);
                 String zjlx = (String) qlrmap.get("ZJLX");
-                String zjlb =realEstateMortgageComponent.getZjlb(zjlx);
+                String zjlb = realEstateMortgageComponent.getZjlb(zjlx);
                 if (Integer.parseInt((String) qlrmap.get("XGRLX")) == 0) {
                     //售房者
-                    businessContract.getGlHouseSellerVoList().add(getGlHouseSeller(zjlb,obligeeType,qlrmap));
-                }else {
-                    businessContract.getGlHouseBuyerVoList().add(getGlHouseBuyer(zjlb,obligeeType,qlrmap));
+                    businessContract.getGlHouseSellerVoList().add(getGlHouseSeller(zjlb, obligeeType, qlrmap));
+                } else {
+                    businessContract.getGlHouseBuyerVoList().add(getGlHouseBuyer(zjlb, obligeeType, qlrmap));
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.getStackTrace();
             log.error(e.getMessage().toString());
         }
@@ -100,42 +99,41 @@ public class HTSoapAnalyzeComponent {
     }
 
 
-
-    private  GlHouseSeller getGlHouseSeller(String zjlb,String obligeeType,Map<String, Object> qlrmap){
+    private GlHouseSeller getGlHouseSeller(String zjlb, String obligeeType, Map<String, Object> qlrmap) {
         GlHouseSeller glHouseSeller = new GlHouseSeller();
         glHouseSeller.setObligeeName((String) qlrmap.get("XGRMC"));//售房名称
         glHouseSeller.setObligeeType(obligeeType);
-        if (StringUtils.isNotEmpty((String) qlrmap.get("XGRSX"))){
+        if (StringUtils.isNotEmpty((String) qlrmap.get("XGRSX"))) {
             glHouseSeller.setObligeeOrder(Integer.parseInt((String) qlrmap.get("XGRSX")));
         }
         RelatedPerson relatedPerson = new RelatedPerson();
         relatedPerson.setObligeeName((String) qlrmap.get("XGRMC"));
         relatedPerson.setObligeeDocumentType(zjlb);
-        relatedPerson.setObligeeDocumentNumber((String)qlrmap.get("ZJHM"));
+        relatedPerson.setObligeeDocumentNumber((String) qlrmap.get("ZJHM"));
         glHouseSeller.setRelatedPerson(relatedPerson);
-        return  glHouseSeller;
+        return glHouseSeller;
     }
 
 
-    private GlHouseBuyer getGlHouseBuyer(String zjlb,String obligeeType,Map<String, Object> qlrmap){
+    private GlHouseBuyer getGlHouseBuyer(String zjlb, String obligeeType, Map<String, Object> qlrmap) {
         GlHouseBuyer glHouseBuyer = new GlHouseBuyer();
         glHouseBuyer.setObligeeName((String) qlrmap.get("XGRMC"));//买房
         glHouseBuyer.setObligeeType(obligeeType);
-        if (StringUtils.isNotEmpty((String) qlrmap.get("XGRSX"))){
+        if (StringUtils.isNotEmpty((String) qlrmap.get("XGRSX"))) {
             glHouseBuyer.setObligeeOrder(Integer.parseInt((String) qlrmap.get("XGRSX")));
         }
         RelatedPerson relatedPerson = new RelatedPerson();
         relatedPerson.setObligeeDocumentType(zjlb);
-        relatedPerson.setObligeeDocumentNumber((String)qlrmap.get("ZJHM"));
+        relatedPerson.setObligeeDocumentNumber((String) qlrmap.get("ZJHM"));
         relatedPerson.setObligeeName((String) qlrmap.get("XGRMC"));
         glHouseBuyer.setRelatedPerson(relatedPerson);
-        return  glHouseBuyer;
+        return glHouseBuyer;
     }
-
 
 
     /**
      * 商品房信息获取
+     *
      * @param htxml
      * @param qlrxml
      * @return
@@ -189,11 +187,11 @@ public class HTSoapAnalyzeComponent {
         for (Element elemq : elemqs) {
             Map<String, Object> qlrmap = ParseXML.parseByElement(elemq);
             String zjlx = (String) qlrmap.get("ZJLX");
-            String zjlb =realEstateMortgageComponent.getZjlb(zjlx);
+            String zjlb = realEstateMortgageComponent.getZjlb(zjlx);
             if (Integer.parseInt((String) qlrmap.get("XGRLX")) == 0) {
-                  businessContract.getGlHouseSellerVoList().add(getGlHouseSeller(zjlb,obligeeType,qlrmap));
-            }else {
-                businessContract.getGlHouseBuyerVoList().add(getGlHouseBuyer(zjlb,obligeeType,qlrmap));
+                businessContract.getGlHouseSellerVoList().add(getGlHouseSeller(zjlb, obligeeType, qlrmap));
+            } else {
+                businessContract.getGlHouseBuyerVoList().add(getGlHouseBuyer(zjlb, obligeeType, qlrmap));
             }
         }
         rv.setMessage("success");

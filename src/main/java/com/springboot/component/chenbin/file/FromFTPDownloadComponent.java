@@ -23,12 +23,12 @@ public class FromFTPDownloadComponent {
     @Value("${webplus.ftpPassword}")
     private String ftpPassword;
 
-    public boolean downFile(String remotePath,String fileName, SJ_Fjfile fj) {
+    public boolean downFile(String remotePath, String fileName, SJ_Fjfile fj) {
         boolean success = false;
         FTPClient ftp = new FTPClient();
         try {
             int reply;
-            ftp.connect(ftpAddress,Integer.parseInt(ftpPort));
+            ftp.connect(ftpAddress, Integer.parseInt(ftpPort));
             // 如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
             ftp.login(ftpUsername, ftpPassword);// 登录
             reply = ftp.getReplyCode();
@@ -36,16 +36,16 @@ public class FromFTPDownloadComponent {
                 ftp.disconnect();
                 return success;
             }
-            System.out.println(remotePath+"   "+fileName);
+            System.out.println(remotePath + "   " + fileName);
             ftp.changeWorkingDirectory(remotePath);// 转移到FTP服务器目录
-            System.out.println("path:"+remotePath+",name:"+fileName+",fj:"+ JSONObject.toJSONString(fj));
+            System.out.println("path:" + remotePath + ",name:" + fileName + ",fj:" + JSONObject.toJSONString(fj));
             //下载指定文件
-            InputStream is = ftp.retrieveFileStream(new String(fileName.getBytes("UTF-8"),"ISO-8859-1"));
+            InputStream is = ftp.retrieveFileStream(new String(fileName.getBytes("UTF-8"), "ISO-8859-1"));
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             IOUtils.copy(is, out);
             byte[] bs = out.toByteArray();
             int length = bs.length;
-            System.out.println("附件字节长度："+length);
+            System.out.println("附件字节长度：" + length);
             fj.setFileSize(Integer.toString(length));
             fj.setFileContent(bs);
             out.close();

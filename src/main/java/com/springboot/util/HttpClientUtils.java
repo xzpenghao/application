@@ -96,7 +96,7 @@ public class HttpClientUtils {
             e.getStackTrace();
             log.error(e.getMessage());
         }
-        System.out.println("返回结果"+sb.toString());
+        System.out.println("返回结果" + sb.toString());
         return sb.toString();
     }
 
@@ -106,7 +106,7 @@ public class HttpClientUtils {
             Iterator<String> it = params.keySet().iterator();
             while (it.hasNext()) {
                 String key = it.next();
-                if(params.get(key) != null) {
+                if (params.get(key) != null) {
                     String value = String.valueOf(params.get(key));
                     list.add(new BasicNameValuePair(key, value));
                 }
@@ -120,8 +120,7 @@ public class HttpClientUtils {
     /**
      * 向指定URL发送GET方法的请求
      *
-     * @param url
-     *            发送请求的URL
+     * @param url 发送请求的URL
      * @param
      * @return URL 所代表远程资源的响应结果
      */
@@ -135,9 +134,9 @@ public class HttpClientUtils {
             if (params != null && !params.isEmpty()) {
                 String str = EntityUtils.toString(new UrlEncodedFormEntity(map2NameValuePairList(params), HTTP.UTF_8));
                 String uri = httpGet.getURI().toString();
-                if(uri.indexOf("?") >= 0){
+                if (uri.indexOf("?") >= 0) {
                     httpGet.setURI(new URI(httpGet.getURI().toString() + "&" + str));
-                }else {
+                } else {
                     httpGet.setURI(new URI(httpGet.getURI().toString() + "?" + str));
                 }
             }
@@ -145,13 +144,13 @@ public class HttpClientUtils {
             // 设置Header
             if (header != null && !header.isEmpty()) {
                 log.debug("   header: " + header);
-                for (Iterator<Map.Entry<String, String>> it = header.entrySet().iterator(); it.hasNext();) {
+                for (Iterator<Map.Entry<String, String>> it = header.entrySet().iterator(); it.hasNext(); ) {
                     Map.Entry<String, String> entry = (Map.Entry<String, String>) it.next();
                     httpGet.setHeader(new BasicHeader(entry.getKey(), entry.getValue()));
                 }
             }
             // 发送请求,获取返回数据
-            body =  execute(httpGet);
+            body = execute(httpGet);
         } catch (Exception e) {
             throw e;
         }
@@ -172,7 +171,7 @@ public class HttpClientUtils {
                 EntityUtils.consume(entity);
             } catch (Exception e) {
                 throw e;
-            }finally {
+            } finally {
                 response.close();
             }
         } catch (Exception e) {

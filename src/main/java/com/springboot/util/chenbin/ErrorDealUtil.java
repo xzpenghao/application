@@ -5,12 +5,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class ErrorDealUtil {
-    public static String getErrorInfo(Exception e){
+    public static String getErrorInfo(Exception e) {
         StringWriter sw = null;
         PrintWriter pw = null;
         try {
             sw = new StringWriter();
-            pw =  new PrintWriter(sw);
+            pw = new PrintWriter(sw);
             //将出错的栈信息输出到printWriter中
             e.printStackTrace(pw);
             pw.flush();
@@ -27,6 +27,6 @@ public class ErrorDealUtil {
                 pw.close();
             }
         }
-         return sw.toString();
+        return sw.toString();
     }
 }
