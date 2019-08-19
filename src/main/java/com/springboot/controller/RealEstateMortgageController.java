@@ -4,8 +4,10 @@ import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.component.EsfRoomComponent;
 import com.springboot.component.RealEstateMortgageComponent;
+import com.springboot.config.ZtgeoBizException;
 import com.springboot.popj.GetReceiving;
 import com.springboot.popj.warrant.ParametricData;
+import com.springboot.util.chenbin.ErrorDealUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +65,23 @@ public class RealEstateMortgageController {
     @RequestMapping(value = "/sendRegistrationMortgageRevocation", method = RequestMethod.POST)
     @ApiOperation("发送数据到登记局进行审批操作返回受理编号")
     public ObjectRestResponse sendRegistrationMortgageRevocation(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws ParseException {
-        return  realEstateMortgageComponent.sendRegistrationMortgageRevocation(commonInterfaceAttributer);
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        try {
+            rv = realEstateMortgageComponent.sendRegistrationMortgageRevocation(commonInterfaceAttributer);
+        }catch (ParseException e1){
+            log.error(ErrorDealUtil.getErrorInfo(e1));
+            rv.setStatus(20500);
+            rv.setData("传入的数据格式不正确");
+        }catch (ZtgeoBizException e2){
+            log.error(ErrorDealUtil.getErrorInfo(e2));
+            rv.setStatus(20500);
+            rv.setData(e2.getMessage());
+        }catch (Exception e3){
+            log.error(ErrorDealUtil.getErrorInfo(e3));
+            rv.setStatus(20500);
+            rv.setData("内网同步出现其它运行时异常，请排查！");
+        }
+        return  rv;
     }
 
     @RequestMapping(value = "/getReceiving",method =RequestMethod.POST)

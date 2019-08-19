@@ -60,7 +60,6 @@ public class HttpCallComponent {
         JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
         Integer status=jsonObject.getInteger("status");
         if (status!=200){
-
             log.error("用户名或密码错误,找不到对应用户");
             return null;
         }
@@ -105,6 +104,19 @@ public class HttpCallComponent {
         String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
                 "application/json",
                 "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter1",
+                map,header);
+        JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
+        System.out.println("chenbin返回信息为："+jsonObject);
+        return json;
+    }
+
+    //内网提交数据后执行向一窗受理的请求（带流程提交）
+    public String preservationRegistryDataAndSubmit(Map<String,String> map,String token){
+        Map<String,String> header = new HashMap<String,String>();
+        header.put("Authorization",token);
+        String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
+                "application/json",
+                "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter2",
                 map,header);
         JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
         System.out.println("chenbin返回信息为："+jsonObject);

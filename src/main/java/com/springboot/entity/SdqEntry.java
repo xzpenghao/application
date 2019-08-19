@@ -6,6 +6,9 @@ public class SdqEntry {
     private String xshh;//新水户号
     private String xdhh;//新电户号
     private String xqhh;//新气户号
+    private String gsdw;//供水单位
+    private String gddw;//供电单位
+    private String gqdw;//供气单位
 
     public String getSlbh() {
         return slbh;
@@ -37,5 +40,29 @@ public class SdqEntry {
 
     public void setXqhh(String xqhh) {
         this.xqhh = xqhh;
+    }
+
+    public String getGsdw() {
+        return gsdw;
+    }
+
+    public void setGsdw(String gsdw) {
+        this.gsdw = gsdw;
+    }
+
+    public String getGddw() {
+        return gddw;
+    }
+
+    public void setGddw(String gddw) {
+        this.gddw = gddw;
+    }
+
+    public String getGqdw() {
+        return gqdw;
+    }
+
+    public void setGqdw(String gqdw) {
+        this.gqdw = gqdw;
     }
 }

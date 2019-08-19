@@ -44,4 +44,11 @@ public class ExchangeToInnerRest {
         }
         return rv;
     }
+
+    @RequestMapping(value = "newWEG2Inner",method = RequestMethod.POST)
+    public ObjectRestResponse<String> newWEG2Inner(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer){
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+
+        return rv;
+    }
 }

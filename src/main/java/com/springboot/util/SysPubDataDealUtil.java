@@ -266,7 +266,7 @@ public class SysPubDataDealUtil {
     }
     public static void dealHandleResults(String JSON_serviceDataInfos, SJ_Sjsq sjsq, String serviceCode){
         List<JSONHandleResult> handleResults = JSONArray.parseArray(JSON_serviceDataInfos,JSONHandleResult.class);
-        List<SJ_Info_Handle_Result> sj_handleResults = new ArrayList<SJ_Info_Handle_Result>();
+        List<SJ_Info_Handle_Result> sj_handleResults = sjsq.getHandleResultVoList()==null?new ArrayList<SJ_Info_Handle_Result>():sjsq.getHandleResultVoList();
         for(JSONHandleResult handleResult:handleResults){
             SJ_Info_Handle_Result sj_handleResult = JSON.parseObject(JSON.toJSONString(handleResult), SJ_Info_Handle_Result.class);
             baseSetting(sj_handleResult,serviceCode,sjsq.getReceiptNumber());

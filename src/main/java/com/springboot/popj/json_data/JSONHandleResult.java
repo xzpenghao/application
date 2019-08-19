@@ -9,6 +9,7 @@ import java.util.Date;
 public class JSONHandleResult implements Serializable {
     private String infoId;                          //主键
     private String receiptNumber;                   //收件编号-sj_sjsq表主键
+    private String acceptanceNumber;
     private String handleResult;
     private String handleText;
     private String remarks;
@@ -36,6 +37,14 @@ public class JSONHandleResult implements Serializable {
 
     public void setReceiptNumber(String receiptNumber) {
         this.receiptNumber = receiptNumber;
+    }
+
+    public String getAcceptanceNumber() {
+        return acceptanceNumber;
+    }
+
+    public void setAcceptanceNumber(String acceptanceNumber) {
+        this.acceptanceNumber = acceptanceNumber;
     }
 
     public String getHandleResult() {

@@ -13,10 +13,7 @@ import com.springboot.popj.ExceptionRecord;
 import com.springboot.popj.GetReceiving;
 import com.springboot.popj.MortgageService;
 import com.springboot.popj.ReturnVo;
-import com.springboot.popj.pub_data.RespServiceData;
-import com.springboot.popj.pub_data.SJ_File;
-import com.springboot.popj.pub_data.SJ_Info_Handle_Result;
-import com.springboot.popj.pub_data.SJ_Sjsq;
+import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.HttpRequestMethedEnum;
 import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.util.HttpClientUtils;
@@ -27,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -87,7 +85,7 @@ public class AnonymousInnerComponent {
                         return Msgagger.USER_LOGIN_BAD;
                     }
                     mapHeader.put("Authorization",token);
-                    if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {//审核
+                    if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {//受理
                         mapParmeter.put("modelId",getReceiving.getModelId());
                         //受理启动一窗受理流程
                         String entry=httpClientUtils.doGet("http://"+windowAcceptanceIp+":"+windowAcceptanceSeam+"/api/biz/RecService/DealRecieveFromOuter6",modelMap,mapHeader);
@@ -186,11 +184,18 @@ public class AnonymousInnerComponent {
         sjSjsq.setDistrictCode(jsonObject.getString("businessAreas"));//区县编码
         List<RealPropertyCertificate> realPropertyCertificateList=new ArrayList<>();
         String array=jsonObject.getString("realEstateInfoList");
+        com.alibaba.fastjson.JSONObject obj1 = jsonObject.getJSONObject("sdqInfo");
         com.alibaba.fastjson.JSONArray jsonArray= com.alibaba.fastjson.JSONArray.parseArray(array);
+
+        //整理水电气部门至不动产sj
+        List<SJ_Execute_depart> executeDeparts = getExecuteDeparts(obj1);
+        sjSjsq.setExecuteDeparts(executeDeparts);
+
         if (null != jsonArray){
             for (int i=0;i<jsonArray.size();i++) {
                 com.alibaba.fastjson.JSONObject jsonObject1=jsonArray.getJSONObject(i);
-                RealPropertyCertificate realPropertyCertificate = realEstateMortgageComponent.getRealPropertyCertificatexx(jsonObject1);
+                //设置serviceInfo信息
+                RealPropertyCertificate realPropertyCertificate = realEstateMortgageComponent.getRealPropertyCertificatexx(jsonObject1,obj1);
                 realPropertyCertificateList.add(realPropertyCertificate);
             }
         }
@@ -211,6 +216,29 @@ public class AnonymousInnerComponent {
             JSONObject sjsqObject=JSONObject.fromObject(sjSjsq);
             stringMap.put("SJ_Sjsq",sjsqObject.toString());//收件
         }
+    }
+
+    public List<SJ_Execute_depart> getExecuteDeparts(com.alibaba.fastjson.JSONObject obj1){
+        List<SJ_Execute_depart> departs = new ArrayList<SJ_Execute_depart>();
+        if(obj1==null){
+            return null;
+        }
+        if(StringUtils.isNotBlank(obj1.getString("gsdw"))){
+            SJ_Execute_depart depart_s = new SJ_Execute_depart();
+            depart_s.setExecuteDepart(obj1.getString("gsdw"));
+            departs.add(depart_s);
+        }
+        if(StringUtils.isNotBlank(obj1.getString("gddw"))){
+            SJ_Execute_depart depart_d = new SJ_Execute_depart();
+            depart_d.setExecuteDepart(obj1.getString("gddw"));
+            departs.add(depart_d);
+        }
+        if(StringUtils.isNotBlank(obj1.getString("gqdw"))){
+            SJ_Execute_depart depart_q = new SJ_Execute_depart();
+            depart_q.setExecuteDepart(obj1.getString("gqdw"));
+            departs.add(depart_q);
+        }
+        return departs;
     }
 
     /**

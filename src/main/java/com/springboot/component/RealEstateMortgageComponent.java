@@ -313,12 +313,12 @@ public class RealEstateMortgageComponent {
      * @param jsonObject
      * @return
      */
-    public  RealPropertyCertificate getRealPropertyCertificatexx(JSONObject jsonObject){
-        return  getRealProperty(jsonObject);
+    public  RealPropertyCertificate getRealPropertyCertificatexx(JSONObject jsonObject,JSONObject obj1){
+        return  getRealProperty(jsonObject,obj1);
     }
 
 
-    private RealPropertyCertificate getRealProperty(JSONObject jsonObject){
+    private RealPropertyCertificate getRealProperty(JSONObject jsonObject,JSONObject obj1){
         RealPropertyCertificate realPropertyCertificate = new RealPropertyCertificate();
         if (StringUtils.isEmpty(jsonObject.getString("realEstateId"))){
             realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("vormerkungId"));
@@ -378,16 +378,22 @@ public class RealEstateMortgageComponent {
             }
         }
         //水电气信息
-        JSONObject sdqObject=(JSONObject) JSONObject.parse(jsonObject.getString("sdqInfo"));
-        if (null != sdqObject){
-            if (StringUtils.isNotEmpty(sdqObject.getString("shhh"))){
-                realPropertyCertificate.setWaterNumber(sdqObject.getString("shhh"));
-                realPropertyCertificate.setElectricNumber(sdqObject.getString("dhhh"));
-                realPropertyCertificate.setGasNumber(sdqObject.getString("qhhh"));
+//        JSONObject sdqObject=(JSONObject) JSONObject.parse(jsonObject.getString("sdqInfo"));
+        if (null != obj1){
+            if (StringUtils.isNotEmpty(obj1.getString("shhh"))){
+                realPropertyCertificate.setWaterNumber(obj1.getString("shhh"));
             }else {
-                realPropertyCertificate.setWaterNumber(sdqObject.getString("xshhh"));
-                realPropertyCertificate.setElectricNumber(sdqObject.getString("xdhhh"));
-                realPropertyCertificate.setGasNumber(sdqObject.getString("xqhhh"));
+                realPropertyCertificate.setWaterNumber(obj1.getString("xshhh"));
+            }
+            if (StringUtils.isNotEmpty(obj1.getString("dhhh"))){
+                realPropertyCertificate.setElectricNumber(obj1.getString("dhhh"));
+            }else{
+                realPropertyCertificate.setElectricNumber(obj1.getString("xdhhh"));
+            }
+            if (StringUtils.isNotEmpty(obj1.getString("qhhh"))){
+                realPropertyCertificate.setGasNumber(obj1.getString("qhhh"));
+            }else{
+                realPropertyCertificate.setGasNumber(obj1.getString("xqhhh"));
             }
         }
         //权利人信息
@@ -423,14 +429,14 @@ public class RealEstateMortgageComponent {
         //判断预告证明号
         if (StringUtils.isNotEmpty(ygCancellcation)){
             JSONObject jsonObject=(JSONObject) JSONObject.parse(json);
-            RealPropertyCertificate realPropertyCertificate=getRealProperty(jsonObject);
+            RealPropertyCertificate realPropertyCertificate=getRealProperty(jsonObject,null);
             realPropertyCertificateList.add(realPropertyCertificate);
             return  realPropertyCertificateList;
         }
         //不动产证号和不动产单元号 (返回list)
         JSONArray jsonArray=JSONArray.parseArray(json);
         for (int i=0;i<jsonArray.size();i++) {
-            realPropertyCertificateList.add(getRealProperty(jsonArray.getJSONObject(i)));
+            realPropertyCertificateList.add(getRealProperty(jsonArray.getJSONObject(i),null));
         }
         return  realPropertyCertificateList;
     }

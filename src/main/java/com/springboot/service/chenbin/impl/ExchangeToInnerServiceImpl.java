@@ -22,6 +22,7 @@ import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,9 +86,10 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         registrationBureau.setAdvanceBizInfo(advanceBizInfo);
 
 //        System.out.println("传入："+JSONObject.toJSONString(registrationBureau));
-        com.alibaba.fastjson.JSONObject  tokenObject = httpCallComponent.getTokenYcsl(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
-        String token=anonymousInnerComponent.getToken(tokenObject,"YGYD2Inner",sjsq.getRegisterNumber(),"预告预抵业务转内网办件",sjsq.getReceiptNumber());
-        if (token==null){
+//        com.alibaba.fastjson.JSONObject  tokenObject = httpCallComponent.getTokenYcsl(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
+//        String token=anonymousInnerComponent.getToken(tokenObject,"YGYD2Inner",sjsq.getRegisterNumber(),"预告预抵业务转内网办件",sjsq.getReceiptNumber());
+        String token = httpCallComponent.getToken(username,password);
+        if (StringUtils.isBlank(token)){
             return Msgagger.USER_LOGIN_BAD;
         }
         //操作FTP上传附件

@@ -38,6 +38,7 @@ public class SJ_Sjsq  implements Serializable {
     private List<SJ_Info_Handle_Result> handleResultVoList;
 
     private List<RespServiceData> serviceDatas; //封装返回值数据
+    private List<SJ_Execute_depart> executeDeparts; //指定执行部门
 
     public String getReceiptNumber() {
         return receiptNumber;
@@ -253,5 +254,13 @@ public class SJ_Sjsq  implements Serializable {
 
     public void setRegisterNumber(String registerNumber) {
         this.registerNumber = registerNumber;
+    }
+
+    public List<SJ_Execute_depart> getExecuteDeparts() {
+        return executeDeparts;
+    }
+
+    public void setExecuteDeparts(List<SJ_Execute_depart> executeDeparts) {
+        this.executeDeparts = executeDeparts;
     }
 }
