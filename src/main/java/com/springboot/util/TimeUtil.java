@@ -6,7 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class TimeUtil {
+public class   TimeUtil {
     private static SimpleDateFormat format_date = new SimpleDateFormat("yyyy-MM-dd");
     private static SimpleDateFormat format_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public static String getDateString(Date date){
