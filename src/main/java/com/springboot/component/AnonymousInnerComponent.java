@@ -189,6 +189,7 @@ public class AnonymousInnerComponent {
 
         //整理水电气部门至不动产sj
         List<SJ_Execute_depart> executeDeparts = getExecuteDeparts(obj1);
+        JSONArray departArray=JSONArray.fromObject(executeDeparts);
         sjSjsq.setExecuteDeparts(executeDeparts);
 
         if (null != jsonArray) {
@@ -209,6 +210,7 @@ public class AnonymousInnerComponent {
             sjSjsq.setServiceDatas(serviceDatas);
             JSONArray serviceArray = JSONArray.fromObject(serviceDatas);
             stringMap.put("serviceDatas", serviceArray.toString());
+            stringMap.put("executeDeparts",departArray.toString());
         } else {
             //添加土地证
             sjSjsq.setServiceDatas(serviceDatas);
