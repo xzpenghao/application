@@ -86,7 +86,8 @@ public class AnonymousInnerComponent {
                     }
                     mapHeader.put("Authorization", token);
                     if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {//受理
-                        mapParmeter.put("modelId", getReceiving.getModelId());
+                        mapParmeter.put("model" +
+                                "Id", getReceiving.getModelId());
                         //受理启动一窗受理流程
                         String entry = httpClientUtils.doGet("http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter6", modelMap, mapHeader);
                         JSONObject entryObject = JSONObject.fromObject(entry);
@@ -191,7 +192,6 @@ public class AnonymousInnerComponent {
         List<SJ_Execute_depart> executeDeparts = getExecuteDeparts(obj1);
         JSONArray departArray=JSONArray.fromObject(executeDeparts);
         sjSjsq.setExecuteDeparts(executeDeparts);
-
         if (null != jsonArray) {
             for (int i = 0; i < jsonArray.size(); i++) {
                 com.alibaba.fastjson.JSONObject jsonObject1 = jsonArray.getJSONObject(i);
@@ -289,7 +289,7 @@ public class AnonymousInnerComponent {
                 try {
                     System.out.println("执行主线程");
                     com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
-                    String token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+                    String token = getToken(tokenObject, "GetReceiving", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                     if (token == null) {
                         return Msgagger.USER_LOGIN_BAD;
                     }
@@ -340,9 +340,12 @@ public class AnonymousInnerComponent {
                             RespServiceData RealEstateBookData = new RespServiceData();
                             RespServiceData getRealEstateBooking = getRealEstateBooking(verfyInfoObject.getString("certificateType"),
                                     verfyInfoObject.getString("certificateId"), RealEstateBookData);
-                            if (getRealEstateBooking.getServiceCode().equals(Msgagger.DYZMHSERVICE_CODE)) {
+                            if (verfyInfoObject.getString("registerSubType").equals(Msgagger.DYZXDJ)){
                                 getRealEstateBooking.setServiceCode(Msgagger.DYZXSERVICECODE);
+                            }else {
+                                getRealEstateBooking.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
                             }
+
                             respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
                         }
                         RespServiceData respServiceData = new RespServiceData();
@@ -399,9 +402,8 @@ public class AnonymousInnerComponent {
         ObjectRestResponse resultRV = new ObjectRestResponse();
         switch (certificateType) {
             case "DYZMH":
-                resultRV = realEstateMortgageComponent.getRealEstateMortgage(certificateId, null, true);
+                resultRV = realEstateMortgageComponent.getRealEstateMortgage(certificateId,null,true);
                 List<MortgageService> mortgageServiceList = (List<MortgageService>) resultRV.getData();
-                respServiceData.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
                 respServiceData.setServiceDataInfos(mortgageServiceList);
                 break;
             case "YGZMH":

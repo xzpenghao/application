@@ -21,7 +21,7 @@ public class SpringBootStart extends SpringBootServletInitializer implements Web
         return application.sources(SpringBootStart.class);
     }
 
-    public static void main(String [] args){
+    public static  void main(String [] args){
         SpringApplication.run(SpringBootStart.class,args);
     }
 }

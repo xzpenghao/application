@@ -60,6 +60,12 @@ public class RealEstateMortgageController {
         return realEstateMortgageComponent.getRealPropertyCertificate(parametricData);
     }
 
+    @RequestMapping(value = "/getAutoRealPropertyCertificateTwo", method = RequestMethod.POST)
+    @ApiOperation("不动产抵押登记（含两证）受理自动接口")
+    public ObjectRestResponse getAutoRealPropertyCertificateTwo(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
+        return realEstateMortgageComponent.getAutoRealPropertyCertificateTwo(commonInterfaceAttributer);
+    }
+
 
     @RequestMapping(value = "/sendRegistrationMortgageRevocation", method = RequestMethod.POST)
     @ApiOperation("发送数据到登记局进行审批操作返回受理编号")

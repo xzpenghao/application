@@ -5,6 +5,9 @@ public class Msgagger {
     public final static String FANGDI = "房地";
     public final static String BDCQZ = "不动产权证";
     public final static String ZONGDI = "宗地";
+    public final static String TDZ="土地证";
+    public final static String FCZ="房产证";
+    public final static String DYZXDJ="抵押权注销登记";
     public final static String AUTOINTECECG = "保存自动接口执行成功";
     public final static String AUTOINTECEBAD = "保存自动接口执行失败";
     public final static String ACCPETNOTICE = "acceptNotice";//受理通知

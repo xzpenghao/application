@@ -11,7 +11,15 @@ public class RealEstateInfo {
     private List<RealEstateUnitInfo> realEstateUnitInfoVoList; //不动产单元信息列表
     private List<QlrGlMortgator> obligeeInfoVoList; //不动产权利人列表
     private List<SalerInfo> salerInfoVoList;//卖方信息列表
+    private String landCertificate;//土地证
 
+    public String getLandCertificate() {
+        return landCertificate;
+    }
+
+    public void setLandCertificate(String landCertificate) {
+        this.landCertificate = landCertificate;
+    }
 
     public List<RealEstateUnitInfo> getRealEstateUnitInfoVoList() {
         return realEstateUnitInfoVoList;

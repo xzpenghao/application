@@ -15,7 +15,8 @@ public class BizOrBizExceptionConstant {
     public final static String TAXATION_RECEIPT_SERVICE = "qsxx";
     public final static String HANDLE_RESULT_SERVICE = "handleResult";
     public final static String IMMOVABLE_TYPE_OF_FD = "房地";
-    public final static String IMMOVABLE_TYPE_OF_JD = "净地";
+    //之前净地改成宗地
+    public final static String IMMOVABLE_TYPE_OF_JD = "宗地";
     public final static String CERTIFICATE_TYPE_OF_BDC = "不动产权证";
     public final static String CERTIFICATE_TYPE_OF_FCTD = "房产土地证";
     public final static String POWER_LEVEL_WRITE = "Write";
