@@ -9,6 +9,24 @@ public class SdqEntry {
     private String gsdw;//供水单位
     private String gddw;//供电单位
     private String gqdw;//供气单位
+    private String gtdw;//有线电视单位
+    private String xthh;//新有线电视号
+
+    public String getGtdw() {
+        return gtdw;
+    }
+
+    public void setGtdw(String gtdw) {
+        this.gtdw = gtdw;
+    }
+
+    public String getXthh() {
+        return xthh;
+    }
+
+    public void setXthh(String xthh) {
+        this.xthh = xthh;
+    }
 
     public String getSlbh() {
         return slbh;

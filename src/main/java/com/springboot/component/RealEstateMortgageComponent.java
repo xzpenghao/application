@@ -145,7 +145,6 @@ RealEstateMortgageComponent {
         }
         System.out.println("json数据:" + resultObject.toJSONString());
         Map<String, String> mapParmeter = new HashMap<>();
-
         mapParmeter.put("receiptNumber", sjSjsq.getReceiptNumber());
         mapParmeter.put("registerNumber", resultObject.getString("slbh"));
         //登记局登录

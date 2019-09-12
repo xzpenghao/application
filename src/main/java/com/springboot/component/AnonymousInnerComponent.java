@@ -124,7 +124,6 @@ public class AnonymousInnerComponent {
                         String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
                         JSONObject ycslObject = JSONObject.fromObject(json);
                     }
-
                 } catch (Exception e) {
                     throw new Exception("Callable terminated with Exception!"); // call方法可以抛出异常
                 }
@@ -238,6 +237,11 @@ public class AnonymousInnerComponent {
         if (StringUtils.isNotBlank(obj1.getString("gqdw"))) {
             SJ_Execute_depart depart_q = new SJ_Execute_depart();
             depart_q.setExecuteDepart(obj1.getString("gqdw"));
+            departs.add(depart_q);
+        }
+        if (StringUtils.isNotBlank(obj1.getString("thhh"))) {
+            SJ_Execute_depart depart_q = new SJ_Execute_depart();
+            depart_q.setExecuteDepart(obj1.getString("thhh"));
             departs.add(depart_q);
         }
         return departs;

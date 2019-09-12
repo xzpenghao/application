@@ -7,7 +7,15 @@ public class ParametricData {
     private String bdcdyh;//不动产单元号
     private String bdczh;//不动产证号
     private String obligeeName;//权利人姓名
+    private String obligeeId;//身份证号
 
+    public String getObligeeId() {
+        return obligeeId;
+    }
+
+    public void setObligeeId(String obligeeId) {
+        this.obligeeId = obligeeId;
+    }
 
     public String getBdcdyh() {
         return bdcdyh;

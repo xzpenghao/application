@@ -3,6 +3,7 @@ package com.springboot.controller;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.component.EsfRoomComponent;
+import com.springboot.component.ParallelSectorsComponent;
 import com.springboot.component.RealEstateMortgageComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.popj.GetReceiving;
@@ -38,6 +39,8 @@ public class RealEstateMortgageController {
     private AnonymousInnerComponent anonymousInner;
     @Autowired
     private EsfRoomComponent esfRoomComponent;
+    @Autowired
+    private ParallelSectorsComponent parallelSectorsComponent;
 
 
     @RequestMapping(value = "/AutoBackfillData", method = RequestMethod.POST)
@@ -59,6 +62,14 @@ public class RealEstateMortgageController {
     public ObjectRestResponse getRealPropertyCertificate(@RequestBody ParametricData parametricData) throws Exception {
         return realEstateMortgageComponent.getRealPropertyCertificate(parametricData);
     }
+
+
+    @RequestMapping(value = "/getParallelSectorsCertificate", method = RequestMethod.POST)
+    @ApiOperation("平行部门数据获取")
+    public ObjectRestResponse getParallelSectorsCertificate(@RequestBody ParametricData parametricData) throws Exception {
+        return parallelSectorsComponent.getParallelSectorsCertificate(parametricData);
+    }
+
 
     @RequestMapping(value = "/getAutoRealPropertyCertificateTwo", method = RequestMethod.POST)
     @ApiOperation("不动产抵押登记（含两证）受理自动接口")

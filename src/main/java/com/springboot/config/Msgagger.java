@@ -25,6 +25,7 @@ public class Msgagger {
     public final static String ESFSDQSERVICE_CODE = "OwnershipCertificateService";
     public final static String SHUISERVICE_CODE = "WaterHandleResultService";
     public final static String DIANSERVICE_CODE = "ElectricHandleResultService";
+    public final static String DIANSHISERVICE_CODE="CableTvHandleResultService\n";
     public final static String QISERVICE_CODE = "GasHandleResultService";
     public final static String BDCQZSDZF_SERVICE_CODE = "ImmovableElectronicCertificate";//不动产权证书
     public final static String CANCELLATION_REGISTRATION = "注销登记";
@@ -38,5 +39,6 @@ public class Msgagger {
     public static String FILE_FAIL = "上传一窗受理附件失败";
     public static String DATE_PARSE_EXCEPTION = "时间转换异常!";
     public static String DATE_IS_NULL = "时间不存在!";
+    public final static String DATA_FAILURE="获取数据失败";
 
 }

@@ -80,6 +80,10 @@ public class EsfRoomComponent {
                     sdqEntry.setXdhh(handleResult.getAcceptanceNumber());
                     sdqEntry.setGddw(handleResult.getProvideUnit());
                     break;
+                case Msgagger.DIANSHISERVICE_CODE:
+                    sdqEntry.setXthh(handleResult.getAcceptanceNumber());
+                    sdqEntry.setGtdw(handleResult.getProvideUnit());
+                    break;
                 default:
                     break;
             }
