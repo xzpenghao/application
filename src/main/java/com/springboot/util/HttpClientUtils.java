@@ -1,6 +1,5 @@
 package com.springboot.util;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import net.sf.json.JSONObject;
@@ -12,7 +11,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;

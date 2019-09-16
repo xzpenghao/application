@@ -1,20 +1,16 @@
 package com.springboot.component;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.Msgagger;
 import com.springboot.popj.parallel_sectors.ImmovableMortgageInquiryInformation;
 import com.springboot.popj.parallel_sectors.ImmovableRightInquiryInformation;
-import com.springboot.popj.pub_data.SJ_Qlr_Gl;
 import com.springboot.popj.pub_data.SJ_Qlr_Info;
 import com.springboot.popj.warrant.ParametricData;
-import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.util.HttpClientUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.apache.bcel.generic.RET;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -5,7 +5,8 @@ import java.util.List;
 /**
  * 二手房水电气受理请求参数
  */
-public class EsfSdq {
+public class
+EsfSdq {
 
     private String slbh;//受理编号
     private boolean transferred;//布尔型false表示转移前，true表示转移后

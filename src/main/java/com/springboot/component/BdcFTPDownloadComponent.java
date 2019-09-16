@@ -1,9 +1,7 @@
 package com.springboot.component;
 
-import com.alibaba.fastjson.JSONObject;
-import com.springboot.util.StrUtil;
+
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
