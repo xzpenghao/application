@@ -373,6 +373,26 @@ RealEstateMortgageComponent {
                 realPropertyCertificate.getGlImmovableVoList().add(glImmovable);
             }
         }
+        //预告证明号
+        JSONArray ygInfojsonArray = (JSONArray) jsonObject.get("advanceInfoVoList");
+        String[] kung=new String[ygInfojsonArray.size()];
+        if (null != ygInfojsonArray) {
+            for (int j = 0; j < ygInfojsonArray.size(); j++) {
+                JSONObject ygObject=ygInfojsonArray.getJSONObject(j);
+                kung[j]=ygObject.getString("vormerkungId");
+            }
+            realPropertyCertificate.setForecastCertificateNos(kung);
+        }
+        //抵押证明号
+        JSONArray dyInfojsonArray = (JSONArray) jsonObject.get("mortgageInfoVoList");
+        String[] dyzmh=new String[dyInfojsonArray.size()];
+        if (null != dyInfojsonArray) {
+            for (int j = 0; j < dyInfojsonArray.size(); j++) {
+                JSONObject dyObject=dyInfojsonArray.getJSONObject(j);
+                dyzmh[j]=dyObject.getString("warrantId");
+            }
+            realPropertyCertificate.setWarrantNos(dyzmh);
+        }
         //宗地信息
         JSONArray zdInfojsonArray = (JSONArray) jsonObject.get("landUnitInfoVoList");
         if (null != zdInfojsonArray) {
@@ -587,6 +607,9 @@ RealEstateMortgageComponent {
         }else if (StringUtils.isNotEmpty(parametricData.getBdczh())){
             json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh());
         }
+//        json="[{\"realEstateId\":\"徐房权证泉山字第218327号\",\"vormerkungId\":null,\"realEstateType\":\"FW\",\"certificateType\":\"房产证\",\"registerDate\":\"2013-02-26 00:00:00\",\"realEstateUnitInfoVoList\":[{\"realEstateUnitId\":\"320311013020GB00085F00020004\",\"householdId\":\"OFH201200200009305-1\",\"buildingId\":\"0002\",\"accountId\":\"0004\",\"sit\":\"湖北路银湖小区14# 1-702\",\"roomId\":\"702\",\"unitId\":\"1\",\"floor\":\"7\",\"totalFloor\":\"7\",\"projectName\":\"银湖小区\",\"architectureName\":\"14#\",\"architectureAera\":\"94.14000000\",\"innerArchitectureAera\":\"73.80000000\",\"sharedArchitectureAera\":\"8.66000000\",\"acquireWay\":\"3\",\"acquirePrice\":null,\"plannedUsage\":\"10\",\"houseType\":null,\"houseNature\":null,\"houseRightType\":\"4\",\"houseRightNature\":\"0\",\"landRightNature\":null,\"landRightStartDate\":null,\"landRightEndDate\":null,\"landRightUser\":null,\"landRightTerm\":null,\"landUsage\":null,\"commonLandArea\":null,\"sharedLandArea\":null,\"singleLandArea\":null}],\"landUnitInfoVoList\":null,\"obligeeInfoVoList\":[{\"id\":\"QLR-201200200009305\",\"obligeeName\":\"韩佳睿\",\"obligeeIdType\":\"1\",\"obligeeId\":\"320323198803277030\",\"commonWay\":null,\"sharedShare\":null}],\"salerInfoVoList\":[{\"salerName\":\"徐州市泉山区人民政府\",\"salerIdType\":\"1\",\"salerId\":\"320323198803277030\"}],\"mortgageInfoVoList\":null,\"advanceInfoVoList\":[{\n" +
+//                "\"vormerkungId\":12\n" +
+//                "}],\"attachmentInfoVoList\":null,\"dissentInfoVoList\":null}]";
         ObjectRestResponse resultRV = new ObjectRestResponse();
         return resultRV.data(getRealPropertySj(json, null));
     }

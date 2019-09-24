@@ -40,7 +40,7 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://10.3.2.206:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://10.3.2.147:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -118,9 +118,9 @@ glHouseBuyer:
   obligeeYwr: 义务人
 httpclient:
   seam: 23335
-  ip: 172.18.0.147
-  windowAcceptanceIp: 10.3.2.206
-  windowAcceptanceSeam: 7780
+  ip: 10.3.2.147
+  windowAcceptanceIp: 10.3.2.203
+  windowAcceptanceSeam: 7779
 businessType:
   clfFmortgage: MORTGAGE_OLD_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
   xjfFmortgage: MORTGAGE_NEW_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）
@@ -168,7 +168,7 @@ mapper:
   mappers: com.github.wxiaoqi.security.common.mapper.CommonMapper
 
 machine:
-  ip: 10.3.2.203
+  ip: 10.3.2.206
   post: 7777
 
 chenbin:
@@ -184,6 +184,8 @@ chenbin:
 penghao:
     mortgageCancellation:       #抵押注销登记
         pid: Proc-190724112944-7G1WKMM6
+    mortgageRegistration:       #抵押登记pid
+        pid: Proc-190828101550-J1B1X7HB
     contractinformation:        #合同消息获取
         ip: 172.18.0.112
         port: 8088

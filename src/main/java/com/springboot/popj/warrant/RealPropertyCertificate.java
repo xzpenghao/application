@@ -40,7 +40,8 @@ public class RealPropertyCertificate {
     private String singleLandArea;                  //独用土地面积
     private String shareLandArea;                   //分摊土地面积
     private String buildingParcelArea;                  //建筑宗地面积
-
+    private String[] forecastCertificateNos;        //预告证明号
+    private String[] warrantNos;                    //抵押证明号
     private String remarks;                      //备注附记
     private String dataType;                     //数据类型（存量/新增）
     private String ext1;                         //扩展字段1
@@ -49,6 +50,22 @@ public class RealPropertyCertificate {
     private List<GlImmovable> glImmovableVoList=new ArrayList<>();//不动产类型(房屋信息)
     private List<GlMortgagor> glObligeeVoList=new ArrayList<>();//权利人数据
     private List<GlMortgagor> glObligorVoList=new ArrayList<>();//义务人数据
+
+    public String[] getWarrantNos() {
+        return warrantNos;
+    }
+
+    public void setWarrantNos(String[] warrantNos) {
+        this.warrantNos = warrantNos;
+    }
+
+    public String[] getForecastCertificateNos() {
+        return forecastCertificateNos;
+    }
+
+    public void setForecastCertificateNos(String[] forecastCertificateNos) {
+        this.forecastCertificateNos = forecastCertificateNos;
+    }
 
     public List<GlImmovable> getGlImmovableVoList() {
         return glImmovableVoList;
