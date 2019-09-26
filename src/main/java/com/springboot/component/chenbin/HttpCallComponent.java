@@ -4,7 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.Msgagger;
+import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.chenbin.personnel.PersonnelUnitEntity;
+import com.springboot.entity.chenbin.personnel.punit.PersonEntity;
 import com.springboot.popj.register.HttpRequestMethedEnum;
 import com.springboot.popj.registration.RegistrationBureau;
 import com.springboot.util.HttpClientUtils;
@@ -12,6 +15,7 @@ import com.springboot.util.ParamHttpClientUtil;
 import com.springboot.util.chenbin.HttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
+import org.apache.commons.lang3.StringUtils;
 import org.omg.PortableServer.LIFESPAN_POLICY_ID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +40,14 @@ public class HttpCallComponent {
     private String windowAcceptanceIp; //一窗受理ip
     @Value("${httpclient.windowAcceptanceSeam}")
     private String windowAcceptanceSeam; //一窗受理接口
+    @Value("${chenbin.otherBureau.ga.basicInfoUrl}")
+    private String basicInfoUrl;
+    @Value("${chenbin.otherBureau.ga.basicInfoCheckUrl}")
+    private String basicInfoCheckUrl;
+    @Value("${chenbin.otherBureau.mz.url}")
+    private String mzUrl;
+    @Value("${chenbin.otherBureau.gs.url}")
+    private String gsUrl;
 
     public JSONObject callRegistrationBureauForRegister(RegistrationBureau registrationBureauVo) {
         //整理json数据
@@ -134,5 +146,21 @@ public class HttpCallComponent {
             log.error(Msgagger.AUTOINTECEBAD);
         }
         return resultRV;
+    }
+
+    public List<PersonEntity> callGaInterface(Map<String,String> params){
+        List<PersonEntity> respDataArray = null;
+        String response = HttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
+                "application/json",
+                basicInfoUrl,
+                params, new HashMap<String, String>());
+        JSONObject respObj = JSONObject.parseObject(response);
+        if(StringUtils.isNotBlank(respObj.getString("status")) && "0".equals(respObj.getString("status"))){
+            com.alibaba.fastjson.JSONArray dataArray = respObj.getJSONArray("data");
+            respDataArray = dataArray.toJavaList(PersonEntity.class);
+        }else{
+            throw new ZtgeoBizException("公安部人口基准信息接口调用失败，失败原因："+(StringUtils.isNotBlank(respObj.getString("msg"))?respObj.getString("msg"):"未给出失败原因"));
+        }
+        return respDataArray;
     }
 }

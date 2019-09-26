@@ -172,7 +172,7 @@ machine:
   post: 7777
 
 chenbin:
-  idType: 身份证,1$社会信用统一代码,8$组织机构代码,6
+  idType: 身份证,1$统一社会信用代码,8$组织机构代码,6
   registrationBureau:           #登记局
     username: tsdjj             #用户名
     password: 123456            #密码
@@ -181,6 +181,14 @@ chenbin:
         bizType: MORTGAGE_NEW_TRAILER
         pid: Proc-171013210700-3785RA40
         isSubmit: false
+  otherBureau:
+    ga:                         #公安
+      basicInfoUrl: http://10.13.0.240:9999/x
+      basicInfoCheckUrl: http://10.13.0.240:9999/x
+    mz:                         #民政
+      url: http://10.13.0.240:9999/y
+    gs:                         #工商
+      url: http://10.13.0.240:9999/z
 penghao:
     mortgageCancellation:       #抵押注销登记
         pid: Proc-190724112944-7G1WKMM6
