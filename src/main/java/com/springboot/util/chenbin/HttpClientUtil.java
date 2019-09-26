@@ -2,28 +2,34 @@ package com.springboot.util.chenbin;
 
 import com.alibaba.fastjson.JSON;
 import com.springboot.popj.register.HttpRequestMethedEnum;
-import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.NameValuePair;
+import net.sf.json.JSONObject;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.*;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 public class HttpClientUtil {
     /**
      * httpclient使用步骤
@@ -48,6 +54,47 @@ public class HttpClientUtil {
             //连接上一个url后，获取response的返回等待时间 ，即在与目标url建立连接后，等待放回response的最大时间，在规定时间内没有返回响应的话就抛出SocketTimeout。
             .setSocketTimeout(1135000)
             .build();
+
+
+    /**
+     * 发送 post请求
+     * @param url 访问的接口地址
+     * @param jsonParam 查询参数
+     * @return HttpResponse 该类包含请求方法的态码及返回的数据
+     * @throws
+     */
+    public static String post(String from_user,String api_id,String jsonParam,String url) throws IOException {
+        HttpClient httpClient = null;
+        HttpPost postMethod = null;
+        HttpResponse response = null;
+        httpClient = HttpClients.createDefault();
+        postMethod = new HttpPost(url);//传入URL地址
+        //设置请求头
+        postMethod.addHeader("from_user", from_user);
+        postMethod.addHeader("api_id",api_id);//设置请求头
+        //传入请求参数
+//        String params = JSON.toJSONString(map);
+
+        postMethod.setEntity(new StringEntity(jsonParam, Charset.forName("UTF-8")));
+
+        response = httpClient.execute(postMethod);//获取响应
+
+        int statusCode = response.getStatusLine().getStatusCode();
+
+        System.out.println("HTTP Status Code:" + statusCode);
+
+        if (statusCode != HttpStatus.SC_OK) {
+            System.out.println("HTTP请求未成功！HTTP Status Code:" + response.getStatusLine());
+        }
+        HttpEntity httpEntity = response.getEntity();
+
+        String reponseContent = EntityUtils.toString(httpEntity);
+        EntityUtils.consume(httpEntity);//释放资源
+        System.out.println("响应内容：" + reponseContent);
+        return reponseContent;
+    }
+
+
 
 
     /**

@@ -34,11 +34,15 @@ public class Msgagger {
     public final static String XML_FROMDATA = "xml形式获取";
     public final static String TO_BE_PROCESSED = "待处理";
     public final static String SHZH_BAD = "数据转换失败";
+    public final static String INTERCE_NULL="调用接口失败";
     public final static String USER_LOGIN_BAD = "用户登录失败或连接服务没有开启";
     public static String FINST_ID_NULL = "条件实列为空，请从新选择";
     public static String FILE_FAIL = "上传一窗受理附件失败";
     public static String DATE_PARSE_EXCEPTION = "时间转换异常!";
     public static String DATE_IS_NULL = "时间不存在!";
     public final static String DATA_FAILURE="获取数据失败";
+    public final static String  GXPT="共享平台";
+    public final static String INTERCE_DY="接口调用";
+    public final static String DSXX_GUODUO="地税信息过多,不予受理";
 
 }

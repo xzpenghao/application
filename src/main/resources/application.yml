@@ -198,3 +198,12 @@ penghao:
         ip: 172.18.0.112
         port: 8088
         region: BDC_jiawang
+sq:
+  jyht:
+    api_id: 3Rkt5FPx
+    from_user: 0b6c220cdfc54288b6630eb1a7fa612f
+    post: 8001
+    ip: 10.3.2.16
+  qsxx:
+    api_id: JwWtYcW7
+    from_user: 0b6c220cdfc54288b6630eb1a7fa612f
