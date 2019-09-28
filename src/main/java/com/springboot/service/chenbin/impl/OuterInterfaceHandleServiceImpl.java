@@ -49,7 +49,7 @@ public class OuterInterfaceHandleServiceImpl implements OuterInterfaceHandleServ
                     ReqForPersonBase64Entity p = new ReqForPersonBase64Entity();
                     p.setXm(mc);
                     p.setSfzh(zjhm);
-                    code = "ga_info";
+                    code = "ga_info_check";
                     boolean isBase64 = false;
                     if(StringUtils.isNotBlank(personnelUnitReq.getFjlj())){
                         code = "ga_check";

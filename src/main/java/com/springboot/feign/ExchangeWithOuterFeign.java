@@ -11,19 +11,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Map;
 
-@FeignClient(name = "exchangeFeign", url = "http://localhost:7780/api/test/")
+@FeignClient(name = "exchangeFeign", url = "http://10.13.0.240:8001/")
 public interface ExchangeWithOuterFeign {
 
-    @RequestMapping(value="share/rkkjzxxcx",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=yyy"})
+    @RequestMapping(value="forwardprovincial",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=bXREUCzt","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
     PersonnelResponseListEntity<PersonEntity> rkkjzxxcx(Map<String,Object> params); //公安信息
 
-    @RequestMapping(value="share/rkkrxbd",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=yyy"})
+    @RequestMapping(value="forwardprovincial",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=buzcT0i9","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
     PersonnelResponseListEntity<PersonCheckEntity> rkkrxbd(Map<String,Object> params); //人像对比
 
-    @RequestMapping(value="share/qyjbxxyz",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=yyy"})
+    @RequestMapping(value="share/qyjbxxyz",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
     PersonnelResponseSingleEntity<GSCommonCheckEntity> qyjbxxyz(Map<String,Object> params); //工商-信息检查
 
-    @RequestMapping(value="share/qyjbxxcx",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=yyy"})
+    @RequestMapping(value="share/qyjbxxcx",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
     PersonnelResponseListEntity<GSCommonEntity> qyjbxxcx(Map<String,Object> params);    //工商-信息数据获取
 
     //社会团体
