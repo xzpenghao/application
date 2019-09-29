@@ -69,13 +69,15 @@ public class HttpClientUtil {
         HttpResponse response = null;
         httpClient = HttpClients.createDefault();
         postMethod = new HttpPost(url);//传入URL地址
+        System.out.println("aa"+postMethod.getMethod());
         //设置请求头
-        postMethod.addHeader("from_user", from_user);
-        postMethod.addHeader("api_id",api_id);//设置请求头
+        postMethod.setHeader("content-Type","application/json;charset=UTF-8");
+        postMethod.setHeader("from_user", from_user);
+        postMethod.setHeader("api_id",api_id);//设置请求头
         //传入请求参数
 //        String params = JSON.toJSONString(map);
 
-        postMethod.setEntity(new StringEntity(jsonParam, Charset.forName("UTF-8")));
+        postMethod.setEntity(new StringEntity(jsonParam));
 
         response = httpClient.execute(postMethod);//获取响应
 

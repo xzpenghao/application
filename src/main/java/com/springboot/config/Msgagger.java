@@ -41,8 +41,10 @@ public class Msgagger {
     public static String DATE_PARSE_EXCEPTION = "时间转换异常!";
     public static String DATE_IS_NULL = "时间不存在!";
     public final static String DATA_FAILURE="获取数据失败";
+    public final static String CHAXUN_CG="查询成功,没有数据";
     public final static String  GXPT="共享平台";
     public final static String INTERCE_DY="接口调用";
     public final static String DSXX_GUODUO="地税信息过多,不予受理";
+    public final static String BUSINESS="买卖";
 
 }

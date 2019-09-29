@@ -9,9 +9,28 @@ public class TransferBizInfo {
     private String htbh;//合同编号
     private String djdl;
     private String dl_val;
+    private String transferReason;//转移原因
+    private String registerSubType;//登记小类
     private String commonWay;//共有方式
     private List<QlrGlMortgator> obligeeInfoVoList; //不动产权利人列表
     private List<WtdlrGlMortgator> agentInfoVoList; //委托代理人信息列表
+
+
+    public String getRegisterSubType() {
+        return registerSubType;
+    }
+
+    public void setRegisterSubType(String registerSubType) {
+        this.registerSubType = registerSubType;
+    }
+
+    public String getTransferReason() {
+        return transferReason;
+    }
+
+    public void setTransferReason(String transferReason) {
+        this.transferReason = transferReason;
+    }
 
     public List<QlrGlMortgator> getObligeeInfoVoList() {
         return obligeeInfoVoList;

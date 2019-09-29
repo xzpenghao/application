@@ -12,8 +12,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -52,6 +55,9 @@ public class NetSignUtils {
 
         return client(soapXml);
     }
+
+
+
 
 
     /**
@@ -112,8 +118,81 @@ public class NetSignUtils {
         return client(soapXml);
     }
 
+    /**
+     * 商品房权利人信息
+     * @param
+     * @return
+     * @throws Exception
+     */
+    public String clfDsxx(String serviceMethod,String swjgdm,String swrydm,String htbh,String url,String from_user,String api_id) throws Exception {
+        //soap服务地址
+//        String url = "http://"+ip+":"+port+"/"+region+"/BDCSrv.asmx?wsdl";
+        String soapXml = "<service xmlns=\"http://www.chinatax.gov.cn/spec/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+                "    <head>\n" +
+                "        <serviceMethod>"+serviceMethod+"</serviceMethod>\n" +
+                "        <swjgdm>"+swjgdm+"</swjgdm>\n" +
+                "        <swrydm>"+swrydm+"</swrydm>\n" +
+                "    </head>\n" +
+                "<body>\n" +
+                "        <![CDATA[{\"HTBH\":\""+htbh+"\"}]]>\n" +
+                "    </body>\n"+
+                "</service>\n";
+        return clientSoap(soapXml,url,from_user,api_id);
+    }
 
-    private String client(String soapXml) throws Exception {
+
+    public String clientSoap(String soapXml,String url,String from_user,String api_id) throws Exception {
+        //创建httpcleint对象
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        //String url = "http://" + ip + ":" + port + "/" + region + "/BDCSrv.asmx?wsdl";
+        //创建http Post请求
+        HttpPost httpPost = new HttpPost(url);
+        String str = "";
+        // 构建请求配置信息
+        RequestConfig config = RequestConfig.custom().setConnectTimeout(1000) // 创建连接的最长时间
+                .setConnectionRequestTimeout(500) // 从连接池中获取到连接的最长时间
+                .setSocketTimeout(3 * 5000) // 数据传输的最长时间10s
+                .build();
+        httpPost.setConfig(config);
+        CloseableHttpResponse response = null;
+        try {
+            //采用SOAP1.1调用服务端，这种方式能调用服务端为soap1.1和soap1.2的服务
+//            httpPost.setHeader("Content-Type", "text/xml;charset=UTF-8");
+//            httpPost.setHeader("SOAPAction", "");
+            //采用SOAP1.2调用服务端，这种方式只能调用服务端为soap1.2的服务
+            httpPost.setHeader("Content-Type", "application/soap+xml;charset=UTF-8");
+            httpPost.setHeader("from_user",from_user);
+            httpPost.setHeader("api_id",api_id);
+            StringEntity stringEntity = new StringEntity(soapXml, Charset.forName("UTF-8"));
+            httpPost.setEntity(stringEntity);
+            response = httpClient.execute(httpPost);
+            // 判断返回状态是否为200
+            if (response.getStatusLine().getStatusCode() == 200) {
+                String content = EntityUtils.toString(response.getEntity(), "UTF-8");
+                System.out.println(content);
+                return content;
+            } else {
+                System.out.println("调用失败!" + response.getStatusLine().toString());
+                return str;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return str;
+        } finally {
+            if (null != response) {
+                response.close();
+            }
+            if (null != httpClient) {
+                httpClient.close();
+            }
+        }
+
+    }
+
+
+
+
+    public String client(String soapXml) throws Exception {
         //创建httpcleint对象
         CloseableHttpClient httpClient = HttpClients.createDefault();
         String url = "http://" + ip + ":" + port + "/" + region + "/BDCSrv.asmx?wsdl";

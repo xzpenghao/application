@@ -15,7 +15,13 @@ import com.springboot.popj.netSign.GlHouseSeller;
 import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.popj.pub_data.Sj_Info_Qsxx;
 import com.springboot.popj.register.HttpRequestMethedEnum;
+import com.springboot.popj.registration.RegistrationBureau;
+import com.springboot.util.HttpClientUtils;
+import com.springboot.util.NetSignUtils;
+import com.springboot.util.SysPubDataDealUtil;
+import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.HttpClientUtil;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -23,8 +29,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -45,38 +55,52 @@ public class SqRealEstateMortgageComponent {
     private String ip;
     @Value("${sq.jyht.post}")
     private String post;
+    @Value("${sq.qsxx.swjgdm}")
+    private String swjgdm;
+    @Value("${sq.qsxx.swrydm}")
+    private String swrydm;
+    @Value("${sq.qsxx.serviceMethod}")
+    private String serviceMethod;
+
     @Autowired
     private RealEstateMortgageComponent realEstateMortgageComponent;
+    @Autowired
+    private NetSignUtils netSignUtils;
 
 
 
-    public ObjectRestResponse sqTaxation(DsEntity dsEntity){
+    /**
+     * 地税信息处理
+     * @param
+     * @return
+     */
+    public ObjectRestResponse sqTaxation(String htbh) throws  Exception{
         ObjectRestResponse resultRV = new ObjectRestResponse();
         Map<String,String> header=new HashMap<>();
         header.put("api_id",qsapiId);
         header.put("from_user",qsfromUser);
-        Map<String,String> param=new HashMap<>();
-        if (StringUtils.isNotEmpty(dsEntity.getHtbh())){
-            param.put("HTBH",dsEntity.getHtbh());
-        }else if (StringUtils.isNotEmpty(dsEntity.getSwjgdm())){
-            param.put("swjgdm",dsEntity.getSwjgdm());
-        }else if (StringUtils.isNotEmpty(dsEntity.getSwrydm())){
-            param.put("swrydm",dsEntity.getSwrydm());
-        }
-        String resultJson="{\"formdata\":\"\",\"suc\":\"1\",\"griddata\":[{\"XTSPHM\":\"320180404000309258\",\"HTBH\":\"2320120180404946623\",\"NSRSBH\":\"32090219890612103X\",\"NSRMC\":\"周盛\",\"ZRFCSFBZ\":\"1\",\"DZSPHM\":\"320180404000309258\",\"PZZL_DM\":\"000001031\",\"PZZG_DM\":\"2321031171\",\"PZHM\":\"08133964\",\"SKSSQQ\":\"2018-04-04\",\"SKSSQZ\":\"2018-04-04\",\"ZSXM_DM\":\"10119\",\"ZSPM_DM\":\"101191211\",\"ZSZM_DM\":\"null\",\"ZSXM_MC\":\"契税\",\"ZSPM_MC\":\"存量房（商品住房买卖）\",\"ZSZM_MC\":\"null\",\"JSYJ\":2550000,\"SL_1\":0.03,\"SJJE\":51000,\"ZGSWSKFJ_DM\":\"13201150100\",\"ZSSWJG_DM\":\"13201151600\",\"SKSSSWJG_DM\":\"13201150000\",\"ZGSWSKFJ_MC\":\"国家税务总局南京市江宁区税务局税源管理一科\",\"ZSSWJG_MC\":\"国家税务总局南京市江宁区税务局第一税务所\",\"SKSSSWJG_MC\":\"国家税务总局南京市江宁区税务局\",\"kjrq\":\"2018-04-04\",\"BZ\":\" 共有人：江颖超，周盛 房源编号:F32011520180017792 房屋坐落地址:托乐嘉花园友邻居4幢801室 权属转移面积:149.33平米 合同日期:2018-04-04,\"},{\"XTSPHM\":\"320180404000309258\",\"HTBH\":\"2320120180404946623\",\"NSRSBH\":\"320911198901072829\",\"NSRMC\":\"江颖超\",\"ZRFCSFBZ\":\"1\",\"DZSPHM\":\"320180404000309258\",\"PZZL_DM\":\"000001031\",\"PZZG_DM\":\"2321031171\",\"PZHM\":\"08133964\",\"SKSSQQ\":\"2018-04-04\",\"SKSSQZ\":\"2018-04-04\",\"ZSXM_DM\":\"10119\",\"ZSPM_DM\":\"101191211\",\"ZSZM_DM\":\"null\",\"ZSXM_MC\":\"契税\",\"ZSPM_MC\":\"存量房（商品住房买卖）\",\"ZSZM_MC\":\"null\",\"JSYJ\":2550000,\"SL_1\":0.03,\"SJJE\":51000,\"ZGSWSKFJ_DM\":\"13201150100\",\"ZSSWJG_DM\":\"13201151600\",\"SKSSSWJG_DM\":\"13201150000\",\"ZGSWSKFJ_MC\":\"国家税务总局南京市江宁区税务局税源管理一科\",\"ZSSWJG_MC\":\"国家税务总局南京市江宁区税务局第一税务所\",\"SKSSSWJG_MC\":\"国家税务总局南京市江宁区税务局\",\"kjrq\":\"2018-04-04\",\"BZ\":\" 共有人：江颖超，周盛 房源编号:F32011520180017792 房屋坐落地址:托乐嘉花园友邻居4幢801室 权属转移面积:149.33平米 合同日期:2018-04-04,\"},{\"XTSPHM\":\"320180404000311789\",\"HTBH\":\"2320120180404946623\",\"NSRSBH\":\"420122197903230055\",\"NSRMC\":\"李军\",\"ZRFCSFBZ\":\"0\",\"DZSPHM\":\"320180404000311789\",\"PZZL_DM\":\"000001031\",\"PZZG_DM\":\"2321031171\",\"PZHM\":\"08133963\",\"SKSSQQ\":\"2018-04-04\",\"SKSSQZ\":\"2018-04-04\",\"ZSXM_DM\":\"10106\",\"ZSPM_DM\":\"101060902\",\"ZSZM_DM\":\"1010609022320001\",\"ZSXM_MC\":\"个人所得税\",\"ZSPM_MC\":\"个人房屋转让所得\",\"ZSZM_MC\":\"房屋转让附征1% \",\"JSYJ\":2550000,\"SL_1\":0.01,\"SJJE\":25500,\"ZGSWSKFJ_DM\":\"13201150100\",\"ZSSWJG_DM\":\"13201151600\",\"SKSSSWJG_DM\":\"13201150000\",\"ZGSWSKFJ_MC\":\"国家税务总局南京市江宁区税务局税源管理一科\",\"ZSSWJG_MC\":\"国家税务总局南京市江宁区税务局第一税务所\",\"SKSSSWJG_MC\":\"国家税务总局南京市江宁区税务局\",\"kjrq\":\"2018-04-04\",\"BZ\":\" 房源编号:F32011520180017792 房屋坐落地址:托乐嘉花园友邻居4幢801室 权属转移面积:149.33平米 合同日期:2018-04-04,\"}],\"msg\":\"查询成功\"}";
-        //String json=HttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,"application/json","http://"+ip+":"+post+"/WxfcjyJmssendAction.do",param,header);
-        JSONObject resultObject=JSONObject.fromObject(resultJson);
-        JSONArray jsonArray=resultObject.getJSONArray("griddata");
-        List<Sj_Info_Qsxx> qsxxList=new ArrayList<>();
-        if (null != jsonArray){
-            if (jsonArray.size() > 1){
-                resultRV.setMessage(Msgagger.DSXX_GUODUO);
-                resultRV.setStatus(20500);
-                return resultRV;
+        Map<String,Object> param=new HashMap<>();
+        param.put("htbh",htbh);
+        List<Sj_Info_Qsxx> qsxxList = new ArrayList<>();
+        param.put("swjgdm",swjgdm);
+        param.put("swrydm",swrydm);
+        param.put("serviceMethod",serviceMethod);
+        String result=netSignUtils.clfDsxx(serviceMethod,swjgdm,swrydm,htbh,"http://"+ip+":"+post+"/WxfcjyJmssendAction.do",qsfromUser,qsapiId);
+
+        JSONObject resultObject=JSONObject.fromObject(result);
+        try {
+
+            if (resultObject.getJSONArray("griddata") !=null){
+                JSONArray jsonArray = resultObject.getJSONArray("griddata");
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    clTaxation(jsonArray.getJSONObject(i), qsxxList);
+                }
+                return resultRV.data(qsxxList);
             }
-            for (int i = 0; i < jsonArray.size(); i++) {
-                clTaxation(jsonArray.getJSONObject(i),qsxxList);
-            }
+        }catch (Exception ex){
+            resultRV.setMessage(Msgagger.DATA_FAILURE);
+            resultRV.setStatus(20500);
+            return resultRV;
         }
         return resultRV.data(qsxxList);
     }
@@ -90,43 +114,28 @@ public class SqRealEstateMortgageComponent {
      */
     public ObjectRestResponse sqTransactionContract(ParamEntity paramEntity) throws IOException {
         ObjectRestResponse resultRV = new ObjectRestResponse();
-        Map<String,String> header=new HashMap<>();
-        String data="";
-//        Map<String,String> param=new HashMap<>();
-//        if (StringUtils.isNotEmpty(paramEntity.getBdcdyh())){
-//            data="bdcdyh="+paramEntity.getBdcdyh()+"&orgId="+1;
-//        }else if (StringUtils.isNotEmpty(paramEntity.getHtbah())){
-//           data="htbah="+paramEntity.getHtbah()+"&orgId="+1;
-//        }else if (StringUtils.isNotEmpty(paramEntity.getComDate()) && StringUtils.isNotEmpty(paramEntity.getBdcdyh())){
-//            data="bdcdyh="+paramEntity.getBdcdyh()+"&orgId="+1+"&ComDate="+paramEntity.getComDate();
-//        }else if (StringUtils.isNotEmpty(paramEntity.getHtbah()) && StringUtils.isNotEmpty(paramEntity.getComDate())){
-//            data="htbah="+paramEntity.getHtbah()+"orgId="+1+"&ComDate="+paramEntity.getComDate();
-//        }
+        paramEntity.setOrgId(1);
         String param= com.alibaba.fastjson.JSONObject.toJSONString(paramEntity, SerializerFeature.PrettyFormat);
-//        String resultJosn="{\"dataInfo\":{\"sInfo\":\"[{\\\"BDCDYH\\\":null,\\\"DJ\\\":6310.34,\\\"DLMC\\\":null,\\\"DZHTFullUrl\\\":" +
-//                "\\\"http://222.187.193.194:8054/sqfc/docx/TNAV?action=runtime.Preview&tmpid=5&docid=20002428&syflag=1\\\"," +
-//                "\\\"FWCX\\\":null,\\\"FWDY\\\":5031,\\\"FWFH\\\":\\\"1805\\\",\\\"FWJG\\\":\\\"钢筋混凝土结构\\\",\\\"FWLX\\\":11," +
-//                "\\\"FWQDSJ\\\":null,\\\"FWXZ\\\":\\\"市场化商品房\\\",\\\"FWYT\\\":11,\\\"FWZH\\\":5031,\\\"GMFDHHM\\\":\\\"18751080832\\\"," +
-//                "\\\"GMFDZ\\\":null,\\\"GMFGJ\\\":null,\\\"GMFXM\\\":\\\"王宁,袁成波\\\",\\\"GMFZJHM\\\":\\\"321302198904190021,321323198806192818\\\"," +
-//                "\\\"GMFZJLX\\\":\\\"身份证\\\",\\\"HTBAH\\\":\\\"SQCLF-201907080073\\\",\\\"HTJE\\\":256200,\\\"HTQDRQ\\\":\\\"2019-07-08\\\"," +
-//                "\\\"JDXZ\\\":null,\\\"JZMJ\\\":40.6,\\\"LCZS\\\":\\\"22\\\",\\\"MFDHHM\\\":\\\"19825762768\\\",\\\"MFDZ\\\":null,\\\"MFGJ\\\":null," +
-//                "\\\"MFXM\\\":\\\"陈莹石,李五将\\\",\\\"MFZJHM\\\":\\\"320819197306302918,321302197709228421\\\",\\\"MFZJLX\\\":\\\"身份证\\\"," +
-//                "\\\"PGJG\\\":null,\\\"SZLC\\\":18,\\\"XQMC\\\":null,\\\"XZQH\\\":\\\"321302\\\"," +
-//                "\\\"YWLX\\\":\\\"存量房网签合同备案\\\",\\\"ZJLXDH\\\":null}]\"},\"success\":true,\"errorCode\":\"0\"}\n";
+        List<BusinessContract> businessContractList=new ArrayList<>();
         String resultJosn=HttpClientUtil.post(jyfromUser,jyapiId,param,"http://"+ip+":"+post+"/sqservice/sh/secondInfo");
         if (resultJosn.equals("0")){
             resultRV.setMessage(Msgagger.INTERCE_NULL);
             resultRV.setStatus(20500);
             return  resultRV;
         }
-        JSONObject jyObject=JSONObject.fromObject(resultJosn);
-        JSONObject dataInfo=jyObject.getJSONObject("dataInfo");
-        JSONArray sInfoArray=dataInfo.getJSONArray("sInfo");
-        List<BusinessContract> businessContractList=new ArrayList<>();
-        if (null != sInfoArray) {
-            for (int i = 0; i < sInfoArray.size(); i++) {
-                clTransactionContract(sInfoArray.getJSONObject(i), businessContractList);
+        try {
+            JSONObject jyObject=JSONObject.fromObject(resultJosn);
+            JSONObject dataInfo=jyObject.getJSONObject("dataInfo");
+            JSONArray sInfoArray=dataInfo.getJSONArray("sInfo");
+            if (null != sInfoArray) {
+                for (int i = 0; i < sInfoArray.size(); i++) {
+                    clTransactionContract(sInfoArray.getJSONObject(i), businessContractList);
+                }
             }
+        }catch (Exception e){
+            resultRV.setMessage(Msgagger.INTERCE_NULL);
+            resultRV.setStatus(20500);
+            return  resultRV;
         }
         return resultRV.data(businessContractList);
     }
@@ -200,27 +209,42 @@ public class SqRealEstateMortgageComponent {
         businessContract.setGlImmovableVoList(glImmovableList);
         //权利人
         List<GlHouseSeller> glHouseSellerVoList=new ArrayList<>();
-        GlHouseSeller glHouseSeller=new GlHouseSeller();
-        glHouseSeller.setObligeeName(jsonObject.getString("MFXM"));
-        glHouseSeller.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR);
-        RelatedPerson relatedPerson=new RelatedPerson();
-        relatedPerson.setObligeeDocumentType(realEstateMortgageComponent.getZjlb(jsonObject.getString("MFZJLX")));
-        relatedPerson.setObligeeName(jsonObject.getString("MFXM"));
-        relatedPerson.setObligeeDocumentNumber(jsonObject.getString("MFZJHM"));
-        glHouseSeller.setRelatedPerson(relatedPerson);
-        glHouseSellerVoList.add(glHouseSeller);
-        businessContract.setGlHouseSellerVoList(glHouseSellerVoList);
+
+        if (jsonObject.getString("MFXM").contains(",")){
+            String [] obligorName=jsonObject.getString("MFXM").split(",");
+            String [] obligorZjhm=jsonObject.getString("MFZJHM").split(",");
+            String [] obligorZjlx=jsonObject.getString("MFZJLX").split(",");
+            for (int i=0;i<obligorName.length;i++) {
+                GlHouseSeller glHouseSeller=new GlHouseSeller();
+                glHouseSeller.setObligeeName(obligorName[i]);
+                glHouseSeller.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR);
+                RelatedPerson relatedPerson=new RelatedPerson();
+                relatedPerson.setObligeeDocumentType(obligorZjlx[i]);
+                relatedPerson.setObligeeName(obligorName[i]);
+                relatedPerson.setObligeeDocumentNumber(obligorZjhm[i]);
+                glHouseSeller.setRelatedPerson(relatedPerson);
+                glHouseSellerVoList.add(glHouseSeller);
+                businessContract.setGlHouseSellerVoList(glHouseSellerVoList);
+            }
+        }
         //购买人
         List<GlHouseBuyer> glHouseBuyerList=new ArrayList<>();
-        GlHouseBuyer glHouseBuyer=new GlHouseBuyer();
-        glHouseBuyer.setObligeeName(jsonObject.getString("GMFXM"));
-        glHouseBuyer.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_GFZ);
-        RelatedPerson gmrelatedPerson=new RelatedPerson();
-        gmrelatedPerson.setObligeeDocumentType(realEstateMortgageComponent.getZjlb(jsonObject.getString("GMFZJLX")));
-        gmrelatedPerson.setObligeeName(jsonObject.getString("GMFXM"));
-        gmrelatedPerson.setObligeeDocumentNumber(jsonObject.getString("GMFZJHM"));
-        glHouseBuyer.setRelatedPerson(relatedPerson);
-        glHouseBuyerList.add(glHouseBuyer);
+        if (jsonObject.getString("GMFXM").contains(",")){
+            String [] obligeeName=jsonObject.getString("GMFXM").split(",");
+            String [] obligeeZjhm=jsonObject.getString("GMFZJHM").split(",");
+            String [] obligeeZjhx=jsonObject.getString("GMFZJLX").split(",");
+            for (int i=0;i<obligeeName.length;i++) {
+                    GlHouseBuyer glHouseBuyer=new GlHouseBuyer();
+                    glHouseBuyer.setObligeeName(obligeeName[i]);
+                    glHouseBuyer.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_GFZ);
+                    RelatedPerson gmrelatedPerson=new RelatedPerson();
+                    gmrelatedPerson.setObligeeDocumentType(obligeeZjhx[i]);
+                    gmrelatedPerson.setObligeeName(obligeeName[i]);
+                    gmrelatedPerson.setObligeeDocumentNumber(obligeeZjhm[i]);
+                    glHouseBuyer.setRelatedPerson(gmrelatedPerson);
+                    glHouseBuyerList.add(glHouseBuyer);
+            }
+        }
         businessContract.setGlHouseBuyerVoList(glHouseBuyerList);
         businessContractList.add(businessContract);
     }

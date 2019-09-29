@@ -75,6 +75,8 @@ RealEstateMortgageComponent {
     private String windowAcceptanceSeam; //一窗受理接口
     @Value("${penghao.mortgageCancellation.pid}")
     private String mortgagePid;
+    @Value("${penghao.transferRegister.pid}")
+    private String transferRegisterPid;
     @Value("${penghao.mortgageRegistration.pid}")
     private String registrationPid;
 
@@ -83,21 +85,21 @@ RealEstateMortgageComponent {
 
 
     /**
-     * 发送登记局数据 返回受理编号  (不动产抵押登记（含两证）
+     * 发送登记局数据 返回受理编号  (转移登记）
      *
      * @param commonInterfaceAttributer
      * @return
      */
-    public ObjectRestResponse sendBureauByRegistration(String commonInterfaceAttributer) throws ParseException {
-        ObjectRestResponse resultRV = new ObjectRestResponse();
-        RegistrationBureau registrationBureauVo = null;
+    public ObjectRestResponse sendTransferRegister(String commonInterfaceAttributer) throws ParseException {
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        System.out.println("二手房转移sjsq:"+JSONObject.toJSONString(sjSjsq));
         //加载到registrationBureau中
-        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, mortgagePid, true, grMortgageRegistration, dealPerson, areaNo);
-        //加载抵押数据
-        registrationBureau = getImmovableCurrentMortgageInfo(sjSjsq.getImmovableCurrentMortgageInfoVoList(), registrationBureau);
-        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureauVo);
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, transferRegisterPid, true, registrationOfTransfer, dealPerson, areaNo);
+        //加载转移信息
+        registrationBureau = getTransferRegister(sjSjsq.getTransactionContractInfo(),sjSjsq.getImmovableRightInfoVoList(),registrationBureau);
+        registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
+        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         return getObjectRestResponse(sjSjsq, resultObject);
     }
 
@@ -122,7 +124,6 @@ RealEstateMortgageComponent {
                     registrationBureauVo = getRevokeBizInfo(sjSjsq.getImmovableCurrentMortgageInfoVoList(), registrationBureau);
                 }
                 break;
-
         }
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureauVo);
         return getObjectRestResponse(sjSjsq, resultObject);
@@ -210,6 +211,41 @@ RealEstateMortgageComponent {
             registrationBureau.setRevokeBizInfo(revokeBizInfo);
         }
         return registrationBureau;
+    }
+
+    /**
+     * 交易合同数据发送登记局
+     * @param sjInfoJyhtxx
+     * @param registrationBureau
+     * @return
+     */
+    private RegistrationBureau getTransferRegister(Sj_Info_Jyhtxx sjInfoJyhtxx,List<SJ_Info_Bdcqlxgxx> immovableRightInfoVoList,RegistrationBureau registrationBureau){
+        TransferBizInfo transferBizInfo=new TransferBizInfo();
+        for (SJ_Info_Bdcqlxgxx sj_info_bdcqlxgxx:immovableRightInfoVoList) {
+            transferBizInfo.setRealEstateId(sj_info_bdcqlxgxx.getImmovableCertificateNo());  //不动产权证号
+        }
+        transferBizInfo.setHtbh(sjInfoJyhtxx.getContractRecordNumber());
+        transferBizInfo.setTransferReason(Msgagger.BUSINESS);
+        transferBizInfo.setObligeeInfoVoList(Qlrxx(sjInfoJyhtxx.getGlHouseBuyerVoList()));
+        registrationBureau.setTransferBizInfo(transferBizInfo);
+        return registrationBureau;
+    }
+
+    /**
+     * 处理权利人信息
+     * @param glHouseSellerVoList
+     * @return
+     */
+    private List<QlrGlMortgator>  Qlrxx(List<SJ_Qlr_Gl> glHouseSellerVoList){
+        List<QlrGlMortgator> obligeeInfoVoList=new ArrayList<>();
+        for (SJ_Qlr_Gl sjQlrGl:glHouseSellerVoList) {
+            QlrGlMortgator qlrGlMortgator=new QlrGlMortgator();
+            qlrGlMortgator.setObligeeName(sjQlrGl.getObligeeName());
+            qlrGlMortgator.setObligeeId(sjQlrGl.getRelatedPerson().getObligeeDocumentNumber());
+            qlrGlMortgator.setObligeeIdType(sjQlrGl.getRelatedPerson().getObligeeDocumentType());
+            obligeeInfoVoList.add(qlrGlMortgator);
+        }
+        return obligeeInfoVoList;
     }
 
 
@@ -375,23 +411,27 @@ RealEstateMortgageComponent {
         }
         //预告证明号
         JSONArray ygInfojsonArray = (JSONArray) jsonObject.get("advanceInfoVoList");
-        String[] kung=new String[ygInfojsonArray.size()];
         if (null != ygInfojsonArray) {
-            for (int j = 0; j < ygInfojsonArray.size(); j++) {
-                JSONObject ygObject=ygInfojsonArray.getJSONObject(j);
-                kung[j]=ygObject.getString("vormerkungId");
+            String[] kung = new String[ygInfojsonArray.size()];
+            if (null != ygInfojsonArray) {
+                for (int j = 0; j < ygInfojsonArray.size(); j++) {
+                    JSONObject ygObject = ygInfojsonArray.getJSONObject(j);
+                    kung[j] = ygObject.getString("vormerkungId");
+                }
+                realPropertyCertificate.setForecastCertificateNos(kung);
             }
-            realPropertyCertificate.setForecastCertificateNos(kung);
         }
         //抵押证明号
         JSONArray dyInfojsonArray = (JSONArray) jsonObject.get("mortgageInfoVoList");
-        String[] dyzmh=new String[dyInfojsonArray.size()];
         if (null != dyInfojsonArray) {
-            for (int j = 0; j < dyInfojsonArray.size(); j++) {
-                JSONObject dyObject=dyInfojsonArray.getJSONObject(j);
-                dyzmh[j]=dyObject.getString("warrantId");
+            String[] dyzmh = new String[dyInfojsonArray.size()];
+            if (null != dyInfojsonArray) {
+                for (int j = 0; j < dyInfojsonArray.size(); j++) {
+                    JSONObject dyObject = dyInfojsonArray.getJSONObject(j);
+                    dyzmh[j] = dyObject.getString("warrantId");
+                }
+                realPropertyCertificate.setWarrantNos(dyzmh);
             }
-            realPropertyCertificate.setWarrantNos(dyzmh);
         }
         //宗地信息
         JSONArray zdInfojsonArray = (JSONArray) jsonObject.get("landUnitInfoVoList");
@@ -598,12 +638,12 @@ RealEstateMortgageComponent {
 //        if (StringUtils.isNotEmpty(parametricData.getBdczh())) {
 //            json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH", map, null);
 //        }
-        if (StringUtils.isNotEmpty(parametricData.getBdcdyh()) && StringUtils.isNotEmpty(parametricData.getObligeeName())){
-            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH"+"?BDCDYH"+parametricData.getBdcdyh()+"&obligeeName"+parametricData.getObligeeName());
+        if (StringUtils.isNotEmpty(parametricData.getBdcdyh()) && StringUtils.isNotEmpty(parametricData.getQlrmc())){
+            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH"+"?BDCDYH"+parametricData.getBdcdyh()+"&obligeeName"+parametricData.getQlrmc());
         }else if (StringUtils.isNotEmpty(parametricData.getBdcdyh())){
             json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH"+"?BDCDYH"+parametricData.getBdcdyh());
-        } else if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeName())){
-            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh()+"&obligeeName="+parametricData.getObligeeName());
+        } else if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getQlrmc())){
+            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh()+"&obligeeName="+parametricData.getQlrmc());
         }else if (StringUtils.isNotEmpty(parametricData.getBdczh())){
             json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh());
         }
@@ -709,7 +749,7 @@ RealEstateMortgageComponent {
                 zjlb = "身份证";
                 break;
             case "7":
-                zjlb = "社会信用统一代码";
+                zjlb = "统一社会信用代码";
                 break;
             default:
                 zjlb = "其它证件";

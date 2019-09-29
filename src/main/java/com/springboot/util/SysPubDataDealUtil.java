@@ -201,7 +201,6 @@ public class SysPubDataDealUtil {
             sj_jyhtxx.setGlImmovableVoList(sj_bdcgls);
             sj_jyhtxx.setGlHouseBuyerVoList(sj_mfrgls);
             sj_jyhtxx.setGlHouseSellerVoList(sj_sellergls);
-
             sj_jyhtxxs.add(sj_jyhtxx);
         }
         //应该只有一个合同

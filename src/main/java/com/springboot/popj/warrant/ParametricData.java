@@ -6,6 +6,7 @@ package com.springboot.popj.warrant;
 public class ParametricData {
     private String bdcdyh;//不动产单元号
     private String bdczh;//不动产证号
+    private String qlrmc;
     private String obligeeName;//权利人姓名
     private String obligeeId;//身份证号
 
@@ -39,5 +40,13 @@ public class ParametricData {
 
     public void setObligeeName(String obligeeName) {
         this.obligeeName = obligeeName;
+    }
+
+    public String getQlrmc() {
+        return qlrmc;
+    }
+
+    public void setQlrmc(String qlrmc) {
+        this.qlrmc = qlrmc;
     }
 }

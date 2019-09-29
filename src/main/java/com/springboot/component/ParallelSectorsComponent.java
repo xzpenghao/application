@@ -45,87 +45,20 @@ public class ParallelSectorsComponent {
      */
     public ObjectRestResponse getParallelSectorsCertificate(ParametricData parametricData)  {
 
+        System.out.println("bdczh:"+parametricData.getBdczh());
         String json = "";
         Map<String, Object> map = new HashMap<>();
         ObjectRestResponse resultRV = new ObjectRestResponse();
-        //       if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeName()) && StringUtils.isNotEmpty(parametricData.getObligeeId())){
-//            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+
-//                    "?BDCZH=" + parametricData.getBdczh()+"&obligeeName="+parametricData.getObligeeName()+"&obligeeId="+parametricData.getObligeeId());
-//        }else if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeName())){
-//            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" +
-//                    parametricData.getBdczh()+"&obligeeName="+parametricData.getObligeeName());
-//        }else if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeId())){
-//           json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh()+
-//                   "&obligeeId="+parametricData.getObligeeId());
-//       }
-        json="[{\n" +
-                "\"realEstateId\":1,\n" +
-                "\"registerDate\":\"2018-01-12\",\n" +
-                "\"salerName\":\"张三\",\n" +
-                "\"realEstateUnitInfoVoList\":[{\n" +
-                "  \"realEstateUnitId\":\"dyh123456\",\n" +
-                "  \"householdId\":1,\n" +
-                "  \"buildingId\":2,\n" +
-                "  \"accountId\":3,\n" +
-                "  \"sit\":\"泉山区国土资源局\",\n" +
-                "  \"architectureName\":null,\n" +
-                "  \"roomId\":null,\n" +
-                "  \"unitId\":null,\n" +
-                "  \"floor\":null,\n" +
-                "  \"totalFloor\":null,\n" +
-                "\"projectName\":null,\n" +
-                " \"architectureName\":null,\n" +
-                "  \"sharedArchitectureAera\":11.2,\n" +
-                "\"acquireWay\":null,\n" +
-                "  \"acquirePrice\":120,\n" +
-                "\"houseType\":\"小高层\",\n" +
-                "\"houseRightNature\":22,\n" +
-                "\"landRightNature\":22,\n" +
-                "\"landRightStartDate\":\"2018-01-02\",\n" +
-                "\"landRightEndDate\":\"2099-11-12\",\n" +
-                "\"landRightUser\":\"张三\",\n" +
-                "\"landRightTerm\":\"2099-01-02\",\n" +
-                "\"landUsage\":\"住房\",\n" +
-                "\"commonLandArea\":130.47,\n" +
-                "\"sharedLandArea\":null,\n" +
-                "\"singleLandArea\":null\n" +
-                " }],\n" +
-                "\"obligeeInfoVoList\":[{\n" +
-                "\"id\":1,\n" +
-                "\"obligeeId\":\"320323179602121023\",\n" +
-                "\"obligeeIdType\":1,\n" +
-                "\"obligeeName\":\"张三\",\n" +
-                "\"commonWay\":null,\n" +
-                "\"sharedShare\":null\n" +
-                "}],\n" +
-                "\"mortgageInfoVoList\":[{\n" +
-                " \"warrantId\":\"dyzmh123\",\n" +
-                "  \"mortgageType\":\"一般抵押\",\n" +
-                "\"dySLBH\":\"201909160001\",\n" +
-                "\"mortgageReason\":null,\n" +
-                "\"mortgageArea\":130.47,\n" +
-                "\"creditAmount\":\"30\",\n" +
-                "\"evaluationValue\":\"130\",\n" +
-                "\"mortgageTerm\":20,\n" +
-                "\"mortgageStartDate\":null,\n" +
-                "\"mortgageEndDate\":null,\n" +
-                "\"registerDate\":\"2018-01-02\",\n" +
-                " \"mortgageeInfoVoList\":[{\n" +
-                "\"id\":2,\n" +
-                "\"mortgageeId\":\"121024\",\n" +
-                "\"mortgageeIdType\":7,\n" +
-                "\"mortgageeName\":\"工商银行\"\n" +
-                "}],\n" +
-                " \"mortgagorInfoVoList\":[{\n" +
-                "\"id\":2,\n" +
-                "\"mortgageeId\":\"121024\",\n" +
-                "\"mortgageeIdType\":7,\n" +
-                "\"mortgageeName\":\"张三\"\n" +
-                "}]\n" +
-                "}]\n" +
-                "\n" +
-                "}]";
-
+               if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeName()) && StringUtils.isNotEmpty(parametricData.getObligeeId())){
+            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+
+                    "?BDCZH=" + parametricData.getBdczh()+"&obligeeName="+parametricData.getObligeeName()+"&obligeeId="+parametricData.getObligeeId());
+        }else if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeName())){
+            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" +
+                    parametricData.getBdczh()+"&obligeeName="+parametricData.getObligeeName());
+        }else if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeId())){
+           json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh()+
+                   "&obligeeId="+parametricData.getObligeeId());
+       }
         if (StringUtils.isEmpty(json)){
             resultRV.setStatus(20500);
             resultRV.setMessage(Msgagger.DATA_FAILURE);

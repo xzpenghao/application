@@ -56,6 +56,16 @@ public class AnonymousInnerComponent {
     private String machineIp;
     @Value("${machine.post}")
     private String machinePost;
+    @Value("${djj.bsryname}")
+    private String bsryname;
+    @Value("${djj.bsrypassword}")
+    private String bsrypassword;
+    @Value("${djj.tsryname}")
+    private String tsryname;
+    @Value("${djj.tsrypaaword}")
+    private String tsrypaaword;
+
+
     @Autowired
     private ExceptionRecordMapper exceptionRecordMapper;
     @Autowired
@@ -78,7 +88,7 @@ public class AnonymousInnerComponent {
             public String call() throws Exception { //建议抛出异常
                 try {
                     System.out.println("执行主线程");
-                    com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
+                    com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
                     String token = getToken(tokenObject, "", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                     if (token == null) {
                         return Msgagger.USER_LOGIN_BAD;
@@ -290,14 +300,24 @@ public class AnonymousInnerComponent {
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception { //建议抛出异常
                 try {
+                    String token="";
                     System.out.println("执行主线程");
-                    com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
-                    String token = getToken(tokenObject, "GetReceiving", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
-                    if (token == null) {
-                        return Msgagger.USER_LOGIN_BAD;
+                    if (getReceiving.getBizType().equals("1")) {
+                        com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
+                        token = getToken(tokenObject, "GetReceiving", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+                        if (token == null) {
+                            return Msgagger.USER_LOGIN_BAD;
+                        }
                     }
                     if (getReceiving.getMessageType().equals(Msgagger.VERIFYNOTICE)) {//审核
                         System.out.println("进入审核");
+                        if (getReceiving.getBizType().equals("2")){
+                            com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(bsryname,bsrypassword);//获得token
+                            token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+                            if (token == null) {
+                                return Msgagger.USER_LOGIN_BAD;
+                            }
+                        }
                         map.put("slbh", getReceiving.getSlbh());
                         //发送登记局获取数据整理发送一窗受理
                         String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetVerifyInfo", map, null);
@@ -310,6 +330,9 @@ public class AnonymousInnerComponent {
                             JSONObject verfyInfoObject = verfyInfoArray.getJSONObject(i);
                             SJ_Info_Handle_Result handleResult = new SJ_Info_Handle_Result();
                             handleResult.setHandleText(verfyInfoObject.getString("verifyOpinion"));
+                            if (null == verfyInfoObject.getString("registerSubType")){
+                                handleResult.setHandleResult(Msgagger.ADOPT);
+                            }
                             handleResult.setHandleResult(verfyInfoObject.getString("registerSubType") + Msgagger.ADOPT);
                             handleResult.setProvideUnit(Msgagger.REGISTRATION);
                             handleResult.setDataComeFromMode(Msgagger.SUCCESSFUL_INTERFACE);
@@ -326,13 +349,24 @@ public class AnonymousInnerComponent {
                     } else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)) {//登簿审核
                         System.out.println("进入登簿");
                         map.put("slbh", getReceiving.getSlbh());
+                        if (getReceiving.getBizType().equals("2")){
+                            com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(bsryname,bsrypassword);//获得token
+                            token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+                            if (token == null) {
+                                return Msgagger.USER_LOGIN_BAD;
+                            }
+
+                        }
+                        System.out.println("获取token成功，为："+token);
                         //发送登记局获取数据整理发送一窗受理
                         String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
+                        System.out.println("获取登簿数据成功，为："+json);
                         JSONObject jsonObject = JSONObject.fromObject(json);
                         mapParmeter.put("immovableSite", jsonObject.getString("sit"));
                         mapParmeter.put("registerNumber", jsonObject.getString("slbh"));
                         //登簿返回信息
                         JSONArray ficateInfoArray = jsonObject.getJSONArray("certificateInfoVoList");
+                        System.out.println("sit:"+jsonObject.getString("sit")+";slbh:"+jsonObject.getString("slbh")+"certificateInfoVoList:"+ficateInfoArray);
                         List<SJ_Info_Handle_Result> handleResultVoList = new ArrayList<>();
                         List<RespServiceData> respServiceDataList = new ArrayList<>();
                         List<String> stringList = new ArrayList<>();
@@ -348,7 +382,6 @@ public class AnonymousInnerComponent {
                             }else {
                                 getRealEstateBooking.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
                             }
-
                             respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
                         }
                         RespServiceData respServiceData = new RespServiceData();
@@ -367,6 +400,13 @@ public class AnonymousInnerComponent {
                         JSONArray jsonArray = JSONArray.fromObject(respServiceDataList);
                         mapParmeter.put("serviceDatas", jsonArray.toString());
                     } else if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {
+                        if (getReceiving.getBizType().equals("2")){
+                            com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
+                            token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+                            if (token == null) {
+                                return Msgagger.USER_LOGIN_BAD;
+                            }
+                        }
                         System.out.println("执行受理操作");
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
                     }
@@ -376,6 +416,7 @@ public class AnonymousInnerComponent {
                     System.err.println("result is " + resultJson);
                     return resultJson;
                 } catch (Exception e) {
+                    e.printStackTrace();
                     throw new Exception("Callable terminated with Exception!"); // call方法可以抛出异常
                 }
             }
@@ -395,6 +436,9 @@ public class AnonymousInnerComponent {
         System.err.println("result is " + JSONObject.fromObject(returnVo) + ", time is " + (System.currentTimeMillis() - t));
         executor.shutdown();
     }
+
+
+
 
     /**
      * 通过类型，证号查询登记局数据

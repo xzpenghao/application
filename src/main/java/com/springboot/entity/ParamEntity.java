@@ -7,15 +7,13 @@ public class ParamEntity {
 
     private String bdcdyh;//不动产单元号
     private String htbah;//合同备案号
-    private String comDate;//信息修改时间
-    private int orgId =1;
+    private int orgId ;
 
-
-    public Integer getOrgId() {
+    public int getOrgId() {
         return orgId;
     }
 
-    public void setOrgId(Integer orgId) {
+    public void setOrgId(int orgId) {
         this.orgId = orgId;
     }
 
@@ -35,11 +33,4 @@ public class ParamEntity {
         this.htbah = htbah;
     }
 
-    public String getComDate() {
-        return comDate;
-    }
-
-    public void setComDate(String comDate) {
-        this.comDate = comDate;
-    }
 }

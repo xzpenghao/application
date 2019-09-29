@@ -131,7 +131,7 @@ businessType:
   transferAndMortgage: ZY_DY         #（转移及抵押，（组合业务，转移+抵押））；
   vormerkung: YGDJ         #预告登记
   areaNo: 320301
-  dealPerson: gewenchao_1
+  dealPerson: ADMIN
 
 
 
@@ -194,6 +194,8 @@ penghao:
         pid: Proc-190724112944-7G1WKMM6
     mortgageRegistration:       #抵押登记pid
         pid: Proc-190828101550-J1B1X7HB
+    transferRegister:           #转移登记
+        pid: Proc-180517131507-5803W07O
     contractinformation:        #合同消息获取
         ip: 172.18.0.112
         port: 8088
@@ -203,7 +205,16 @@ sq:
     api_id: 3Rkt5FPx
     from_user: 0b6c220cdfc54288b6630eb1a7fa612f
     post: 8001
-    ip: 10.3.2.16
+    ip: 10.13.0.240
   qsxx:
     api_id: JwWtYcW7
     from_user: 0b6c220cdfc54288b6630eb1a7fa612f
+    serviceMethod: queryNsrWsqk
+    swjgdm: 23213000000
+    swrydm: 13213730007
+
+djj:
+  bsryname: testdjj
+  bsrypassword: 123456
+  tsryname: tsdjj
+  tsrypaaword: 123456
