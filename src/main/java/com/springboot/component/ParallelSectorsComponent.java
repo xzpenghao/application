@@ -16,13 +16,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
+
 import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.TimeUnit;
+
+
+
 @Component
 @Slf4j
 public class ParallelSectorsComponent {
@@ -47,7 +47,6 @@ public class ParallelSectorsComponent {
 
         System.out.println("bdczh:"+parametricData.getBdczh());
         String json = "";
-        Map<String, Object> map = new HashMap<>();
         ObjectRestResponse resultRV = new ObjectRestResponse();
                if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeName()) && StringUtils.isNotEmpty(parametricData.getObligeeId())){
             json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+
@@ -210,14 +209,6 @@ public class ParallelSectorsComponent {
         sj_qlr_info.setObligeeDocumentNumber(qxrJsonObject.getString("mortgageeId"));
         obligeeVoList.add(sj_qlr_info);
     }
-
-//    private void getDyrxx( JSONObject  qxrJsonObject,List<SJ_Qlr_Info> obligeeVoList){
-//        SJ_Qlr_Info sj_qlr_info=new SJ_Qlr_Info();
-//        sj_qlr_info.setObligeeName(qxrJsonObject.getString("mortgageeName"));
-//        sj_qlr_info.setObligeeDocumentType(realEstateMortgageComponent.getZjlb(qxrJsonObject.getString("mortgageeIdType")));
-//        sj_qlr_info.setObligeeDocumentNumber(qxrJsonObject.getString("mortgageeId"));
-//        obligeeVoList.add(sj_qlr_info);
-//    }
 
 
 

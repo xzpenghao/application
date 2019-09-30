@@ -10,9 +10,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
@@ -36,62 +34,6 @@ public class HttpClientUtils {
     protected Charset charset;
 
 
-
-
-//    /**
-//     *
-//     * @author:            zhrb
-//     * @Title:             creatPostAndTransData
-//     * @Description:       TODO
-//     * @param:             @param dataMap,内含ip,disPhone,email
-//     * @param:             @return   String 类型,string是请求接口返回的报文信息拼接的字符串
-//     * @return:            String
-//     * @throws MalformedURLException,IOException
-//     */
-//    public  static String creatPostAndTransData(String XmlInfo,String url) {
-//        //创建httpcleint对象
-//        CloseableHttpClient httpClient = HttpClients.createDefault();
-//        String url = "http://" + ip + ":" + port + "/" + region + "/BDCSrv.asmx?wsdl";
-//        //创建http Post请求
-//        HttpPost httpPost = new HttpPost(url);
-//        String str = "";
-//        // 构建请求配置信息
-//        RequestConfig config = RequestConfig.custom().setConnectTimeout(1000) // 创建连接的最长时间
-//                .setConnectionRequestTimeout(500) // 从连接池中获取到连接的最长时间
-//                .setSocketTimeout(3 * 1000) // 数据传输的最长时间10s
-//                .build();
-//        httpPost.setConfig(config);
-//        CloseableHttpResponse response = null;
-//        try {
-//            //采用SOAP1.1调用服务端，这种方式能调用服务端为soap1.1和soap1.2的服务
-////            httpPost.setHeader("Content-Type", "text/xml;charset=UTF-8");
-////            httpPost.setHeader("SOAPAction", "");
-//            //采用SOAP1.2调用服务端，这种方式只能调用服务端为soap1.2的服务
-//            httpPost.setHeader("Content-Type", "application/soap+xml;charset=UTF-8");
-//            StringEntity stringEntity = new StringEntity(soapXml, Charset.forName("UTF-8"));
-//            httpPost.setEntity(stringEntity);
-//            response = httpClient.execute(httpPost);
-//            // 判断返回状态是否为200
-//            if (response.getStatusLine().getStatusCode() == 200) {
-//                String content = EntityUtils.toString(response.getEntity(), "UTF-8");
-//                System.out.println(content);
-//                return content;
-//            } else {
-//                System.out.println("调用失败!" + response.getStatusLine().toString());
-//                return str;
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (null != response) {
-//                response.close();
-//            }
-//            if (null != httpClient) {
-//                httpClient.close();
-//            }
-//        }
-//        return str;
-//    }
 
     /**
      *

@@ -4,9 +4,7 @@ import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.component.RealEstateMortgageComponent;
 import com.springboot.component.SqRealEstateMortgageComponent;
-import com.springboot.entity.DsEntity;
 import com.springboot.entity.ParamEntity;
-import com.springboot.popj.GetReceiving;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +13,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 @Slf4j
 @Api(tags = "宿迁不动产api")

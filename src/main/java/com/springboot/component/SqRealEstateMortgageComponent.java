@@ -4,7 +4,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.Msgagger;
 import com.springboot.constant.penghao.BizOrBizExceptionConstant;
-import com.springboot.entity.DsEntity;
 import com.springboot.entity.ParamEntity;
 import com.springboot.popj.FwInfo;
 import com.springboot.popj.GlImmovable;
@@ -12,29 +11,16 @@ import com.springboot.popj.RelatedPerson;
 import com.springboot.popj.netSign.BusinessContract;
 import com.springboot.popj.netSign.GlHouseBuyer;
 import com.springboot.popj.netSign.GlHouseSeller;
-import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.popj.pub_data.Sj_Info_Qsxx;
-import com.springboot.popj.register.HttpRequestMethedEnum;
-import com.springboot.popj.registration.RegistrationBureau;
-import com.springboot.util.HttpClientUtils;
 import com.springboot.util.NetSignUtils;
-import com.springboot.util.SysPubDataDealUtil;
-import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.HttpClientUtil;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -86,10 +72,8 @@ public class SqRealEstateMortgageComponent {
         param.put("swrydm",swrydm);
         param.put("serviceMethod",serviceMethod);
         String result=netSignUtils.clfDsxx(serviceMethod,swjgdm,swrydm,htbh,"http://"+ip+":"+post+"/WxfcjyJmssendAction.do",qsfromUser,qsapiId);
-
         JSONObject resultObject=JSONObject.fromObject(result);
         try {
-
             if (resultObject.getJSONArray("griddata") !=null){
                 JSONArray jsonArray = resultObject.getJSONArray("griddata");
                 for (int i = 0; i < jsonArray.size(); i++) {

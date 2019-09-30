@@ -4,7 +4,6 @@ import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.google.common.collect.Maps;
 import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
-import com.springboot.config.DJJUser;
 import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.EsfSdq;
