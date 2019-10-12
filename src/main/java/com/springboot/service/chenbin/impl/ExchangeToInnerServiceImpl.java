@@ -58,8 +58,6 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private String pid;
     @Value("${chenbin.registrationBureau.forecast.commercialHouse.isSubmit}")
     private boolean isSubmit;
-    @Autowired
-    private AnonymousInnerComponent anonymousInnerComponent;
 
     @Override
     public String dealYGYD2Inner(String commonInterfaceAttributer) throws ParseException {
@@ -95,8 +93,9 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         //操作FTP上传附件
         List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
         log.warn("双预告附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
-        List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
-        registrationBureau.setFileInfoVoList(fileList);
+        //内网附件上传
+//        List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
+//        registrationBureau.setFileInfoVoList(fileList);
 
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         if (resultObject != null) {

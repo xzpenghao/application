@@ -5,6 +5,7 @@ import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.component.EsfRoomComponent;
 import com.springboot.component.ParallelSectorsComponent;
 import com.springboot.component.RealEstateMortgageComponent;
+import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.popj.GetReceiving;
 import com.springboot.popj.warrant.ParametricData;
@@ -41,6 +42,8 @@ public class RealEstateMortgageController {
     private EsfRoomComponent esfRoomComponent;
     @Autowired
     private ParallelSectorsComponent parallelSectorsComponent;
+    @Autowired
+    private HttpCallComponent httpCallComponent;
 
 
     @RequestMapping(value = "/AutoBackfillData", method = RequestMethod.POST)
@@ -117,6 +120,8 @@ public class RealEstateMortgageController {
     public ObjectRestResponse getMortgageCancellation(String ygzmh) throws Exception {
         return realEstateMortgageComponent.getMortgageCancellation(ygzmh);
     }
+
+
 
 
 }

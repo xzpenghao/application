@@ -117,10 +117,10 @@ glHouseBuyer:
   obligeeQlr: 权利人
   obligeeYwr: 义务人
 httpclient:
-  seam: 23335
-  ip: 10.3.2.147
-  windowAcceptanceIp: 10.3.2.203
-  windowAcceptanceSeam: 7779
+  seam: 23335       #登记平台接口
+  ip: 10.3.2.147    #登记平台ip
+  windowAcceptanceIp: 10.3.2.203   #一窗受理ip
+  windowAcceptanceSeam: 7779      #一窗受理接口
 businessType:
   clfFmortgage: MORTGAGE_OLD_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
   xjfFmortgage: MORTGAGE_NEW_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）
@@ -179,7 +179,7 @@ chenbin:
     forecast:                   #预告预抵
       commercialHouse:          #商品房
         bizType: MORTGAGE_NEW_TRAILER
-        pid: Proc-171013210700-3785RA40
+        pid: Proc-180517142329-18NT00D7
         isSubmit: false
   otherBureau:
     ga:                         #公安
@@ -191,11 +191,13 @@ chenbin:
       url: http://10.13.0.240:9999/z
 penghao:
     mortgageCancellation:       #抵押注销登记
-        pid: Proc-190724112944-7G1WKMM6
+        pid:  Proc-180517124140-3MN26M71
     mortgageRegistration:       #抵押登记pid
-        pid: Proc-190828101550-J1B1X7HB
+        pid: Proc-180517124205-2WM2423B
     transferRegister:           #转移登记
         pid: Proc-180517131507-5803W07O
+    transferMortgage:           #转移及抵押二手房
+        pid: Proc-180517141343-020312K8
     contractinformation:        #合同消息获取
         ip: 172.18.0.112
         port: 8088

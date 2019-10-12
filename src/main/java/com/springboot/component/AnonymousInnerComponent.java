@@ -94,8 +94,7 @@ public class AnonymousInnerComponent {
                     }
                     mapHeader.put("Authorization", token);
                     if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {//受理
-                        mapParmeter.put("model" +
-                                "Id", getReceiving.getModelId());
+                        mapParmeter.put("modelId" , getReceiving.getModelId());
                         //受理启动一窗受理流程
                         String entry = httpClientUtils.doGet("http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter6", modelMap, mapHeader);
                         JSONObject entryObject = JSONObject.fromObject(entry);
@@ -105,14 +104,93 @@ public class AnonymousInnerComponent {
                         esfSdq.setSlbh(getReceiving.getSlbh());
                         esfSdq.setTransferred(false);
                         JSONObject paramObject = JSONObject.fromObject(esfSdq);//整理参数信息
+                        System.out.println("aa"+paramObject.toString());
                         //根据受理编号查询转移信息（水电气）
-                        String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+                        //String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+                        String  zyxx="{\n" +
+                                "    \"realEstateInfoList\": [\n" +
+                                "        {\n" +
+                                "            \"realEstateId\": \"国房初丰字第BCS121413号\",\n" +
+                                "            \"certificateType\": \"房屋不动产证\",\n" +
+                                "            \"realEstateUnitInfoVoList\": [\n" +
+                                "                {\n" +
+                                "                    \"realEstateUnitId\": \"320321030001GB00026F00000000\",\n" +
+                                "                    \"householdId\": \"10FBCD0E-D06B-418C-90E2-197102317C\",\n" +
+                                "                    \"buildingId\": \"0003\",\n" +
+                                "                    \"accountId\": \"0001\",\n" +
+                                "                    \"sit\": \"测试坐落\",\n" +
+                                "                    \"roomId\": \"101\",\n" +
+                                "                    \"unitId\": \"1\",\n" +
+                                "                    \"floor\": \"1\",\n" +
+                                "                    \"totalFloor\": \"5\",\n" +
+                                "                    \"projectName\": \"名仕雅苑一期\",\n" +
+                                "                    \"architectureName\": \"11#\",\n" +
+                                "                    \"architectureAera\": null,\n" +
+                                "                    \"innerArchitectureAera\": null,\n" +
+                                "                    \"sharedArchitectureAera\": null,\n" +
+                                "                    \"acquireWay\": null,\n" +
+                                "                    \"acquirePrice\": null,\n" +
+                                "                    \"plannedUsage\": \"10\",\n" +
+                                "                    \"houseType\": null,\n" +
+                                "                    \"houseNature\": null,\n" +
+                                "                    \"houseRightType\": \"4\",\n" +
+                                "                    \"houseRightNature\": \"0\",\n" +
+                                "                    \"landRightNature\": null,\n" +
+                                "                    \"landRightStartDate\": null,\n" +
+                                "                    \"landRightEndDate\": null,\n" +
+                                "                    \"landRightUser\": null,\n" +
+                                "                    \"landRightTerm\": null,\n" +
+                                "                    \"landUsage\": null,\n" +
+                                "                    \"commonLandArea\": null,\n" +
+                                "                    \"sharedLandArea\": null,\n" +
+                                "                    \"singleLandArea\": null\n" +
+                                "                }\n" +
+                                "            ],\n" +
+                                "            \"landUnitInfoVoList\": null,\n" +
+                                "            \"obligeeInfoVoList\": [\n" +
+                                "                {\n" +
+                                "                    \"id\": \"QLR-190806144734-8A7M74UI2O\",\n" +
+                                "                    \"obligeeName\": \"史平安\",\n" +
+                                "                    \"obligeeIdType\": \"99\",\n" +
+                                "                    \"obligeeId\": null,\n" +
+                                "                    \"commonWay\": \"0\",\n" +
+                                "                    \"sharedShare\": null\n" +
+                                "                }\n" +
+                                "            ],\n" +
+                                "            \"salerInfoVoList\": [],\n" +
+                                "            \"registerDate\": \"2019-08-06 00:00:00\"\n" +
+                                "        }\n" +
+                                "    ],\n" +
+                                "    \"sdqInfo\": {\n" +
+                                "        \"shhh\": null,\n" +
+                                "        \"dhhh\": null,\n" +
+                                "        \"qhhh\": null,\n" +
+                                "        \"thhh\": null,\n" +
+                                "        \"xshhh\": null,\n" +
+                                "        \"xdhhh\": null,\n" +
+                                "        \"xqhhh\": null,\n" +
+                                "        \"xthhh\": null,\n" +
+                                "        \"gsdw\": null,\n" +
+                                "        \"gddw\": null,\n" +
+                                "        \"gqdw\": null,\n" +
+                                "        \"gtdw\": null\n" +
+                                "    },\n" +
+                                "    \"fileInfoList\": [],\n" +
+                                "    \"contacts\": \"史平安\",\n" +
+                                "    \"contactsPhone\": \"15162098070\",\n" +
+                                "    \"contactsAdress\": null,\n" +
+                                "    \"businessAreas\": \"丰县\"\n" +
+                                "}";
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(zyxx);                        //整理数据发送到一窗受理
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.ESFSDQSERVICE_CODE, false, getReceiving.getSlbh());//获取不动产权属信息
+                        log.info("sjsq"+mapParmeter.get("SJ_Sjsq"));
+                        log.info("modelId"+mapParmeter.get("modelId"));
+                        log.info("fileVoList"+mapParmeter.get("fileVoList"));
                         getProcessingAnnex(zyxxObject, mapParmeter);//附件上传
                         //发送一窗受理进行启动流程
                         String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter5");
                         JSONObject jsonObject = JSONObject.fromObject(json);
+                        log.info(jsonObject.get("status").toString());
                         if ((Integer) jsonObject.get("status") == 200) {
                             log.info("存量房水电气流程数据保存成功及流程开启成功");
                         } else {
@@ -142,7 +220,7 @@ public class AnonymousInnerComponent {
         long t = System.currentTimeMillis();
         try {
             returnVo.setCode(200);
-            returnVo.setMessage("成功");
+            returnVo.setMessage(Msgagger.CG);
             JSONObject object = JSONObject.fromObject(returnVo);
             outputStream.write(object.toString().getBytes());
             outputStream.flush();
@@ -299,10 +377,11 @@ public class AnonymousInnerComponent {
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception { //建议抛出异常
                 try {
+                    com.alibaba.fastjson.JSONObject tokenObject;
                     String token="";
                     System.out.println("执行主线程");
-                    if (getReceiving.getBizType().equals("1")) {
-                        com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
+                    if (StringUtils.isEmpty(getReceiving.getBizType()) || getReceiving.getBizType().equals("1")) {
+                        tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
                         token = getToken(tokenObject, "GetReceiving", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                         if (token == null) {
                             return Msgagger.USER_LOGIN_BAD;
@@ -311,7 +390,7 @@ public class AnonymousInnerComponent {
                     if (getReceiving.getMessageType().equals(Msgagger.VERIFYNOTICE)) {//审核
                         System.out.println("进入审核");
                         if (getReceiving.getBizType().equals("2")){
-                            com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(bsryname,bsrypassword);//获得token
+                             tokenObject = httpCallComponent.getTokenYcsl(bsryname,bsrypassword);//获得token
                             token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                             if (token == null) {
                                 return Msgagger.USER_LOGIN_BAD;
@@ -349,12 +428,11 @@ public class AnonymousInnerComponent {
                         System.out.println("进入登簿");
                         map.put("slbh", getReceiving.getSlbh());
                         if (getReceiving.getBizType().equals("2")){
-                            com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(bsryname,bsrypassword);//获得token
+                             tokenObject = httpCallComponent.getTokenYcsl(bsryname,bsrypassword);//获得token
                             token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                             if (token == null) {
                                 return Msgagger.USER_LOGIN_BAD;
                             }
-
                         }
                         System.out.println("获取token成功，为："+token);
                         //发送登记局获取数据整理发送一窗受理
@@ -378,7 +456,7 @@ public class AnonymousInnerComponent {
                                     verfyInfoObject.getString("certificateId"), RealEstateBookData);
                             if (verfyInfoObject.getString("registerSubType").equals(Msgagger.DYZXDJ)){
                                 getRealEstateBooking.setServiceCode(Msgagger.DYZXSERVICECODE);
-                            }else {
+                            }else if (StringUtils.isEmpty(getRealEstateBooking.getServiceCode())){
                                 getRealEstateBooking.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
                             }
                             respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
@@ -400,7 +478,7 @@ public class AnonymousInnerComponent {
                         mapParmeter.put("serviceDatas", jsonArray.toString());
                     } else if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {
                         if (getReceiving.getBizType().equals("2")){
-                            com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
+                            tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
                             token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                             if (token == null) {
                                 return Msgagger.USER_LOGIN_BAD;
@@ -424,7 +502,7 @@ public class AnonymousInnerComponent {
         long t = System.currentTimeMillis();
 //        try {
         returnVo.setCode(200);
-        returnVo.setMessage("受理成功");
+        returnVo.setMessage(Msgagger.CG);
         JSONObject object = JSONObject.fromObject(returnVo);
         outputStream.write(object.toString().getBytes());
         outputStream.flush();

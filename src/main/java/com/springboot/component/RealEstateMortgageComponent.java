@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
 
@@ -77,6 +78,8 @@ RealEstateMortgageComponent {
     private String mortgagePid;
     @Value("${penghao.transferRegister.pid}")
     private String transferRegisterPid;
+    @Value("${penghao.transferMortgage.pid}")
+    private String transferMortgagePid;
     @Value("${penghao.mortgageRegistration.pid}")
     private String registrationPid;
 
@@ -85,9 +88,31 @@ RealEstateMortgageComponent {
 
 
     /**
+     * 发送登记局数据 返回受理编号  (转移登记及抵押）
+     *
+     * @param commonInterfaceAttributer 接收参数
+     * @return
+     */
+    public ObjectRestResponse sendTransferMortgage(String commonInterfaceAttributer) throws ParseException {
+        //获取json数据转成收件申请
+        SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        //加载到registrationBureau中
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, transferMortgagePid, true, registrationOfTransfer, dealPerson, areaNo);
+        //加载转移信息
+        registrationBureau = getTransferRegister(sjSjsq.getTransactionContractInfo(),sjSjsq.getImmovableRightInfoVoList(),registrationBureau);
+        registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
+        //加载抵押信息
+        registrationBureau =ClAutoRealPropertyCertificate(sjSjsq,registrationBureau);
+        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
+        return getObjectRestResponse(sjSjsq, resultObject);
+    }
+
+
+
+    /**
      * 发送登记局数据 返回受理编号  (转移登记）
      *
-     * @param commonInterfaceAttributer
+     * @param commonInterfaceAttributer 接收参数
      * @return
      */
     public ObjectRestResponse sendTransferRegister(String commonInterfaceAttributer) throws ParseException {
@@ -105,18 +130,16 @@ RealEstateMortgageComponent {
 
 
     /**
-     * 发送登记局数据 返回受理编号
+     * 发送登记局数据 返回受理编号 (抵押注销登记)
      *
      * @param commonInterfaceAttributer
      * @return
      */
     public ObjectRestResponse sendRegistrationMortgageRevocation(String commonInterfaceAttributer) throws ParseException {
-        ObjectRestResponse resultRV = new ObjectRestResponse();
-//        net.sf.json.JSONObject jsonObject=null;
         RegistrationBureau registrationBureauVo = null;
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
-        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, mortgagePid, true, grMortgageCancellation, dealPerson, areaNo);
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, mortgagePid, false, grMortgageCancellation, dealPerson, areaNo);
         switch (sjSjsq.getBusinessType()) {
             case Msgagger.CANCELLATION_REGISTRATION:
                 registrationBureau.setBizType(grMortgageCancellation);
@@ -338,12 +361,11 @@ RealEstateMortgageComponent {
      */
     public ObjectRestResponse getMortgageCancellation(String ygCancellcation) throws Exception {
         ObjectRestResponse resultRV = new ObjectRestResponse();
-        Map<String, Object> map = new HashMap<>();
         if (StringUtils.isEmpty(ygCancellcation)) {
             throw new ZtgeoBizException(Msgagger.MORTGAGE_CERTIFICATE_NULL);
         }
-        map.put("YGZMH", ygCancellcation);
-        String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByYGZMH", map, null);
+//        String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByYGZMH", map, null);
+        String json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByYGZMH"+ "?YGZMH=" + ygCancellcation);
         System.out.println("aa" + getRealPropertySj(json, ygCancellcation));
         return resultRV.data(getRealPropertySj(json, ygCancellcation));
     }
@@ -527,7 +549,9 @@ RealEstateMortgageComponent {
         mortgageBizInfo.setMortgageApplyDate(mortgageContractInfo.getApplyTime());
         mortgageBizInfo.setMortgageWay(mortgageContractInfo.getMortgageMode());
         mortgageBizInfo.setMortgageTerm(mortgageContractInfo.getMortgagePeriod());
-        mortgageBizInfo.setHighestClaimAmount(mortgageContractInfo.getMaximumClaimAmount().toString());
+        if ( null != mortgageContractInfo.getMaximumClaimAmount() ) {
+            mortgageBizInfo.setHighestClaimAmount(mortgageContractInfo.getMaximumClaimAmount().toString());
+        }
         mortgageBizInfo.setMortgageReason(mortgageContractInfo.getMortgageReason());
         mortgageBizInfo.setMortgageStartDate(mortgageContractInfo.getMortgageStartingDate());
         mortgageBizInfo.setMortgageEndDate(mortgageContractInfo.getMortgageEndingDate());
@@ -565,7 +589,7 @@ RealEstateMortgageComponent {
         if (sj_sjsq.getImmovableRightInfoVoList() != null && sj_sjsq.getImmovableRightInfoVoList().size() != 0) {
             for (SJ_Info_Bdcqlxgxx bdcqlxgxx : sj_sjsq.getImmovableRightInfoVoList()) {
                 //房屋
-                if (bdcqlxgxx.getCertificateType().equals(Msgagger.FCZ)) {
+                if (bdcqlxgxx.getCertificateType().equals(Msgagger.FCZ) || bdcqlxgxx.getCertificateType().equals(Msgagger.BDCQZ)) {
                     RealEstateInfo realEstateInfo = new RealEstateInfo();
                     realEstateInfo.setRealEstateId(bdcqlxgxx.getImmovableCertificateNo());
                     List<RealEstateUnitInfo> realEstateUnitInfoList = new ArrayList<>();
@@ -623,21 +647,6 @@ RealEstateMortgageComponent {
     public ObjectRestResponse getRealPropertyCertificate(ParametricData parametricData) throws Exception {
         String json = "";
         Map<String, Object> map = new HashMap<>();
-//        if (StringUtils.isNotEmpty(parametricData.getBdcdyh())) {
-//            map.put("BDCDYH", parametricData.getBdcdyh());
-//        }
-//        if (StringUtils.isNotEmpty(parametricData.getObligeeName())) {
-//            map.put("obligeeName", parametricData.getObligeeName());
-//        }
-//        if (StringUtils.isNotEmpty(parametricData.getBdczh())) {
-//            map.put("BDCZH", parametricData.getBdczh());
-//        }
-//        if (StringUtils.isNotEmpty(parametricData.getBdcdyh())) {
-//            json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH", map, null);
-//        }
-//        if (StringUtils.isNotEmpty(parametricData.getBdczh())) {
-//            json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH", map, null);
-//        }
         if (StringUtils.isNotEmpty(parametricData.getBdcdyh()) && StringUtils.isNotEmpty(parametricData.getQlrmc())){
             json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH"+"?BDCDYH"+parametricData.getBdcdyh()+"&obligeeName"+parametricData.getQlrmc());
         }else if (StringUtils.isNotEmpty(parametricData.getBdcdyh())){
@@ -647,9 +656,6 @@ RealEstateMortgageComponent {
         }else if (StringUtils.isNotEmpty(parametricData.getBdczh())){
             json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh());
         }
-//        json="[{\"realEstateId\":\"徐房权证泉山字第218327号\",\"vormerkungId\":null,\"realEstateType\":\"FW\",\"certificateType\":\"房产证\",\"registerDate\":\"2013-02-26 00:00:00\",\"realEstateUnitInfoVoList\":[{\"realEstateUnitId\":\"320311013020GB00085F00020004\",\"householdId\":\"OFH201200200009305-1\",\"buildingId\":\"0002\",\"accountId\":\"0004\",\"sit\":\"湖北路银湖小区14# 1-702\",\"roomId\":\"702\",\"unitId\":\"1\",\"floor\":\"7\",\"totalFloor\":\"7\",\"projectName\":\"银湖小区\",\"architectureName\":\"14#\",\"architectureAera\":\"94.14000000\",\"innerArchitectureAera\":\"73.80000000\",\"sharedArchitectureAera\":\"8.66000000\",\"acquireWay\":\"3\",\"acquirePrice\":null,\"plannedUsage\":\"10\",\"houseType\":null,\"houseNature\":null,\"houseRightType\":\"4\",\"houseRightNature\":\"0\",\"landRightNature\":null,\"landRightStartDate\":null,\"landRightEndDate\":null,\"landRightUser\":null,\"landRightTerm\":null,\"landUsage\":null,\"commonLandArea\":null,\"sharedLandArea\":null,\"singleLandArea\":null}],\"landUnitInfoVoList\":null,\"obligeeInfoVoList\":[{\"id\":\"QLR-201200200009305\",\"obligeeName\":\"韩佳睿\",\"obligeeIdType\":\"1\",\"obligeeId\":\"320323198803277030\",\"commonWay\":null,\"sharedShare\":null}],\"salerInfoVoList\":[{\"salerName\":\"徐州市泉山区人民政府\",\"salerIdType\":\"1\",\"salerId\":\"320323198803277030\"}],\"mortgageInfoVoList\":null,\"advanceInfoVoList\":[{\n" +
-//                "\"vormerkungId\":12\n" +
-//                "}],\"attachmentInfoVoList\":null,\"dissentInfoVoList\":null}]";
         ObjectRestResponse resultRV = new ObjectRestResponse();
         return resultRV.data(getRealPropertySj(json, null));
     }

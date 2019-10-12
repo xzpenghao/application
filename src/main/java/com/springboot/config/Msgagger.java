@@ -14,6 +14,7 @@ public class Msgagger {
     public final static String VERIFYNOTICE = "verifyNotice";//核定通知
     public final static String RESULTNOTICE = "resultNotice";//登簿通知
     public final static String ADOPT = "通过";
+    public final static String CG="成功";
     public final static String SUCCESSFUL_REGISTRATION = "审核成功";
     public final static String SUCCESSFUL_DENGBUCG = "登簿成功";
     public final static String SUCCESSFUL_INTERFACE = "接口提交";

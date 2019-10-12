@@ -40,6 +40,12 @@ public class SqRealEstateMortgageController {
         return realEstateMortgageComponent.sendTransferRegister(commonInterfaceAttributer);
     }
 
+    @RequestMapping(value = "/sendTransferMortgage", method = RequestMethod.POST)
+    @ApiOperation("二手房转移登记及抵押发送登记局收件")
+    public ObjectRestResponse sendTransferMortgage(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
+        return realEstateMortgageComponent.sendTransferMortgage(commonInterfaceAttributer);
+    }
+
     @RequestMapping(value = "/sqTaxation", method = RequestMethod.POST)
     @ApiOperation("地税信息处理")
     public ObjectRestResponse sqTaxation(@RequestParam("htbh") String htbh) throws Exception{
