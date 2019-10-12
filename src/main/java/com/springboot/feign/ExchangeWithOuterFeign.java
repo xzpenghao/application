@@ -27,4 +27,13 @@ public interface ExchangeWithOuterFeign {
     PersonnelResponseListEntity<GSCommonEntity> qyjbxxcx(Map<String,Object> params);    //工商-信息数据获取
 
     //社会团体
+    @RequestMapping(value="share/shttfrdjzscx",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
+    Map<String,Object> shttfrdjzscx(Map<String,Object> params);
+    //民办非企业单位
+    @RequestMapping(value="share/mbfqydwdjzscx",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
+    Map<String,Object> mbfqydwdjzscx(Map<String,Object> params);
+    //基金会
+    @RequestMapping(value="share/jjhfrdjzscx",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
+    Map<String,Object> jjhfrdjzscx(Map<String,Object> params);
+
 }

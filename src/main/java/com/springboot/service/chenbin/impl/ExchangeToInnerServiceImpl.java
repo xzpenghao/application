@@ -10,6 +10,11 @@ import com.springboot.config.DJJUser;
 import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.chenbin.personnel.other.paph.PaphCfxx;
+import com.springboot.entity.chenbin.personnel.other.paph.PaphDyxx;
+import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
+import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
+import com.springboot.feign.ForImmovableFeign;
 import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.popj.pub_data.Sj_Info_Dyhtxx;
 import com.springboot.popj.pub_data.Sj_Info_Jyhtxx;
@@ -29,6 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +47,8 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private HttpCallComponent httpCallComponent;
     @Autowired
     private OtherComponent otherComponent;
+    @Autowired
+    private ForImmovableFeign immovableFeign;
 
     @Value("${chenbin.idType}")
     private String idType;
@@ -58,6 +66,8 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private String pid;
     @Value("${chenbin.registrationBureau.forecast.commercialHouse.isSubmit}")
     private boolean isSubmit;
+    @Autowired
+    private AnonymousInnerComponent anonymousInnerComponent;
 
     @Override
     public String dealYGYD2Inner(String commonInterfaceAttributer) throws ParseException {
@@ -93,9 +103,8 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         //操作FTP上传附件
         List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
         log.warn("双预告附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
-        //内网附件上传
-//        List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
-//        registrationBureau.setFileInfoVoList(fileList);
+        List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
+        registrationBureau.setFileInfoVoList(fileList);
 
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         if (resultObject != null) {
@@ -119,5 +128,169 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
             throw new ZtgeoBizException((String) resultRV.getData());
         }
         return result;
+    }
+
+    @Override
+    public List<PaphEntity> getPaphMortBefore(PaphReqEntity paph) {
+        Map<String,Object> params = new HashMap<String,Object>();
+        params.put("obligeeName",paph.getQlrmc());
+        params.put("obligeeId",paph.getQlrzjh());
+        String bdczl = paph.getBdczl();
+        if(StringUtils.isNotBlank(bdczl)) {
+            String[] bdczls = bdczl.split("\\$");
+            System.out.println("bdczls:" + bdczls + JSONObject.toJSONString(bdczls));
+            params.put("sit", bdczls);
+        }
+        List<JSONObject> objs = immovableFeign.getBdcInfoByZL(params);
+        System.out.println("返回："+objs+"， 详情："+JSONObject.toJSONString(objs));
+        List<PaphEntity> paphEntitys = new ArrayList<PaphEntity>();
+        if (objs!=null && objs.size()>0){
+            for(JSONObject obj:objs){
+                PaphEntity paphEntity = getBasePaph(obj);
+                JSONArray mortArray = obj.getJSONArray("mortgageInfoVoList");
+                if(mortArray!=null && mortArray.size()>0){
+                    paphEntity.setSfdy("是");
+                    List<PaphDyxx> dyxxs = getBeforeDyxxs(mortArray);
+                    paphEntity.setDyxxs(dyxxs);
+                }
+                JSONArray attachArray = obj.getJSONArray("attachInfoVoList");
+                if (attachArray!=null && attachArray.size()>0){
+                    paphEntity.setSfcf("是");
+                    List<PaphCfxx> cfxxs = getCfxxs(attachArray);
+                    paphEntity.setCfxxs(cfxxs);
+                }
+                paphEntitys.add(paphEntity);
+            }
+        }else{
+            throw new ZtgeoBizException("未查询到该权利人存在现势登记的权属信息");
+        }
+        return paphEntitys;
+    }
+
+    @Override
+    public List<PaphEntity> getPaphMortAfter(PaphReqEntity paph) {
+        Map<String,Object> params = new HashMap<String,Object>();
+        params.put("obligeeName",paph.getDyrmc());
+        params.put("obligeeId",paph.getDyrzjh());
+        List<JSONObject> objs = immovableFeign.getBdcInfoByZL(params);
+        List<PaphEntity> paphEntitys = new ArrayList<PaphEntity>();
+        if (objs!=null && objs.size()>0){
+            for(JSONObject obj:objs){
+                PaphEntity paphEntity = getBasePaph(obj);
+                JSONArray mortArray = obj.getJSONArray("mortgageInfoVoList");
+                if(mortArray!=null && mortArray.size()>0){
+                    List<PaphDyxx> dyxxs = getAfterDyxxs(mortArray,paph);
+                    if(dyxxs!=null && dyxxs.size()>0){
+                        paphEntity.setSfqtdy("是");
+                        paphEntity.setDyxxs(dyxxs);
+                    }
+                }
+                JSONArray attachArray = obj.getJSONArray("attachInfoVoList");
+                if (attachArray!=null && attachArray.size()>0){
+                    paphEntity.setSfcf("是");
+                    List<PaphCfxx> cfxxs = getCfxxs(attachArray);
+                    paphEntity.setCfxxs(cfxxs);
+                }
+                paphEntitys.add(paphEntity);
+            }
+        }else{
+            throw new ZtgeoBizException("未查询到该权利人存在现势登记的权属信息");
+        }
+        return paphEntitys;
+    }
+
+    private PaphEntity getBasePaph(JSONObject obj){
+        PaphEntity paphEntity = new PaphEntity();
+        paphEntity.setBdczh(obj.getString("realEstateId"));
+        JSONObject unit = obj.getJSONObject("realEstateUnitInfoVo");
+        paphEntity.setBdczl(unit.getString("sit"));
+        paphEntity.setBdcdyh(unit.getString("realEstateUnitId"));
+        return paphEntity;
+    }
+
+    private List<PaphDyxx> getBeforeDyxxs(JSONArray mortArray){
+        List<PaphDyxx> dyxxs = new ArrayList<PaphDyxx>();
+        for(int i=0;i<mortArray.size();i++){
+            JSONObject mortObj = mortArray.getJSONObject(i);
+            PaphDyxx dyxx = getBaseDyxx(mortObj);
+            JSONArray dyqrArray = mortObj.getJSONArray("mortgageeInfoVoList");
+            if(dyqrArray!=null && dyqrArray.size()>0) {
+                boolean isBank = false;
+                for (int j=0;j<dyqrArray.size();j++){
+                    if(dyqrArray.getJSONObject(j).getString("mortgageeName").contains("银行")){
+                        dyxx.setDyqr("银行");
+                        isBank = true;
+                        break;
+                    }
+                }
+                if(!isBank){
+                    dyxx.setDyqr("其它");
+                }
+            }
+            dyxxs.add(dyxx);
+        }
+        return dyxxs;
+    }
+    private List<PaphDyxx> getAfterDyxxs(JSONArray mortArray,PaphReqEntity paph){
+        List<PaphDyxx> dyxxs = new ArrayList<PaphDyxx>();
+        for(int i=0;i<mortArray.size();i++){
+            JSONObject mortObj = mortArray.getJSONObject(i);
+            JSONArray dyqrArray = mortObj.getJSONArray("mortgageeInfoVoList");
+            if(dyqrArray!=null && dyqrArray.size()>0) {
+                boolean isPaph = false;
+                boolean isBank = false;
+                for (int j=0;j<dyqrArray.size();j++){
+                    JSONObject dyqrObj = dyqrArray.getJSONObject(j);
+                    String targetMc = dyqrObj.getString("mortgageeName");
+                    String targetZh = dyqrObj.getString("mortgageeId");
+                    if(
+                        StringUtils.isNotBlank(targetMc)
+                        && targetMc.equals(paph.getDyqrmc())
+                        && StringUtils.isNotBlank(targetZh)
+                        && targetZh.equals(paph.getDyqrzjh())
+                    ){
+                        isPaph = true;
+                        break;
+                    }
+                    if(targetMc.contains("银行")){
+                        isBank = true;
+                        break;
+                    }
+                }
+                if(isPaph){
+                    continue;
+                }
+                PaphDyxx dyxx = getBaseDyxx(mortObj);
+                if(isBank){
+                    dyxx.setDyqr("银行");
+                }else {
+                    dyxx.setDyqr("其它");
+                }
+                dyxxs.add(dyxx);
+            }
+        }
+        return dyxxs;
+    }
+
+    private List<PaphCfxx> getCfxxs(JSONArray attachArray){
+        List<PaphCfxx> cfxxs = new ArrayList<PaphCfxx>();
+        for(int k=0;k<attachArray.size();k++) {
+            JSONObject attach = attachArray.getJSONObject(k);
+            PaphCfxx cfxx = new PaphCfxx();
+            cfxx.setCfqxq(attach.getString("attachStartDate"));
+            cfxx.setCfqxz(attach.getString("attachEndDate"));
+            cfxxs.add(cfxx);
+        }
+        return cfxxs;
+    }
+
+    private PaphDyxx getBaseDyxx(JSONObject mortObj){
+        PaphDyxx dyxx = new PaphDyxx();
+        dyxx.setDylx(mortObj.getString("mortgageType"));
+        dyxx.setZqje(mortObj.getString("creditAmount"));
+        String ks = mortObj.getString("mortgageStartDate");
+        String js = mortObj.getString("mortgageEndDate");
+        dyxx.setZwlxqx((StringUtils.isNotBlank(ks)? ks+" 至 ":"")+(StringUtils.isNotBlank(js)?js:"未定"));
+        return dyxx;
     }
 }

@@ -78,20 +78,46 @@ public class OuterInterfaceHandleServiceImpl implements OuterInterfaceHandleServ
                     String top_2 = zjhm.substring(1,2);
                     switch (top_1){
                         case "1":
+
                             break;
                         case "5":
+                            params.put("org_name",mc);
+                            params.put("usc_code",zjhm);
+                            Map<String,Object> result = null;
                             switch (top_2){
                                 case "1":       //社会团体
-
+                                    code = "mz_social_group_check";
+                                    //调用
+                                    result = exchangeFeign.shttfrdjzscx(params);
                                     break;
                                 case "2":       //民办非企业单位
+                                    code = "mz_private_unit_check";
+                                    //调用
+                                    result = exchangeFeign.mbfqydwdjzscx(params);
                                     break;
                                 case "3":       //基金会
+                                    code = "mz_foundation_check";
+                                    //调用
+                                    result = exchangeFeign.jjhfrdjzscx(params);
                                     break;
                                 case "9":
                                     throw new ZtgeoBizException("暂不支持验证的机构编号");
                                 default:
                                     throw new ZtgeoBizException("暂不支持验证的机构编号");
+                            }
+                            if(result!=null){
+                                String status = (String)result.get("status");
+                                String msg = (String)result.get("msg");
+                                if(StringUtils.isNotBlank(status) && status.equals("0")){
+                                    rv_list = new PersonnelResponseListEntity();
+                                    rv_list.setStatus(status);
+                                    rv_list.setMsg(msg);
+                                    rv_list.setData((List<Object>) result.get("data"));
+                                }else{
+                                    rv_single = new PersonnelResponseSingleEntity();
+                                    rv_single.setStatus(status);
+                                    rv_single.setMsg(msg);
+                                }
                             }
                             break;
                         case "9":

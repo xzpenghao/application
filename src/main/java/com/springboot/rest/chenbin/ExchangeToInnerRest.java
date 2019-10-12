@@ -2,18 +2,18 @@ package com.springboot.rest.chenbin;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
+import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
 import com.springboot.service.chenbin.ExchangeToInnerService;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.List;
 
 @Slf4j
 @Api(tags = "不动产apiII")
@@ -50,5 +50,19 @@ public class ExchangeToInnerRest {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
 
         return rv;
+    }
+
+    @RequestMapping(value = "getPaphMortBefore",method = RequestMethod.POST)
+    public ObjectRestResponse<List<PaphEntity>> getPaphMortBefore(@RequestBody PaphReqEntity paph){
+        ObjectRestResponse<List<PaphEntity>> rv = new ObjectRestResponse<List<PaphEntity>>();
+
+        return rv.data(exchangeToInnerService.getPaphMortBefore(paph));
+    }
+
+    @RequestMapping(value = "getPaphMortAfter",method = RequestMethod.POST)
+    public ObjectRestResponse<List<PaphEntity>> getPaphMortAfter(@RequestBody PaphReqEntity paph){
+        ObjectRestResponse<List<PaphEntity>> rv = new ObjectRestResponse<List<PaphEntity>>();
+
+        return rv.data(exchangeToInnerService.getPaphMortAfter(paph));
     }
 }
