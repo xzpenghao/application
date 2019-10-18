@@ -27,7 +27,8 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
     private List<SJ_Bdc_Gl> glImmovableVoList;          //关联的不动产数据
     private List<SJ_Qlr_Gl> glMortgagorVoList;            //关联的抵押人数据
     private List<SJ_Qlr_Gl> glMortgageHolderVoList;            //关联的抵押权人数据
-
+    private List<SJ_Qlr_Gl> glObligorInfoVoList;            //关联的债务人
+    private List<SJ_Qlr_Gl> glAgentInfoVoList;                //关联的委托代理人
 
 
     public String getMortgageContractNumber() {
@@ -182,4 +183,19 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
         this.glMortgageHolderVoList = glMortgageHolderVoList;
     }
 
+    public List<SJ_Qlr_Gl> getGlObligorInfoVoList() {
+        return glObligorInfoVoList;
+    }
+
+    public void setGlObligorInfoVoList(List<SJ_Qlr_Gl> glObligorInfoVoList) {
+        this.glObligorInfoVoList = glObligorInfoVoList;
+    }
+
+    public List<SJ_Qlr_Gl> getGlAgentInfoVoList() {
+        return glAgentInfoVoList;
+    }
+
+    public void setGlAgentInfoVoList(List<SJ_Qlr_Gl> glAgentInfoVoList) {
+        this.glAgentInfoVoList = glAgentInfoVoList;
+    }
 }
