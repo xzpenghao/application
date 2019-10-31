@@ -43,22 +43,6 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
         this.applyTime = applyTime;
     }
 
-    public List<SJ_Qlr_Gl> getGlObligorInfoVoList() {
-        return glObligorInfoVoList;
-    }
-
-    public void setGlObligorInfoVoList(List<SJ_Qlr_Gl> glObligorInfoVoList) {
-        this.glObligorInfoVoList = glObligorInfoVoList;
-    }
-
-    public List<SJ_Qlr_Gl> getGlAgentInfoVoList() {
-        return glAgentInfoVoList;
-    }
-
-    public void setGlAgentInfoVoList(List<SJ_Qlr_Gl> glAgentInfoVoList) {
-        this.glAgentInfoVoList = glAgentInfoVoList;
-    }
-
     public String getMortgageContractNumber() {
         return mortgageContractNumber;
     }
@@ -211,4 +195,19 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
         this.glMortgageHolderVoList = glMortgageHolderVoList;
     }
 
+    public List<SJ_Qlr_Gl> getGlObligorInfoVoList() {
+        return glObligorInfoVoList;
+    }
+
+    public void setGlObligorInfoVoList(List<SJ_Qlr_Gl> glObligorInfoVoList) {
+        this.glObligorInfoVoList = glObligorInfoVoList;
+    }
+
+    public List<SJ_Qlr_Gl> getGlAgentInfoVoList() {
+        return glAgentInfoVoList;
+    }
+
+    public void setGlAgentInfoVoList(List<SJ_Qlr_Gl> glAgentInfoVoList) {
+        this.glAgentInfoVoList = glAgentInfoVoList;
+    }
 }
