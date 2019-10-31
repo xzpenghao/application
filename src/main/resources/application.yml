@@ -40,7 +40,7 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://10.3.2.147:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://10.3.2.203:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -118,7 +118,8 @@ glHouseBuyer:
   obligeeYwr: 义务人
 httpclient:
   seam: 23335       #登记平台接口
-  ip: 10.3.2.147    #登记平台ip
+  ip: 172.18.0.147
+  #10.3.2.147    #登记平台ip
   windowAcceptanceIp: 10.3.2.203   #一窗受理ip
   windowAcceptanceSeam: 7779      #一窗受理接口
 businessType:
@@ -131,7 +132,7 @@ businessType:
   transferAndMortgage: ZY_DY         #（转移及抵押，（组合业务，转移+抵押））；
   vormerkung: YGDJ         #预告登记
   areaNo: 320301
-  dealPerson: ADMIN
+  dealPerson: zhujun              #ADMIN
 
 
 
@@ -141,10 +142,10 @@ webplus:
   ftpUsername: forftp
   ftpPassword: 123456
 
-  ftpAddressBdc: 172.18.0.147
+  ftpAddressBdc: 10.3.2.203
   ftpPortBdc: 21
-  ftpUsernameBdc: bdcda
-  ftpPasswordBdc: bdcda
+  ftpUsernameBdc: forftp
+  ftpPasswordBdc: 123456
 
 logging:
   level:
@@ -179,7 +180,8 @@ chenbin:
     forecast:                   #预告预抵
       commercialHouse:          #商品房
         bizType: MORTGAGE_NEW_TRAILER
-        pid: Proc-180517142329-18NT00D7
+        pid: Proc-171013210700-3785RA40
+        # Proc-180517142329-18NT00D7 宿迁的
         isSubmit: false
   otherBureau:
     ga:                         #公安
@@ -191,9 +193,11 @@ chenbin:
       url: http://10.13.0.240:9999/z
 penghao:
     mortgageCancellation:       #抵押注销登记
-        pid:  Proc-180517124140-3MN26M71
+        pid: Proc-171013213255-X42L8440
+          #Proc-180517124140-3MN26M71
     mortgageRegistration:       #抵押登记pid
-        pid: Proc-180517124205-2WM2423B
+        pid: Proc-171019093148-WLI15DA7  #徐州
+         # Proc-180517124205-2WM2423B 宿迁
     transferRegister:           #转移登记
         pid: Proc-180517131507-5803W07O
     transferMortgage:           #转移及抵押二手房
@@ -203,11 +207,20 @@ penghao:
         port: 8088
         region: BDC_jiawang
 sq:
+  bdcdydj: 340100
+  ygdy: 327501
+  dyzxdj: 342501
+  gxpt:
+      ftpAddress: 172.22.148.129
+      ftpPort: 21
+      ftpUsername: ftpadmin
+      ftpPassword: 123qwe!@#
   jyht:
     api_id: 3Rkt5FPx
     from_user: 0b6c220cdfc54288b6630eb1a7fa612f
     post: 8001
     ip: 10.13.0.240
+
   qsxx:
     api_id: JwWtYcW7
     from_user: 0b6c220cdfc54288b6630eb1a7fa612f
@@ -220,3 +233,7 @@ djj:
   bsrypassword: 123456
   tsryname: tsdjj
   tsrypaaword: 123456
+
+bank:
+  bsryname: testbank
+  bsrypassword: 123456

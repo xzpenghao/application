@@ -155,6 +155,10 @@ RealEstateMortgageComponent {
 
     private ObjectRestResponse getObjectRestResponse(SJ_Sjsq sjSjsq, JSONObject resultObject) {
         ObjectRestResponse resultRV = new ObjectRestResponse();
+        if (null == resultObject){
+            resultRV.setStatus(20500);
+            return resultRV.data(Msgagger.DJPT_P_BAD);
+        }
         String message = resultObject.getString("message");
         boolean success = (boolean) resultObject.get("success");
         if (success == false) {

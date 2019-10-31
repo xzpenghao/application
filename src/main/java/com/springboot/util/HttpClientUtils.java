@@ -225,7 +225,7 @@ public class HttpClientUtils {
      * @param
      * @return URL 所代表远程资源的响应结果
      */
-    public String doGet(String url, Map<String, Object> params, Map<String, String> header) throws Exception {
+    public String doGet(String url, Map<String, Object> params, Map<String, String> header) throws  Exception {
         String body = null;
         try {
             // Get请求
@@ -254,6 +254,7 @@ public class HttpClientUtils {
             // 发送请求,获取返回数据
             body = execute(httpGet);
         } catch (Exception e) {
+            log.error(e.getMessage()+e);
             throw e;
         }
         log.debug("  result: " + body);

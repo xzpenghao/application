@@ -15,14 +15,7 @@ import java.net.MalformedURLException;
 @Slf4j
 @Component
 public class BdcFTPDownloadComponent {
-    @Value("${webplus.ftpAddressBdc}")
-    private String ftpAddress;
-    @Value("${webplus.ftpPortBdc}")
-    private String ftpPort;
-    @Value("${webplus.ftpUsernameBdc}")
-    private String ftpUsername;
-    @Value("${webplus.ftpPasswordBdc}")
-    private String ftpPassword;
+
     //链接
     private static FTPClient ftpClient = new FTPClient();
 
@@ -37,6 +30,7 @@ public class BdcFTPDownloadComponent {
             baos.write(tmp, 0, i);
         }
         byte imgs[] = baos.toByteArray();
+        log.info("imgs"+imgs.toString());
         return imgs;
     }
 
@@ -49,26 +43,33 @@ public class BdcFTPDownloadComponent {
      * @param bytes
      * @return
      */
-    public byte[] downFile(String remotePath, String fileName, byte[] bytes) {
+    public byte[] downFile(String remotePath, String fileName, byte[] bytes,String address,String port,String username,String password) {
         try {
             int reply;
-            ftpClient.connect(ftpAddress, Integer.parseInt(ftpPort));
+            ftpClient.connect(address, Integer.parseInt(port));
             // 如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
-            ftpClient.login(ftpUsername, ftpPassword);// 登录
+            ftpClient.login(username, password);// 登录
             reply = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftpClient.disconnect();
                 return bytes;
             }
+            ftpClient.enterLocalPassiveMode();
+            ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
+            ftpClient.setBufferSize(1024*1024);
             ftpClient.changeWorkingDirectory(remotePath);// 转移到FTP服务器目录
+            log.info("fileName"+fileName);
             //下载指定文件
             InputStream is = ftpClient.retrieveFileStream(fileName);
+            log.info("InputStream"+is.toString());
+            log.info("走到指定文件");
             bytes = is2byte(is);
+            log.info("aaa"+bytes.toString());
             return bytes;
         } catch (IOException e) {
             e.printStackTrace();
+            log.error("附件下载错误:"+e.getMessage(),e);
         } finally {
-
             if (ftpClient.isConnected()) {
                 try {
                     ftpClient.disconnect();
@@ -87,11 +88,11 @@ public class BdcFTPDownloadComponent {
      * @param filename 要删除的文件名称 *
      * @return
      */
-    public boolean deleteFile(String pathname, String filename) {
+    public boolean deleteFile(String pathname, String filename,String address,String port,String username,String password ) {
         boolean flag = false;
         try {
             System.out.println("开始删除文件");
-            initFtpClient();
+            initFtpClient(address,port,username,password);
             //切换FTP目录
             ftpClient.changeWorkingDirectory(pathname);
             ftpClient.dele(filename);
@@ -117,18 +118,18 @@ public class BdcFTPDownloadComponent {
     /**
      * 初始化ftp服务器
      */
-    public void initFtpClient() {
+    public void initFtpClient(String address,String port,String username,String password ) {
         ftpClient = new FTPClient();
         ftpClient.setControlEncoding("utf-8");
         try {
-            System.out.println("connecting...ftp服务器:" + this.ftpAddress + ":" + this.ftpPort);
-            ftpClient.connect(ftpAddress, Integer.parseInt(ftpPort)); //连接ftp服务器
-            ftpClient.login(ftpUsername, ftpPassword); //登录ftp服务器
+            System.out.println("connecting...ftp服务器:" + address + ":" + port);
+            ftpClient.connect(address, Integer.parseInt(port)); //连接ftp服务器
+            ftpClient.login(username, password); //登录ftp服务器
             int replyCode = ftpClient.getReplyCode(); //是否成功登录服务器
             if (!FTPReply.isPositiveCompletion(replyCode)) {
-                System.out.println("connect failed...ftp服务器:" + this.ftpUsername + ":" + this.ftpPort);
+                System.out.println("connect failed...ftp服务器:" + username + ":" + port);
             }
-            System.out.println("connect successfu...ftp服务器:" + this.ftpUsername + ":" + this.ftpPort);
+            System.out.println("connect successfu...ftp服务器:" + username + ":" + port);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

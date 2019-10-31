@@ -1,5 +1,8 @@
 package com.springboot.util;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class StrUtil {
 
 
@@ -25,6 +28,7 @@ public class StrUtil {
             sb.append(splitTmp[i]).append("/");
         }
         remotePath = sb.deleteCharAt(sb.length() - 1).toString();
+        log.info("remotePath"+remotePath);
         return remotePath;
     }
 

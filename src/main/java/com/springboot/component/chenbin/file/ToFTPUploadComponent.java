@@ -127,6 +127,7 @@ public class ToFTPUploadComponent {
                 ftpClient.disconnect();
                 return null;
             }
+            log.debug("reply"+reply);
             ftpClient.setControlEncoding("UTF-8");
             //如果没有需求上传图片的话还ok，
             // 但是要是传图片，就需要设置一下文件类型为二进制
@@ -136,17 +137,20 @@ public class ToFTPUploadComponent {
             //创建目录
             mkDir(path);//创建目录
             ftpClient.changeWorkingDirectory("/" + path);//创建完了目录需要将当前工作目录切换过来，然后直接在下面创建文件
-            System.out.println("aa" + ftpClient.changeWorkingDirectory("/" + path));
+            log.info("aa" + ftpClient.changeWorkingDirectory("/" + path));
             if (FTPReply.isPositiveCompletion(ftpClient.sendCommand("OPTS UTF8", "ON"))) {// 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码，否则就使用本地编码（GBK）.
                 LOCAL_CHARSET = "UTF-8";
             }
-            System.out.println(ftpClient.printWorkingDirectory());
+            log.info(ftpClient.printWorkingDirectory());
+            log.debug("printWorkingDirectory"+ftpClient.printWorkingDirectory());
             returnValue = ftpClient.storeFile(fileName, input);
             System.out.println(returnValue);
             FTPFile[] fs = ftpClient.listFiles(fileName);
             if (fs.length == 0) {
+                log.debug("this file not exist ftp");
                 System.out.println("this file not exist ftp");
             } else if (fs.length == 1) {
+                log.debug("this file exist ftp");
                 System.out.println("this file exist ftp");
             }
             ftpClient.logout();

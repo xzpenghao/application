@@ -31,6 +31,15 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
     private List<SJ_Bdc_Gl> glImmovableVoList;          //关联的不动产数据
     private List<SJ_Qlr_Gl> glMortgagorVoList;            //关联的抵押人数据
     private List<SJ_Qlr_Gl> glMortgageHolderVoList;            //关联的抵押权人数据
+    private List<SJ_Qlr_Gl> glAgentInfoVoList;             //关联委托代理人数据
+
+    public List<SJ_Qlr_Gl> getGlAgentInfoVoList() {
+        return glAgentInfoVoList;
+    }
+
+    public void setGlAgentInfoVoList(List<SJ_Qlr_Gl> glAgentInfoVoList) {
+        this.glAgentInfoVoList = glAgentInfoVoList;
+    }
 
     public String getAcceptanceNumber() {
         return acceptanceNumber;

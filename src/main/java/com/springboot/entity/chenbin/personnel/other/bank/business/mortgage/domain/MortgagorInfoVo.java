@@ -10,7 +10,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MortgagorInfoVo implements Serializable {
-    private String mortgagorNmae;
+    private String mortgagorName;
     private String mortgagorIdType;
     private String mortgagorId;
 }

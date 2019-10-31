@@ -7,6 +7,9 @@ import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.EsfSdq;
+import com.springboot.entity.chenbin.personnel.other.bank.bankenum.FileTypeEnum;
+import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.MortgageRegistrationReqVo;
+import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.FileInfoVo;
 import com.springboot.mapper.ExceptionRecordMapper;
 import com.springboot.popj.ExceptionRecord;
 import com.springboot.popj.GetReceiving;
@@ -55,6 +58,14 @@ public class AnonymousInnerComponent {
     private String machineIp;
     @Value("${machine.post}")
     private String machinePost;
+    @Value("${webplus.ftpAddressBdc}")
+    private String ftpAddress;
+    @Value("${webplus.ftpPortBdc}")
+    private String ftpPort;
+    @Value("${webplus.ftpUsernameBdc}")
+    private String ftpUsername;
+    @Value("${webplus.ftpPasswordBdc}")
+    private String ftpPassword;
     @Value("${djj.bsryname}")
     private String bsryname;
     @Value("${djj.bsrypassword}")
@@ -88,7 +99,7 @@ public class AnonymousInnerComponent {
                 try {
                     System.out.println("执行主线程");
                     com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
-                    String token = getToken(tokenObject, "", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+                    String token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                     if (token == null) {
                         return Msgagger.USER_LOGIN_BAD;
                     }
@@ -106,95 +117,22 @@ public class AnonymousInnerComponent {
                         JSONObject paramObject = JSONObject.fromObject(esfSdq);//整理参数信息
                         System.out.println("aa"+paramObject.toString());
                         //根据受理编号查询转移信息（水电气）
-                        //String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
-                        String  zyxx="{\n" +
-                                "    \"realEstateInfoList\": [\n" +
-                                "        {\n" +
-                                "            \"realEstateId\": \"国房初丰字第BCS121413号\",\n" +
-                                "            \"certificateType\": \"房屋不动产证\",\n" +
-                                "            \"realEstateUnitInfoVoList\": [\n" +
-                                "                {\n" +
-                                "                    \"realEstateUnitId\": \"320321030001GB00026F00000000\",\n" +
-                                "                    \"householdId\": \"10FBCD0E-D06B-418C-90E2-197102317C\",\n" +
-                                "                    \"buildingId\": \"0003\",\n" +
-                                "                    \"accountId\": \"0001\",\n" +
-                                "                    \"sit\": \"测试坐落\",\n" +
-                                "                    \"roomId\": \"101\",\n" +
-                                "                    \"unitId\": \"1\",\n" +
-                                "                    \"floor\": \"1\",\n" +
-                                "                    \"totalFloor\": \"5\",\n" +
-                                "                    \"projectName\": \"名仕雅苑一期\",\n" +
-                                "                    \"architectureName\": \"11#\",\n" +
-                                "                    \"architectureAera\": null,\n" +
-                                "                    \"innerArchitectureAera\": null,\n" +
-                                "                    \"sharedArchitectureAera\": null,\n" +
-                                "                    \"acquireWay\": null,\n" +
-                                "                    \"acquirePrice\": null,\n" +
-                                "                    \"plannedUsage\": \"10\",\n" +
-                                "                    \"houseType\": null,\n" +
-                                "                    \"houseNature\": null,\n" +
-                                "                    \"houseRightType\": \"4\",\n" +
-                                "                    \"houseRightNature\": \"0\",\n" +
-                                "                    \"landRightNature\": null,\n" +
-                                "                    \"landRightStartDate\": null,\n" +
-                                "                    \"landRightEndDate\": null,\n" +
-                                "                    \"landRightUser\": null,\n" +
-                                "                    \"landRightTerm\": null,\n" +
-                                "                    \"landUsage\": null,\n" +
-                                "                    \"commonLandArea\": null,\n" +
-                                "                    \"sharedLandArea\": null,\n" +
-                                "                    \"singleLandArea\": null\n" +
-                                "                }\n" +
-                                "            ],\n" +
-                                "            \"landUnitInfoVoList\": null,\n" +
-                                "            \"obligeeInfoVoList\": [\n" +
-                                "                {\n" +
-                                "                    \"id\": \"QLR-190806144734-8A7M74UI2O\",\n" +
-                                "                    \"obligeeName\": \"史平安\",\n" +
-                                "                    \"obligeeIdType\": \"99\",\n" +
-                                "                    \"obligeeId\": null,\n" +
-                                "                    \"commonWay\": \"0\",\n" +
-                                "                    \"sharedShare\": null\n" +
-                                "                }\n" +
-                                "            ],\n" +
-                                "            \"salerInfoVoList\": [],\n" +
-                                "            \"registerDate\": \"2019-08-06 00:00:00\"\n" +
-                                "        }\n" +
-                                "    ],\n" +
-                                "    \"sdqInfo\": {\n" +
-                                "        \"shhh\": null,\n" +
-                                "        \"dhhh\": null,\n" +
-                                "        \"qhhh\": null,\n" +
-                                "        \"thhh\": null,\n" +
-                                "        \"xshhh\": null,\n" +
-                                "        \"xdhhh\": null,\n" +
-                                "        \"xqhhh\": null,\n" +
-                                "        \"xthhh\": null,\n" +
-                                "        \"gsdw\": null,\n" +
-                                "        \"gddw\": null,\n" +
-                                "        \"gqdw\": null,\n" +
-                                "        \"gtdw\": null\n" +
-                                "    },\n" +
-                                "    \"fileInfoList\": [],\n" +
-                                "    \"contacts\": \"史平安\",\n" +
-                                "    \"contactsPhone\": \"15162098070\",\n" +
-                                "    \"contactsAdress\": null,\n" +
-                                "    \"businessAreas\": \"丰县\"\n" +
-                                "}";
+                       String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(zyxx);                        //整理数据发送到一窗受理
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.ESFSDQSERVICE_CODE, false, getReceiving.getSlbh());//获取不动产权属信息
                         log.info("sjsq"+mapParmeter.get("SJ_Sjsq"));
                         log.info("modelId"+mapParmeter.get("modelId"));
-                        log.info("fileVoList"+mapParmeter.get("fileVoList"));
-                        getProcessingAnnex(zyxxObject, mapParmeter);//附件上传
+                        getProcessingAnnex(zyxxObject, mapParmeter,null,ftpAddress,ftpPort,ftpUsername,ftpPassword);//附件上传
+                        log.info("fileInfoList"+mapParmeter.get("fileInfoList"));
                         //发送一窗受理进行启动流程
                         String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter5");
                         JSONObject jsonObject = JSONObject.fromObject(json);
-                        log.info(jsonObject.get("status").toString());
+                        log.info("流程返回"+json);
+                        log.info("返回结果"+jsonObject.get("status").toString());
                         if ((Integer) jsonObject.get("status") == 200) {
                             log.info("存量房水电气流程数据保存成功及流程开启成功");
                         } else {
-                            log.error("存量房信息保存失败,流程未开启");
+                            log.error("存量房信息保存失败,流程未开启"+json);
                         }
                     } else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)) {
                         //登簿通知
@@ -211,6 +149,7 @@ public class AnonymousInnerComponent {
                         JSONObject ycslObject = JSONObject.fromObject(json);
                     }
                 } catch (Exception e) {
+                    log.error("附件错误:"+e.getMessage());
                     throw new Exception("Callable terminated with Exception!"); // call方法可以抛出异常
                 }
                 return null;
@@ -222,7 +161,7 @@ public class AnonymousInnerComponent {
             returnVo.setCode(200);
             returnVo.setMessage(Msgagger.CG);
             JSONObject object = JSONObject.fromObject(returnVo);
-            outputStream.write(object.toString().getBytes());
+            outputStream.write(object.toString().getBytes("UTF-8"));
             outputStream.flush();
             outputStream.close();
             System.out.println(JSONObject.fromObject(returnVo));
@@ -335,25 +274,30 @@ public class AnonymousInnerComponent {
 
     /**
      * 处理
-     *
+     *ftpAddress,ftpPort,ftpUsername,ftpPassword
      * @param jsonObject
      * @return
      */
-    private void getProcessingAnnex(com.alibaba.fastjson.JSONObject jsonObject, Map<String, String> stringMap) {
-        com.alibaba.fastjson.JSONArray fileArray = jsonObject.getJSONArray("fileInfoList");
+    public void getProcessingAnnex(com.alibaba.fastjson.JSONObject jsonObject, Map<String, String> stringMap, List<FileInfoVo> fileInfoVoList, String address, String port, String username, String password) {
+        com.alibaba.fastjson.JSONArray fileArray=null;
         List<SJ_File> sjFileList = new ArrayList<>();
-        if (null != fileArray) {
+        if (null != jsonObject && null != fileInfoVoList) {
+            fileArray = jsonObject.getJSONArray("fileInfoList");
             for (int i = 0; i < fileArray.size(); i++) {
                 com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
                 String fileAddress = fileObject.getString("fileAddress");
+                log.info("fileAddress:" + fileObject.getString("fileAddress"));
+                log.info("fileType:" + fileObject.getString("fileType"));
                 String fileType = fileObject.getString("fileType");
-                byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null);//连接一窗受理平台ftp
+                byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
                 Object uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType);//获取上传路径和名称
                 if (uploadObject == null) {
                     log.error(Msgagger.FILE_FAIL);
                     throw new ZtgeoBizException(Msgagger.FILE_FAIL);
                 }
                 Map<String, Object> map = (Map<String, Object>) uploadObject;
+                log.info("path:" + map.get("path").toString());
+                log.info("fileName" + map.get("fileName").toString());
                 //覆盖原有url  名称
                 SJ_File sj_file = new SJ_File();
                 sj_file.setFileAddress(map.get("path").toString() + "\\" + map.get("fileName").toString());
@@ -363,8 +307,36 @@ public class AnonymousInnerComponent {
                 sj_file.setpName(fileObject.getString("pName"));
                 sjFileList.add(sj_file);
             }
+        }else {
+            fileArray = com.alibaba.fastjson.JSONArray.parseArray(com.alibaba.fastjson.JSONObject.toJSONString(fileInfoVoList));
+            for (int i = 0; i < fileArray.size(); i++) {
+                com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
+                String fileAddress = fileObject.getString("fileAddress");
+                String fileType = fileAddress.substring(fileAddress.lastIndexOf(".") + 1);
+                byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
+                Object uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType);//获取上传路径和名称
+                if (uploadObject == null) {
+                    log.error(Msgagger.FILE_FAIL);
+                    throw new ZtgeoBizException(Msgagger.FILE_FAIL);
+                }
+                Map<String, Object> map = (Map<String, Object>) uploadObject;
+                log.info("path:" + map.get("path").toString());
+                log.info("fileName" + map.get("fileName").toString());
+                //覆盖原有url  名称
+                SJ_File sj_file = new SJ_File();
+                sj_file.setFileAddress(map.get("path").toString() + "\\" + map.get("fileName").toString());
+                sj_file.setFileName(map.get("fileName").toString());
+                sj_file.setFileType(fileType);
+                sj_file.setFileSequence(fileObject.getString("fileSequence"));
+                sj_file.setpName(FileTypeEnum.Sc(fileObject.getString("pName")));
+                sjFileList.add(sj_file);
+            }
         }
+        log.info("a:"+fileArray.toString());
+        log.info("sssssssss"+fileArray.size());
+
         JSONArray jsonArray = JSONArray.fromObject(sjFileList);
+        log.info("附件条数"+jsonArray.size());
         stringMap.put("fileVoList", jsonArray.toString());
     }
 
@@ -461,6 +433,8 @@ public class AnonymousInnerComponent {
                             }
                             respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
                         }
+                        JSONArray respService=JSONArray.fromObject(respServiceDataList);
+                        mapParmeter.put("serviceData",respService.toString());
                         RespServiceData respServiceData = new RespServiceData();
                         respServiceData.setServiceCode(Msgagger.DBSERVICECODE);
                         //获取登记小类信息
@@ -476,6 +450,7 @@ public class AnonymousInnerComponent {
                         respServiceDataList.add(respServiceData);
                         JSONArray jsonArray = JSONArray.fromObject(respServiceDataList);
                         mapParmeter.put("serviceDatas", jsonArray.toString());
+                        mapParmeter.put("Notification","1");//给银行登簿做通知用
                     } else if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {
                         if (getReceiving.getBizType().equals("2")){
                             tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
@@ -578,7 +553,7 @@ public class AnonymousInnerComponent {
     }
 
 
-    private String preservationRegistryData(Map<String, String> map, String token, String url) {
+    public String preservationRegistryData(Map<String, String> map, String token, String url) {
         Map<String, String> header = new HashMap<String, String>();
         header.put("Authorization", token);
         String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,

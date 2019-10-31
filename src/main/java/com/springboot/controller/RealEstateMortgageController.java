@@ -115,6 +115,9 @@ public class RealEstateMortgageController {
         anonymousInner.getSendRoom(getReceiving, resp);
     }
 
+
+
+
     @RequestMapping(value = "/getMortgageCancellation", method = RequestMethod.POST)
     @ApiOperation(value = "不动产预告证明号")
     public ObjectRestResponse getMortgageCancellation(String ygzmh) throws Exception {

@@ -1,8 +1,11 @@
 package com.springboot.entity.chenbin.personnel.other.bank.business.revok;
 
-import com.springboot.entity.chenbin.personnel.other.bank.business.revok.domain.AgentInfoVo;
-import com.springboot.entity.chenbin.personnel.other.bank.business.revok.domain.FileInfoVo;
-import com.springboot.entity.chenbin.personnel.other.bank.business.revok.domain.MortgagorInfoVo;
+import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.AgentInfoVo;
+import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.FileInfoVo;
+import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.MortgagorInfoVo;
+
+
+
 import com.springboot.entity.chenbin.personnel.other.bank.business.revok.domain.RealEstateInfoVo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
