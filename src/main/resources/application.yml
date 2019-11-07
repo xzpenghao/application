@@ -118,7 +118,7 @@ glHouseBuyer:
   obligeeYwr: 义务人
 httpclient:
   seam: 23335       #登记平台接口
-  ip: 172.18.0.147
+  ip: 10.3.2.147
   #10.3.2.147    #登记平台ip
   windowAcceptanceIp: 10.3.2.203   #一窗受理ip
   windowAcceptanceSeam: 7779      #一窗受理接口
@@ -137,12 +137,12 @@ businessType:
 
 
 webplus:
-  ftpAddress: 10.3.2.203
+  ftpAddress: 10.3.2.203     #一窗受理ftp
   ftpPort: 21
   ftpUsername: forftp
   ftpPassword: 123456
 
-  ftpAddressBdc: 10.3.2.203
+  ftpAddressBdc: 10.3.2.203    #不动产登记平台
   ftpPortBdc: 21
   ftpUsernameBdc: forftp
   ftpPasswordBdc: 123456
@@ -210,11 +210,18 @@ sq:
   bdcdydj: 340100
   ygdy: 327501
   dyzxdj: 342501
+  bank:
+    jt:          #交通
+      username: testbank     #用户名
+      password: 123456     #密码
+      resultPdf: 1    #是否登簿传输pdf
+      itemName: 电子证明
   gxpt:
-      ftpAddress: 172.22.148.129
+      ftpAddress: 172.22.148.129   #共享平台ftp
       ftpPort: 21
       ftpUsername: ftpadmin
       ftpPassword: 123qwe!@#
+
   jyht:
     api_id: 3Rkt5FPx
     from_user: 0b6c220cdfc54288b6630eb1a7fa612f

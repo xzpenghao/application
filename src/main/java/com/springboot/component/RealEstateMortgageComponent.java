@@ -388,7 +388,7 @@ RealEstateMortgageComponent {
     private RealPropertyCertificate getRealProperty(JSONObject jsonObject, JSONObject obj1) {
         RealPropertyCertificate realPropertyCertificate = new RealPropertyCertificate();
         if (StringUtils.isEmpty(jsonObject.getString("realEstateId"))) {
-            realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("vormerkungId"));
+            realPropertyCertificate.setForecastCertificateNos(jsonObject.getString("vormerkungId").split(","));
         } else {
             realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("realEstateId"));
         }
@@ -540,7 +540,7 @@ RealEstateMortgageComponent {
         ObjectRestResponse resultRV = new ObjectRestResponse();
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
-        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, registrationPid, true, grMortgageRegistration, dealPerson, areaNo);
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, registrationPid, false, grMortgageRegistration, dealPerson, areaNo);
         registrationBureau = ClAutoRealPropertyCertificate(sjSjsq, registrationBureau);
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         return getObjectRestResponse(sjSjsq, resultObject);
@@ -578,7 +578,7 @@ RealEstateMortgageComponent {
         //抵押权人
         List<DyqrGlMortgator> dyqrGlMortgatorList = new ArrayList<>();
         if (mortgageContractInfo.getGlMortgageHolderVoList() != null && mortgageContractInfo.getGlMortgageHolderVoList().size() != 0) {
-            for (SJ_Qlr_Gl dyqr : mortgageContractInfo.getGlMortgagorVoList()) {
+            for (SJ_Qlr_Gl dyqr : mortgageContractInfo.getGlMortgageHolderVoList()) {
                 DyqrGlMortgator dyrGlMortgator = new DyqrGlMortgator();
                 SJ_Qlr_Info relatedPerson = dyqr.getRelatedPerson();
                 dyrGlMortgator.setMortgageeId(relatedPerson.getObligeeDocumentNumber());
@@ -694,6 +694,7 @@ RealEstateMortgageComponent {
                 for (int a = 0; a < mortgageInfojsonArray.size(); a++) {
                     //抵押信息
                     JSONObject mortgageInfo = mortgageInfojsonArray.getJSONObject(a);
+                    mortgageService.setImmovableCertificateNo(jsonObject.getString("realEstateId"));
                     mortgageService.setAcceptanceNumber(mortgageInfo.getString("dySLBH"));
                     mortgageService.setMortgageMode(mortgageInfo.getString("mortgageType"));//抵押类型
                     mortgageService.setMortgageCertificateNo(mortgageInfo.getString("warrantId"));//抵押证明号

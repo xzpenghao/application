@@ -1,6 +1,7 @@
 package com.springboot.util.chenbin;
 
 import com.springboot.util.TimeUtil;
+import org.omg.CORBA.PUBLIC_MEMBER;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,5 +24,9 @@ public class IDUtil {
     public static String getFinstId() {
         String date = TimeUtil.getDateString(new Date());
         return "FINST-" + date.replaceAll("-", "") + "-" + UUID.randomUUID().toString().substring(0, 12).replaceAll("-", "").toUpperCase();
+    }
+
+    public static String getUUId(){
+        return  UUID.randomUUID().toString();
     }
 }

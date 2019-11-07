@@ -72,8 +72,12 @@ public class HttpClientUtil {
         System.out.println("aa"+postMethod.getMethod());
         //设置请求头
         postMethod.setHeader("content-Type","application/json;charset=UTF-8");
-        postMethod.setHeader("from_user", from_user);
-        postMethod.setHeader("api_id",api_id);//设置请求头
+        if (StringUtils.isNotEmpty(from_user)){
+            postMethod.setHeader("from_user", from_user);
+        }
+        if (StringUtils.isNotEmpty(api_id)){
+            postMethod.setHeader("api_id", api_id);
+        }
         //传入请求参数
 //        String params = JSON.toJSONString(map);
 

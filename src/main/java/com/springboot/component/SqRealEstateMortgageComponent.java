@@ -30,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -73,9 +75,9 @@ public class SqRealEstateMortgageComponent {
     @Value("${sq.gxpt.ftpPassword}")
     private String ftpPassword;
 
-    @Value("${bank.bsryname}")
+    @Value("${sq.bank.jt.username}")
     private String bankBsryname;
-    @Value("${bank.bsrypassword}")
+    @Value("${sq.bank.jt.password}")
     private String bankBsrypassword;
     @Value("${httpclient.windowAcceptanceIp}")
     private String windowAcceptanceIp; //一窗受理ip
@@ -94,9 +96,9 @@ public class SqRealEstateMortgageComponent {
     public  Object sqJgdyzx(RevokeRegistrationReqVo revokeRegistrationRespVo){
         JSONObject reObject=null;
         RevokeRegistrationRespVo registrationReqV=new RevokeRegistrationRespVo();
-        //revokeRegistrationRespVo=com.alibaba.fastjson.JSONObject.parseObject(data,RevokeRegistrationReqVo.class);//转成对象格式
         if (null == revokeRegistrationRespVo){
             Xyfzbad(null,registrationReqV,"000002","接口编码有误");
+            registrationReqV.setAcceptStaus(Msgagger.JSBAD);
             reObject=JSONObject.fromObject(revokeRegistrationRespVo);
             return reObject.toString();
         }
@@ -108,6 +110,7 @@ public class SqRealEstateMortgageComponent {
         sj_sjsq.setNotifiedPersonTelephone(revokeRegistrationRespVo.getContactsPhone());
         sj_sjsq.setReceiptTime(new Date());
         sj_sjsq.setBusinessType(Msgagger.ZXDJ);
+        sj_sjsq.setDistrictCode(DistrictCodeEnum.Sc(revokeRegistrationRespVo.getBusinessAreas()));//办理区域
         if (null != revokeRegistrationRespVo.getRealEstateInfoVoList()){
             List<RespServiceData> respServiceDataList=new ArrayList<>();
             for (com.springboot.entity.chenbin.personnel.other.bank.business.revok.domain.RealEstateInfoVo realEstateInfoV: revokeRegistrationRespVo.getRealEstateInfoVoList()) {
@@ -120,7 +123,6 @@ public class SqRealEstateMortgageComponent {
             sj_sjsq.setServiceDatas(respServiceDataList);
         }
         mapParmeter.put("modelId",dyzxdj);
-        mapParmeter.put("returnSlbh","1");
         com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(bankBsryname, bankBsrypassword);//获得token
         String token =anonymousInnerComponent.getToken(tokenObject, "sqJgdyzx", null, null, null);
         if (token == null) {
@@ -129,8 +131,10 @@ public class SqRealEstateMortgageComponent {
         mapParmeter.put("Authorization", token);
         //附件上传
         if (null != revokeRegistrationRespVo.getFileInfoVoList() && revokeRegistrationRespVo.getFileInfoVoList().size()!=0) {
-            anonymousInnerComponent.getProcessingAnnex(null, mapParmeter, revokeRegistrationRespVo.getFileInfoVoList(), ftpAddress, ftpPort, ftpUsername, ftpPassword);
+            String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
+            anonymousInnerComponent.getProcessingAnnex(null, mapParmeter, revokeRegistrationRespVo.getFileInfoVoList(), ftpAddress, ftpPort, ftpUsername, ftpPassword,path);
         }
+        mapParmeter.put("returnSlbh","1");
         JSONObject sjsqObject = JSONObject.fromObject(sj_sjsq);
         mapParmeter.put("SJ_Sjsq", sjsqObject.toString());//收件
         //发送一窗受理进行启动流程
@@ -145,7 +149,7 @@ public class SqRealEstateMortgageComponent {
         }else {
             sjsq  = com.alibaba.fastjson.JSONObject.parseObject(jsonObject.getString("data"),SJ_Sjsq.class);
         }
-        if ((Integer) jsonObject.get("status") == 200 && StringUtils.isNotEmpty(sjsq.getReceiptNumber()) && StringUtils.isNotEmpty(sjsq.getRegisterNumber())) {
+        if (StringUtils.isNotEmpty(sjsq.getReceiptNumber()) && StringUtils.isNotEmpty(sjsq.getRegisterNumber())) {
             log.info("流程启动成功并发送至登记平台");
             Xyfzbad(revokeRegistrationRespVo,registrationReqV,"0000000","");
             registrationReqV.setRevokeApplyId(revokeRegistrationRespVo.getRevokeApplyId());
@@ -155,11 +159,13 @@ public class SqRealEstateMortgageComponent {
         } else if ((Integer) jsonObject.get("status") == 200 && StringUtils.isEmpty(sjsq.getRegisterNumber())){
             log.error("发送登记局失败");
             Xyfzbad(revokeRegistrationRespVo,registrationReqV,"000004","发送登记局失败");
+            registrationReqV.setAcceptStaus(Msgagger.JSBAD);
             reObject=JSONObject.fromObject(registrationReqV);
             return reObject.toString();
         }else {
             log.error("流程未开启");
             Xyfzbad(revokeRegistrationRespVo,registrationReqV,"000004","流程未开启");
+            registrationReqV.setAcceptStaus(Msgagger.JSBAD);
             reObject=JSONObject.fromObject(registrationReqV);
             return reObject.toString();
         }
@@ -216,12 +222,13 @@ public class SqRealEstateMortgageComponent {
      * @return
      */
     public Object sqJgdyjk(MortgageRegistrationReqVo mortgageRegistrationReqVo){
-        JSONObject reObject=null;
+        JSONObject reObject=new JSONObject();
         ReMortgageRegistrationVo reMortgageRegistrationVo=new ReMortgageRegistrationVo();
         //转成对象
        // MortgageRegistrationReqVo mortgageRegistrationReqVo= com.alibaba.fastjson.JSONObject.parseObject(data,MortgageRegistrationReqVo.class);
         if (null == mortgageRegistrationReqVo){
             XySj(reMortgageRegistrationVo,null,"000003","接口参数合法性验证失败");
+            reMortgageRegistrationVo.setAcceptStatus(Msgagger.JSBAD);
             reObject=JSONObject.fromObject(reMortgageRegistrationVo);
             return reObject.toString();
         }
@@ -252,7 +259,8 @@ public class SqRealEstateMortgageComponent {
             mapParmeter.put("Authorization", token);
             //附件上传
             if (null != mortgageRegistrationReqVo.getFileInfoVoList() && mortgageRegistrationReqVo.getFileInfoVoList().size()!=0) {
-                anonymousInnerComponent.getProcessingAnnex(null, mapParmeter,mortgageRegistrationReqVo.getFileInfoVoList(),ftpAddress, ftpPort, ftpUsername, ftpPassword);
+                String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
+                anonymousInnerComponent.getProcessingAnnex(null,mapParmeter,mortgageRegistrationReqVo.getFileInfoVoList(),ftpAddress, ftpPort, ftpUsername, ftpPassword,path);
             }
             JSONObject sjsqObject = JSONObject.fromObject(sj_sjsq);
             mapParmeter.put("SJ_Sjsq", sjsqObject.toString());//收件
@@ -262,7 +270,6 @@ public class SqRealEstateMortgageComponent {
             log.info("流程返回"+json);
             log.info("返回结果"+jsonObject.get("status").toString());
             SJ_Sjsq sjsq= com.alibaba.fastjson.JSONObject.parseObject(jsonObject.getString("data"),SJ_Sjsq.class);
-
             if ((Integer) jsonObject.get("status") == 200 && StringUtils.isNotEmpty(sjsq.getReceiptNumber()) && StringUtils.isNotEmpty(sjsq.getRegisterNumber())) {
                 log.info("流程启动成功并发送至登记平台");
                 XySj(reMortgageRegistrationVo,mortgageRegistrationReqVo,"0000000","");
@@ -270,18 +277,20 @@ public class SqRealEstateMortgageComponent {
                 reMortgageRegistrationVo.setMortgageAcceptId(sjsq.getReceiptNumber());
                 reMortgageRegistrationVo.setAcceptStatus(Msgagger.JSCG);
                 reMortgageRegistrationVo.setBusinessId(sjsq.getRegisterNumber());
+                reObject=JSONObject.fromObject(reMortgageRegistrationVo);
             } else if ((Integer) jsonObject.get("status") == 200 && StringUtils.isEmpty(sjsq.getRegisterNumber())){
                 log.error("发送登记局失败");
                 XySj(reMortgageRegistrationVo,mortgageRegistrationReqVo,"000004","发送登记局失败");
+                reMortgageRegistrationVo.setAcceptStatus(Msgagger.JSBAD);
                 reObject=JSONObject.fromObject(reMortgageRegistrationVo);
                 return reObject.toString();
             }else {
                 log.error("流程未开启");
                 XySj(reMortgageRegistrationVo,mortgageRegistrationReqVo,"000004","流程未开启");
+                reMortgageRegistrationVo.setAcceptStatus(Msgagger.JSBAD);
                 reObject=JSONObject.fromObject(reMortgageRegistrationVo);
                 return reObject.toString();
             }
-             reObject=JSONObject.fromObject(reMortgageRegistrationVo);
         } catch (Exception e){
             log.error(e.getMessage()+e);
             System.out.println(e.getStackTrace());
@@ -291,7 +300,7 @@ public class SqRealEstateMortgageComponent {
 
     private void ClYgydxx(MortgageRegistrationReqVo mortgageRegistrationReqVo,SJ_Sjsq sj_sjsq, List<RespServiceData> respServiceDataList){
         ClDydjxx(mortgageRegistrationReqVo,sj_sjsq,respServiceDataList);//抵押合同
-        ClJyht(mortgageRegistrationReqVo,respServiceDataList);//交易合同信息
+        ClJyht(mortgageRegistrationReqVo,sj_sjsq,respServiceDataList);//交易合同信息
     }
 
     /**
@@ -339,6 +348,7 @@ public class SqRealEstateMortgageComponent {
         sj_sjsq.setReceiptMan(mortgageRegistrationReqVo.getOperatorName());
         sj_sjsq.setReceiptTime(DateUtils.parseDate(new Date(),mortgageRegistrationReqVo.getMortgageApplyDate()));
         sj_sjsq.setRegistrationCategory(MortgageTypeEnum.Sc(mortgageRegistrationReqVo.getMortgageType()));//登记大类
+        sj_sjsq.setDistrictCode(DistrictCodeEnum.Sc(mortgageRegistrationReqVo.getBusinessAreas()));//办理区域
         //sj_sjsq.setImmovableType(mortgageRegistrationReqVo.getMortgageType());//一般类型
     }
 
@@ -348,7 +358,7 @@ public class SqRealEstateMortgageComponent {
      * @param mortgageRegistrationReqVo
      * @param
      */
-    private void ClJyht(MortgageRegistrationReqVo mortgageRegistrationReqVo,List<RespServiceData> respServiceDataList){
+    private void ClJyht(MortgageRegistrationReqVo mortgageRegistrationReqVo,SJ_Sjsq sj_sjsq,List<RespServiceData> respServiceDataList){
         List<Sj_Info_Jyhtxx> infoJyhtxxList=new ArrayList<>();
         Sj_Info_Jyhtxx transactionContractInfo=new Sj_Info_Jyhtxx();
         List<SJ_Bdc_Gl> glImmovableVoList=new ArrayList<>();
@@ -384,7 +394,7 @@ public class SqRealEstateMortgageComponent {
         respServiceData.setServiceDataInfos(infoJyhtxxList);//权属信息
         respServiceData.setServiceCode(Msgagger.JYTHSERVICE_CODE);
         respServiceDataList.add(respServiceData);
-        //sj_sjsq.setTransactionContractInfo(transactionContractInfo);
+        sj_sjsq.setTransactionContractInfo(transactionContractInfo);
     }
 
 
@@ -535,10 +545,11 @@ public class SqRealEstateMortgageComponent {
         SJ_Qlr_Gl sj_qlr_gl=new SJ_Qlr_Gl();
         sj_qlr_gl.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_SFZ);
         sj_qlr_gl.setObligeeName(salerInfoVo.getSalerName());
-        RelatedPerson relatedPerson=new RelatedPerson();
+        SJ_Qlr_Info relatedPerson=new SJ_Qlr_Info();
         relatedPerson.setObligeeDocumentType(salerInfoVo.getSalerIdType());
         relatedPerson.setObligeeDocumentNumber(salerInfoVo.getSalerId());
         relatedPerson.setObligeeName(salerInfoVo.getSalerName());
+        sj_qlr_gl.setRelatedPerson(relatedPerson);
         glMortgagorVoList.add(sj_qlr_gl);
     }
 

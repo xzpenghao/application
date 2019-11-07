@@ -13,11 +13,16 @@ public class Msgagger {
     public final static String CLFYGDHDJ = "存量房预告抵押登记";
     public final static String DYDJGR = "抵押登记（个人）";
     public final static String DJPT_P_BAD="登记平台无法走件";
+    public final static String SHANZHENG="缮证";
+    public final static String DENGBU="登簿";
+    public final static String FILE_TYPE="MORTGAGE_EL_PROVE";
+
 
     public final static String AUTOINTECEBAD = "保存自动接口执行失败";
     public final static String ACCPETNOTICE = "acceptNotice";//受理通知
     public final static String VERIFYNOTICE = "verifyNotice";//核定通知
     public final static String RESULTNOTICE = "resultNotice";//登簿通知
+    public final static String PROCESSING="makeCertificateNotice";//缮证
     public final static String ADOPT = "通过";
     public final static String CG = "成功";
     public final static String SUCCESSFUL_REGISTRATION = "审核成功";
@@ -55,11 +60,12 @@ public class Msgagger {
     public final static String INTERCE_DY = "接口调用";
     public final static String DSXX_GUODUO = "地税信息过多,不予受理";
     public final static String BUSINESS = "买卖";
-    public final static String JSBAD="接收失败";
-    public final static String JSCG="接收成功";
+    public final static String JSBAD="ACEPTE_FAIL";
+    public final static String JSCG="ACEPTE_SUCESS";
     public final static String SJSEND_BAD="数据发送至登记平台失败";
     public final static String DYDJ_BAD="存量房信息保存失败,流程未开启";
     public final static String ZXDJ="注销登记";
+
 
 
 }

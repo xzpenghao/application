@@ -91,9 +91,9 @@ public class ToFTPUploadComponent {
         return uploadFile(ftpPath, bais);
     }
 
-    public Object ycslUpload(byte[] bytes, String fileName, String Type) {
+    public Object ycslUpload(byte[] bytes, String fileName, String Type,String path,String yftpAddress,String yftpPort,String yftpUsername,String yftpPassword) {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        return upYcslloadFile(bais, fileName, Type);
+        return upYcslloadFile(bais, fileName, Type,path,yftpAddress,yftpPort,yftpUsername,yftpPassword);
     }
 
 
@@ -103,13 +103,13 @@ public class ToFTPUploadComponent {
      * @param
      * @return
      */
-    public Object upYcslloadFile(InputStream input, String fileName, String fileType) {
+    public Object upYcslloadFile(InputStream input, String fileName, String fileType,String path,String yftpAddress,String yftpPort,String yftpUsername,String yftpPassword) {
         System.out.println(fileName + "\t" + fileType);
         Map<String, Object> map = Maps.newHashMap();
         boolean returnValue = false;
         String hz = null;
         //路径年/月/日/entryId名称
-        String path = DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
+//        String path = ;
         try {
             log.info("进入附件处理");
             int reply;

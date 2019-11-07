@@ -8,20 +8,24 @@ import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.EsfSdq;
 import com.springboot.entity.chenbin.personnel.other.bank.bankenum.FileTypeEnum;
-import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.MortgageRegistrationReqVo;
+import com.springboot.entity.chenbin.personnel.other.bank.bankenum.MortgagorPtypeEnum;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.FileInfoVo;
+import com.springboot.entity.chenbin.personnel.other.bank.notice.result.ResultNoticeReqVo;
+import com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.MortgageeInfoVo;
+import com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.MortgagorInfoVo;
+import com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.RealEstateInfoVo;
 import com.springboot.mapper.ExceptionRecordMapper;
-import com.springboot.popj.ExceptionRecord;
-import com.springboot.popj.GetReceiving;
-import com.springboot.popj.MortgageService;
-import com.springboot.popj.ReturnVo;
+import com.springboot.popj.*;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.HttpRequestMethedEnum;
 import com.springboot.popj.warrant.RealPropertyCertificate;
+import com.springboot.util.DateUtils;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.ParamHttpClientUtil;
 import com.springboot.util.StrUtil;
+import com.springboot.util.chenbin.HttpClientUtil;
 import com.springboot.util.chenbin.IDUtil;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -30,8 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -54,6 +60,8 @@ public class AnonymousInnerComponent {
     private String seam;
     @Value("${service.bdcbljgtjfw}")
     private String immovableHandleResultService;
+    @Value("${sq.bank.jt.itemName}")
+    private String itemName;
     @Value("${machine.ip}")
     private String machineIp;
     @Value("${machine.post}")
@@ -74,6 +82,27 @@ public class AnonymousInnerComponent {
     private String tsryname;
     @Value("${djj.tsrypaaword}")
     private String tsrypaaword;
+
+
+    @Value("${sq.gxpt.ftpAddress}")
+    private String gxftpAddress;
+    @Value("${sq.gxpt.ftpPort}")
+    private String gxftpPort;
+    @Value("${sq.gxpt.ftpUsername}")
+    private String gxftpUsername;
+    @Value("${sq.gxpt.ftpPassword}")
+    private String gxftpPassword;
+
+
+    @Value("${webplus.ftpAddress}")
+    private String yftpAddress;
+    @Value("${webplus.ftpPort}")
+    private String yftpPort;
+    @Value("${webplus.ftpUsername}")
+    private String yftpUsername;
+    @Value("${webplus.ftpPassword}")
+    private String yftpPassword;
+
 
 
     @Autowired
@@ -122,7 +151,8 @@ public class AnonymousInnerComponent {
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.ESFSDQSERVICE_CODE, false, getReceiving.getSlbh());//获取不动产权属信息
                         log.info("sjsq"+mapParmeter.get("SJ_Sjsq"));
                         log.info("modelId"+mapParmeter.get("modelId"));
-                        getProcessingAnnex(zyxxObject, mapParmeter,null,ftpAddress,ftpPort,ftpUsername,ftpPassword);//附件上传
+                        String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
+                        getProcessingAnnex(zyxxObject,mapParmeter,null,ftpAddress,ftpPort,ftpUsername,ftpPassword,path);//附件上传
                         log.info("fileInfoList"+mapParmeter.get("fileInfoList"));
                         //发送一窗受理进行启动流程
                         String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter5");
@@ -272,15 +302,47 @@ public class AnonymousInnerComponent {
         return departs;
     }
 
+    public Object sqUploadPdf(com.alibaba.fastjson.JSONArray jsonArray,String address, String port, String username, String password, String path) {
+        List<SJ_File> sjFileList = new ArrayList<>();
+        Object uploadObject = null;
+        if (null != jsonArray && jsonArray.size() >0) {
+            for (int i = 0; i < jsonArray.size(); i++) {
+                com.alibaba.fastjson.JSONObject fileObject = jsonArray.getJSONObject(i);
+                String fileAddress = fileObject.getString("fileAddress");
+                String fileType = fileObject.getString("fileType");
+                byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
+                uploadObject = toFTPUploadComponent.ycslUpload(bytes,DateUtils.getNowYear() + DateUtils.getNowMonth() + DateUtils.getNowDay() + IDUtil.getUUId()+"."+fileType, fileType, path,gxftpAddress,gxftpPort,gxftpUsername,gxftpPassword);//获取上传路径和名称
+                if (uploadObject == null) {
+                    log.error(Msgagger.FILE_FAIL);
+                    throw new ZtgeoBizException(Msgagger.FILE_FAIL);
+                }
+                Map<String, Object> map = (Map<String, Object>) uploadObject;
+                log.info("path:" + map.get("path").toString());
+                log.info("fileName" + map.get("fileName").toString());
+                //覆盖原有url  名称
+                SJ_File sj_file = new SJ_File();
+                sj_file.setFileAddress(map.get("path").toString() + "\\" + map.get("fileName").toString());
+                sj_file.setFileName(map.get("fileName").toString());
+                sj_file.setFileType(fileType);
+                sj_file.setFileSequence(fileObject.getString("fileSequence"));
+                sj_file.setpName(fileObject.getString("pName"));
+                sjFileList.add(sj_file);
+            }
+        }
+        return sjFileList;
+    }
+
+
     /**
      * 处理
      *ftpAddress,ftpPort,ftpUsername,ftpPassword
      * @param jsonObject
      * @return
      */
-    public void getProcessingAnnex(com.alibaba.fastjson.JSONObject jsonObject, Map<String, String> stringMap, List<FileInfoVo> fileInfoVoList, String address, String port, String username, String password) {
+    public void getProcessingAnnex(com.alibaba.fastjson.JSONObject jsonObject ,Map<String, String> stringMap, List<FileInfoVo> fileInfoVoList, String address, String port, String username, String password,String path) {
         com.alibaba.fastjson.JSONArray fileArray=null;
         List<SJ_File> sjFileList = new ArrayList<>();
+        Object uploadObject=null;
         if (null != jsonObject && null != fileInfoVoList) {
             fileArray = jsonObject.getJSONArray("fileInfoList");
             for (int i = 0; i < fileArray.size(); i++) {
@@ -290,7 +352,7 @@ public class AnonymousInnerComponent {
                 log.info("fileType:" + fileObject.getString("fileType"));
                 String fileType = fileObject.getString("fileType");
                 byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
-                Object uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType);//获取上传路径和名称
+                uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,yftpAddress,yftpPort,yftpUsername,yftpPassword);//获取上传路径和名称
                 if (uploadObject == null) {
                     log.error(Msgagger.FILE_FAIL);
                     throw new ZtgeoBizException(Msgagger.FILE_FAIL);
@@ -314,7 +376,7 @@ public class AnonymousInnerComponent {
                 String fileAddress = fileObject.getString("fileAddress");
                 String fileType = fileAddress.substring(fileAddress.lastIndexOf(".") + 1);
                 byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
-                Object uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType);//获取上传路径和名称
+                uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,yftpAddress,yftpPort,yftpUsername,yftpPassword);//获取上传路径和名称
                 if (uploadObject == null) {
                     log.error(Msgagger.FILE_FAIL);
                     throw new ZtgeoBizException(Msgagger.FILE_FAIL);
@@ -334,7 +396,6 @@ public class AnonymousInnerComponent {
         }
         log.info("a:"+fileArray.toString());
         log.info("sssssssss"+fileArray.size());
-
         JSONArray jsonArray = JSONArray.fromObject(sjFileList);
         log.info("附件条数"+jsonArray.size());
         stringMap.put("fileVoList", jsonArray.toString());
@@ -361,11 +422,13 @@ public class AnonymousInnerComponent {
                     }
                     if (getReceiving.getMessageType().equals(Msgagger.VERIFYNOTICE)) {//审核
                         System.out.println("进入审核");
-                        if (getReceiving.getBizType().equals("2")){
-                             tokenObject = httpCallComponent.getTokenYcsl(bsryname,bsrypassword);//获得token
-                            token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
-                            if (token == null) {
-                                return Msgagger.USER_LOGIN_BAD;
+                        if (StringUtils.isNotEmpty(getReceiving.getBizType())) {
+                            if (getReceiving.getBizType().equals("2")) {
+                                tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
+                                token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+                                if (token == null) {
+                                    return Msgagger.USER_LOGIN_BAD;
+                                }
                             }
                         }
                         map.put("slbh", getReceiving.getSlbh());
@@ -399,12 +462,14 @@ public class AnonymousInnerComponent {
                     } else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)) {//登簿审核
                         System.out.println("进入登簿");
                         map.put("slbh", getReceiving.getSlbh());
-                        if (getReceiving.getBizType().equals("2")){
-                             tokenObject = httpCallComponent.getTokenYcsl(bsryname,bsrypassword);//获得token
-                            token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
-                            if (token == null) {
-                                return Msgagger.USER_LOGIN_BAD;
-                            }
+                            if (StringUtils.isNotEmpty(getReceiving.getBizType())) {
+                                if (getReceiving.getBizType().equals("2")) {
+                                    tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
+                                    token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+                                    if (token == null) {
+                                        return Msgagger.USER_LOGIN_BAD;
+                                    }
+                                }
                         }
                         System.out.println("获取token成功，为："+token);
                         //发送登记局获取数据整理发送一窗受理
@@ -419,6 +484,7 @@ public class AnonymousInnerComponent {
                         List<SJ_Info_Handle_Result> handleResultVoList = new ArrayList<>();
                         List<RespServiceData> respServiceDataList = new ArrayList<>();
                         List<String> stringList = new ArrayList<>();
+                        RespServiceData resultServiceData=null;
                         //获取受理编号信息
                         for (int i = 0; i < ficateInfoArray.size(); i++) {
                             JSONObject verfyInfoObject = ficateInfoArray.getJSONObject(i);
@@ -428,6 +494,7 @@ public class AnonymousInnerComponent {
                                     verfyInfoObject.getString("certificateId"), RealEstateBookData);
                             if (verfyInfoObject.getString("registerSubType").equals(Msgagger.DYZXDJ)){
                                 getRealEstateBooking.setServiceCode(Msgagger.DYZXSERVICECODE);
+                                resultServiceData=getRealEstateBooking;
                             }else if (StringUtils.isEmpty(getRealEstateBooking.getServiceCode())){
                                 getRealEstateBooking.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
                             }
@@ -447,20 +514,110 @@ public class AnonymousInnerComponent {
                             handleResultVoList.add(handleResult);
                             respServiceData.setServiceDataInfos(handleResultVoList);
                         }
+                        //整理数据发送银行
+                        if (null !=resultServiceData) {
+                            List<MortgageService> mortgageServiceList = resultServiceData.getServiceDataInfos();
+                            ResultNoticeReqVo resultNoticeReqVo = new ResultNoticeReqVo();
+                            resultNoticeReqVo.setBusinessId(getReceiving.getSlbh());
+                            ClNotice(resultNoticeReqVo, "MORTGAGE_PERSONAL",Msgagger.DENGBU);
+                            ClDdyxxNotice(mortgageServiceList, resultNoticeReqVo);
+                            JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
+                            System.out.println("bankObject"+bankObject.toString());
+                            //String resultJson= BankNotification("a/a",bankObject.toString());
+                        }
                         respServiceDataList.add(respServiceData);
                         JSONArray jsonArray = JSONArray.fromObject(respServiceDataList);
                         mapParmeter.put("serviceDatas", jsonArray.toString());
-                        mapParmeter.put("Notification","1");//给银行登簿做通知用
                     } else if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {
-                        if (getReceiving.getBizType().equals("2")){
-                            tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
-                            token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
-                            if (token == null) {
-                                return Msgagger.USER_LOGIN_BAD;
+                        if (StringUtils.isNotEmpty(getReceiving.getBizType())) {
+                            if (getReceiving.getBizType().equals("2")) {
+                                tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
+                                token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+                                if (token == null) {
+                                    return Msgagger.USER_LOGIN_BAD;
+                                }
                             }
                         }
                         System.out.println("执行受理操作");
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
+                    } else if (getReceiving.getMessageType().equals(Msgagger.PROCESSING)) {//缮证
+                        map.put("slbh", getReceiving.getSlbh());
+                        String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
+                        JSONObject jsonObject = JSONObject.fromObject(json);
+                        JSONObject bankObject=null;
+                        //登簿返回信息
+                        JSONArray ficateInfoArray = jsonObject.getJSONArray("certificateInfoVoList");
+                        List<ResultNoticeReqVo> resultNoticeReqVoList=new ArrayList<>();
+                        //获取受理编号信息
+                        for (int i = 0; i < ficateInfoArray.size(); i++) {
+                            JSONObject verfyInfoObject = ficateInfoArray.getJSONObject(i);
+                            ResultNoticeReqVo resultNoticeReqVo = getDataProcessing(getReceiving.getSlbh(), verfyInfoObject.getString("certificateType"),
+                                    verfyInfoObject.getString("certificateId"));
+                            resultNoticeReqVoList.add(resultNoticeReqVo);
+                        }
+                        List<MortgagorInfoVo> mortgagorInfoVoList=new ArrayList<>();
+                        List<MortgageeInfoVo> mortgageeInfoVoList=new ArrayList<>();
+                        ResultNoticeReqVo dyResultNotice=null;
+                        if (resultNoticeReqVoList.size()>1){
+                            Iterator<ResultNoticeReqVo> iterator = resultNoticeReqVoList.iterator();
+                            while (iterator.hasNext()) {
+                                ResultNoticeReqVo resultNoticeReqVo = iterator.next();
+                                       //判断是否为
+                                if (null != resultNoticeReqVo.getWarrantId() && !resultNoticeReqVo.getWarrantId().equals("")) {
+                                    mortgagorInfoVoList = resultNoticeReqVo.getMortgagorInfoVoList();
+                                    mortgageeInfoVoList = resultNoticeReqVo.getMortgageeInfoVoList();
+                                    dyResultNotice = resultNoticeReqVo;
+                                    iterator.remove();
+                                }
+                            }
+                        resultNoticeReqVoList.get(0).setMortgagorInfoVoList(mortgagorInfoVoList);
+                        resultNoticeReqVoList.get(0).setMortgageeInfoVoList(mortgageeInfoVoList);
+                        resultNoticeReqVoList.get(0).setMortagageLandArea(dyResultNotice.getMortagageLandArea());
+                        resultNoticeReqVoList.get(0).setMortgageArea(dyResultNotice.getMortgageArea());
+                        resultNoticeReqVoList.get(0).setWarrantId(dyResultNotice.getWarrantId());
+                        resultNoticeReqVoList.get(0).setCreditAmount(dyResultNotice.getCreditAmount());
+                        resultNoticeReqVoList.get(0).setMortgageTerm(dyResultNotice.getMortgageTerm());
+                        }
+                        //获取附件信息
+                        List<String> stringList=new ArrayList<>();
+                        stringList.add(itemName);
+                        EsfSdq esfSdq = new EsfSdq();
+                        esfSdq.setAttDirList(stringList);
+                        esfSdq.setSlbh(getReceiving.getSlbh());
+                        JSONObject paramObject = JSONObject.fromObject(esfSdq);//整理参数信息
+                        System.out.println("aa"+paramObject.toString());
+                        //根据受理编号查询转移信息（水电气）
+                        String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetAttachList4Bdc");
+                        zyxx="[ \n" +
+                                "{\n" +
+                                " \"fileName\": \"FINST-20191104-760C4097FC0\",\n" +
+                                " \"fileType\": \"pdf\", \n" +
+                                "\"fileAddress\": \"2019/11/04/FINST-20191104-760C4097FC0.pdf\", \n" +
+                                "\"pName\": \"电子证明\", \n" +
+                                "\"fileSequence\": \"1\" \n" +
+                                "} \n" +
+                                "]";
+                        if (!zyxx.equals("[]\n")) {
+                            com.alibaba.fastjson.JSONArray zyxxObject = (com.alibaba.fastjson.JSONArray) com.alibaba.fastjson.JSONArray.parse(zyxx);
+                            String path = "home" + File.separator + "platform" + File.separator + getReceiving.getSlbh();
+                            List<SJ_File> sjFileList = (List<SJ_File>) sqUploadPdf(zyxxObject,ftpAddress, ftpPort, ftpUsername, ftpPassword, path);//附件上传
+                            List<com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.FileInfoVo> fileInfoVoList = new ArrayList<>();
+                            for (SJ_File file :
+                                    sjFileList) {
+                                com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.FileInfoVo fileInfoVo = new com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.FileInfoVo();
+                                fileInfoVo.setFileAdress(file.getFileAddress());
+                                fileInfoVo.setFileName(file.getFileName());
+                                fileInfoVo.setFileSequence(file.getFileSequence());
+                                fileInfoVo.setFileType(Msgagger.FILE_TYPE);
+                                fileInfoVoList.add(fileInfoVo);
+                            }
+                            resultNoticeReqVoList.get(0).setFileInfoVoList(fileInfoVoList);
+                        }
+                        bankObject=JSONObject.fromObject(resultNoticeReqVoList.get(0));
+                        System.out.println("bankObject"+bankObject.toString());
+                        String resultJson= BankNotification("a/a",bankObject.toString());
+                        log.info("resultJson"+resultJson);
+                        return resultJson;
                     }
                     System.out.println(token);
                     //返回数据到一窗受理平台保存受理编号和登记编号
@@ -499,21 +656,170 @@ public class AnonymousInnerComponent {
      */
     private RespServiceData getRealEstateBooking(String certificateType, String certificateId, RespServiceData respServiceData) throws Exception {
         ObjectRestResponse resultRV = new ObjectRestResponse();
+            switch (certificateType) {
+                case "DYZMH":
+                    resultRV = realEstateMortgageComponent.getRealEstateMortgage(certificateId, null, true);
+                    List<MortgageService> mortgageServiceList = (List<MortgageService>) resultRV.getData();
+                    respServiceData.setServiceDataInfos(mortgageServiceList);
+                    break;
+                case "YGZMH":
+                    resultRV = realEstateMortgageComponent.getMortgageCancellation(certificateId);
+                    List<RealPropertyCertificate> realPropertyCertificateList = (List<RealPropertyCertificate>) resultRV.getData();
+                    respServiceData.setServiceCode(Msgagger.YGZMSERVICE_CODE);
+                    respServiceData.setServiceDataInfos(realPropertyCertificateList);
+                    break;
+            }
+        return respServiceData;
+    }
+
+    /**
+     *缮证
+     */
+    private ResultNoticeReqVo  getDataProcessing(String slbh,String certificateType, String certificateId)throws Exception{
+        ObjectRestResponse resultRV = new ObjectRestResponse();
+        ResultNoticeReqVo resultNoticeReqVo=new ResultNoticeReqVo();
+        resultNoticeReqVo.setBusinessId(slbh);
         switch (certificateType) {
             case "DYZMH":
                 resultRV = realEstateMortgageComponent.getRealEstateMortgage(certificateId,null,true);
                 List<MortgageService> mortgageServiceList = (List<MortgageService>) resultRV.getData();
-                respServiceData.setServiceDataInfos(mortgageServiceList);
+                //处理抵押
+                ClNotice(resultNoticeReqVo,"MORTGAGE_PERSONAL",Msgagger.SHANZHENG);
+                ClDdyxxNotice(mortgageServiceList,resultNoticeReqVo);
                 break;
             case "YGZMH":
                 resultRV = realEstateMortgageComponent.getMortgageCancellation(certificateId);
                 List<RealPropertyCertificate> realPropertyCertificateList = (List<RealPropertyCertificate>) resultRV.getData();
-                respServiceData.setServiceCode(Msgagger.YGZMSERVICE_CODE);
-                respServiceData.setServiceDataInfos(realPropertyCertificateList);
+                ClNotice(resultNoticeReqVo,"MORTGAGE_NEW_TRAILER",Msgagger.SHANZHENG);
+                ClYgxxNotice(realPropertyCertificateList,resultNoticeReqVo,certificateId);
                 break;
         }
-        return respServiceData;
+        return  resultNoticeReqVo;
     }
+
+    private void ClNotice(ResultNoticeReqVo resultNoticeReqVo,String Type,String businessNodeName){
+        resultNoticeReqVo.setBusinessStatus("ACEPTE_SUCESS");
+        resultNoticeReqVo.setBusinessType(Type);//MORTGAGE_PERSONAL
+        resultNoticeReqVo.setBusinessNodeCode("1");//业务节点编码
+        resultNoticeReqVo.setBusinessNodeName(businessNodeName);//业务节点名称
+        resultNoticeReqVo.setCompletionTime(DateUtils.dateString(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        resultNoticeReqVo.setCharset("UTF-8");
+        resultNoticeReqVo.setOrgId(IDUtil.getBinID());
+        resultNoticeReqVo.setVersion("1.0.0");
+        resultNoticeReqVo.setReqDate(DateUtils.dateString(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        resultNoticeReqVo.setReqUniqueNo(IDUtil.getExceptionId());
+        resultNoticeReqVo.setApiName("resultNotice");
+    }
+
+    private void ClYgxxNotice(List<RealPropertyCertificate> realPropertyCertificateList,ResultNoticeReqVo resultNoticeReqVo,String certificateId){
+        List< RealEstateInfoVo > realEstateInfoVoList=new ArrayList<>();
+        List<com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.RealEstateUnitInfoVo> realEstateUnitInfoVos=new ArrayList<>();
+        RealEstateInfoVo realEstateInfoVo = new RealEstateInfoVo();
+        for (RealPropertyCertificate realPropertyCertificate:
+             realPropertyCertificateList ) {
+            realEstateInfoVo.setRealEstateId(realPropertyCertificate.getImmovableCertificateNo());//不动产权证号
+            realEstateInfoVo.setLandCertificate(realPropertyCertificate.getLandCertificateNo());//土地号
+            realEstateInfoVo.setVormerkungId(certificateId);//预告证明号
+            List<GlImmovable> glImmovableList = realPropertyCertificate.getGlImmovableVoList();
+            //不动产单元信息
+            ClNoticeFwInfo(glImmovableList,realEstateUnitInfoVos,realEstateInfoVoList,realEstateInfoVo);
+            resultNoticeReqVo.setRealEstateInfoVoList(realEstateInfoVoList);
+        }
+    }
+
+
+    private void ClNoticeFwInfo(List<GlImmovable> glImmovableList,List<com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.RealEstateUnitInfoVo> realEstateUnitInfoVoList,
+                                List<RealEstateInfoVo> realEstateInfoVoList, RealEstateInfoVo realEstateInfoVo ){
+        for (GlImmovable glmmovable:
+                glImmovableList) {
+            com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.RealEstateUnitInfoVo realEstateUnitInfoVo=new com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.RealEstateUnitInfoVo();
+            FwInfo fwInfo=glmmovable.getFwInfo();
+            realEstateUnitInfoVo.setRealEstateUnitId(fwInfo.getImmovableUnitNumber());
+            realEstateUnitInfoVo.setSit(fwInfo.getHouseLocation());
+            realEstateUnitInfoVo.setHouseholdId(fwInfo.getHouseholdNumber());
+            realEstateUnitInfoVoList.add(realEstateUnitInfoVo);
+            realEstateInfoVo.setRealEstateUnitInfoVoList(realEstateUnitInfoVoList);
+            realEstateInfoVoList.add(realEstateInfoVo);
+        }
+    }
+
+
+    /**
+     * 处理银行通知抵押信息
+     * @param mortgageServiceList
+     * @param resultNoticeReqVo
+     */
+    private void ClDdyxxNotice(List<MortgageService> mortgageServiceList,ResultNoticeReqVo resultNoticeReqVo){
+        List<RealEstateInfoVo> realEstateInfoVoList=new ArrayList<>();
+        List<com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.RealEstateUnitInfoVo> realEstateUnitInfoVoList=new ArrayList<>();
+        List<MortgagorInfoVo> mortgagorInfoVoList=new ArrayList<>();
+        List<MortgageeInfoVo> mortgageeInfoVoList=new ArrayList<>();
+        RealEstateInfoVo realEstateInfoVo = new RealEstateInfoVo();
+        for (MortgageService mortgageService:
+                mortgageServiceList ) {
+            //  MORTGAGE_NEW_TRAILER
+            resultNoticeReqVo.setWarrantId(mortgageService.getMortgageCertificateNo());//抵押证明号
+            resultNoticeReqVo.setMortgageArea(mortgageService.getMortgageArea().toString());
+            resultNoticeReqVo.setMortgageTerm(getMonthDiff(mortgageService.getMortgageStartingDate(),mortgageService.getMortgageEndingDate()));
+            List<GlImmovable> glImmovableList = mortgageService.getGlImmovableVoList();
+            realEstateInfoVo.setRealEstateId(mortgageService.getImmovableCertificateNo());
+            //不动产单元信息
+            ClNoticeFwInfo(glImmovableList,realEstateUnitInfoVoList,realEstateInfoVoList,realEstateInfoVo);
+            resultNoticeReqVo.setRealEstateInfoVoList(realEstateInfoVoList);
+            List<GlMortgagor> glMortgagorVoList=mortgageService.getGlMortgagorVoList();
+            for (GlMortgagor glMortgagor: glMortgagorVoList) { //抵押人信息
+                MortgagorInfoVo mortgagorInfoVo=new MortgagorInfoVo();
+                mortgagorInfoVo.setMortgagorNmae(glMortgagor.getObligeeName());
+                mortgagorInfoVo.setMortgagorId(glMortgagor.getRelatedPerson().getObligeeDocumentNumber());
+                mortgagorInfoVo.setMortgagorIdType(MortgagorPtypeEnum.Sc(glMortgagor.getRelatedPerson().getObligeeDocumentType()));
+                mortgagorInfoVoList.add(mortgagorInfoVo);
+            }
+            resultNoticeReqVo.setMortgagorInfoVoList(mortgagorInfoVoList);
+            List<GlMortgageHolder> glMortgageHolderVoList=mortgageService.getGlMortgageHolderVoList();
+            for (GlMortgageHolder glMortgageHolder: glMortgageHolderVoList) { //抵押权人信息
+                MortgageeInfoVo mortgageeInfoVo=new MortgageeInfoVo();
+                mortgageeInfoVo.setMortgageeName(glMortgageHolder.getObligeeName());
+                mortgageeInfoVo.setMortgageeId(glMortgageHolder.getRelatedPerson().getObligeeDocumentNumber());
+                mortgageeInfoVo.setMortgageeIdType(MortgagorPtypeEnum.Sc(glMortgageHolder.getRelatedPerson().getObligeeDocumentType()));
+                mortgageeInfoVoList.add(mortgageeInfoVo);
+            }
+            resultNoticeReqVo.setMortgageeInfoVoList(mortgageeInfoVoList);
+        }
+    }
+
+
+
+    /**
+     * 获取两个日期相差的月数
+     */
+    public static String getMonthDiff(Date d1, Date d2) {
+        Calendar c1 = Calendar.getInstance();
+        Calendar c2 = Calendar.getInstance();
+        c1.setTime(d1);
+        c2.setTime(d2);
+        int year1 = c1.get(Calendar.YEAR);
+        int year2 = c2.get(Calendar.YEAR);
+        int month1 = c1.get(Calendar.MONTH);
+        int month2 = c2.get(Calendar.MONTH);
+        int day1 = c1.get(Calendar.DAY_OF_MONTH);
+        int day2 = c2.get(Calendar.DAY_OF_MONTH);
+        // 获取年的差值
+        int yearInterval = year1 - year2;
+        // 如果 d1的 月-日 小于 d2的 月-日 那么 yearInterval-- 这样就得到了相差的年数
+        if (month1 < month2 || month1 == month2 && day1 < day2) {
+            yearInterval--;
+        }
+        // 获取月数差值
+        int monthInterval = (month1 + 12) - month2;
+        if (day1 < day2) {
+            monthInterval--;
+        }
+        monthInterval %= 12;
+        int monthsDiff = Math.abs(yearInterval * 12 + monthInterval);
+        return String.valueOf(monthsDiff);
+    }
+
+
 
     public String getToken(com.alibaba.fastjson.JSONObject jsonObject, String method, String registerNumber, String noticeType, String receiptNumber) {
         Integer status = jsonObject.getInteger("status");
@@ -562,6 +868,14 @@ public class AnonymousInnerComponent {
                 map, header);
         com.alibaba.fastjson.JSONObject jsonObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(json);
         System.out.println("chenbin返回信息为：" + jsonObject);
+        return json;
+    }
+
+
+    private String BankNotification(String url,String param) throws IOException{
+        String json = HttpClientUtil.post(null,null,
+                param, "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + url);
+        System.out.println("yinhang返回信息为：" + json);
         return json;
     }
 

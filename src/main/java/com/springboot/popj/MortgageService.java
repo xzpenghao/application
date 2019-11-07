@@ -8,6 +8,7 @@ public class MortgageService {
     private String acceptanceNumber;//不动产内网受理编号
     private String immovableSite;//不动产坐落（收件单坐落）
     private String mortgageCertificateNo;// 抵押证明号
+    private String immovableCertificateNo; //权证号
     private Date registrationDate; //登记日期
     private String mortgageMode;//抵押类型
     private Double mortgageArea;//抵押面积
@@ -31,6 +32,14 @@ public class MortgageService {
 
     public List<GlImmovable> getGlImmovableVoList() {
         return glImmovableVoList;
+    }
+
+    public String getImmovableCertificateNo() {
+        return immovableCertificateNo;
+    }
+
+    public void setImmovableCertificateNo(String immovableCertificateNo) {
+        this.immovableCertificateNo = immovableCertificateNo;
     }
 
     public void setGlImmovableVoList(List<GlImmovable> glImmovableVoList) {

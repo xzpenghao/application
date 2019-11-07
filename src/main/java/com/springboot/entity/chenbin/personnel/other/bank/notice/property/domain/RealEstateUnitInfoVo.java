@@ -13,4 +13,5 @@ public class RealEstateUnitInfoVo {
     private String sit;
     private String projectName;
     private String thinBoardTime;
+    private String householdId;
 }
