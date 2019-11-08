@@ -7,6 +7,7 @@ public class SJ_Qlr_Info implements Serializable {
     private String obligeeName;                   //权利人名称
     private String obligeeDocumentType;           //权利人证件类型
     private String obligeeDocumentNumber;         //权利人证件号码
+    private String dh;
     private String status;                        //状态
     private String ext1;                          //扩展字段1
     private String ext2;                          //扩展字段2
@@ -76,17 +77,11 @@ public class SJ_Qlr_Info implements Serializable {
         this.ext3 = ext3;
     }
 
-    @Override
-    public String toString() {
-        return "SJ_Qlr_Info{" +
-                "obligeeId='" + obligeeId + '\'' +
-                ", obligeeName='" + obligeeName + '\'' +
-                ", obligeeDocumentType='" + obligeeDocumentType + '\'' +
-                ", obligeeDocumentNumber='" + obligeeDocumentNumber + '\'' +
-                ", status='" + status + '\'' +
-                ", ext1='" + ext1 + '\'' +
-                ", ext2='" + ext2 + '\'' +
-                ", ext3='" + ext3 + '\'' +
-                '}';
+    public String getDh() {
+        return dh;
+    }
+
+    public void setDh(String dh) {
+        this.dh = dh;
     }
 }

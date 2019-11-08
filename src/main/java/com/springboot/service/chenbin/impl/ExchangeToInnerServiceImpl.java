@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.AnonymousInnerComponent;
+import com.springboot.component.chenbin.ExchangeToInnerComponent;
 import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.component.chenbin.OtherComponent;
 import com.springboot.config.DJJUser;
@@ -15,14 +16,16 @@ import com.springboot.entity.chenbin.personnel.other.paph.PaphDyxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
 import com.springboot.feign.ForImmovableFeign;
-import com.springboot.popj.pub_data.SJ_Sjsq;
-import com.springboot.popj.pub_data.Sj_Info_Dyhtxx;
-import com.springboot.popj.pub_data.Sj_Info_Jyhtxx;
+import com.springboot.feign.OuterBackFeign;
+import com.springboot.popj.pub_data.*;
+import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.registration.AdvanceBizInfo;
 import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.popj.registration.MortgageBizInfo;
 import com.springboot.popj.registration.RegistrationBureau;
+import com.springboot.popj.warrant.ParametricData;
 import com.springboot.service.chenbin.ExchangeToInnerService;
+import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
@@ -33,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +53,10 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private OtherComponent otherComponent;
     @Autowired
     private ForImmovableFeign immovableFeign;
+    @Autowired
+    private ExchangeToInnerComponent exchangeToInnerComponent;
+    @Autowired
+    private OuterBackFeign backFeign;
 
     @Value("${chenbin.idType}")
     private String idType;
@@ -131,6 +139,25 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     }
 
     @Override
+    public String secTra2InnerWithoutDY(String commonInterfaceAttributer) throws ParseException {
+        SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        String token = backFeign.getToken(new JwtAuthenticationRequest("testdjj","123456")).getData();
+        Map<String,String> params = new HashMap<String,String>();
+        params.put("receiptNumber", sjsq.getReceiptNumber());
+        params.put("registerNumber",sjsq.getReceiptNumber().replaceAll("YCSL-",""));
+        backFeign.dealRecieveFromOuter1(token,params);
+        System.out.println("进入不动产处理，受理成功！");
+        return "转移登记同步内网办理成功";
+    }
+
+    @Override
+    public String secTra2InnerWithDY(String commonInterfaceAttributer) throws ParseException {
+        SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+
+        return null;
+    }
+
+    @Override
     public List<PaphEntity> getPaphMortBefore(PaphReqEntity paph) {
         Map<String,Object> params = new HashMap<String,Object>();
         params.put("obligeeName",paph.getQlrmc());
@@ -197,6 +224,11 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
             throw new ZtgeoBizException("未查询到该权利人存在现势登记的权属信息");
         }
         return paphEntitys;
+    }
+
+    @Override
+    public List<SJ_Info_Bdcqlxgxx> getBdcQlInfoWithItsRights(ParametricData parametricData) {
+        return exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
     }
 
     private PaphEntity getBasePaph(JSONObject obj){

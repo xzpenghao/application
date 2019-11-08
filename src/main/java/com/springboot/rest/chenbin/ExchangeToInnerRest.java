@@ -4,6 +4,7 @@ import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
+import com.springboot.popj.warrant.ParametricData;
 import com.springboot.service.chenbin.ExchangeToInnerService;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import io.swagger.annotations.Api;
@@ -45,6 +46,50 @@ public class ExchangeToInnerRest {
         return rv;
     }
 
+    @RequestMapping(value = "secTra2InnerWithoutDY", method = RequestMethod.POST)
+    public ObjectRestResponse<String> secTra2InnerWithoutDY(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        try {
+            log.warn("二手房转移转入，本次参数为：" + commonInterfaceAttributer);
+            rv.data(exchangeToInnerService.secTra2InnerWithoutDY(commonInterfaceAttributer));
+        } catch (ParseException e1) {
+            log.error(ErrorDealUtil.getErrorInfo(e1));
+            rv.setStatus(20500);
+            rv.setData("转内网传入的数据格式不正确");
+        } catch (ZtgeoBizException e2) {
+            log.error(ErrorDealUtil.getErrorInfo(e2));
+            rv.setStatus(20500);
+            rv.setData(e2.getMessage());
+        } catch (Exception e3) {
+            log.error(ErrorDealUtil.getErrorInfo(e3));
+            rv.setStatus(20500);
+            rv.setData("转内网出现其它运行时异常，请排查！");
+        }
+        return rv;
+    }
+
+    @RequestMapping(value = "secTra2InnerWithDY", method = RequestMethod.POST)
+    public ObjectRestResponse<String> secTra2InnerWithDY(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        try {
+            log.warn("二手房转移转入，本次参数为：" + commonInterfaceAttributer);
+            rv.data(exchangeToInnerService.secTra2InnerWithDY(commonInterfaceAttributer));
+        } catch (ParseException e1) {
+            log.error(ErrorDealUtil.getErrorInfo(e1));
+            rv.setStatus(20500);
+            rv.setData("转内网传入的数据格式不正确");
+        } catch (ZtgeoBizException e2) {
+            log.error(ErrorDealUtil.getErrorInfo(e2));
+            rv.setStatus(20500);
+            rv.setData(e2.getMessage());
+        } catch (Exception e3) {
+            log.error(ErrorDealUtil.getErrorInfo(e3));
+            rv.setStatus(20500);
+            rv.setData("转内网出现其它运行时异常，请排查！");
+        }
+        return rv;
+    }
+
     @RequestMapping(value = "newWEG2Inner", method = RequestMethod.POST)
     public ObjectRestResponse<String> newWEG2Inner(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
@@ -64,5 +109,12 @@ public class ExchangeToInnerRest {
         ObjectRestResponse<List<PaphEntity>> rv = new ObjectRestResponse<List<PaphEntity>>();
 
         return rv.data(exchangeToInnerService.getPaphMortAfter(paph));
+    }
+
+    @RequestMapping(value = "getBdcQlInfoWithItsRights",method = RequestMethod.POST)
+    public ObjectRestResponse getBdcQlInfoWithItsRights(@RequestBody ParametricData parametricData){
+        ObjectRestResponse rv = new ObjectRestResponse();
+
+        return rv.data(exchangeToInnerService.getBdcQlInfoWithItsRights(parametricData));
     }
 }

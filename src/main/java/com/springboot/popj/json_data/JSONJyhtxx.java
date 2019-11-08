@@ -1,6 +1,5 @@
 package com.springboot.popj.json_data;
 
-
 import com.springboot.util.TimeUtil;
 
 import java.io.Serializable;
@@ -19,6 +18,13 @@ public class JSONJyhtxx implements Serializable {
     private Date contractSignTime;                   //合同签订时间
     private BigDecimal contractAmount;                     //合同金额
     private String isReal;                             //合同是否有效
+    private String holdingDifferent;                                   //分别持证
+    private String fundTrusteeship;                                    //资金托管
+    private String paymentMethod;                                     //支付方式
+    private String taxBurdenParty;                                   //税费承担方式
+    private String deliveryDays;                                      //交付天数
+    private Date deliveryDate;                                      //交付日期
+    private String oldHouseCode;                                    //原房产户编码
     private String dataJson;                           //原始查询数据
     private String dataComeFromMode;                //数据获取方式
     private String preservationMan;                 //数据提交人
@@ -32,6 +38,10 @@ public class JSONJyhtxx implements Serializable {
     private String glImmovableVoList;          //关联的不动产数据
     private String glHouseBuyerVoList;            //关联的购房人数据
     private String glHouseSellerVoList;            //关联的售房人数据
+    private String glAgentVoList;               //关联代理人
+    private String glAgentSellerVoList;                 //关联的卖方代理人数据
+
+    private String htDetail;                        //合同细节数据
 
     public String getInfoId() {
         return infoId;
@@ -111,6 +121,62 @@ public class JSONJyhtxx implements Serializable {
 
     public void setIsReal(String isReal) {
         this.isReal = isReal;
+    }
+
+    public String getHoldingDifferent() {
+        return holdingDifferent;
+    }
+
+    public void setHoldingDifferent(String holdingDifferent) {
+        this.holdingDifferent = holdingDifferent;
+    }
+
+    public String getFundTrusteeship() {
+        return fundTrusteeship;
+    }
+
+    public void setFundTrusteeship(String fundTrusteeship) {
+        this.fundTrusteeship = fundTrusteeship;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getTaxBurdenParty() {
+        return taxBurdenParty;
+    }
+
+    public void setTaxBurdenParty(String taxBurdenParty) {
+        this.taxBurdenParty = taxBurdenParty;
+    }
+
+    public String getDeliveryDays() {
+        return deliveryDays;
+    }
+
+    public void setDeliveryDays(String deliveryDays) {
+        this.deliveryDays = deliveryDays;
+    }
+
+    public Date getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    public void setDeliveryDate(String deliveryDate) throws ParseException {
+        this.deliveryDate = TimeUtil.getDateFromString(deliveryDate);
+    }
+
+    public String getOldHouseCode() {
+        return oldHouseCode;
+    }
+
+    public void setOldHouseCode(String oldHouseCode) {
+        this.oldHouseCode = oldHouseCode;
     }
 
     public String getDataJson() {
@@ -207,5 +273,29 @@ public class JSONJyhtxx implements Serializable {
 
     public void setGlHouseSellerVoList(String glHouseSellerVoList) {
         this.glHouseSellerVoList = glHouseSellerVoList;
+    }
+
+    public String getGlAgentVoList() {
+        return glAgentVoList;
+    }
+
+    public void setGlAgentVoList(String glAgentVoList) {
+        this.glAgentVoList = glAgentVoList;
+    }
+
+    public String getGlAgentSellerVoList() {
+        return glAgentSellerVoList;
+    }
+
+    public void setGlAgentSellerVoList(String glAgentSellerVoList) {
+        this.glAgentSellerVoList = glAgentSellerVoList;
+    }
+
+    public String getHtDetail() {
+        return htDetail;
+    }
+
+    public void setHtDetail(String htDetail) {
+        this.htDetail = htDetail;
     }
 }

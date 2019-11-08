@@ -15,6 +15,13 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
     private String contractSignTime;                   //合同签订时间
     private BigDecimal contractAmount;                     //合同金额
     private String isReal;                             //合同是否有效
+    private String holdingDifferent;                                   //分别持证
+    private String fundTrusteeship;                                    //资金托管
+    private String paymentMethod;                                     //支付方式
+    private String taxBurdenParty;                                   //税费承担方式
+    private String deliveryDays;                                      //交付天数
+    private String deliveryDate;                                      //交付日期
+    private String oldHouseCode;                                    //原房产户编码
     private String ext1;                               //扩展字段1
     private String ext2;                               //扩展字段2
     private String ext3;                               //扩展字段3
@@ -22,10 +29,15 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
     private List<SJ_Bdc_Gl> glImmovableVoList;          //关联的不动产数据
     private List<SJ_Qlr_Gl> glHouseBuyerVoList;            //关联的购房人数据
     private List<SJ_Qlr_Gl> glHouseSellerVoList;            //关联的售房人数据
+    private List<SJ_Qlr_Gl> glAgentVoList;                 //关联的代理人数据
+    private List<SJ_Qlr_Gl> glAgentSellerVoList;                 //关联的卖方代理人数据
+
+    private SJ_Jyht_Detail htDetail;                        //合同细节数据
 
     public String getContractId() {
         return contractId;
     }
+
 
     public void setContractId(String contractId) {
         this.contractId = contractId;
@@ -87,6 +99,62 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
         this.isReal = isReal;
     }
 
+    public String getHoldingDifferent() {
+        return holdingDifferent;
+    }
+
+    public void setHoldingDifferent(String holdingDifferent) {
+        this.holdingDifferent = holdingDifferent;
+    }
+
+    public String getFundTrusteeship() {
+        return fundTrusteeship;
+    }
+
+    public void setFundTrusteeship(String fundTrusteeship) {
+        this.fundTrusteeship = fundTrusteeship;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getTaxBurdenParty() {
+        return taxBurdenParty;
+    }
+
+    public void setTaxBurdenParty(String taxBurdenParty) {
+        this.taxBurdenParty = taxBurdenParty;
+    }
+
+    public String getDeliveryDays() {
+        return deliveryDays;
+    }
+
+    public void setDeliveryDays(String deliveryDays) {
+        this.deliveryDays = deliveryDays;
+    }
+
+    public String getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    public void setDeliveryDate(Date deliveryDate) {
+        this.deliveryDate = TimeUtil.getDateString(deliveryDate);
+    }
+
+    public String getOldHouseCode() {
+        return oldHouseCode;
+    }
+
+    public void setOldHouseCode(String oldHouseCode) {
+        this.oldHouseCode = oldHouseCode;
+    }
+
     public String getExt1() {
         return ext1;
     }
@@ -133,5 +201,29 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
 
     public void setGlHouseSellerVoList(List<SJ_Qlr_Gl> glHouseSellerVoList) {
         this.glHouseSellerVoList = glHouseSellerVoList;
+    }
+
+    public List<SJ_Qlr_Gl> getGlAgentVoList() {
+        return glAgentVoList;
+    }
+
+    public void setGlAgentVoList(List<SJ_Qlr_Gl> glAgentVoList) {
+        this.glAgentVoList = glAgentVoList;
+    }
+
+    public List<SJ_Qlr_Gl> getGlAgentSellerVoList() {
+        return glAgentSellerVoList;
+    }
+
+    public void setGlAgentSellerVoList(List<SJ_Qlr_Gl> glAgentSellerVoList) {
+        this.glAgentSellerVoList = glAgentSellerVoList;
+    }
+
+    public SJ_Jyht_Detail getHtDetail() {
+        return htDetail;
+    }
+
+    public void setHtDetail(SJ_Jyht_Detail htDetail) {
+        this.htDetail = htDetail;
     }
 }

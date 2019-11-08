@@ -97,6 +97,9 @@ public class SysPubDataDealUtil {
             String JSON_glImmovableVoList = qlxgxx.getGlImmovableVoList();
             String JSON_glObligeeVoList = qlxgxx.getGlObligeeVoList();
             String JSON_glObligorVoList = qlxgxx.getGlObligorVoList();
+            String JSON_glAgentVoList = qlxgxx.getGlAgentVoList();
+            String JSON_itsRightVoList = qlxgxx.getItsRightVoList();
+            String JSON_glAgentObligorVoList = qlxgxx.getGlAgentObligorVoList();//义务代理人
 
             if (JSON_glObligorVoList == null || JSON_glObligorVoList.length() <= 0) {
                 HaveOrNot = false;  //判断义务人是否必须
@@ -105,6 +108,9 @@ public class SysPubDataDealUtil {
             qlxgxx.setGlImmovableVoList(null);
             qlxgxx.setGlObligeeVoList(null);
             qlxgxx.setGlObligorVoList(null);
+            qlxgxx.setGlAgentVoList(null);
+            qlxgxx.setItsRightVoList(null);
+            qlxgxx.setGlAgentObligorVoList(null);
 
             //反转出不动产权利信息
             SJ_Info_Bdcqlxgxx sj_qlxgxx = JSON.parseObject(JSON.toJSONString(qlxgxx), SJ_Info_Bdcqlxgxx.class);
@@ -127,6 +133,21 @@ public class SysPubDataDealUtil {
             if (HaveOrNot) {
                 List<SJ_Qlr_Gl> sj_ywrgls = copyJSONQlrToSJQlr(JSON_glObligorVoList, BizOrBizExceptionConstant.IMMOVABLE_RIGHT_RECEIPT_SERVICE, BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_YWR);
                 sj_qlxgxx.setGlObligorVoList(sj_ywrgls);
+            }
+
+            if(StringUtils.isNotBlank(JSON_glAgentVoList)){
+                List<SJ_Qlr_Gl> sj_dlrgl = copyJSONQlrToSJQlr(JSON_glAgentVoList,BizOrBizExceptionConstant.IMMOVABLE_RIGHT_RECEIPT_SERVICE,BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR_DLR);
+                sj_qlxgxx.setGlAgentVoList(sj_dlrgl);
+            }
+
+            if(StringUtils.isNotBlank(JSON_glAgentObligorVoList)){
+                List<SJ_Qlr_Gl> sj_ywdlrgl = copyJSONQlrToSJQlr(JSON_glAgentObligorVoList,BizOrBizExceptionConstant.IMMOVABLE_RIGHT_RECEIPT_SERVICE,BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_YWR_DLR);
+                sj_qlxgxx.setGlAgentObligorVoList(sj_ywdlrgl);
+            }
+
+            if(StringUtils.isNotBlank(JSON_itsRightVoList)){
+                List<SJ_Its_Right> itsRightVoList = JSONArray.parseArray(JSON_itsRightVoList,SJ_Its_Right.class);
+                sj_qlxgxx.setItsRightVoList(itsRightVoList);
             }
             sj_qlxgxx.setGlImmovableVoList(sj_bdcgls);
             sj_qlxgxx.setGlObligeeVoList(sj_qlrgls);
@@ -185,9 +206,15 @@ public class SysPubDataDealUtil {
             String JSON_glImmovableVoList = jyhtxx.getGlImmovableVoList();
             String JSON_glHouseBuyerVoList = jyhtxx.getGlHouseBuyerVoList();
             String JSON_glHouseSellerVoList = jyhtxx.getGlHouseSellerVoList();
+            String JSON_glAgentVoList = jyhtxx.getGlAgentVoList();
+            String JSON_glAgentSellerVoList = jyhtxx.getGlAgentSellerVoList();
+            String JSON_htDetail = jyhtxx.getHtDetail();
             jyhtxx.setGlHouseBuyerVoList(null);
             jyhtxx.setGlHouseSellerVoList(null);
             jyhtxx.setGlImmovableVoList(null);
+            jyhtxx.setGlAgentVoList(null);
+            jyhtxx.setGlAgentSellerVoList(null);
+            jyhtxx.setHtDetail(null);
             //反转出合同信息
             Sj_Info_Jyhtxx sj_jyhtxx = JSON.parseObject(JSON.toJSONString(jyhtxx), Sj_Info_Jyhtxx.class);
             baseSetting(sj_jyhtxx, serviceCode, sjsq.getReceiptNumber());
@@ -197,7 +224,23 @@ public class SysPubDataDealUtil {
             List<SJ_Qlr_Gl> sj_mfrgls = copyJSONQlrToSJQlr(JSON_glHouseBuyerVoList, BizOrBizExceptionConstant.TRANSACTION_CONTRACT_RECEIPT_SERVICE, BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_GFZ);
             //卖方人处理
             List<SJ_Qlr_Gl> sj_sellergls = copyJSONQlrToSJQlr(JSON_glHouseSellerVoList, BizOrBizExceptionConstant.TRANSACTION_CONTRACT_RECEIPT_SERVICE, BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_SFZ);
-
+            //代理人
+            if(StringUtils.isNotBlank(JSON_glAgentVoList)){
+                List<SJ_Qlr_Gl> sj_dlrgl = copyJSONQlrToSJQlr(JSON_glAgentVoList,BizOrBizExceptionConstant.TRANSACTION_CONTRACT_RECEIPT_SERVICE,BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR_DLR);
+                sj_jyhtxx.setGlAgentVoList(sj_dlrgl);
+            }
+            //合同细节
+            if(StringUtils.isNotBlank(JSON_htDetail)) {
+                SJ_Jyht_Detail sjJyhtDetail = JSON.parseObject(JSON_htDetail, SJ_Jyht_Detail.class);
+                sj_jyhtxx.setHtDetail(sjJyhtDetail);
+            }
+            /*
+             *  卖方代理人关联信息处理
+             */
+            if(StringUtils.isNotBlank(JSON_glAgentSellerVoList)){
+                List<SJ_Qlr_Gl> sj_ywdlrgl = copyJSONQlrToSJQlr(JSON_glAgentSellerVoList,BizOrBizExceptionConstant.TRANSACTION_CONTRACT_RECEIPT_SERVICE,BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_YWR_DLR);
+                sj_jyhtxx.setGlAgentSellerVoList(sj_ywdlrgl);
+            }
             sj_jyhtxx.setGlImmovableVoList(sj_bdcgls);
             sj_jyhtxx.setGlHouseBuyerVoList(sj_mfrgls);
             sj_jyhtxx.setGlHouseSellerVoList(sj_sellergls);

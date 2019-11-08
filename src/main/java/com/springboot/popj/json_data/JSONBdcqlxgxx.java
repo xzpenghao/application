@@ -15,16 +15,24 @@ public class JSONBdcqlxgxx implements Serializable {
     private String immovableCertificateNo;       //不动产权证号
     private String houseCertificateNo;           //房产证号
     private String landCertificateNo;            //土地证号
+    private String waterNumber;                  //水号
+    private String electricNumber;               //电号
+    private String gasNumber;                    //气号
+    private String wiredNumber;                  //有线电视号
     private Date registrationDate;             //登记日期
     private String certificateType;              //证书类型(与sjsq中证书类型保持一致）
     private BigDecimal architecturalArea;               //建筑面积
     private BigDecimal houseArchitecturalArea;          //套内建筑面积
     private BigDecimal apportionmentArchitecturalArea;  //分摊建筑面积
+    private BigDecimal atticArea;                       //阁楼面积
+    private BigDecimal garageArea;                       //车库面积
+    private BigDecimal storeroomArea;                       //储藏室面积
     private String houseObtainingWays;                   //房屋取得方式
     private BigDecimal houseObtainingPrice;             //房屋取得价格
     private String housePlanningPurpose;                //房屋规划用途
     private String houseValuationAmount;                //房屋评估金额
     private String houseType;                           //房屋类型
+    private String houseNature;                         //房屋性质
     private String houseRightType;               //房屋权利类型
     private String houseRightNature;             //房屋权利性质
 
@@ -35,6 +43,7 @@ public class JSONBdcqlxgxx implements Serializable {
     private String landUseRightOwner;            //土地使用权人
     private String landUseTimeLimit;                //土地使用期限
     private String landPurpose;                     //土地用途
+    private String landObtainWay;                   //土地取得途径
     private BigDecimal commonLandArea;                  //共有土地面积
     private BigDecimal singleLandArea;                  //独用土地面积
     private BigDecimal shareLandArea;                   //分摊土地面积
@@ -53,6 +62,17 @@ public class JSONBdcqlxgxx implements Serializable {
     private String glImmovableVoList;          //关联的不动产数据
     private String glObligeeVoList;            //关联的权利人数据
     private String glObligorVoList;            //关联的义务人数据
+    private String itsRightVoList;          //他项权列表
+    private String glAgentVoList;               //关联代理人
+    private String glAgentObligorVoList;       //关联义务代理人数据
+
+    public String getWiredNumber() {
+        return wiredNumber;
+    }
+
+    public void setWiredNumber(String wiredNumber) {
+        this.wiredNumber = wiredNumber;
+    }
 
     public String getInfoId() {
         return infoId;
@@ -108,6 +128,30 @@ public class JSONBdcqlxgxx implements Serializable {
 
     public void setLandCertificateNo(String landCertificateNo) {
         this.landCertificateNo = landCertificateNo;
+    }
+
+    public String getWaterNumber() {
+        return waterNumber;
+    }
+
+    public void setWaterNumber(String waterNumber) {
+        this.waterNumber = waterNumber;
+    }
+
+    public String getElectricNumber() {
+        return electricNumber;
+    }
+
+    public void setElectricNumber(String electricNumber) {
+        this.electricNumber = electricNumber;
+    }
+
+    public String getGasNumber() {
+        return gasNumber;
+    }
+
+    public void setGasNumber(String gasNumber) {
+        this.gasNumber = gasNumber;
     }
 
     public Date getRegistrationDate() {
@@ -262,6 +306,14 @@ public class JSONBdcqlxgxx implements Serializable {
         this.landPurpose = landPurpose;
     }
 
+    public String getLandObtainWay() {
+        return landObtainWay;
+    }
+
+    public void setLandObtainWay(String landObtainWay) {
+        this.landObtainWay = landObtainWay;
+    }
+
     public BigDecimal getCommonLandArea() {
         return commonLandArea;
     }
@@ -398,5 +450,61 @@ public class JSONBdcqlxgxx implements Serializable {
 
     public void setGlObligorVoList(String glObligorVoList) {
         this.glObligorVoList = glObligorVoList;
+    }
+
+    public String getItsRightVoList() {
+        return itsRightVoList;
+    }
+
+    public void setItsRightVoList(String itsRightVoList) {
+        this.itsRightVoList = itsRightVoList;
+    }
+
+    public String getGlAgentVoList() {
+        return glAgentVoList;
+    }
+
+    public void setGlAgentVoList(String glAgentVoList) {
+        this.glAgentVoList = glAgentVoList;
+    }
+
+    public BigDecimal getAtticArea() {
+        return atticArea;
+    }
+
+    public void setAtticArea(BigDecimal atticArea) {
+        this.atticArea = atticArea;
+    }
+
+    public BigDecimal getGarageArea() {
+        return garageArea;
+    }
+
+    public void setGarageArea(BigDecimal garageArea) {
+        this.garageArea = garageArea;
+    }
+
+    public BigDecimal getStoreroomArea() {
+        return storeroomArea;
+    }
+
+    public void setStoreroomArea(BigDecimal storeroomArea) {
+        this.storeroomArea = storeroomArea;
+    }
+
+    public String getHouseNature() {
+        return houseNature;
+    }
+
+    public void setHouseNature(String houseNature) {
+        this.houseNature = houseNature;
+    }
+
+    public String getGlAgentObligorVoList() {
+        return glAgentObligorVoList;
+    }
+
+    public void setGlAgentObligorVoList(String glAgentObligorVoList) {
+        this.glAgentObligorVoList = glAgentObligorVoList;
     }
 }

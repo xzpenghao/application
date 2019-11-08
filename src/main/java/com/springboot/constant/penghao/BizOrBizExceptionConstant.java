@@ -3,6 +3,8 @@ package com.springboot.constant.penghao;
 public class BizOrBizExceptionConstant {
     public final static String INTERFACE_PACKAGE_URL = "com.ztgeo.general.entity.service_data.intface_param";
     public final static String OBLIGEE_TYPE_OF_QLR = "权利人";
+    public final static String OBLIGEE_TYPE_OF_QLR_DLR = "权利代理人";
+    public final static String OBLIGEE_TYPE_OF_YWR_DLR = "义务代理人";
     public final static String OBLIGEE_TYPE_OF_YWR = "义务人";
     public final static String OBLIGEE_TYPE_OF_DYQR = "抵押权人";
     public final static String OBLIGEE_TYPE_OF_DYR = "抵押人";

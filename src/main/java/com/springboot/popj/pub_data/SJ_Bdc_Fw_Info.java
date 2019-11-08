@@ -33,6 +33,10 @@ public class SJ_Bdc_Fw_Info implements Serializable {
     private String ext1;                                        //扩展字段1
     private String ext2;                                        //扩展字段2
     private String ext3;                                        //扩展字段3
+    private String houseType;                                   //类型
+    private String houseNature;                                 //性质
+    private String houseStructure;                              //结构
+    private String oldHouseCode;
 
     public String getHouseId() {
         return houseId;
@@ -266,38 +270,35 @@ public class SJ_Bdc_Fw_Info implements Serializable {
         this.ext3 = ext3;
     }
 
-    @Override
-    public String toString() {
-        return "SJ_Bdc_Fw_Info{" +
-                "houseId='" + houseId + '\'' +
-                ", householdId='" + householdId + '\'' +
-                ", seatId='" + seatId + '\'' +
-                ", buildingNumber='" + buildingNumber + '\'' +
-                ", houseNumber='" + houseNumber + '\'' +
-                ", immovableUnicode='" + immovableUnicode + '\'' +
-                ", immovablePlanningUse='" + immovablePlanningUse + '\'' +
-                ", houseLocation='" + houseLocation + '\'' +
-                ", immovableUnitNumber='" + immovableUnitNumber + '\'' +
-                ", householdNumber='" + householdNumber + '\'' +
-                ", seatNumber='" + seatNumber + '\'' +
-                ", householdMark='" + householdMark + '\'' +
-                ", roomMark='" + roomMark + '\'' +
-                ", unitMark='" + unitMark + '\'' +
-                ", totalStorey='" + totalStorey + '\'' +
-                ", locationStorey='" + locationStorey + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", architecturalArea=" + architecturalArea +
-                ", houseArchitecturalArea=" + houseArchitecturalArea +
-                ", apportionmentArchitecturalArea=" + apportionmentArchitecturalArea +
-                ", buildingName='" + buildingName + '\'' +
-                ", mortgageSituation='" + mortgageSituation + '\'' +
-                ", closureSituation='" + closureSituation + '\'' +
-                ", objectionSituation='" + objectionSituation + '\'' +
-                ", remarks='" + remarks + '\'' +
-                ", status='" + status + '\'' +
-                ", ext1='" + ext1 + '\'' +
-                ", ext2='" + ext2 + '\'' +
-                ", ext3='" + ext3 + '\'' +
-                '}';
+    public String getHouseType() {
+        return houseType;
+    }
+
+    public void setHouseType(String houseType) {
+        this.houseType = houseType;
+    }
+
+    public String getHouseNature() {
+        return houseNature;
+    }
+
+    public void setHouseNature(String houseNature) {
+        this.houseNature = houseNature;
+    }
+
+    public String getHouseStructure() {
+        return houseStructure;
+    }
+
+    public void setHouseStructure(String houseStructure) {
+        this.houseStructure = houseStructure;
+    }
+
+    public String getOldHouseCode() {
+        return oldHouseCode;
+    }
+
+    public void setOldHouseCode(String oldHouseCode) {
+        this.oldHouseCode = oldHouseCode;
     }
 }

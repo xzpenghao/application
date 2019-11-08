@@ -183,6 +183,11 @@ chenbin:
         pid: Proc-171013210700-3785RA40
         # Proc-180517142329-18NT00D7 宿迁的
         isSubmit: false
+    secRec:                   #二手房
+      transfer:               #转移
+        wholeMoney:           #全款
+          pid: P-ershoufang
+          mid: 977759
   otherBureau:
     ga:                         #公安
       basicInfoUrl: http://10.13.0.240:9999/x
@@ -191,6 +196,7 @@ chenbin:
       url: http://10.13.0.240:9999/y
     gs:                         #工商
       url: http://10.13.0.240:9999/z
+
 penghao:
     mortgageCancellation:       #抵押注销登记
         pid: Proc-171013213255-X42L8440

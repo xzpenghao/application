@@ -3,12 +3,16 @@ package com.springboot.util.chenbin;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.chenbin.personnel.pub_use.*;
+import com.springboot.entity.chenbin.personnel.tax.TaxParamBody;
+import com.springboot.entity.chenbin.personnel.tra.TraParamBody;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.registration.*;
 import com.springboot.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -185,5 +189,184 @@ public class BusinessDealBaseUtil {
             }
         }
         return i;
+    }
+
+    public static TaxParamBody dealParamForTax(SJ_Sjsq sjsq){
+        TaxParamBody taxParam = new TaxParamBody();
+        List<SJ_Info_Bdcqlxgxx> bdcqls =  sjsq.getImmovableRightInfoVoList();
+        Sj_Info_Jyhtxx jyht = sjsq.getTransactionContractInfo();
+        String CFZT = "0";
+        String YYZT = "0";
+        String DYZT = "0";
+        List<QSXX> QSXX = new ArrayList<QSXX>();
+        for(SJ_Info_Bdcqlxgxx bdcql:bdcqls){
+            List<SJ_Its_Right> itsRightVoList = bdcql.getItsRightVoList();
+            if(itsRightVoList!=null){
+                for(SJ_Its_Right itsRight:itsRightVoList){
+                    switch (itsRight.getItsRightType()){
+                        case "抵押":
+                            DYZT = "1";
+                            break;
+                        case "查封":
+                            CFZT = "1";
+                            break;
+                        case "异议":
+                            YYZT = "1";
+                            break;
+                    }
+                }
+            }
+
+            //权属信息
+            QSXX qsxx = new QSXX();
+            qsxx.setBDCZH(bdcql.getImmovableCertificateNo());
+            qsxx.setJZMJ(bdcql.getArchitecturalArea());
+            qsxx.setTNMJ(bdcql.getHouseArchitecturalArea());
+            qsxx.setYT(bdcql.getHousePlanningPurpose());
+            qsxx.setZL(bdcql.getImmovableSite());
+            qsxx.setTDSYQR(bdcql.getLandUseRightOwner());
+            qsxx.setTDHQFS(bdcql.getLandObtainWay());
+            List<FWXX> FWXX = new ArrayList<FWXX>();
+            List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
+            if(bdcgls!=null) {
+                for (SJ_Bdc_Gl bdcgl : bdcgls) {
+                    if(bdcgl.getImmovableType().equals("房地")) {
+                        SJ_Bdc_Fw_Info fw = bdcgl.getFwInfo();
+                        FWXX fwxx = new FWXX();
+                        fwxx.setBDCDYH(fw.getImmovableUnitNumber());
+                        fwxx.setFTMJ(fw.getApportionmentArchitecturalArea());
+                        fwxx.setFWDY(fw.getUnitMark());
+                        fwxx.setFWFH(fw.getRoomMark());
+                        fwxx.setFWJG(fw.getHouseStructure());
+                        fwxx.setFWLX(fw.getHouseType());
+                        fwxx.setFWXZ(fw.getHouseNature());
+                        fwxx.setFWZL(fw.getHouseLocation());
+                        fwxx.setJZMJ(fw.getArchitecturalArea());
+                        fwxx.setTNMJ(fw.getHouseArchitecturalArea());
+                        fwxx.setXMMC(fw.getProjectName());
+                        fwxx.setYFCBH(fw.getOldHouseCode());
+                        fwxx.setYT(fw.getImmovablePlanningUse());
+                        fwxx.setZL(fw.getHouseLocation());
+                        fwxx.setZCS(fw.getTotalStorey());
+                        fwxx.setSZC(fw.getLocationStorey());
+                        FWXX.add(fwxx);
+                    }
+                }
+            }
+            qsxx.setFWXX(FWXX);
+            QSXX.add(qsxx);
+        }
+
+        List<SJ_Qlr_Gl> buyergls = jyht.getGlHouseBuyerVoList();
+        List<SJ_Qlr_Gl> sellergls = jyht.getGlHouseSellerVoList();
+        List<JYQLRXX> JYQLRXX = new ArrayList<JYQLRXX>();
+        for(SJ_Qlr_Gl buyergl:buyergls){
+            JYQLRXX jyqlrxx = getJyqlr(buyergl);
+            jyqlrxx.setQLRBS("1");
+            JYQLRXX.add(jyqlrxx);
+        }
+        for(SJ_Qlr_Gl sellergl:sellergls){
+            JYQLRXX jyqlrxx = getJyqlr(sellergl);
+            jyqlrxx.setQLRBS("0");
+            JYQLRXX.add(jyqlrxx);
+        }
+
+        List<SJ_Qlr_Gl> buyerAgentgls = jyht.getGlAgentVoList();
+        List<SJ_Qlr_Gl> sellerAgentgls = jyht.getGlAgentSellerVoList();
+        List<JYQLRXX> JYDLRXX = new ArrayList<JYQLRXX>();
+        if(buyerAgentgls!=null){//权利代理人整理
+            for(SJ_Qlr_Gl buyerAgentgl:buyerAgentgls) {
+                JYQLRXX ydlrxx = getJyqlr(buyerAgentgl);
+                ydlrxx.setQLRBS("1");
+                JYDLRXX.add(ydlrxx);
+            }
+        }
+        if(sellerAgentgls!=null){//义务代理人整理
+            for(SJ_Qlr_Gl sellerAgentgl:sellerAgentgls) {
+                JYQLRXX jdlrxx = getJyqlr(sellerAgentgl);
+                jdlrxx.setQLRBS("0");
+                JYQLRXX.add(jdlrxx);
+            }
+        }
+
+        DecimalFormat df = new DecimalFormat("#.00");
+        SJ_Jyht_Detail htDetail = jyht.getHtDetail();
+        HTXX HTXX = new HTXX();
+        HTXX.setHTJE(jyht.getContractAmount()!=null?df.format(jyht.getContractAmount()):null);//合同金额
+        HTXX.setFSSS(htDetail.getHouseProperties());//附属设施
+        HTXX.setSFCZ(StringUtils.isNotBlank(htDetail.getIsHire())?Integer.parseInt(htDetail.getIsHire()):null);//是否出租
+        HTXX.setCZSM(htDetail.getHireInstructions());//出租说明
+        HTXX.setSFBHFS(StringUtils.isNotBlank(htDetail.getDoesIncludeHouseProperties())?Integer.parseInt(htDetail.getDoesIncludeHouseProperties()):null);//是否包含附属设施 1 包含，0 不包含
+        HTXX.setSFTG(StringUtils.isNotBlank(jyht.getFundTrusteeship())?Integer.parseInt(jyht.getFundTrusteeship()):null);//是否资金托管 1 是，0 否
+        HTXX.setTGKHH(htDetail.getFundOpenBank());//资金托管开户行
+        HTXX.setTGZH(htDetail.getFundAccount());//托管账户
+        HTXX.setTGMFZFNR(htDetail.getFundBuyerPaysContent());//买方支付内容
+        HTXX.setZFFS(StringUtils.isNotBlank(jyht.getPaymentMethod())?Integer.parseInt(jyht.getPaymentMethod()):null);//支付方式 1 一次性付款，2 分期付款，3 贷款付款，4 其它付款方式
+        HTXX.setFKRQ(htDetail.getFullPaymentDate());//付款日期（付款方式1）
+        HTXX.setFQFKRQ1(htDetail.getStagePaymentDate1());//分期付款日期1（付款方式2）
+        HTXX.setFQFKJE1(htDetail.getStagePaymentAmount1()!=null?df.format(htDetail.getStagePaymentAmount1()):null);//分期付款金额1（付款方式2）//保留两位小数
+        HTXX.setFQFKRQ2(htDetail.getStagePaymentDate2());//分期付款日期2（付款方式2）
+        HTXX.setFQFKJE2(htDetail.getStagePaymentAmount2()!=null?df.format(htDetail.getStagePaymentAmount2()):null);//分期付款金额2（付款方式2）
+        HTXX.setFQFKRQ3(htDetail.getStagePaymentDate3());//分期付款日期3（付款方式2）
+        HTXX.setFQFKJE3(htDetail.getStagePaymentAmount3()!=null?df.format(htDetail.getStagePaymentAmount3()):null);//分期付款金额3（付款方式2）
+        HTXX.setDKFS(StringUtils.isNotBlank(htDetail.getLoanMode())?Integer.parseInt(htDetail.getLoanMode()):null); //贷款方式，1 银行按揭，2 公积金贷款（付款方式3）
+        HTXX.setSFKRQ(htDetail.getFirstPaymentDate());//首付款日期（付款方式3）
+        HTXX.setSFKJE(htDetail.getFirstPaymentAmount()!=null?df.format(htDetail.getFirstPaymentAmount()):null); //首付款金额（付款方式3）//保留两位小数
+        HTXX.setDKSQRQ(htDetail.getLoanApplyDate()); //贷款申请日期（付款方式3）
+        HTXX.setQTFKNR(htDetail.getPaymentContents()); //其它付款内容（付款方式4）
+        HTXX.setQTFKMFZF(htDetail.getBuyerPays()); //其它付款-买方支付（付款方式4）
+        if(StringUtils.isNotBlank(jyht.getTaxBurdenParty())){
+            if(jyht.getTaxBurdenParty().equals("1")){
+                HTXX.setJFCDSF(1); //买方承担税费情况，1 独自承担（此时YFCDSF为空），2 承担各自部分
+            }else if(jyht.getTaxBurdenParty().equals("2")){
+                HTXX.setYFCDSF(1); //卖方承担税费情况，1 独自承担（此时JFCDSF为空），2 承担各自部分
+            }else if(jyht.getTaxBurdenParty().equals("3")){
+                HTXX.setJFCDSF(2); //买方承担税费情况，1 独自承担（此时YFCDSF为空），2 承担各自部分
+                HTXX.setYFCDSF(2); //卖方承担税费情况，1 独自承担（此时JFCDSF为空），2 承担各自部分
+            }else{
+                throw new ZtgeoBizException("不支持的税费承担方式");
+            }
+        }
+        HTXX.setJFTS(Integer.parseInt(jyht.getDeliveryDays())); //交付天数
+        HTXX.setJFRQ(jyht.getDeliveryDate());  //交付日期
+
+        YCSLXX YCSLXX = new YCSLXX();
+        YCSLXX.setSLBH(sjsq.getReceiptNumber());
+        YCSLXX.setSQSJ(sjsq.getReceiptTime());
+
+        taxParam.setCFZT(CFZT);
+        taxParam.setDYZT(DYZT);
+        taxParam.setYYZT(YYZT);
+        taxParam.setHTXX(HTXX);
+        taxParam.setYCSLXX(YCSLXX);
+        taxParam.setQSXX(QSXX);
+        taxParam.setJYQLRXX(JYQLRXX);
+        taxParam.setJYDLRXX(JYDLRXX);
+        return taxParam;
+    }
+    public static TraParamBody dealParamForTra(SJ_Sjsq sjsq){
+        TaxParamBody taxParam = dealParamForTax(sjsq);
+        TraParamBody traParam = new TraParamBody();
+        traParam.setCFZT(taxParam.getCFZT());
+        traParam.setDYZT(taxParam.getDYZT());
+        traParam.setHTXX(taxParam.getHTXX());
+        traParam.setJYQLRXX(taxParam.getJYQLRXX());
+        traParam.setJYDLRXX(taxParam.getJYDLRXX());
+        traParam.setQSXX(taxParam.getQSXX());
+        traParam.setYCSLXX(taxParam.getYCSLXX());
+        traParam.setYYZT(taxParam.getYYZT());
+        return traParam;
+    }
+
+    public static JYQLRXX getJyqlr(SJ_Qlr_Gl qlrgl){
+        JYQLRXX jyqlrxx = new JYQLRXX();
+        SJ_Qlr_Info qlrInfo = qlrgl.getRelatedPerson();
+        jyqlrxx.setQLRMC(qlrInfo.getObligeeName());
+        jyqlrxx.setZJLX(qlrInfo.getObligeeDocumentType());
+        jyqlrxx.setZJHM(qlrInfo.getObligeeDocumentNumber());
+        jyqlrxx.setDH(qlrInfo.getDh());
+        jyqlrxx.setGYFS(qlrgl.getSharedMode());
+        jyqlrxx.setGYFE(qlrgl.getSharedValue()!=null?Integer.toString(qlrgl.getSharedValue()):null);
+        return jyqlrxx;
     }
 }

@@ -11,6 +11,8 @@ public class SJ_Sjsq  implements Serializable {
     private String receiptNumber;                              //收件编号
     private String businessType;                               //业务类型
     private String registrationCategory;                       //登记大类（大类字典值）
+    private String registrationSubclass;                       //登记小类
+    private String registrationReason;                         //登记原因
     private String immovableType;                              //不动产类型
     private String immovableSite;                              //不动产坐落
     private String notifiedPersonName;                         //通知人名称
@@ -62,6 +64,22 @@ public class SJ_Sjsq  implements Serializable {
 
     public void setRegistrationCategory(String registrationCategory) {
         this.registrationCategory = registrationCategory;
+    }
+
+    public String getRegistrationSubclass() {
+        return registrationSubclass;
+    }
+
+    public void setRegistrationSubclass(String registrationSubclass) {
+        this.registrationSubclass = registrationSubclass;
+    }
+
+    public String getRegistrationReason() {
+        return registrationReason;
+    }
+
+    public void setRegistrationReason(String registrationReason) {
+        this.registrationReason = registrationReason;
     }
 
     public String getImmovableType() {
