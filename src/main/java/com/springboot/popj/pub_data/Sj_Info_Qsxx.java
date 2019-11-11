@@ -1,72 +1,78 @@
 package com.springboot.popj.pub_data;
 
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Date;
 
 public class Sj_Info_Qsxx extends SJ_Information {
-    private String xtsphm;//系统税票号码
 
+    @ApiModelProperty(value = "系统税票号码")
+    private String xtsphm;//系统税票号码
+    @ApiModelProperty(value = "合同编号")
     private String htbh;//合同编号
+    @ApiModelProperty(value = "纳税人识别号")
+    private String nsrsbh;  //纳税人识别号
+    @ApiModelProperty(value = "zrfcsfbz")
+    private String zrfcsfbz; //
+    @ApiModelProperty(value = "纳税人名称")
+    private String nsrmc;   //纳税人名称
+    @ApiModelProperty(value = "电子税票号码")
+    private String dzsphm;//电子税票号码
+    @ApiModelProperty(value = "凭证种类代码")
+    private String pzzlDm;//凭证种类代码
+    @ApiModelProperty(value = "票证子规代码")
+    private String pzzgDm;//票证子规代码
+    @ApiModelProperty(value = "票证号码")
+    private String pzhm;//票证号码
+    @ApiModelProperty(value = "税款所属期起")
+    private String skssqq;//税款所属期起
+    @ApiModelProperty(value = "税款所属期止")
+    private String skssqz;//税款所属期止
+    @ApiModelProperty(value = "征收项目代码")
+    private String zsxmDm;//征收项目代码
+    @ApiModelProperty(value = "征收品目代码")
+    private String zspmDm;//征收品目代码
+    @ApiModelProperty(value = "征收子目代码")
+    private String zszmDm;//征收子目代码
+    @ApiModelProperty(value = "征收项目名称")
+    private String zsxmMc;//征收项目名称
+    @ApiModelProperty(value = "征收品目名称")
+    private String zspmMc;//征收品目名称
+    @ApiModelProperty(value = "征收子目名称")
+    private String zszmMc;//征收子目名称
+    @ApiModelProperty(value = "计税依据")
+    private String jsyj;//计税依据
+    @ApiModelProperty(value = "税率")
+    private String sl;//税率
+    @ApiModelProperty(value = "实际缴纳金额")
+    private Long sjje;//实际缴纳金额
+    @ApiModelProperty(value = "主管税务机关科分局")
+    private String zgswskfjDm;//主管税务机关科分局
+    @ApiModelProperty(value = "征收税务机关")
+    private String zsswjgDm;//征收税务机关
+    @ApiModelProperty(value = "税款所属机关")
+    private String skssswjgDm;//税款所属机关
+    @ApiModelProperty(value = "主管税务机关科分局名称")
+    private String zgswskfjMc;
+    @ApiModelProperty(value = "征收税务机关名称")
+    private String zsswjgMc;
+    @ApiModelProperty(value = "税款所属机关名称")
+    private String skssswjgMc;
+    @ApiModelProperty(value = "扣缴日期")
+    private String kjrq;//扣缴日期
+    @ApiModelProperty(value = "备注")
+    private String bz;//备注
+    @ApiModelProperty(value = "不动产单元号")
+    private String bdcdyh;//不动产单元号
+
+
 
     private String ext1;
 
     private String ext2;
 
     private String ext3;
-
-    private String nsrsbh;
-
-    private String zrfcsfbz;
-
-    private String nsrmc;
-
-    private String dzsphm;//电子税票号码
-
-    private String pzzlDm;//凭证种类代码
-
-    private String pzzgDm;//票证子规代码
-
-    private String pzhm;//票证号码
-
-    private String skssqq;//税款所属期起
-
-    private String skssqz;//税款所属期止
-
-    private String zsxmDm;//征收项目
-
-    private String zspmDm;//征收品目
-
-    private String zszmDm;//征收子目
-
-    private String zsxmMc;
-
-    private String zspmMc;
-
-    private String zszmMc;
-
-    private String jsyj;//计税依据
-
-    private String sl;//税率
-
-    private Long sjje;//实际缴纳金额
-
-    private String zgswskfjDm;//主管税务机关科分局
-
-    private String zsswjgDm;//征收税务机关
-
-    private String skssswjgDm;//税款所属机关
-
-    private String zgswskfjMc;
-
-    private String zsswjgMc;
-
-    private String skssswjgMc;
-
-    private String kjrq;//扣缴日期
-
-    private String bz;//备注
-
-    private String bdcdyh;//不动产单元号
 
 
     public String getXtsphm() {

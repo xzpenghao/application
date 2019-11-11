@@ -19,16 +19,14 @@ import com.springboot.feign.ForImmovableFeign;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.JwtAuthenticationRequest;
-import com.springboot.popj.registration.AdvanceBizInfo;
-import com.springboot.popj.registration.ImmovableFile;
-import com.springboot.popj.registration.MortgageBizInfo;
-import com.springboot.popj.registration.RegistrationBureau;
+import com.springboot.popj.registration.*;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.service.chenbin.ExchangeToInnerService;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
+import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.mybatis.spring.annotation.MapperScan;
@@ -74,6 +72,17 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private String pid;
     @Value("${chenbin.registrationBureau.forecast.commercialHouse.isSubmit}")
     private boolean isSubmit;
+
+    @Value("${djj.bsryname}")
+    private String bsryname;
+    @Value("${djj.bsrypassword}")
+    private String bsrypassword;
+
+    @Value("${penghao.transferRegister.pid}")
+    private String transferRegisterPid;
+    @Value("${businessType.registrationOfTransfer}")
+    private String registrationOfTransfer;
+
     @Autowired
     private AnonymousInnerComponent anonymousInnerComponent;
 
@@ -140,11 +149,44 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
 
     @Override
     public String secTra2InnerWithoutDY(String commonInterfaceAttributer) throws ParseException {
+        //获取一窗受理操作token
+        String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
+        //处理数据
         SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
-        String token = backFeign.getToken(new JwtAuthenticationRequest("testdjj","123456")).getData();
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjsq, transferRegisterPid, false, registrationOfTransfer, dealPerson, areaNo);
+        TransferBizInfo transferBizInfo = BusinessDealBaseUtil.getTransferBizInfoByJyhtAndBdcqls(sjsq,idType);
+        registrationBureau.setTransferBizInfo(transferBizInfo);
+        //处理附件
+//        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
+//        log.warn(" 二手房转移 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
+//        if(fileVoList != null && fileVoList.size()>0) {
+//            List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
+//            registrationBureau.setFileInfoVoList(fileList);
+//        }else{
+//            log.error("附件列表为空");
+//        }
+        System.out.println("二手房转移业务最终传入不动产数据为：\n"+JSONObject.toJSONString(registrationBureau));
+        //发送登记局
+        Map<String,Object> map = null;
+        try {
+            map = immovableFeign.createFlow(registrationBureau);
+        } catch (Exception e){
+            log.error(sjsq.getReceiptNumber()+"号二手房转移业务创建失败，失败出现在发送不动产受理阶段，抛出异常：\n"+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("不动产创建二手房转移业务流程失败，失败出现在发送不动产受理阶段，抛出异常：\n"+ ErrorDealUtil.getErrorInfo(e));
+        }
+        if(map==null){
+            log.error(sjsq.getReceiptNumber()+"号二手房转移业务创建失败，失败出现在发送不动产受理阶段，响应为空");
+            throw new ZtgeoBizException("不动产创建二手房转移业务流程失败，响应为空");
+        } else {
+            if(!((boolean)map.get("success"))){
+                log.error(sjsq.getReceiptNumber()+"号二手房转移业务创建失败，失败出现在发送不动产受理阶段，返回的错误信息为："+map.get("message"));
+                throw new ZtgeoBizException("不动产创建二手房转移业务流程失败，响应为空");
+            }
+        }
+        //回填slbh至一窗受理
         Map<String,String> params = new HashMap<String,String>();
         params.put("receiptNumber", sjsq.getReceiptNumber());
-        params.put("registerNumber",sjsq.getReceiptNumber().replaceAll("YCSL-",""));
+        params.put("registerNumber",(String) map.get("slbh"));
         backFeign.dealRecieveFromOuter1(token,params);
         System.out.println("进入不动产处理，受理成功！");
         return "转移登记同步内网办理成功";
@@ -155,6 +197,20 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
 
         return null;
+    }
+
+    @Override
+    public String processAutoSubmit(String commonInterfaceAttributer) throws ParseException {
+        //获取一窗受理操作token
+        String token = backFeign.getToken(new JwtAuthenticationRequest("testdjj","123456")).getData();
+        //处理数据
+        SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        //回填slbh至一窗受理
+        Map<String,String> params = new HashMap<String,String>();
+        params.put("receiptNumber", sjsq.getReceiptNumber());
+        params.put("registerNumber",sjsq.getRegisterNumber());
+        backFeign.DealRecieveFromOuter2(token,params);
+        return "流程自动提交成功";
     }
 
     @Override

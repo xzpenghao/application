@@ -34,6 +34,9 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
 
     private SJ_Jyht_Detail htDetail;                        //合同细节数据
 
+    private String registrationSubclass;                       //登记小类
+    private String registrationReason;                         //登记原因
+
     public String getContractId() {
         return contractId;
     }
@@ -225,5 +228,21 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
 
     public void setHtDetail(SJ_Jyht_Detail htDetail) {
         this.htDetail = htDetail;
+    }
+
+    public String getRegistrationSubclass() {
+        return registrationSubclass;
+    }
+
+    public void setRegistrationSubclass(String registrationSubclass) {
+        this.registrationSubclass = registrationSubclass;
+    }
+
+    public String getRegistrationReason() {
+        return registrationReason;
+    }
+
+    public void setRegistrationReason(String registrationReason) {
+        this.registrationReason = registrationReason;
     }
 }

@@ -3,12 +3,14 @@ package com.springboot.popj.pub_data;
 
 
 import com.springboot.util.TimeUtil;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.util.Date;
 
 public class SJ_Information implements Serializable {
     private String infoId;                          //主键
+    @ApiModelProperty(value = "收件编号")
     private String receiptNumber;                   //收件编号-sj_sjsq表主键
     private String serviceCode;                     //服务code
     private String dataJson;                        //原始查询数据

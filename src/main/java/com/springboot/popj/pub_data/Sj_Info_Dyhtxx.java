@@ -30,6 +30,9 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
     private List<SJ_Qlr_Gl> glAgentInfoVoList;            //关联的代理人数据
     private List<SJ_Qlr_Gl> glMortgageHolderVoList;            //关联的抵押权人数据
 
+    private String registrationSubclass;                       //登记小类
+    private String registrationReason;                         //登记原因
+
 
     public void setMortgageStartingDate(String mortgageStartingDate) {
         this.mortgageStartingDate = mortgageStartingDate;
@@ -209,5 +212,21 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
 
     public void setGlAgentInfoVoList(List<SJ_Qlr_Gl> glAgentInfoVoList) {
         this.glAgentInfoVoList = glAgentInfoVoList;
+    }
+
+    public String getRegistrationSubclass() {
+        return registrationSubclass;
+    }
+
+    public void setRegistrationSubclass(String registrationSubclass) {
+        this.registrationSubclass = registrationSubclass;
+    }
+
+    public String getRegistrationReason() {
+        return registrationReason;
+    }
+
+    public void setRegistrationReason(String registrationReason) {
+        this.registrationReason = registrationReason;
     }
 }

@@ -1,6 +1,7 @@
 package com.springboot.feign;
 
 import com.alibaba.fastjson.JSONObject;
+import com.springboot.popj.registration.RegistrationBureau;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,4 +22,7 @@ public interface ForImmovableFeign {
             @RequestParam(value = "obligeeName",required = false) String obligeeName,
             @RequestParam(value = "obligeeId",required = false) String obligeeId
     );
+
+    @RequestMapping(value = "api/services/app/BdcWorkFlow/CreateFlow",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
+    Map<String,Object> createFlow(RegistrationBureau registrationBureau);
 }

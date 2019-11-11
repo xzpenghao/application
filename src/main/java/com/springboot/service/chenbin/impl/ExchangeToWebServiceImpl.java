@@ -103,6 +103,7 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
                     throw new ZtgeoBizException("传入的交付日期格式不正确");
                 }
             }
+            System.out.println(JSONObject.toJSONString(htdata.getHtDetail()));
             jyhtxx.setHtDetail(htdata.getHtDetail());
             List<RequestParamQlr> houseBuyerVoList = htdata.getHouseBuyerVoList();
             List<SJ_Qlr_Gl> buyergls = getQlrFromHtMan(houseBuyerVoList, BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_GFZ);

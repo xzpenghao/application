@@ -120,8 +120,8 @@ httpclient:
   seam: 23335       #登记平台接口
   ip: 10.3.2.147
   #10.3.2.147    #登记平台ip
-  windowAcceptanceIp: 10.3.2.203   #一窗受理ip
-  windowAcceptanceSeam: 7779      #一窗受理接口
+  windowAcceptanceIp: localhost   #一窗受理ip
+  windowAcceptanceSeam: 7780      #一窗受理接口
 businessType:
   clfFmortgage: MORTGAGE_OLD_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
   xjfFmortgage: MORTGAGE_NEW_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）
@@ -205,7 +205,7 @@ penghao:
         pid: Proc-171019093148-WLI15DA7  #徐州
          # Proc-180517124205-2WM2423B 宿迁
     transferRegister:           #转移登记
-        pid: Proc-180517131507-5803W07O
+        pid: Proc-180403153139-46641AJ0
     transferMortgage:           #转移及抵押二手房
         pid: Proc-180517141343-020312K8
     contractinformation:        #合同消息获取
@@ -249,4 +249,12 @@ djj:
 
 bank:
   bsryname: testbank
+  bsrypassword: 123456
+
+tax:
+  bsryname: testsw
+  bsrypassword: 123456
+
+tra:
+  bsryname: testfg
   bsrypassword: 123456

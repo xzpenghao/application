@@ -12,6 +12,7 @@ public interface ExchangeToInnerService {
     String dealYGYD2Inner(String commonInterfaceAttributer) throws ParseException;
     String secTra2InnerWithoutDY(String commonInterfaceAttributer) throws ParseException;
     String secTra2InnerWithDY(String commonInterfaceAttributer) throws ParseException;
+    String processAutoSubmit(String commonInterfaceAttributer) throws ParseException;
 
     List<PaphEntity> getPaphMortBefore(PaphReqEntity paph);
     List<PaphEntity> getPaphMortAfter(PaphReqEntity paph);

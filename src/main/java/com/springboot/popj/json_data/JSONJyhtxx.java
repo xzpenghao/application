@@ -43,6 +43,9 @@ public class JSONJyhtxx implements Serializable {
 
     private String htDetail;                        //合同细节数据
 
+    private String registrationSubclass;                       //登记小类
+    private String registrationReason;                         //登记原因
+
     public String getInfoId() {
         return infoId;
     }
@@ -297,5 +300,21 @@ public class JSONJyhtxx implements Serializable {
 
     public void setHtDetail(String htDetail) {
         this.htDetail = htDetail;
+    }
+
+    public String getRegistrationSubclass() {
+        return registrationSubclass;
+    }
+
+    public void setRegistrationSubclass(String registrationSubclass) {
+        this.registrationSubclass = registrationSubclass;
+    }
+
+    public String getRegistrationReason() {
+        return registrationReason;
+    }
+
+    public void setRegistrationReason(String registrationReason) {
+        this.registrationReason = registrationReason;
     }
 }

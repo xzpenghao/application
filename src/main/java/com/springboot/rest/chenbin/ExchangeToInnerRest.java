@@ -90,6 +90,14 @@ public class ExchangeToInnerRest {
         return rv;
     }
 
+    //流程自动提交接口
+    @RequestMapping(value = "processAutoSubmit", method = RequestMethod.POST)
+    public ObjectRestResponse<String> processAutoSubmit(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+
+        return rv;
+    }
+
     @RequestMapping(value = "newWEG2Inner", method = RequestMethod.POST)
     public ObjectRestResponse<String> newWEG2Inner(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
