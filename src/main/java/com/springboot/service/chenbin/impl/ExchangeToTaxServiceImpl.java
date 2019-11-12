@@ -93,7 +93,7 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
             rv.setMessage("税务数据与一窗受理相关联的收件编号为空");
             return rv;
         }
-        mapParmeter.put("registerNumber",taxRespBody.getReceiptNumber());
+        mapParmeter.put("receiptNumber",taxRespBody.getReceiptNumber());
 
         List<Sj_Info_Qsxx> sfxxList = taxRespBody.getSfxxList();
 
@@ -111,7 +111,7 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
         serviceData.setServiceDataInfos(sfxxList);
         serviceDatas.add(serviceData);
         mapParmeter.put("serviceDatas", JSONArray.toJSONString(serviceDatas));
-        System.out.println("契税处理结果："+JSONArray.toJSONString(serviceDatas));
+        System.out.println("契税处理结果："+JSONObject.toJSONString(mapParmeter));
         rv = backFeign.DealRecieveFromOuter2(token,mapParmeter);
         return rv;
     }

@@ -37,6 +37,7 @@ public class SJ_Sjsq  implements Serializable {
     private List<Sj_Info_Bdcdyxgxx> immovableCurrentMortgageInfoVoList;     //不动产抵押信息集合（可能涉及多项抵押）
     private Sj_Info_Dyhtxx mortgageContractInfo;              //抵押业务时银行提供的合同信息
     private Sj_Info_Jyhtxx transactionContractInfo;              //转移业务时网签提供的交易信息
+    private List<Sj_Info_Qsxx> taxInfoVoList;                  //涉税信息
     private List<SJ_Info_Handle_Result> handleResultVoList;
 
     private List<RespServiceData> serviceDatas; //封装返回值数据
@@ -280,5 +281,13 @@ public class SJ_Sjsq  implements Serializable {
 
     public void setExecuteDeparts(List<SJ_Execute_depart> executeDeparts) {
         this.executeDeparts = executeDeparts;
+    }
+
+    public List<Sj_Info_Qsxx> getTaxInfoVoList() {
+        return taxInfoVoList;
+    }
+
+    public void setTaxInfoVoList(List<Sj_Info_Qsxx> taxInfoVoList) {
+        this.taxInfoVoList = taxInfoVoList;
     }
 }

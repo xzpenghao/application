@@ -91,8 +91,8 @@ public class BusinessDealBaseUtil {
         SJ_Info_Bdcqlxgxx immovableRightInfo_bdcqz = immovableRightInfoVoList.get(index_bdcqzh);
         transferBizInfo.setRealEstateId(immovableRightInfo_bdcqz.getImmovableCertificateNo());//不动产权证
         transferBizInfo.setHtbh(sjInfoJyhtxx.getContractRecordNumber());//合同备案号
-        transferBizInfo.setRegisterSubType(sjInfoJyhtxx.getRegistrationSubclass());//登记小类
-        transferBizInfo.setTransferReason(sjInfoJyhtxx.getRegistrationReason());//转移原因
+        transferBizInfo.setRegisterSubType(StringUtils.isBlank(sjInfoJyhtxx.getRegistrationSubclass())?sjsq.getRegistrationSubclass():sjInfoJyhtxx.getRegistrationSubclass());//登记小类
+        transferBizInfo.setTransferReason(StringUtils.isBlank(sjInfoJyhtxx.getRegistrationReason())?sjsq.getRegistrationReason():sjInfoJyhtxx.getRegistrationReason());//转移原因
         List<SJ_Qlr_Gl> buyers = sjInfoJyhtxx.getGlHouseBuyerVoList();
         if(buyers==null || buyers.size()==0){
             throw new ZtgeoBizException("不完备的权利人数据");

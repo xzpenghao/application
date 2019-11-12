@@ -301,11 +301,13 @@ public class SysPubDataDealUtil {
             sj_qsxxs.add(sj_qsxx);
         }
         //只有一条地税信息
-        if (sj_qsxxs != null && sj_qsxxs.size() > 1) {
-            log.error("地税信息条数异常");
-            throw new ZtgeoBizException(BizOrBizExceptionConstant.RECEIPT_TAXATION_COUNT_ERROR);
+//        if (sj_qsxxs != null && sj_qsxxs.size() > 1) {
+//            log.error("地税信息条数异常");
+//            throw new ZtgeoBizException(BizOrBizExceptionConstant.RECEIPT_TAXATION_COUNT_ERROR);
+//        }
+        if(sj_qsxxs!=null){
+            sjsq.setTaxInfoVoList(sj_qsxxs);
         }
-
     }
 
     public static void dealHandleResults(String JSON_serviceDataInfos, SJ_Sjsq sjsq, String serviceCode) {

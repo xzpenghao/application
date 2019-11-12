@@ -93,8 +93,14 @@ public class ExchangeToInnerRest {
     //流程自动提交接口
     @RequestMapping(value = "processAutoSubmit", method = RequestMethod.POST)
     public ObjectRestResponse<String> processAutoSubmit(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
+        System.out.println("进入自动提交");
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
-
+        try {
+            rv.data(exchangeToInnerService.processAutoSubmit(commonInterfaceAttributer));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        System.out.println("自动提交结束");
         return rv;
     }
 

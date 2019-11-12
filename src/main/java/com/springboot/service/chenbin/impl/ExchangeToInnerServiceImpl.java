@@ -202,7 +202,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     @Override
     public String processAutoSubmit(String commonInterfaceAttributer) throws ParseException {
         //获取一窗受理操作token
-        String token = backFeign.getToken(new JwtAuthenticationRequest("testdjj","123456")).getData();
+        String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
         //处理数据
         SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
         //回填slbh至一窗受理
