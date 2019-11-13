@@ -19,7 +19,7 @@ public enum  MortgageTypeEnum {
             case "MORTGAGE_NEW_TRAILER":
                 a = MortgageTypeEnum.Xj.day;
                 break;
-            case "MORTGAGE_OLD_ TRAILER":
+            case "MORTGAGE_OLD_TRAILER":
                 a = MortgageTypeEnum.Cl.day;
                 break;
             case "MORTGAGE_PERSONAL":

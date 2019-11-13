@@ -120,8 +120,8 @@ httpclient:
   seam: 23335       #登记平台接口
   ip: 10.3.2.147
   #10.3.2.147    #登记平台ip
-  windowAcceptanceIp: localhost   #一窗受理ip
-  windowAcceptanceSeam: 7780      #一窗受理接口
+  windowAcceptanceIp: 10.3.2.203   #一窗受理ip
+  windowAcceptanceSeam: 7779      #一窗受理接口
 businessType:
   clfFmortgage: MORTGAGE_OLD_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
   xjfFmortgage: MORTGAGE_NEW_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）
@@ -196,7 +196,6 @@ chenbin:
       url: http://10.13.0.240:9999/y
     gs:                         #工商
       url: http://10.13.0.240:9999/z
-
 penghao:
     mortgageCancellation:       #抵押注销登记
         pid: Proc-171013213255-X42L8440
@@ -205,7 +204,7 @@ penghao:
         pid: Proc-171019093148-WLI15DA7  #徐州
          # Proc-180517124205-2WM2423B 宿迁
     transferRegister:           #转移登记
-        pid: Proc-180403153139-46641AJ0
+        pid: Proc-180517131507-5803W07O
     transferMortgage:           #转移及抵押二手房
         pid: Proc-180517141343-020312K8
     contractinformation:        #合同消息获取
@@ -222,13 +221,15 @@ sq:
       password: 123456     #密码
       resultPdf: 1    #是否登簿传输pdf
       itemName: 电子证明
+      ip: 2.198.164.15
+      post: 42506
   gxpt:
       ftpAddress: 172.22.148.129   #共享平台ftp
       ftpPort: 21
       ftpUsername: ftpadmin
       ftpPassword: 123qwe!@#
 
-  jyht:
+  jyht:     #商品房权利人信息
     api_id: 3Rkt5FPx
     from_user: 0b6c220cdfc54288b6630eb1a7fa612f
     post: 8001

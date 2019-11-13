@@ -12,6 +12,8 @@ public enum   FileTypeEnum {
     {
         this.day=day;
     }
+
+
     public static String Sc(String i)
     {
         String a="";

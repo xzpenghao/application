@@ -13,10 +13,11 @@ public enum  MortgageModeEnum {
         String a="";
         switch(i)
         {
-            case "MORTGAGE_ GENERAL":
+
+            case "MORTGAGE_GENERAL":
                 a = MortgageModeEnum.Yb.day;
                 break;
-            case "MORTGAGE_ SURPLUS":
+            case "MORTGAGE_SURPLUS":
                 a = MortgageModeEnum.Yz.day;
                 break;
             case "MORTGAGE_MAX":

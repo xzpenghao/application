@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class RevokeRegistrationRespVo implements Serializable {
     private String revokeApplyId;
     private String revokeAcceptId;
-    private String acceptStaus;
+    private String acceptStatus;
     private String acceptMessage;
     private String businessId;
 

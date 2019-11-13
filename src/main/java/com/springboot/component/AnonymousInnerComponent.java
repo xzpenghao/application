@@ -103,6 +103,10 @@ public class AnonymousInnerComponent {
     @Value("${webplus.ftpPassword}")
     private String yftpPassword;
 
+    @Value("${sq.bank.jt.ip}")
+    private String jtIp;
+    @Value("${sq.bank.jt.post}")
+    private String jtPost;
 
 
     @Autowired
@@ -146,7 +150,7 @@ public class AnonymousInnerComponent {
                         JSONObject paramObject = JSONObject.fromObject(esfSdq);//整理参数信息
                         System.out.println("aa"+paramObject.toString());
                         //根据受理编号查询转移信息（水电气）
-                       String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+                        String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(zyxx);                        //整理数据发送到一窗受理
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.ESFSDQSERVICE_CODE, false, getReceiving.getSlbh());//获取不动产权属信息
                         log.info("sjsq"+mapParmeter.get("SJ_Sjsq"));
@@ -412,7 +416,7 @@ public class AnonymousInnerComponent {
                 try {
                     com.alibaba.fastjson.JSONObject tokenObject;
                     String token="";
-                    System.out.println("执行主线程");
+                    log.info("执行主线程");
                     if (StringUtils.isEmpty(getReceiving.getBizType()) || getReceiving.getBizType().equals("1")) {
                         tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
                         token = getToken(tokenObject, "GetReceiving", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
@@ -420,8 +424,9 @@ public class AnonymousInnerComponent {
                             return Msgagger.USER_LOGIN_BAD;
                         }
                     }
+                    log.info("type"+getReceiving.getMessageType());
                     if (getReceiving.getMessageType().equals(Msgagger.VERIFYNOTICE)) {//审核
-                        System.out.println("进入审核");
+                        log.info("进入审核");
                         if (StringUtils.isNotEmpty(getReceiving.getBizType())) {
                             if (getReceiving.getBizType().equals("2")) {
                                 tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
@@ -434,7 +439,7 @@ public class AnonymousInnerComponent {
                         map.put("slbh", getReceiving.getSlbh());
                         //发送登记局获取数据整理发送一窗受理
                         String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetVerifyInfo", map, null);
-                        System.out.println(json);
+                        log.info("json"+json);
                         JSONObject jsonObject = JSONObject.fromObject(json);
                         JSONArray verfyInfoArray = jsonObject.getJSONArray("verifyInfoVoList");
                         List<SJ_Info_Handle_Result> handleResultVoList = new ArrayList<>();
@@ -460,9 +465,9 @@ public class AnonymousInnerComponent {
                         mapParmeter.put("serviceDatas", jsonArray.toString());
                         mapParmeter.put("registerNumber", jsonObject.getString("slbh"));//受理编号)
                     } else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)) {//登簿审核
-                        System.out.println("进入登簿");
+                        log.info("进入登簿");
                         map.put("slbh", getReceiving.getSlbh());
-                            if (StringUtils.isNotEmpty(getReceiving.getBizType())) {
+                        if (StringUtils.isNotEmpty(getReceiving.getBizType())) {
                                 if (getReceiving.getBizType().equals("2")) {
                                     tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
                                     token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
@@ -471,10 +476,10 @@ public class AnonymousInnerComponent {
                                     }
                                 }
                         }
-                        System.out.println("获取token成功，为："+token);
+                        log.info("获取token成功，为："+token);
                         //发送登记局获取数据整理发送一窗受理
                         String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
-                        System.out.println("获取登簿数据成功，为："+json);
+                        log.info("获取登簿数据成功，为："+json);
                         JSONObject jsonObject = JSONObject.fromObject(json);
                         mapParmeter.put("immovableSite", jsonObject.getString("sit"));
                         mapParmeter.put("registerNumber", jsonObject.getString("slbh"));
@@ -514,16 +519,20 @@ public class AnonymousInnerComponent {
                             handleResultVoList.add(handleResult);
                             respServiceData.setServiceDataInfos(handleResultVoList);
                         }
+                        log.info("resultServiceData1"+resultServiceData);
+                        log.info("resultServiceData2:\n"+respServiceData.getServiceDataInfos());
                         //整理数据发送银行
                         if (null !=resultServiceData) {
+                            log.info("抵押注销通知进来了");
                             List<MortgageService> mortgageServiceList = resultServiceData.getServiceDataInfos();
                             ResultNoticeReqVo resultNoticeReqVo = new ResultNoticeReqVo();
                             resultNoticeReqVo.setBusinessId(getReceiving.getSlbh());
                             ClNotice(resultNoticeReqVo, "MORTGAGE_PERSONAL",Msgagger.DENGBU);
                             ClDdyxxNotice(mortgageServiceList, resultNoticeReqVo);
                             JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
-                            System.out.println("bankObject"+bankObject.toString());
-                            //String resultJson= BankNotification("a/a",bankObject.toString());
+                            log.info("bankObject"+bankObject.toString());
+                            String resultJson= BankNotification("/JSRCIS/sqResultNotice",bankObject.toString());
+                            log.info("银行返回json"+resultJson);
                         }
                         respServiceDataList.add(respServiceData);
                         JSONArray jsonArray = JSONArray.fromObject(respServiceDataList);
@@ -538,11 +547,13 @@ public class AnonymousInnerComponent {
                                 }
                             }
                         }
-                        System.out.println("执行受理操作");
+                        log.info("执行受理操作");
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
                     } else if (getReceiving.getMessageType().equals(Msgagger.PROCESSING)) {//缮证
+                        log.info("缮证");
                         map.put("slbh", getReceiving.getSlbh());
                         String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
+                        log.info("szJson"+json);
                         JSONObject jsonObject = JSONObject.fromObject(json);
                         JSONObject bankObject=null;
                         //登簿返回信息
@@ -578,6 +589,7 @@ public class AnonymousInnerComponent {
                         resultNoticeReqVoList.get(0).setCreditAmount(dyResultNotice.getCreditAmount());
                         resultNoticeReqVoList.get(0).setMortgageTerm(dyResultNotice.getMortgageTerm());
                         }
+                        log.info("resultNoticeReqVoList"+resultNoticeReqVoList.get(0).toString());
                         //获取附件信息
                         List<String> stringList=new ArrayList<>();
                         stringList.add(itemName);
@@ -585,18 +597,10 @@ public class AnonymousInnerComponent {
                         esfSdq.setAttDirList(stringList);
                         esfSdq.setSlbh(getReceiving.getSlbh());
                         JSONObject paramObject = JSONObject.fromObject(esfSdq);//整理参数信息
-                        System.out.println("aa"+paramObject.toString());
+                        log.info("aa"+paramObject.toString());
                         //根据受理编号查询转移信息（水电气）
                         String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetAttachList4Bdc");
-                        zyxx="[ \n" +
-                                "{\n" +
-                                " \"fileName\": \"FINST-20191104-760C4097FC0\",\n" +
-                                " \"fileType\": \"pdf\", \n" +
-                                "\"fileAddress\": \"2019/11/04/FINST-20191104-760C4097FC0.pdf\", \n" +
-                                "\"pName\": \"电子证明\", \n" +
-                                "\"fileSequence\": \"1\" \n" +
-                                "} \n" +
-                                "]";
+                        log.info("zyxx"+zyxx);
                         if (!zyxx.equals("[]\n")) {
                             com.alibaba.fastjson.JSONArray zyxxObject = (com.alibaba.fastjson.JSONArray) com.alibaba.fastjson.JSONArray.parse(zyxx);
                             String path = "home" + File.separator + "platform" + File.separator + getReceiving.getSlbh();
@@ -615,11 +619,10 @@ public class AnonymousInnerComponent {
                         }
                         bankObject=JSONObject.fromObject(resultNoticeReqVoList.get(0));
                         System.out.println("bankObject"+bankObject.toString());
-                        String resultJson= BankNotification("a/a",bankObject.toString());
+                        String resultJson= BankNotification("/JSRCIS/sqResultNotice",bankObject.toString());
                         log.info("resultJson"+resultJson);
                         return resultJson;
                     }
-                    System.out.println(token);
                     //返回数据到一窗受理平台保存受理编号和登记编号
                     String resultJson = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
                     System.err.println("result is " + resultJson);
@@ -636,7 +639,7 @@ public class AnonymousInnerComponent {
         returnVo.setCode(200);
         returnVo.setMessage(Msgagger.CG);
         JSONObject object = JSONObject.fromObject(returnVo);
-        outputStream.write(object.toString().getBytes());
+        outputStream.write(object.toString().getBytes("UTF-8"));
         outputStream.flush();
         outputStream.close();
         System.out.println(JSONObject.fromObject(returnVo));
@@ -760,7 +763,9 @@ public class AnonymousInnerComponent {
             //  MORTGAGE_NEW_TRAILER
             resultNoticeReqVo.setWarrantId(mortgageService.getMortgageCertificateNo());//抵押证明号
             resultNoticeReqVo.setMortgageArea(mortgageService.getMortgageArea().toString());
-            resultNoticeReqVo.setMortgageTerm(getMonthDiff(mortgageService.getMortgageStartingDate(),mortgageService.getMortgageEndingDate()));
+            if (mortgageService.getMortgageStartingDate()!=null && mortgageService.getMortgageEndingDate()!=null){
+                resultNoticeReqVo.setMortgageTerm(getMonthDiff(mortgageService.getMortgageStartingDate(),mortgageService.getMortgageEndingDate()));
+            }
             List<GlImmovable> glImmovableList = mortgageService.getGlImmovableVoList();
             realEstateInfoVo.setRealEstateId(mortgageService.getImmovableCertificateNo());
             //不动产单元信息
@@ -861,6 +866,9 @@ public class AnonymousInnerComponent {
 
     public String preservationRegistryData(Map<String, String> map, String token, String url) {
         Map<String, String> header = new HashMap<String, String>();
+        log.info("windowAcceptanceIp"+windowAcceptanceIp);
+        log.info("windowAcceptanceSeam"+windowAcceptanceSeam);
+        log.info("url"+url);
         header.put("Authorization", token);
         String json = ParamHttpClientUtil.sendHttp(HttpRequestMethedEnum.HttpPost,
                 "application/json",
@@ -874,8 +882,8 @@ public class AnonymousInnerComponent {
 
     private String BankNotification(String url,String param) throws IOException{
         String json = HttpClientUtil.post(null,null,
-                param, "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + url);
-        System.out.println("yinhang返回信息为：" + json);
+                param, "http://" + jtIp + ":" + jtPost + url);
+        log.info("yinhang返回信息为：" + json);
         return json;
     }
 

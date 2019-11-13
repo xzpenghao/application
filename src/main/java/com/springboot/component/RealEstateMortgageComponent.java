@@ -570,7 +570,7 @@ RealEstateMortgageComponent {
                 SJ_Qlr_Info relatedPerson = dyr.getRelatedPerson();
                 dyrGlMortgator.setMortgagorName(dyr.getObligeeName());
                 dyrGlMortgator.setMortgagorId(relatedPerson.getObligeeDocumentNumber());
-                dyrGlMortgator.setMortgagorIdType(relatedPerson.getObligeeDocumentType());
+                dyrGlMortgator.setMortgagorIdType(getZjlbx(relatedPerson.getObligeeDocumentType()));
                 mortgagorInfoVoList.add(dyrGlMortgator);
             }
             mortgageBizInfo.setMortgagorInfoVoList(mortgagorInfoVoList);
@@ -582,7 +582,7 @@ RealEstateMortgageComponent {
                 DyqrGlMortgator dyrGlMortgator = new DyqrGlMortgator();
                 SJ_Qlr_Info relatedPerson = dyqr.getRelatedPerson();
                 dyrGlMortgator.setMortgageeId(relatedPerson.getObligeeDocumentNumber());
-                dyrGlMortgator.setMortgageeIdType(relatedPerson.getObligeeDocumentType());
+                dyrGlMortgator.setMortgageeIdType(getZjlbx(relatedPerson.getObligeeDocumentType()));
                 dyrGlMortgator.setMortgageeName(dyqr.getObligeeName());
                 dyqrGlMortgatorList.add(dyrGlMortgator);
             }
@@ -683,7 +683,6 @@ RealEstateMortgageComponent {
             json="http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByDYZMH"+"?DYZMH="+dyzmh+"&containHistory="+containHistroy;
         }
         json=httpClientUtils.paramGet(json);
-//        json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByDYZMH", map, null);
         JSONArray jsonArray = JSONArray.parseArray(json);
         List<MortgageService> mortgageServiceList = new ArrayList<>();
         if (jsonArray != null) {
@@ -759,7 +758,7 @@ RealEstateMortgageComponent {
             case "1":
                 zjlb = "身份证";
                 break;
-            case "7":
+            case "8":
                 zjlb = "统一社会信用代码";
                 break;
             default:
@@ -768,6 +767,41 @@ RealEstateMortgageComponent {
         }
         return zjlb;
     }
+
+    public String getZjlbx(String zjlx) {
+        String zjlb = "";
+        switch (zjlx) {
+            case "身份证":
+                zjlb = "1";
+                break;
+            case "统一社会信用代码":
+                zjlb = "8";
+                break;
+            case "港澳台身份证":
+                zjlb = "2";
+                break;
+            case "护照":
+                zjlb = "3";
+                break;
+            case "户口簿":
+                zjlb = "4";
+                break;
+            case "军官证(士兵证)":
+                zjlb = "5";
+                break;
+            case "组织机构代码":
+                zjlb = "6";
+                break;
+            case "营业执照":
+                zjlb = "7";
+                break;
+            case "其他":
+                zjlb = "99";
+                break;
+        }
+        return zjlb;
+    }
+
 
 
     private FwInfo getFwInfo(JSONObject glImmovableObject, JSONObject jsonObject, String dyqk) {
