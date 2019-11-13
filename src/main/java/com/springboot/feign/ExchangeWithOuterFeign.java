@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.Map;
 
-@FeignClient(name = "exchangeFeign", url = "http://10.13.0.240:8001/")
+@FeignClient(name = "exchangeFeign", url = "${gxjhpt.url}")
 public interface ExchangeWithOuterFeign {
 
     @RequestMapping(value="forwardprovincial",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=bXREUCzt","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})

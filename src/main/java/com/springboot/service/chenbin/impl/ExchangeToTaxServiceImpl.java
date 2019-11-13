@@ -56,18 +56,18 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
         //整理参数
         TaxParamBody taxParamBody = BusinessDealBaseUtil.dealParamForTax(sjsq);
         System.out.println("进入税务处理，参数转换为:"+JSONObject.toJSONString(taxParamBody));
-        //调用Feign
-        ObjectRestResponse<String> rv = otherFeign.testTax(taxParamBody);
-        if(rv.getStatus()==200){
-            result = rv.getData();
+        //调用Feign,暂时取消
+//        ObjectRestResponse<String> rv = otherFeign.testTax(taxParamBody);
+//        if(rv.getStatus()==200){
+//            result = rv.getData();
             //成功后由税务人员签收办件
             String receiptNumber = sjsq.getReceiptNumber();
             Map<String, String> mapParmeter = new HashMap<>();
             mapParmeter.put("receiptNumber", receiptNumber);
             backFeign.dealRecieveFromOuter1(token,mapParmeter);
-        }else{
-            throw new ZtgeoBizException("税务通知失败，失败原因："+rv.getMessage());
-        }
+//        }else{
+//            throw new ZtgeoBizException("税务通知失败，失败原因："+rv.getMessage());
+//        }
         System.out.println("税务处理返回，结果为:"+result);
         return result;
     }

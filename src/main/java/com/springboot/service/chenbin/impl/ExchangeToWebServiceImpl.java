@@ -3,6 +3,7 @@ package com.springboot.service.chenbin.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.component.chenbin.ExchangeToInnerComponent;
+import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.constant.penghao.BizOrBizExceptionConstant;
 import com.springboot.entity.chenbin.personnel.other.web.*;
@@ -11,13 +12,18 @@ import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.service.chenbin.ExchangeToWebService;
+import com.springboot.util.DateUtils;
 import com.springboot.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import sun.misc.BASE64Decoder;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -41,6 +47,9 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
 
     @Autowired
     private ExchangeToInnerComponent exchangeToInnerComponent;
+
+    @Autowired
+    private ToFTPUploadComponent toFTPUploadComponent;
 
     @Override
     public Object initWebSecReg(RequestParamBody paramBody) {
@@ -82,6 +91,8 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
         List<Sj_Info_Jyhtxx> jyhtxxes = new ArrayList<Sj_Info_Jyhtxx>();
         Sj_Info_Jyhtxx jyhtxx = new Sj_Info_Jyhtxx();
         if(htdata!=null){//交易信息
+            jyhtxx.setRegistrationSubclass(sjsq_req.getRegistrationSubclass());
+            jyhtxx.setRegistrationReason(sjsq_req.getRegistrationReason());
             jyhtxx.setContractType(htdata.getContractType());
             String jyje = getNotNullData(htdata.getContractAmount());
             if(StringUtils.isNotBlank(jyje)) {
@@ -92,9 +103,12 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
             jyhtxx.setHoldingDifferent(htdata.getHoldingDifferent());
             jyhtxx.setFundTrusteeship(htdata.getFundTrusteeship());
             jyhtxx.setOldHouseCode(htdata.getOldHouseCode());
-            jyhtxx.setPaymentMethod(htdata.getPaymentMethod());
+            jyhtxx.setPaymentMethod(StringUtils.isNotBlank(htdata.getPaymentMethod())?htdata.getPaymentMethod():"1");
             jyhtxx.setTaxBurdenParty(htdata.getTaxBurdenParty());
             jyhtxx.setDeliveryDays(htdata.getDeliveryDays());
+            if(StringUtils.isNotBlank(htdata.getDeliveryDays())){
+                jyhtxx.setDeliveryMode("天数交付");
+            }
             if(StringUtils.isNotBlank(htdata.getDeliveryDate())) {
                 try {
                     jyhtxx.setDeliveryDate(TimeUtil.getDateFromString(htdata.getDeliveryDate()));
@@ -103,8 +117,18 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
                     throw new ZtgeoBizException("传入的交付日期格式不正确");
                 }
             }
-            System.out.println(JSONObject.toJSONString(htdata.getHtDetail()));
-            jyhtxx.setHtDetail(htdata.getHtDetail());
+            if(StringUtils.isNotBlank(jyhtxx.getDeliveryDate())){
+                jyhtxx.setDeliveryMode("日期交付");
+            }
+            System.out.println("合同细节数据"+JSONObject.toJSONString(htdata.getHtDetail()));
+            if(htdata.getHtDetail()!=null) {
+                if(StringUtils.isBlank(htdata.getHtDetail().getDoesIncludeHouseProperties())){//当没有给定附属设施的明确说明自己造
+                    htdata.getHtDetail().setDoesIncludeHouseProperties("0");
+                }
+                jyhtxx.setHtDetail(htdata.getHtDetail());
+            }else{
+                throw new ZtgeoBizException("请传入正确的合同细节数据");
+            }
             List<RequestParamQlr> houseBuyerVoList = htdata.getHouseBuyerVoList();
             List<SJ_Qlr_Gl> buyergls = getQlrFromHtMan(houseBuyerVoList, BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_GFZ);
             if(buyergls!=null && buyergls.size()>0) {
@@ -132,10 +156,39 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
 
         mapParmeter.put("returnSlbh",returnSlbh);
         if(fileVoList!=null) {
-            //mapParmeter.put("fileVoList", JSONArray.toJSONString(fileVoList));
+            List<com.springboot.popj.registration.ImmovableFile> files = new ArrayList<com.springboot.popj.registration.ImmovableFile>();
+            for(ImmovableFile f:fileVoList){
+                com.springboot.popj.registration.ImmovableFile file = new com.springboot.popj.registration.ImmovableFile();
+                if(f.getFileType().contains(".")){
+                    f.setFileType(f.getFileType().replaceAll(".",""));
+                }
+                file.setFileName(f.getFileName().contains(f.getFileType())?f.getFileName():(f.getFileName()+'.'+f.getFileType()));
+                file.setFileSequence(f.getFileSequence());
+                file.setFileSize(f.getFileSize());
+                file.setFileType(f.getFileType());
+                file.setpName(f.getpName());
+                BASE64Decoder base64Decoder = new BASE64Decoder();
+                String pathFold = DateUtils.getNowYear()
+                        + File.separator
+                        + DateUtils.getNowMonth()
+                        + File.separator + DateUtils.getNowDay();
+                try {
+                    if(toFTPUploadComponent.uploadFileBDC(pathFold,f.getFileName(),f.getFileType(),new ByteArrayInputStream(base64Decoder.decodeBuffer(f.getFileBase64())))){
+                        file.setFileAdress(pathFold + File.separator  + f.getFileName() + "." + f.getFileType());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new ZtgeoBizException("附件base64解析异常");
+                } catch (RuntimeException er){
+                    er.printStackTrace();
+                    throw new ZtgeoBizException(er.getMessage());
+                }
+                files.add(file);
+            }
+            mapParmeter.put("fileVoList", JSONArray.toJSONString(files));
         }
         mapParmeter.put("modelId",mouldId);
-        mapParmeter.put("subControl","1");
+        mapParmeter.put("subControl","1");//0是提交，1是不提交
         mapParmeter.put("SJ_Sjsq", JSONObject.toJSONString(sjsq));
         String token = outerBackFeign.getToken(new JwtAuthenticationRequest(username, password)).getData();
         return outerBackFeign.DealRecieveFromOuter5(token,mapParmeter).getData();

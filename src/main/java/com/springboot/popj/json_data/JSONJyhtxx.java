@@ -22,6 +22,7 @@ public class JSONJyhtxx implements Serializable {
     private String fundTrusteeship;                                    //资金托管
     private String paymentMethod;                                     //支付方式
     private String taxBurdenParty;                                   //税费承担方式
+    private String deliveryMode;
     private String deliveryDays;                                      //交付天数
     private Date deliveryDate;                                      //交付日期
     private String oldHouseCode;                                    //原房产户编码
@@ -316,5 +317,13 @@ public class JSONJyhtxx implements Serializable {
 
     public void setRegistrationReason(String registrationReason) {
         this.registrationReason = registrationReason;
+    }
+
+    public String getDeliveryMode() {
+        return deliveryMode;
+    }
+
+    public void setDeliveryMode(String deliveryMode) {
+        this.deliveryMode = deliveryMode;
     }
 }

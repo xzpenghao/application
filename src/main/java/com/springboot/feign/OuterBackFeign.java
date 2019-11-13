@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Map;
 
-@FeignClient(name = "backFeign", url = "http://localhost:7780/")
+@FeignClient(name = "backFeign", url = "${ycsl.url}")
 public interface OuterBackFeign {
 
     //获取token

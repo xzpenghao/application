@@ -3,6 +3,7 @@ package com.springboot.util.chenbin;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.chenbin.personnel.OtherEntity.FcIndexAndTdzh;
 import com.springboot.entity.chenbin.personnel.pub_use.*;
 import com.springboot.entity.chenbin.personnel.tax.TaxParamBody;
 import com.springboot.entity.chenbin.personnel.tra.TraParamBody;
@@ -69,26 +70,20 @@ public class BusinessDealBaseUtil {
         //加载转移信息
         Sj_Info_Jyhtxx sjInfoJyhtxx = sjsq.getTransactionContractInfo();
         List<SJ_Info_Bdcqlxgxx> immovableRightInfoVoList = sjsq.getImmovableRightInfoVoList();
-        if(immovableRightInfoVoList==null ||immovableRightInfoVoList.size()<1 ||immovableRightInfoVoList.size()>2){
-            throw new ZtgeoBizException("检查是否传入了不动产权利信息数据或传入过多的不动产权利信息数据");
-        }
-        int index_bdcqzh = 0;
-        if(immovableRightInfoVoList.size()==2){
-            int index = -1;
-            for(int i=0;i<2;i++){
-                SJ_Info_Bdcqlxgxx immovableRightInfo = immovableRightInfoVoList.get(i);
-                if(immovableRightInfo.getCertificateType().equals("土地证")){
-                    index = i;
-                    break;
-                }
+
+        SJ_Info_Bdcqlxgxx immovableRightInfo_bdcqz = null;
+        SJ_Info_Bdcqlxgxx immovableRightInfo_td = null;
+        for(SJ_Info_Bdcqlxgxx immovableRightInfo:immovableRightInfoVoList){
+            if(StringUtils.isNotBlank(immovableRightInfo.getDataType()) && "主设施".equals(immovableRightInfo.getDataType())){
+                immovableRightInfo_bdcqz = immovableRightInfo;
             }
-            if(index<0){
-                throw new ZtgeoBizException("一窗受理受理转移业务时，暂时不支持同时办理两本不动产权证书或房产证的转移");
+            if(immovableRightInfo.getCertificateType().equals("土地证")){
+                immovableRightInfo_td = immovableRightInfo;
             }
-            transferBizInfo.setLandCertificate(immovableRightInfoVoList.get(index).getImmovableCertificateNo());//土地证
-            index_bdcqzh = 1-index;
         }
-        SJ_Info_Bdcqlxgxx immovableRightInfo_bdcqz = immovableRightInfoVoList.get(index_bdcqzh);
+        if(immovableRightInfo_td!=null) {
+            transferBizInfo.setLandCertificate(immovableRightInfo_td.getImmovableCertificateNo());//土地证
+        }
         transferBizInfo.setRealEstateId(immovableRightInfo_bdcqz.getImmovableCertificateNo());//不动产权证
         transferBizInfo.setHtbh(sjInfoJyhtxx.getContractRecordNumber());//合同备案号
         transferBizInfo.setRegisterSubType(StringUtils.isBlank(sjInfoJyhtxx.getRegistrationSubclass())?sjsq.getRegistrationSubclass():sjInfoJyhtxx.getRegistrationSubclass());//登记小类
@@ -254,16 +249,19 @@ public class BusinessDealBaseUtil {
     public static TaxParamBody dealParamForTax(SJ_Sjsq sjsq){
         TaxParamBody taxParam = new TaxParamBody();
         List<SJ_Info_Bdcqlxgxx> bdcqls =  sjsq.getImmovableRightInfoVoList();
+
         Sj_Info_Jyhtxx jyht = sjsq.getTransactionContractInfo();
         String CFZT = "0";
         String YYZT = "0";
         String DYZT = "0";
-        List<QSXX> QSXX = new ArrayList<QSXX>();
-        for(SJ_Info_Bdcqlxgxx bdcql:bdcqls){
+        //权属信息
+        QSXX qsxx = new QSXX();
+        List<FWXX> FWXX = new ArrayList<FWXX>();
+        for(SJ_Info_Bdcqlxgxx bdcql:bdcqls) {
             List<SJ_Its_Right> itsRightVoList = bdcql.getItsRightVoList();
-            if(itsRightVoList!=null){
-                for(SJ_Its_Right itsRight:itsRightVoList){
-                    switch (itsRight.getItsRightType()){
+            if (itsRightVoList != null) {
+                for (SJ_Its_Right itsRight : itsRightVoList) {
+                    switch (itsRight.getItsRightType()) {
                         case "抵押":
                             DYZT = "1";
                             break;
@@ -277,46 +275,41 @@ public class BusinessDealBaseUtil {
                 }
             }
 
-            //权属信息
-            QSXX qsxx = new QSXX();
-            qsxx.setBDCZH(bdcql.getImmovableCertificateNo());
-            qsxx.setJZMJ(bdcql.getArchitecturalArea());
-            qsxx.setTNMJ(bdcql.getHouseArchitecturalArea());
-            qsxx.setYT(bdcql.getHousePlanningPurpose());
-            qsxx.setZL(bdcql.getImmovableSite());
-            qsxx.setTDSYQR(bdcql.getLandUseRightOwner());
-            qsxx.setTDHQFS(bdcql.getLandObtainWay());
-            List<FWXX> FWXX = new ArrayList<FWXX>();
-            List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
-            if(bdcgls!=null) {
-                for (SJ_Bdc_Gl bdcgl : bdcgls) {
-                    if(bdcgl.getImmovableType().equals("房地")) {
-                        SJ_Bdc_Fw_Info fw = bdcgl.getFwInfo();
-                        FWXX fwxx = new FWXX();
-                        fwxx.setBDCDYH(fw.getImmovableUnitNumber());
-                        fwxx.setFTMJ(fw.getApportionmentArchitecturalArea());
-                        fwxx.setFWDY(fw.getUnitMark());
-                        fwxx.setFWFH(fw.getRoomMark());
-                        fwxx.setFWJG(fw.getHouseStructure());
-                        fwxx.setFWLX(StringUtils.isBlank(fw.getHouseType())?bdcql.getHouseType():fw.getHouseType());
-                        fwxx.setFWXZ(StringUtils.isBlank(fw.getHouseNature())?bdcql.getHouseNature():fw.getHouseNature());
-                        fwxx.setFWZL(fw.getHouseLocation());
-                        fwxx.setJZMJ(fw.getArchitecturalArea());
-                        fwxx.setTNMJ(fw.getHouseArchitecturalArea());
-                        fwxx.setXMMC(fw.getProjectName());
-                        fwxx.setYFCBH(fw.getOldHouseCode());
-                        fwxx.setYT(fw.getImmovablePlanningUse());
-                        fwxx.setZL(fw.getHouseLocation());
-                        fwxx.setZCS(fw.getTotalStorey());
-                        fwxx.setSZC(fw.getLocationStorey());
-                        FWXX.add(fwxx);
+            if (StringUtils.isNotBlank(bdcql.getDataType()) && "主设施".equals(bdcql.getDataType())) {
+                String bdczh = bdcql.getImmovableCertificateNo();
+                if(bdczh.contains("-")) {
+                    bdczh = bdczh.substring(0,bdczh.lastIndexOf("-"))+"号";
+                }
+                qsxx.setBDCZH(bdczh);
+                qsxx.setJZMJ(bdcql.getArchitecturalArea());
+                qsxx.setTNMJ(bdcql.getHouseArchitecturalArea());
+                qsxx.setYT(bdcql.getHousePlanningPurpose());
+                qsxx.setZL(bdcql.getImmovableSite());
+                qsxx.setTDSYQR(bdcql.getLandUseRightOwner());
+                qsxx.setTDHQFS(bdcql.getLandObtainWay());
+                List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
+                if (bdcgls != null) {
+                    for (SJ_Bdc_Gl bdcgl : bdcgls) {
+                        if (bdcgl.getImmovableType().equals("房地")) {
+                            FWXX.add(getFwxx(bdcql,bdcgl.getFwInfo()));
+                        }
+                    }
+                }
+            } else if(!bdcql.getCertificateType().equals("土地证")){
+                List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
+                if (bdcgls != null) {
+                    for (SJ_Bdc_Gl bdcgl : bdcgls) {
+                        if (bdcgl.getImmovableType().equals("房地")) {
+                            SJ_Bdc_Fw_Info fw = bdcgl.getFwInfo();
+                            FWXX.add(getFwxx(bdcql,fw));
+                        }
                     }
                 }
             }
-            qsxx.setFWXX(FWXX);
-            QSXX.add(qsxx);
         }
+        qsxx.setFWXX(FWXX);
 
+        //买卖方
         List<SJ_Qlr_Gl> buyergls = jyht.getGlHouseBuyerVoList();
         List<SJ_Qlr_Gl> sellergls = jyht.getGlHouseSellerVoList();
         List<JYQLRXX> JYQLRXX = new ArrayList<JYQLRXX>();
@@ -387,7 +380,7 @@ public class BusinessDealBaseUtil {
                 throw new ZtgeoBizException("不支持的税费承担方式");
             }
         }
-        HTXX.setJFTS(Integer.parseInt(jyht.getDeliveryDays())); //交付天数
+        HTXX.setJFTS(StringUtils.isNotBlank(jyht.getDeliveryDays())?Integer.parseInt(jyht.getDeliveryDays()):null); //交付天数
         HTXX.setJFRQ(jyht.getDeliveryDate());  //交付日期
 
         YCSLXX YCSLXX = new YCSLXX();
@@ -399,7 +392,7 @@ public class BusinessDealBaseUtil {
         taxParam.setYYZT(YYZT);
         taxParam.setHTXX(HTXX);
         taxParam.setYCSLXX(YCSLXX);
-        taxParam.setQSXX(QSXX);
+        taxParam.setQSXX(qsxx);
         taxParam.setJYQLRXX(JYQLRXX);
         taxParam.setJYDLRXX(JYDLRXX);
         return taxParam;
@@ -428,5 +421,26 @@ public class BusinessDealBaseUtil {
         jyqlrxx.setGYFS(qlrgl.getSharedMode());
         jyqlrxx.setGYFE(qlrgl.getSharedValue()!=null?Integer.toString(qlrgl.getSharedValue()):null);
         return jyqlrxx;
+    }
+
+    public static FWXX getFwxx(SJ_Info_Bdcqlxgxx bdcql,SJ_Bdc_Fw_Info fw){
+        FWXX fwxx = new FWXX();
+        fwxx.setBDCDYH(fw.getImmovableUnitNumber());
+        fwxx.setFTMJ(fw.getApportionmentArchitecturalArea());
+        fwxx.setFWDY(fw.getUnitMark());
+        fwxx.setFWFH(fw.getRoomMark());
+        fwxx.setFWJG(fw.getHouseStructure());
+        fwxx.setFWLX(StringUtils.isBlank(fw.getHouseType()) ? bdcql.getHouseType() : fw.getHouseType());
+        fwxx.setFWXZ(StringUtils.isBlank(fw.getHouseNature()) ? bdcql.getHouseNature() : fw.getHouseNature());
+        fwxx.setFWZL(fw.getHouseLocation());
+        fwxx.setJZMJ(fw.getArchitecturalArea());
+        fwxx.setTNMJ(fw.getHouseArchitecturalArea());
+        fwxx.setXMMC(fw.getProjectName());
+        fwxx.setYFCBH(fw.getOldHouseCode());
+        fwxx.setYT(fw.getImmovablePlanningUse());
+        fwxx.setZL(fw.getHouseLocation());
+        fwxx.setZCS(fw.getTotalStorey());
+        fwxx.setSZC(fw.getLocationStorey());
+        return fwxx;
     }
 }

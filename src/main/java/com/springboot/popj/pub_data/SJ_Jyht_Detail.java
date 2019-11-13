@@ -1,5 +1,7 @@
 package com.springboot.popj.pub_data;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -95,7 +97,11 @@ public class SJ_Jyht_Detail implements Serializable {
     }
 
     public void setFullPaymentDate(String fullPaymentDate) {
-        this.fullPaymentDate = fullPaymentDate;
+        if(StringUtils.isNotBlank(fullPaymentDate) && fullPaymentDate.length()==19){
+            this.fullPaymentDate = fullPaymentDate.substring(0, 10);
+        }else {
+            this.fullPaymentDate = fullPaymentDate;
+        }
     }
 
     public String getStagePaymentDate1() {

@@ -15,7 +15,7 @@ public class TraParamBody implements Serializable {
 
     private com.springboot.entity.chenbin.personnel.pub_use.HTXX HTXX;
     private com.springboot.entity.chenbin.personnel.pub_use.YCSLXX YCSLXX;
-    private List<com.springboot.entity.chenbin.personnel.pub_use.QSXX> QSXX;
+    private com.springboot.entity.chenbin.personnel.pub_use.QSXX QSXX;
     private List<com.springboot.entity.chenbin.personnel.pub_use.JYQLRXX> JYQLRXX;
     private List<JYQLRXX> JYDLRXX;
 
@@ -59,11 +59,11 @@ public class TraParamBody implements Serializable {
         this.YCSLXX = YCSLXX;
     }
 
-    public List<com.springboot.entity.chenbin.personnel.pub_use.QSXX> getQSXX() {
+    public com.springboot.entity.chenbin.personnel.pub_use.QSXX getQSXX() {
         return QSXX;
     }
 
-    public void setQSXX(List<com.springboot.entity.chenbin.personnel.pub_use.QSXX> QSXX) {
+    public void setQSXX(com.springboot.entity.chenbin.personnel.pub_use.QSXX QSXX) {
         this.QSXX = QSXX;
     }
 

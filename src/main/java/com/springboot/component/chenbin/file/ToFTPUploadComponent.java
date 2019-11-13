@@ -170,14 +170,14 @@ public class ToFTPUploadComponent {
     }
 
 
-    public boolean uploadFileBDC(String fileName, String fileType, InputStream is) {
-        boolean success;
+    public boolean uploadFileBDC(String pathFold,String fileName, String fileType, InputStream is) {
+        boolean success = false;;
+        // 上传文件
+        FTPClient ftp = new FTPClient();
         try {
             String fileName_ftp = fileName + "." + fileType;
             //路径年/月/日/entryId名称
-            String mulu = DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
-            // 上传文件
-            FTPClient ftp = new FTPClient();
+            String mulu = pathFold;
             ftp.connect(yftpAddress, Integer.valueOf(yftpPort));
             ftp.login(yftpUsername, yftpPassword);
             int reply = ftp.getReplyCode();
@@ -190,20 +190,58 @@ public class ToFTPUploadComponent {
             ftp.setBufferSize(10240 * 10240);
             boolean flag = ftp.changeWorkingDirectory(mulu);
             if (!flag) {
-                mkDir(mulu);
+                mkDir(mulu,ftp);
             }
             ftp.changeWorkingDirectory(mulu);
             success = ftp.storeFile(fileName_ftp, is);
-            ftp.logout();
             is.close();
-//            success = true;
+            ftp.logout();
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("FTP上传文件异常！" + e.getMessage());
+        } finally {
+            if (ftp.isConnected()) {
+                try {
+                    ftp.disconnect();
+                } catch (IOException ioe) {
+                }
+            }
         }
         return success;
     }
 
+    public static boolean mkDir(String ftpPath,FTPClient ftpClient) {
+        try {
+            // 将路径中的斜杠统一
+            char[] chars = ftpPath.toCharArray();
+            StringBuffer sbStr = new StringBuffer(256);
+            for (int i = 0; i < chars.length; i++) {
+                if ('\\' == chars[i]) {
+                    sbStr.append('/');
+                } else {
+                    sbStr.append(chars[i]);
+                }
+            }
+            ftpPath = sbStr.toString();
+            // System.out.println("ftpPath:" + ftpPath);
+            if (ftpPath.indexOf('/') == -1) {
+                // 只有一层目录
+                ftpClient.makeDirectory(new String(ftpPath.getBytes(), "iso-8859-1"));
+                ftpClient.changeWorkingDirectory(new String(ftpPath.getBytes(), "iso-8859-1"));
+            } else {
+                // 多层目录循环创建
+                String[] paths = ftpPath.split("/");
+                for (int i = 0; i < paths.length; i++) {
+                    ftpClient.makeDirectory(new String(paths[i].getBytes(), "iso-8859-1"));
+                    ftpClient.changeWorkingDirectory(new String(paths[i].getBytes(), "iso-8859-1"));
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     /**
      * 选择上传的目录，没有创建目录
@@ -246,6 +284,4 @@ public class ToFTPUploadComponent {
             return false;
         }
     }
-
-
 }

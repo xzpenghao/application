@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(name = "otherFeign", url = "http://localhost:7780/api/test/")
+@FeignClient(name = "otherFeign", url = "${other.url}")
 public interface ExchangeWithOtherFeign {
 
-    @RequestMapping(value = "testTax",method = RequestMethod.POST)
+    @RequestMapping(value = "api/test/testTax",method = RequestMethod.POST)
     public ObjectRestResponse<String> testTax(TaxParamBody taxParamBody);
-    @RequestMapping(value = "testTra",method = RequestMethod.POST)
+    @RequestMapping(value = "api/test/testTra",method = RequestMethod.POST)
     public ObjectRestResponse<String> testTra(TraParamBody TraParamBody);
 
 }

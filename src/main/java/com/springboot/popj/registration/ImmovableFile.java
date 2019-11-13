@@ -5,10 +5,10 @@ import java.io.Serializable;
 public class ImmovableFile implements Serializable {
     private String fileName;
     private String fileType;
-    private Double fileSize;
+    private String fileSize;
     private String fileAdress;
     private String pName;
-    private int fileSequence;
+    private String fileSequence;
 
     public String getFileName() {
         return fileName;
@@ -24,14 +24,6 @@ public class ImmovableFile implements Serializable {
 
     public void setFileType(String fileType) {
         this.fileType = fileType;
-    }
-
-    public Double getFileSize() {
-        return fileSize;
-    }
-
-    public void setFileSize(Double fileSize) {
-        this.fileSize = fileSize;
     }
 
     public String getFileAdress() {
@@ -50,11 +42,19 @@ public class ImmovableFile implements Serializable {
         this.pName = pName;
     }
 
-    public int getFileSequence() {
+    public String getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(String fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public String getFileSequence() {
         return fileSequence;
     }
 
-    public void setFileSequence(int fileSequence) {
+    public void setFileSequence(String fileSequence) {
         this.fileSequence = fileSequence;
     }
 }

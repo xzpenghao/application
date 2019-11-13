@@ -19,6 +19,7 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
     private String fundTrusteeship;                                    //资金托管
     private String paymentMethod;                                     //支付方式
     private String taxBurdenParty;                                   //税费承担方式
+    private String deliveryMode;
     private String deliveryDays;                                      //交付天数
     private String deliveryDate;                                      //交付日期
     private String oldHouseCode;                                    //原房产户编码
@@ -244,5 +245,13 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
 
     public void setRegistrationReason(String registrationReason) {
         this.registrationReason = registrationReason;
+    }
+
+    public String getDeliveryMode() {
+        return deliveryMode;
+    }
+
+    public void setDeliveryMode(String deliveryMode) {
+        this.deliveryMode = deliveryMode;
     }
 }

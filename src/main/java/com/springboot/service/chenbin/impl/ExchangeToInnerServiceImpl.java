@@ -157,14 +157,14 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         TransferBizInfo transferBizInfo = BusinessDealBaseUtil.getTransferBizInfoByJyhtAndBdcqls(sjsq,idType);
         registrationBureau.setTransferBizInfo(transferBizInfo);
         //处理附件
-//        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
-//        log.warn(" 二手房转移 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
-//        if(fileVoList != null && fileVoList.size()>0) {
-//            List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
-//            registrationBureau.setFileInfoVoList(fileList);
-//        }else{
-//            log.error("附件列表为空");
-//        }
+        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
+        log.warn(" 二手房转移 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
+        if(fileVoList != null && fileVoList.size()>0) {
+            List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
+            registrationBureau.setFileInfoVoList(fileList);
+        }else{
+            log.error("附件列表为空");
+        }
         System.out.println("二手房转移业务最终传入不动产数据为：\n"+JSONObject.toJSONString(registrationBureau));
         //发送登记局
         Map<String,Object> map = null;

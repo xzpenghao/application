@@ -28,14 +28,14 @@ public class OtherComponent {
             immovableFile.setFileName(file.getFileName());
             immovableFile.setpName(file.getLogicPath());
             immovableFile.setFileType(file.getFileExt());
-            immovableFile.setFileSize(Double.parseDouble(file.getFileSize()));
+            immovableFile.setFileSize(file.getFileSize());
             int sort = BusinessDealBaseUtil.getFileXh(file, fileVoList);
 
             //排序
             if (sort == 0) {
                 throw new ZtgeoBizException("附件异常");
             }
-            immovableFile.setFileSequence(sort);
+            immovableFile.setFileSequence(Integer.toString(sort));
 
             //获取附件并上传至指定地址
             System.out.println("FTP路径：" + file.getFtpPath());

@@ -14,7 +14,7 @@ public class TaxParamBody implements Serializable {
 
     private HTXX HTXX;
     private YCSLXX YCSLXX;
-    private List<QSXX> QSXX;
+    private QSXX QSXX;
     private List<JYQLRXX> JYQLRXX;
     private List<JYQLRXX> JYDLRXX;
 
@@ -58,11 +58,11 @@ public class TaxParamBody implements Serializable {
         this.YCSLXX = YCSLXX;
     }
 
-    public List<com.springboot.entity.chenbin.personnel.pub_use.QSXX> getQSXX() {
+    public com.springboot.entity.chenbin.personnel.pub_use.QSXX getQSXX() {
         return QSXX;
     }
 
-    public void setQSXX(List<com.springboot.entity.chenbin.personnel.pub_use.QSXX> QSXX) {
+    public void setQSXX(com.springboot.entity.chenbin.personnel.pub_use.QSXX QSXX) {
         this.QSXX = QSXX;
     }
 
