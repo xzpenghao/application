@@ -486,6 +486,11 @@ RealEstateMortgageComponent {
             } else {
                 realPropertyCertificate.setGasNumber(obj1.getString("xqhhh"));
             }
+            if (StringUtils.isNotEmpty(obj1.getString("thhh"))) {
+                realPropertyCertificate.setWiredNumber(obj1.getString("thhh"));
+            } else {
+                realPropertyCertificate.setWiredNumber(obj1.getString("xthh"));
+            }
         }
         //权利人信息
         JSONArray obligeeInfoArray = (JSONArray) jsonObject.get("obligeeInfoVoList");

@@ -4,7 +4,6 @@ import com.springboot.popj.GlImmovable;
 import com.springboot.popj.GlMortgagor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +28,7 @@ public class RealPropertyCertificate {
     private String waterNumber;                  //水号
     private String electricNumber;               //电号
     private String gasNumber;                    //气号
+    private String wiredNumber;                  //有线电视号
     private String landRightType;                //土地权利类型
     private String landRightNature;              //土地权利性质
     private String landUseRightStartingDate;     //土地使用权起始日期
@@ -50,6 +50,14 @@ public class RealPropertyCertificate {
     private List<GlImmovable> glImmovableVoList=new ArrayList<>();//不动产类型(房屋信息)
     private List<GlMortgagor> glObligeeVoList=new ArrayList<>();//权利人数据
     private List<GlMortgagor> glObligorVoList=new ArrayList<>();//义务人数据
+
+    public String getWiredNumber() {
+        return wiredNumber;
+    }
+
+    public void setWiredNumber(String wiredNumber) {
+        this.wiredNumber = wiredNumber;
+    }
 
     public String[] getWarrantNos() {
         return warrantNos;
