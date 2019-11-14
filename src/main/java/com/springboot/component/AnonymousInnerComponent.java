@@ -531,7 +531,7 @@ public class AnonymousInnerComponent {
                             ClDdyxxNotice(mortgageServiceList, resultNoticeReqVo);
                             JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
                             log.info("bankObject"+bankObject.toString());
-                            String resultJson= BankNotification("/JSRCIS/sqResultNotice",bankObject.toString());
+                            String resultJson= BankNotification(bankObject,"/JSRCIS/sqResultNotice");
                             log.info("银行返回json"+resultJson);
                         }
                         respServiceDataList.add(respServiceData);
@@ -619,7 +619,7 @@ public class AnonymousInnerComponent {
                         }
                         bankObject=JSONObject.fromObject(resultNoticeReqVoList.get(0));
                         System.out.println("bankObject"+bankObject.toString());
-                        String resultJson= BankNotification("/JSRCIS/sqResultNotice",bankObject.toString());
+                        String resultJson= BankNotification(bankObject,"/JSRCIS/sqResultNotice");
                         log.info("resultJson"+resultJson);
                         return resultJson;
                     }
@@ -707,7 +707,7 @@ public class AnonymousInnerComponent {
         resultNoticeReqVo.setBusinessNodeName(businessNodeName);//业务节点名称
         resultNoticeReqVo.setCompletionTime(DateUtils.dateString(new Date(),"yyyy-MM-dd HH:mm:ss"));
         resultNoticeReqVo.setCharset("UTF-8");
-        resultNoticeReqVo.setOrgId(IDUtil.getBinID());
+        resultNoticeReqVo.setOrgId("01398999999");//宿迁交通银行固定值
         resultNoticeReqVo.setVersion("1.0.0");
         resultNoticeReqVo.setReqDate(DateUtils.dateString(new Date(),"yyyy-MM-dd HH:mm:ss"));
         resultNoticeReqVo.setReqUniqueNo(IDUtil.getExceptionId());
@@ -880,9 +880,9 @@ public class AnonymousInnerComponent {
     }
 
 
-    private String BankNotification(String url,String param) throws IOException{
-        String json = HttpClientUtil.post(null,null,
-                param, "http://" + jtIp + ":" + jtPost + url);
+    private String BankNotification(JSONObject jsonObject,String url) throws IOException{
+        String json = HttpClientUtils.getJsonData(
+                jsonObject, "http://" + jtIp + ":" + jtPost + url);
         log.info("yinhang返回信息为：" + json);
         return json;
     }
