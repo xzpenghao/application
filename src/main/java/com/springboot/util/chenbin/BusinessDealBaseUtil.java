@@ -40,7 +40,7 @@ public class BusinessDealBaseUtil {
     public static MortgageBizInfo getMortgageBizInfoByContract(Sj_Info_Jyhtxx jyht, Sj_Info_Dyhtxx dyht, String idType) {
         MortgageBizInfo mortgageBizInfo = new MortgageBizInfo();
         mortgageBizInfo.setMortgageApplyDate(StringUtils.isNotBlank(dyht.getApplyTime()) ? dyht.getApplyTime() : TimeUtil.getTimeString(new Date()));
-        mortgageBizInfo.setMortgageWay(dyht.getMortgageMode());
+        mortgageBizInfo.setMortgageWay(StringUtils.isBlank(dyht.getMortgageMode())?dyht.getRegistrationSubclass():dyht.getMortgageMode());
         mortgageBizInfo.setCreditAmount(dyht.getCreditAmount() == null ? null : dyht.getCreditAmount().toString());
         mortgageBizInfo.setEvaluationValue(dyht.getValuationValue() == null ? null : dyht.getValuationValue().toString());
         mortgageBizInfo.setMortgageTerm(dyht.getMortgagePeriod());
@@ -59,6 +59,31 @@ public class BusinessDealBaseUtil {
         mortgageBizInfo.setMortgageeInfoVoList(mortgageeInfoVoList);
         mortgageBizInfo.setMortgagorInfoVoList(mortgagorInfoVoList);
         mortgageBizInfo.setRealEstateInfoVoList(realEstateInfoVoList);
+        return mortgageBizInfo;
+    }
+
+    public static MortgageBizInfo getMortgageBizInfoByImmovList(List<SJ_Info_Bdcqlxgxx> bdcqls,Sj_Info_Dyhtxx dyhtxx){
+        MortgageBizInfo mortgageBizInfo = new MortgageBizInfo();
+
+        return mortgageBizInfo;
+    }
+
+    public static MortgageBizInfo getMortgageBizInfoByDyhtAndBiztype(SJ_Sjsq sjsq,String idType,boolean isTransfer){
+        if(sjsq==null || sjsq.getMortgageContractInfo()==null){
+            throw new ZtgeoBizException("抵押登记缺失必要数据，检查是否传入参数或传入的参数是否包含抵押合同信息");
+        }
+        MortgageBizInfo mortgageBizInfo = null;
+        if(isTransfer){
+            if(sjsq.getTransactionContractInfo()==null){
+                throw new ZtgeoBizException("转移及抵押登记缺失必要数据，检查传入参数是否包含交易合同信息");
+            }
+            mortgageBizInfo = getMortgageBizInfoByContract(sjsq.getTransactionContractInfo(),sjsq.getMortgageContractInfo(),idType);
+        }else{
+            if(sjsq.getImmovableRightInfoVoList()==null || sjsq.getImmovableRightInfoVoList().size()==0){
+                throw new ZtgeoBizException("转移及抵押登记缺失必要数据，检查传入参数是否包含不动产权属信息");
+            }
+            mortgageBizInfo = getMortgageBizInfoByImmovList(sjsq.getImmovableRightInfoVoList(),sjsq.getMortgageContractInfo());
+        }
         return mortgageBizInfo;
     }
 
@@ -278,7 +303,7 @@ public class BusinessDealBaseUtil {
             if (StringUtils.isNotBlank(bdcql.getDataType()) && "主设施".equals(bdcql.getDataType())) {
                 String bdczh = bdcql.getImmovableCertificateNo();
                 if(bdczh.contains("-")) {
-                    bdczh = bdczh.substring(0,bdczh.lastIndexOf("-"))+"号";
+                    bdczh = bdczh.substring(0,bdczh.lastIndexOf("_"))+"号";
                 }
                 qsxx.setBDCZH(bdczh);
                 qsxx.setJZMJ(bdcql.getArchitecturalArea());

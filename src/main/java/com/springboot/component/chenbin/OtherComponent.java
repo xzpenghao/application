@@ -5,12 +5,15 @@ import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.popj.registration.ImmovableFile;
+import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.IDUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -40,6 +43,9 @@ public class OtherComponent {
             //获取附件并上传至指定地址
             System.out.println("FTP路径：" + file.getFtpPath());
             String applyDate = file.getFileSubmissionTime();
+            if(StringUtils.isBlank(applyDate) || applyDate.length()!=19){
+                TimeUtil.getTimeString(new Date());
+            }
             if (fromFTPDownloadComponent.downFile(
                     file.getFtpPath().substring(0, file.getFtpPath().lastIndexOf("\\")),
                     file.getFtpPath().substring(file.getFtpPath().lastIndexOf("\\") + 1),

@@ -44,11 +44,11 @@ public class ImmovableFile implements Serializable {
         this.fileAdress = fileAdress;
     }
 
-    public String getpName() {
+    public String getPName() {
         return pName;
     }
 
-    public void setpName(String pName) {
+    public void setPName(String pName) {
         this.pName = pName;
     }
 

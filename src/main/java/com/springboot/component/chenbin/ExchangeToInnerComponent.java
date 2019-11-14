@@ -164,7 +164,9 @@ public class ExchangeToInnerComponent {
                         qlrgl.setObligeeType("权利人");
                         qlrgl.setObligeeOrder(i+1);
                         String gyfs = getNotNullData(qlrObj.getString("commonWay"));
-                        qlrgl.setSharedMode(chooseGyfs(gyfs));
+                        if(gyfs!=null) {
+                            qlrgl.setSharedMode(chooseGyfs(gyfs));
+                        }
                         String gyfe = getNotNullData(qlrObj.getString("sharedShare"));
                         qlrgl.setSharedValue(StringUtils.isNotBlank(gyfe)?Integer.parseInt(gyfe):null);
                         qlrgls.add(qlrgl);
