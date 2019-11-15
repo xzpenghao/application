@@ -7,6 +7,7 @@ public class ImmovableFile implements Serializable {
     private String fileType;
     private String fileSize;
     private String fileAdress;
+    private String fileAddress;
     private String pName;
     private String fileSequence;
 
@@ -56,5 +57,13 @@ public class ImmovableFile implements Serializable {
 
     public void setFileSequence(String fileSequence) {
         this.fileSequence = fileSequence;
+    }
+
+    public String getFileAddress() {
+        return fileAddress;
+    }
+
+    public void setFileAddress(String fileAddress) {
+        this.fileAddress = fileAddress;
     }
 }

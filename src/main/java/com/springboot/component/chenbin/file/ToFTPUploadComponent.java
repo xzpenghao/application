@@ -174,8 +174,14 @@ public class ToFTPUploadComponent {
         boolean success = false;;
         // 上传文件
         FTPClient ftp = new FTPClient();
+        ftp.setControlEncoding("UTF-8");
         try {
-            String fileName_ftp = fileName + "." + fileType;
+            String fileName_ftp = "";
+            if(!fileName.contains(fileType)) {
+                fileName_ftp = new String((fileName + "." + fileType).getBytes(),"UTF-8");
+            }else{
+                fileName_ftp = new String(fileName.getBytes(),"UTF-8");
+            }
             //路径年/月/日/entryId名称
             String mulu = pathFold;
             ftp.connect(yftpAddress, Integer.valueOf(yftpPort));
@@ -191,8 +197,9 @@ public class ToFTPUploadComponent {
             boolean flag = ftp.changeWorkingDirectory(mulu);
             if (!flag) {
                 mkDir(mulu,ftp);
+                ftp.changeWorkingDirectory(mulu);
             }
-            ftp.changeWorkingDirectory(mulu);
+//            ftp.changeWorkingDirectory(mulu);
             success = ftp.storeFile(fileName_ftp, is);
             is.close();
             ftp.logout();
@@ -204,6 +211,7 @@ public class ToFTPUploadComponent {
                 try {
                     ftp.disconnect();
                 } catch (IOException ioe) {
+                    ioe.printStackTrace();
                 }
             }
         }

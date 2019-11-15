@@ -108,17 +108,18 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
             jyhtxx.setDeliveryDays(htdata.getDeliveryDays());
             if(StringUtils.isNotBlank(htdata.getDeliveryDays())){
                 jyhtxx.setDeliveryMode("天数交付");
-            }
-            if(StringUtils.isNotBlank(htdata.getDeliveryDate())) {
-                try {
-                    jyhtxx.setDeliveryDate(TimeUtil.getDateFromString(htdata.getDeliveryDate()));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    throw new ZtgeoBizException("传入的交付日期格式不正确");
+            } else {
+                if (StringUtils.isNotBlank(htdata.getDeliveryDate())) {
+                    try {
+                        jyhtxx.setDeliveryDate(TimeUtil.getDateFromString(htdata.getDeliveryDate()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        throw new ZtgeoBizException("传入的交付日期格式不正确");
+                    }
                 }
-            }
-            if(StringUtils.isNotBlank(jyhtxx.getDeliveryDate())){
-                jyhtxx.setDeliveryMode("日期交付");
+                if (StringUtils.isNotBlank(jyhtxx.getDeliveryDate())) {
+                    jyhtxx.setDeliveryMode("日期交付");
+                }
             }
             System.out.println("合同细节数据"+JSONObject.toJSONString(htdata.getHtDetail()));
             if(htdata.getHtDetail()!=null) {
@@ -166,15 +167,17 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
                 file.setFileSequence(f.getFileSequence());
                 file.setFileSize(f.getFileSize());
                 file.setFileType(f.getFileType());
-                file.setpName(f.getpName());
+                file.setpName(f.getPName());
                 BASE64Decoder base64Decoder = new BASE64Decoder();
                 String pathFold = DateUtils.getNowYear()
                         + File.separator
                         + DateUtils.getNowMonth()
                         + File.separator + DateUtils.getNowDay();
                 try {
+                    System.out.println("巴涩："+f.getFileBase64());
                     if(toFTPUploadComponent.uploadFileBDC(pathFold,f.getFileName(),f.getFileType(),new ByteArrayInputStream(base64Decoder.decodeBuffer(f.getFileBase64())))){
-                        file.setFileAdress(pathFold + File.separator  + f.getFileName() + "." + f.getFileType());
+                        file.setFileAdress(pathFold + File.separator  + file.getFileName());
+                        file.setFileAddress(pathFold + File.separator  + file.getFileName());
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -188,7 +191,7 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
             mapParmeter.put("fileVoList", JSONArray.toJSONString(files));
         }
         mapParmeter.put("modelId",mouldId);
-        mapParmeter.put("subControl","1");//0是提交，1是不提交
+        mapParmeter.put("subControl","0");//0是提交，1是不提交
         mapParmeter.put("SJ_Sjsq", JSONObject.toJSONString(sjsq));
         String token = outerBackFeign.getToken(new JwtAuthenticationRequest(username, password)).getData();
         return outerBackFeign.DealRecieveFromOuter5(token,mapParmeter).getData();
