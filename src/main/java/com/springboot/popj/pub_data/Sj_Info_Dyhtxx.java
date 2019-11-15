@@ -34,14 +34,6 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
     private String registrationReason;                         //登记原因
 
 
-    public void setMortgageStartingDate(String mortgageStartingDate) {
-        this.mortgageStartingDate = mortgageStartingDate;
-    }
-
-    public void setMortgageEndingDate(String mortgageEndingDate) {
-        this.mortgageEndingDate = mortgageEndingDate;
-    }
-
     public void setApplyTime(String applyTime) {
         this.applyTime = applyTime;
     }

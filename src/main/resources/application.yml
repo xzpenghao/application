@@ -120,8 +120,8 @@ httpclient:
   seam: 23335       #登记平台接口
   ip: 10.3.2.147
   #10.3.2.147    #登记平台ip
-  windowAcceptanceIp: 10.3.2.203   #一窗受理ip
-  windowAcceptanceSeam: 7779      #一窗受理接口
+  windowAcceptanceIp: 10.3.2.206   #一窗受理ip
+  windowAcceptanceSeam: 7780      #一窗受理接口
 businessType:
   clfFmortgage: MORTGAGE_OLD_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
   xjfFmortgage: MORTGAGE_NEW_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）

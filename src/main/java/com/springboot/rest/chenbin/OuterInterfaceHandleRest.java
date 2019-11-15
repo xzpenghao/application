@@ -1,6 +1,7 @@
 package com.springboot.rest.chenbin;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.PersonnelUnitEntity;
 import com.springboot.entity.chenbin.personnel.req.PersonnelUnitReqEntity;
 import com.springboot.service.chenbin.OuterInterfaceHandleService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 @Slf4j
@@ -27,7 +29,26 @@ public class OuterInterfaceHandleRest {
     @RequestMapping(value = "/checkPersonnelUnit",method = RequestMethod.POST)
     public ObjectRestResponse<List<PersonnelUnitEntity>> checkPersonnelUnit(@RequestBody PersonnelUnitReqEntity personnelUnit){
         ObjectRestResponse<List<PersonnelUnitEntity>> rv = new ObjectRestResponse<List<PersonnelUnitEntity>>();
-        return rv.data(outerIntfService.getPersonnelUnits(personnelUnit));
+        List<PersonnelUnitEntity> personnelUnitEntityList = null;
+        try {
+            personnelUnitEntityList = outerIntfService.getPersonnelUnits(personnelUnit);
+        } catch (ZtgeoBizException e){
+            e.printStackTrace();
+            throw e;
+        } catch (Exception e){
+            e.printStackTrace();
+            if(e.getMessage().equals("connect timed out")){
+                throw new ZtgeoBizException("接口连接超时");
+            }
+            if(e.getMessage().contains("404")){
+                throw new ZtgeoBizException("请求地址错误");
+            }
+            throw e;
+        }
+        if(personnelUnitEntityList==null || personnelUnitEntityList.size()==0){
+            throw new ZtgeoBizException("接口请求异常，返回空数据集");
+        }
+        return rv.data(personnelUnitEntityList);
     }
 
     @RequestMapping(value = "/exchangePersonnelUnit",method = RequestMethod.POST)
