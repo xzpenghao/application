@@ -169,6 +169,7 @@ public class AnonymousInnerComponent {
                             log.error("存量房信息保存失败,流程未开启"+json);
                         }
                     } else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)) {
+                        log.info("开始进行二手房登簿");
                         //登簿通知
                         EsfSdq esfSdq = new EsfSdq();
                         esfSdq.setSlbh(getReceiving.getSlbh());
@@ -176,11 +177,13 @@ public class AnonymousInnerComponent {
                         JSONObject jsonObject = JSONObject.fromObject(esfSdq);
                         //根据受理编号查询转移信息（水电气）
                         String jsonData = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+                        log.info("查询转移信息(水电气)"+jsonData);
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(jsonData);
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.BDCQZSDZF_SERVICE_CODE, true, getReceiving.getSlbh());//获取不动产权属信息
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
                         String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
                         JSONObject ycslObject = JSONObject.fromObject(json);
+                        log.info("一窗受理返回"+json);
                     }
                 } catch (Exception e) {
                     log.error("附件错误:"+e.getMessage());
@@ -352,7 +355,7 @@ public class AnonymousInnerComponent {
             for (int i = 0; i < fileArray.size(); i++) {
                 com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
                 String fileAddress = fileObject.getString("fileAddress");
-                log.info("fileAddress:" + fileObject.getString("fileAddress"));
+                log.info("fileAdress:" + fileObject.getString("fileAddress"));
                 log.info("fileType:" + fileObject.getString("fileType"));
                 String fileType = fileObject.getString("fileType");
                 byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
@@ -377,7 +380,11 @@ public class AnonymousInnerComponent {
             fileArray = com.alibaba.fastjson.JSONArray.parseArray(com.alibaba.fastjson.JSONObject.toJSONString(fileInfoVoList));
             for (int i = 0; i < fileArray.size(); i++) {
                 com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
-                String fileAddress = fileObject.getString("fileAddress");
+                String fileAddress="";
+                fileAddress  = fileObject.getString("fileAddress");
+                if (StringUtils.isEmpty(fileAddress)){
+                    fileAddress=fileObject.getString("fileAdress");
+                }
                 String fileType = fileAddress.substring(fileAddress.lastIndexOf(".") + 1);
                 byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
                 uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,yftpAddress,yftpPort,yftpUsername,yftpPassword);//获取上传路径和名称

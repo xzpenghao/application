@@ -45,11 +45,16 @@ public class BdcFTPDownloadComponent {
      */
     public byte[] downFile(String remotePath, String fileName, byte[] bytes,String address,String port,String username,String password) {
         try {
+            log.info("address"+address);
+            log.info("post"+port);
+            log.info("username"+username);
+            log.info("password"+password);
             int reply;
             ftpClient.connect(address, Integer.parseInt(port));
             // 如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
             ftpClient.login(username, password);// 登录
             reply = ftpClient.getReplyCode();
+            log.info("reply"+reply);
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftpClient.disconnect();
                 return bytes;
