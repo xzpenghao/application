@@ -125,12 +125,13 @@ public class AnonymousInnerComponent {
         ReturnVo returnVo = new ReturnVo();
         Map<String, String> mapParmeter = new HashMap<>();
         Map<String, Object> modelMap = Maps.newHashMap();
+        log.info("modelId"+getReceiving.getModelId());
         modelMap.put("modelId", getReceiving.getModelId());
         Map<String, String> mapHeader = new HashMap<>();
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception { //建议抛出异常
                 try {
-                    System.out.println("执行主线程");
+                    log.info("执行主线程");
                     com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
                     String token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                     if (token == null) {
@@ -141,6 +142,7 @@ public class AnonymousInnerComponent {
                         mapParmeter.put("modelId" , getReceiving.getModelId());
                         //受理启动一窗受理流程
                         String entry = httpClientUtils.doGet("http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter6", modelMap, mapHeader);
+                        log.info("entry"+entry);
                         JSONObject entryObject = JSONObject.fromObject(entry);
                         JSONArray entryArray = JSONArray.fromObject(entryObject.get("data"));//获取data数据
                         EsfSdq esfSdq = new EsfSdq();
@@ -151,6 +153,7 @@ public class AnonymousInnerComponent {
                         System.out.println("aa"+paramObject.toString());
                         //根据受理编号查询转移信息（水电气）
                         String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+                        log.info("zyxx"+zyxx);
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(zyxx);                        //整理数据发送到一窗受理
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.ESFSDQSERVICE_CODE, false, getReceiving.getSlbh());//获取不动产权属信息
                         log.info("sjsq"+mapParmeter.get("SJ_Sjsq"));
@@ -176,8 +179,9 @@ public class AnonymousInnerComponent {
                         esfSdq.setTransferred(true);
                         JSONObject jsonObject = JSONObject.fromObject(esfSdq);
                         //根据受理编号查询转移信息（水电气）
-                        String jsonData = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
-                        log.info("查询转移信息(水电气)"+jsonData);
+                       // String jsonData = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+                        //log.info("查询转移信息(水电气)"+jsonData);
+                        String  jsonData="{\"realEstateInfoList\":[{\"realEstateId\":\"苏(2019)丰县不动产权第0019203号\",\"certificateType\":\"房屋不动产证\",\"realEstateUnitInfoVoList\":[{\"realEstateUnitId\":\"320321030001GB00026F00000000\",\"householdId\":\"10FBCD0E-D06B-418C-90E2-197102317C\",\"buildingId\":\"0003\",\"accountId\":\"0001\",\"sit\":\"测试坐落\",\"roomId\":\"101\",\"unitId\":\"1\",\"floor\":\"1\",\"totalFloor\":\"5\",\"projectName\":\"名仕雅苑一期\",\"architectureName\":\"11#\",\"architectureAera\":null,\"innerArchitectureAera\":null,\"sharedArchitectureAera\":null,\"acquireWay\":null,\"acquirePrice\":null,\"plannedUsage\":\"10\",\"houseType\":null,\"houseNature\":null,\"houseRightType\":\"4\",\"houseRightNature\":\"0\",\"landRightNature\":null,\"landRightStartDate\":null,\"landRightEndDate\":null,\"landRightUser\":null,\"landRightTerm\":null,\"landUsage\":null,\"commonLandArea\":null,\"sharedLandArea\":null,\"singleLandArea\":null}],\"landUnitInfoVoList\":null,\"obligeeInfoVoList\":[{\"id\":\"QLR-191009113230-38S8S30X08\",\"obligeeName\":\"史平安\",\"obligeeIdType\":\"1\",\"obligeeId\":\"320321199203121413\",\"commonWay\":\"0\",\"sharedShare\":null}],\"salerInfoVoList\":[{\"salerName\":\"史平安\",\"salerIdType\":\"99\",\"salerId\":null}],\"registerDate\":\"2019-11-17 14:20:52\"}],\"sdqInfo\":{\"shhh\":\"101\",\"dhhh\":\"102\",\"qhhh\":\"103\",\"thhh\":null,\"xshhh\":null,\"xdhhh\":null,\"xqhhh\":null,\"xthhh\":null,\"gsdw\":\"丰县自来水公司\",\"gddw\":\"丰县供电公司\",\"gqdw\":\"丰县滨海燃气有限公司\",\"gtdw\":\"丰县有线电视\"},\"fileInfoList\":[],\"contacts\":\"史平安\",\"contactsPhone\":\"15162098070\",\"contactsAdress\":null,\"businessAreas\":\"丰县\"}\n";
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(jsonData);
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.BDCQZSDZF_SERVICE_CODE, true, getReceiving.getSlbh());//获取不动产权属信息
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
@@ -348,10 +352,16 @@ public class AnonymousInnerComponent {
      */
     public void getProcessingAnnex(com.alibaba.fastjson.JSONObject jsonObject ,Map<String, String> stringMap, List<FileInfoVo> fileInfoVoList, String address, String port, String username, String password,String path) {
         com.alibaba.fastjson.JSONArray fileArray=null;
+        log.info("jsonObject"+jsonObject);
+        log.info("address"+address);
+        log.info("post"+port);
+        log.info("username"+username);
+        log.info("password"+password);
         List<SJ_File> sjFileList = new ArrayList<>();
         Object uploadObject=null;
-        if (null != jsonObject && null != fileInfoVoList) {
+        if (null != jsonObject && null == fileInfoVoList) {
             fileArray = jsonObject.getJSONArray("fileInfoList");
+            log.info("fileArraySize"+fileArray.size());
             for (int i = 0; i < fileArray.size(); i++) {
                 com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
                 String fileAddress = fileObject.getString("fileAddress");
