@@ -16,9 +16,6 @@ import java.net.MalformedURLException;
 @Component
 public class BdcFTPDownloadComponent {
 
-    //链接
-    private static FTPClient ftpClient = new FTPClient();
-
 
     // inputstream转byte[]
     private byte[] is2byte(InputStream is) throws IOException {
@@ -44,6 +41,7 @@ public class BdcFTPDownloadComponent {
      * @return
      */
     public byte[] downFile(String remotePath, String fileName, byte[] bytes,String address,String port,String username,String password) {
+        FTPClient ftpClient = new FTPClient();
         try {
             log.info("address"+address);
             log.info("post"+port);
@@ -95,6 +93,7 @@ public class BdcFTPDownloadComponent {
      */
     public boolean deleteFile(String pathname, String filename,String address,String port,String username,String password ) {
         boolean flag = false;
+        FTPClient ftpClient = new FTPClient();
         try {
             System.out.println("开始删除文件");
             initFtpClient(address,port,username,password);
@@ -124,7 +123,7 @@ public class BdcFTPDownloadComponent {
      * 初始化ftp服务器
      */
     public void initFtpClient(String address,String port,String username,String password ) {
-        ftpClient = new FTPClient();
+        FTPClient ftpClient = new FTPClient();
         ftpClient.setControlEncoding("utf-8");
         try {
             System.out.println("connecting...ftp服务器:" + address + ":" + port);

@@ -179,9 +179,8 @@ public class AnonymousInnerComponent {
                         esfSdq.setTransferred(true);
                         JSONObject jsonObject = JSONObject.fromObject(esfSdq);
                         //根据受理编号查询转移信息（水电气）
-                       // String jsonData = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
-                        //log.info("查询转移信息(水电气)"+jsonData);
-                        String  jsonData="{\"realEstateInfoList\":[{\"realEstateId\":\"苏(2019)丰县不动产权第0019203号\",\"certificateType\":\"房屋不动产证\",\"realEstateUnitInfoVoList\":[{\"realEstateUnitId\":\"320321030001GB00026F00000000\",\"householdId\":\"10FBCD0E-D06B-418C-90E2-197102317C\",\"buildingId\":\"0003\",\"accountId\":\"0001\",\"sit\":\"测试坐落\",\"roomId\":\"101\",\"unitId\":\"1\",\"floor\":\"1\",\"totalFloor\":\"5\",\"projectName\":\"名仕雅苑一期\",\"architectureName\":\"11#\",\"architectureAera\":null,\"innerArchitectureAera\":null,\"sharedArchitectureAera\":null,\"acquireWay\":null,\"acquirePrice\":null,\"plannedUsage\":\"10\",\"houseType\":null,\"houseNature\":null,\"houseRightType\":\"4\",\"houseRightNature\":\"0\",\"landRightNature\":null,\"landRightStartDate\":null,\"landRightEndDate\":null,\"landRightUser\":null,\"landRightTerm\":null,\"landUsage\":null,\"commonLandArea\":null,\"sharedLandArea\":null,\"singleLandArea\":null}],\"landUnitInfoVoList\":null,\"obligeeInfoVoList\":[{\"id\":\"QLR-191009113230-38S8S30X08\",\"obligeeName\":\"史平安\",\"obligeeIdType\":\"1\",\"obligeeId\":\"320321199203121413\",\"commonWay\":\"0\",\"sharedShare\":null}],\"salerInfoVoList\":[{\"salerName\":\"史平安\",\"salerIdType\":\"99\",\"salerId\":null}],\"registerDate\":\"2019-11-17 14:20:52\"}],\"sdqInfo\":{\"shhh\":\"101\",\"dhhh\":\"102\",\"qhhh\":\"103\",\"thhh\":null,\"xshhh\":null,\"xdhhh\":null,\"xqhhh\":null,\"xthhh\":null,\"gsdw\":\"丰县自来水公司\",\"gddw\":\"丰县供电公司\",\"gqdw\":\"丰县滨海燃气有限公司\",\"gtdw\":\"丰县有线电视\"},\"fileInfoList\":[],\"contacts\":\"史平安\",\"contactsPhone\":\"15162098070\",\"contactsAdress\":null,\"businessAreas\":\"丰县\"}\n";
+                        String jsonData = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+                        log.info("查询转移信息(水电气)"+jsonData);
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(jsonData);
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.BDCQZSDZF_SERVICE_CODE, true, getReceiving.getSlbh());//获取不动产权属信息
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
@@ -314,6 +313,10 @@ public class AnonymousInnerComponent {
     }
 
     public Object sqUploadPdf(com.alibaba.fastjson.JSONArray jsonArray,String address, String port, String username, String password, String path) {
+        log.info("address1"+address);
+        log.info("post1"+port);
+        log.info("username1"+username);
+        log.info("password1"+password);
         List<SJ_File> sjFileList = new ArrayList<>();
         Object uploadObject = null;
         if (null != jsonArray && jsonArray.size() >0) {
@@ -332,7 +335,10 @@ public class AnonymousInnerComponent {
                 log.info("fileName" + map.get("fileName").toString());
                 //覆盖原有url  名称
                 SJ_File sj_file = new SJ_File();
-                sj_file.setFileAddress(map.get("path").toString() + "\\" + map.get("fileName").toString());
+                String adress=map.get("path").toString() + "\\" + map.get("fileName").toString();
+                String fileAdress=adress.replaceAll("\\\\","/");
+                log.info("fileAdress:"+fileAdress);
+                sj_file.setFileAddress(fileAdress);
                 sj_file.setFileName(map.get("fileName").toString());
                 sj_file.setFileType(fileType);
                 sj_file.setFileSequence(fileObject.getString("fileSequence"));
@@ -397,6 +403,8 @@ public class AnonymousInnerComponent {
                 }
                 String fileType = fileAddress.substring(fileAddress.lastIndexOf(".") + 1);
                 byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
+                log.info("ftpAdress"+StrUtil.getFTPRemotePathByFTPPath(fileAddress));
+                log.info("");
                 uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,yftpAddress,yftpPort,yftpUsername,yftpPassword);//获取上传路径和名称
                 if (uploadObject == null) {
                     log.error(Msgagger.FILE_FAIL);
@@ -411,8 +419,9 @@ public class AnonymousInnerComponent {
                 sj_file.setFileName(map.get("fileName").toString());
                 sj_file.setFileType(fileType);
                 sj_file.setFileSequence(fileObject.getString("fileSequence"));
-                sj_file.setpName(FileTypeEnum.Sc(fileObject.getString("pName")));
+                sj_file.setpName(FileTypeEnum.Sc(fileObject.getString("fileType")));
                 sjFileList.add(sj_file);
+                log.info("sjFileList"+sjFileList.size());
             }
         }
         log.info("a:"+fileArray.toString());
@@ -544,11 +553,11 @@ public class AnonymousInnerComponent {
                             List<MortgageService> mortgageServiceList = resultServiceData.getServiceDataInfos();
                             ResultNoticeReqVo resultNoticeReqVo = new ResultNoticeReqVo();
                             resultNoticeReqVo.setBusinessId(getReceiving.getSlbh());
-                            ClNotice(resultNoticeReqVo, "MORTGAGE_PERSONAL",Msgagger.DENGBU);
+                            ClNotice(resultNoticeReqVo, "REVOKE_REGISTER",Msgagger.DENGBU);
                             ClDdyxxNotice(mortgageServiceList, resultNoticeReqVo);
                             JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
                             log.info("bankObject"+bankObject.toString());
-                            String resultJson= BankNotification(bankObject,"/JSRCIS/sqResultNotice");
+                            String resultJson= BankNotification(bankObject,"JSRCIS/sq/sqResultNotice.do");
                             log.info("银行返回json"+resultJson);
                         }
                         respServiceDataList.add(respServiceData);
@@ -573,6 +582,9 @@ public class AnonymousInnerComponent {
                         log.info("szJson"+json);
                         JSONObject jsonObject = JSONObject.fromObject(json);
                         JSONObject bankObject=null;
+                        if (jsonObject.getJSONArray("certificateInfoVoList") == null){
+                            log.error("登记平台无法查询到受理编号信息");
+                        }
                         //登簿返回信息
                         JSONArray ficateInfoArray = jsonObject.getJSONArray("certificateInfoVoList");
                         List<ResultNoticeReqVo> resultNoticeReqVoList=new ArrayList<>();
@@ -620,7 +632,8 @@ public class AnonymousInnerComponent {
                         log.info("zyxx"+zyxx);
                         if (!zyxx.equals("[]\n")) {
                             com.alibaba.fastjson.JSONArray zyxxObject = (com.alibaba.fastjson.JSONArray) com.alibaba.fastjson.JSONArray.parse(zyxx);
-                            String path = "home" + File.separator + "platform" + File.separator + getReceiving.getSlbh();
+                            String path =File.separator +"home"+File.separator+"platform" + File.separator+ getReceiving.getSlbh();
+                            log.info("path:"+path);
                             List<SJ_File> sjFileList = (List<SJ_File>) sqUploadPdf(zyxxObject,ftpAddress, ftpPort, ftpUsername, ftpPassword, path);//附件上传
                             List<com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.FileInfoVo> fileInfoVoList = new ArrayList<>();
                             for (SJ_File file :
@@ -634,9 +647,10 @@ public class AnonymousInnerComponent {
                             }
                             resultNoticeReqVoList.get(0).setFileInfoVoList(fileInfoVoList);
                         }
+                        log.info("开始整理数据");
                         bankObject=JSONObject.fromObject(resultNoticeReqVoList.get(0));
-                        System.out.println("bankObject"+bankObject.toString());
-                        String resultJson= BankNotification(bankObject,"/JSRCIS/sqResultNotice");
+                        log.info("bankObject"+bankObject.toString());
+                        String resultJson= BankNotification(bankObject,"JSRCIS/sq/sqResultNotice.do");
                         log.info("resultJson"+resultJson);
                         return resultJson;
                     }
@@ -665,6 +679,10 @@ public class AnonymousInnerComponent {
         System.err.println("result is " + JSONObject.fromObject(returnVo) + ", time is " + (System.currentTimeMillis() - t));
         executor.shutdown();
     }
+
+
+
+
 
 
 
@@ -704,13 +722,13 @@ public class AnonymousInnerComponent {
                 resultRV = realEstateMortgageComponent.getRealEstateMortgage(certificateId,null,true);
                 List<MortgageService> mortgageServiceList = (List<MortgageService>) resultRV.getData();
                 //处理抵押
-                ClNotice(resultNoticeReqVo,"MORTGAGE_PERSONAL",Msgagger.SHANZHENG);
+                ClNotice(resultNoticeReqVo,"MORTGAGE_REGISTER",Msgagger.SHANZHENG);
                 ClDdyxxNotice(mortgageServiceList,resultNoticeReqVo);
                 break;
             case "YGZMH":
                 resultRV = realEstateMortgageComponent.getMortgageCancellation(certificateId);
                 List<RealPropertyCertificate> realPropertyCertificateList = (List<RealPropertyCertificate>) resultRV.getData();
-                ClNotice(resultNoticeReqVo,"MORTGAGE_NEW_TRAILER",Msgagger.SHANZHENG);
+                ClNotice(resultNoticeReqVo,"MORTGAGE_REGISTER",Msgagger.SHANZHENG);
                 ClYgxxNotice(realPropertyCertificateList,resultNoticeReqVo,certificateId);
                 break;
         }
@@ -899,7 +917,7 @@ public class AnonymousInnerComponent {
 
     private String BankNotification(JSONObject jsonObject,String url) throws IOException{
         String json = HttpClientUtils.getJsonData(
-                jsonObject, "http://" + jtIp + ":" + jtPost + url);
+                jsonObject, "http://" + jtIp + ":" + jtPost +"/"+url);
         log.info("yinhang返回信息为：" + json);
         return json;
     }

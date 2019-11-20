@@ -608,6 +608,7 @@ RealEstateMortgageComponent {
                             RealEstateUnitInfo realEstateUnitInfo = new RealEstateUnitInfo();
                             realEstateUnitInfo.setHouseholdId(bdc_gl.getFwInfo().getHouseholdId());
                             realEstateUnitInfo.setRealEstateUnitId(bdc_gl.getFwInfo().getImmovableUnitNumber());
+                            log.info("不动产单元号"+realEstateUnitInfo.getRealEstateUnitId());
                             realEstateUnitInfo.setSit(bdc_gl.getFwInfo().getHouseLocation());
                             realEstateUnitInfoList.add(realEstateUnitInfo);
                         }

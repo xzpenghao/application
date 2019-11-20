@@ -38,8 +38,6 @@ public class ToFTPUploadComponent {
     private String yftpPassword;
 
 
-    //链接
-    private static FTPClient ftpClient = new FTPClient();
     private static String LOCAL_CHARSET = "GBK";
 
 
@@ -106,8 +104,13 @@ public class ToFTPUploadComponent {
     public Object upYcslloadFile(InputStream input, String fileName, String fileType,String path,String yftpAddress,String yftpPort,String yftpUsername,String yftpPassword) {
         System.out.println(fileName + "\t" + fileType);
         Map<String, Object> map = Maps.newHashMap();
+        FTPClient ftpClient = new FTPClient();
+        log.info("ycslyAddress"+yftpAddress);
+        log.info("yftpPort"+yftpPort);
+        log.info("yftpUsername"+yftpUsername);
+        log.info("ycsladress"+yftpPassword);
+        log.info("pathGxpt:"+path);
         boolean returnValue = false;
-        String hz = null;
         //路径年/月/日/entryId名称
 //        String path = ;
         try {
@@ -127,35 +130,37 @@ public class ToFTPUploadComponent {
                 ftpClient.disconnect();
                 return null;
             }
-            log.debug("reply"+reply);
-            ftpClient.setControlEncoding("UTF-8");
+            log.info("reply"+reply);
+            ftpClient.enterLocalPassiveMode();
             //如果没有需求上传图片的话还ok，
             // 但是要是传图片，就需要设置一下文件类型为二进制
             // 这样上传的图片才不会报错（记得我的错误貌似是什么ASCII编码什么的。。）
             ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
             ftpClient.setFileTransferMode(ftpClient.BINARY_FILE_TYPE);
+            log.info("创建目录"+path);
+            mkDirs(ftpClient,path);
             //创建目录
-            mkDir(path);//创建目录
-            ftpClient.changeWorkingDirectory("/" + path);//创建完了目录需要将当前工作目录切换过来，然后直接在下面创建文件
-            log.info("aa" + ftpClient.changeWorkingDirectory("/" + path));
+//            ftpClient.changeWorkingDirectory("/" + path);//创建完了目录需要将当前工作目录切换过来，然后直接在下面创建文件
             if (FTPReply.isPositiveCompletion(ftpClient.sendCommand("OPTS UTF8", "ON"))) {// 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码，否则就使用本地编码（GBK）.
                 LOCAL_CHARSET = "UTF-8";
             }
-            log.info(ftpClient.printWorkingDirectory());
-            log.debug("printWorkingDirectory"+ftpClient.printWorkingDirectory());
+            log.info("fileName"+fileName);
+            /*log.info("printWorkingDirectory"+ftpClient.printWorkingDirectory());*/
             returnValue = ftpClient.storeFile(fileName, input);
-            System.out.println(returnValue);
+            log.info("s:"+returnValue);
+            log.info("jjj");
             FTPFile[] fs = ftpClient.listFiles(fileName);
+            log.info("fsLength"+fs.length);
             if (fs.length == 0) {
                 log.debug("this file not exist ftp");
                 System.out.println("this file not exist ftp");
             } else if (fs.length == 1) {
-                log.debug("this file exist ftp");
+               log.info("this file exist ftp");
                 System.out.println("this file exist ftp");
             }
             ftpClient.logout();
             input.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             returnValue = false;
             e.printStackTrace();
             System.out.print(e.getMessage());
@@ -168,6 +173,39 @@ public class ToFTPUploadComponent {
         }
         return null;
     }
+
+    /**
+     * ------------------------------以下为私有方法------------------------------
+     */
+    // 创建文件夹
+    private void mkDirs(FTPClient client, String p) throws Exception {
+        if (null == p) {
+            return;
+        }
+
+        if (p != null && !"".equals(p) && !"/".equals(p)) {
+            String ps = "";
+            for (int i = 0; i < p.split("/").length; i++) {
+                ps += p.split("/")[i] + "/";
+                if (!isDirExist(client, ps)) {
+                    client.makeDirectory(ps);// 创建目录
+                    client.changeWorkingDirectory(ps);// 进入创建的目录
+                }
+            }
+        }
+    }
+
+    // 判断文件夹是否存在
+    private static boolean isDirExist(FTPClient client, String dir) {
+        boolean flag;
+        try {
+            flag = client.changeWorkingDirectory(dir);
+        } catch (Exception e) {
+            return false;
+        }
+        return flag;
+    }
+
 
 
     public boolean uploadFileBDC(String pathFold,String fileName, String fileType, InputStream is) {
@@ -191,7 +229,7 @@ public class ToFTPUploadComponent {
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftp.disconnect();
             }
-//            ftp.enterLocalPassiveMode();
+            ftp.enterLocalPassiveMode();
             ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
             ftp.setBufferSize(10240 * 10240);
             boolean flag = ftp.changeWorkingDirectory(mulu);
@@ -251,45 +289,5 @@ public class ToFTPUploadComponent {
         }
     }
 
-    /**
-     * 选择上传的目录，没有创建目录
-     *
-     * @param ftpPath 需要上传、创建的目录
-     * @return
-     */
-    public static boolean mkDir(String ftpPath) {
-        if (!ftpClient.isConnected()) {
-            return false;
-        }
-        try {
-            // 将路径中的斜杠统一
-            char[] chars = ftpPath.toCharArray();
-            StringBuffer sbStr = new StringBuffer(256);
-            for (int i = 0; i < chars.length; i++) {
-                if ('\\' == chars[i]) {
-                    sbStr.append('/');
-                } else {
-                    sbStr.append(chars[i]);
-                }
-            }
-            ftpPath = sbStr.toString();
-            // System.out.println("ftpPath:" + ftpPath);
-            if (ftpPath.indexOf('/') == -1) {
-                // 只有一层目录
-                ftpClient.makeDirectory(new String(ftpPath.getBytes(), "iso-8859-1"));
-                ftpClient.changeWorkingDirectory(new String(ftpPath.getBytes(), "iso-8859-1"));
-            } else {
-                // 多层目录循环创建
-                String[] paths = ftpPath.split("/");
-                for (int i = 0; i < paths.length; i++) {
-                    ftpClient.makeDirectory(new String(paths[i].getBytes(), "iso-8859-1"));
-                    ftpClient.changeWorkingDirectory(new String(paths[i].getBytes(), "iso-8859-1"));
-                }
-            }
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+
 }

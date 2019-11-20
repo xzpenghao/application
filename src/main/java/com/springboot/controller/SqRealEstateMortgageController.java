@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 @Slf4j
 @Api(tags = "宿迁不动产api")
@@ -60,15 +61,15 @@ public class SqRealEstateMortgageController {
 
     @RequestMapping(value = "/sqBdcdydj", method = RequestMethod.POST)
     @ApiOperation("不动产抵押登记,预告及预告抵押通知接口")
-    public Object sqBdcdydj(@RequestBody MortgageRegistrationReqVo mortgageRegistrationReqVo){
-        return sqRealEstateMortgageComponent.sqJgdyjk(mortgageRegistrationReqVo);
+    public void sqBdcdydj(@RequestBody MortgageRegistrationReqVo mortgageRegistrationReqVo, OutputStream outputStream){
+         sqRealEstateMortgageComponent.sqJgdyjk(mortgageRegistrationReqVo,outputStream);
     }
 
 
     @RequestMapping(value = "/sqBdczxdj", method = RequestMethod.POST)
     @ApiOperation("抵押注销通知接口")
-    public Object sqBdczxdj(@RequestBody RevokeRegistrationReqVo revokeRegistrationRespVo){
-        return sqRealEstateMortgageComponent.sqJgdyzx(revokeRegistrationRespVo);
+    public void sqBdczxdj(@RequestBody RevokeRegistrationReqVo revokeRegistrationRespVo,OutputStream outputStream){
+        sqRealEstateMortgageComponent.sqJgdyzx(revokeRegistrationRespVo,outputStream);
     }
 
 }
