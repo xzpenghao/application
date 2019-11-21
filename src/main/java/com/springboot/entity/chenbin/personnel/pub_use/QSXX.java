@@ -1,18 +1,28 @@
 package com.springboot.entity.chenbin.personnel.pub_use;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
 public class QSXX implements Serializable {
+    @JsonProperty("bDCZH")
     private String BDCZH;
+    @JsonProperty("jZMJ")
     private BigDecimal JZMJ;
+    @JsonProperty("tNMJ")
     private BigDecimal TNMJ;
+    @JsonProperty("zL")
     private String ZL;
+    @JsonProperty("yT")
     private String YT;
+    @JsonProperty("tDSYQR")
     private String TDSYQR;
-    private String TDHQFS;
+    @JsonProperty("tDHQFS")
+    private String TDHQFS = "";
 
+    @JsonProperty("fWXX")
     private List<FWXX> FWXX;
 
     public String getBDCZH() {
@@ -76,6 +86,8 @@ public class QSXX implements Serializable {
     }
 
     public void setTDHQFS(String TDHQFS) {
-        this.TDHQFS = TDHQFS;
+        if(TDHQFS!=null) {
+            this.TDHQFS = TDHQFS;
+        }
     }
 }

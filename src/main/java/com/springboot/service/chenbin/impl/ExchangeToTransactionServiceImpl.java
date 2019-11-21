@@ -55,7 +55,11 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
         TraParamBody traParamBody = BusinessDealBaseUtil.dealParamForTra(sjsq);
         System.out.println("进入交易处理，参数转换为:"+ JSONObject.toJSONString(traParamBody));
         //调用Feign
-        ObjectRestResponse<String> rv = otherFeign.testTra(traParamBody);
+        Map<String,Object> traBody = new HashMap<String,Object>();
+        traBody.put("sign","");
+        traBody.put("data",traParamBody);
+        log.info("交易转办最终传入数据为："+JSONObject.toJSONString(traBody));
+        ObjectRestResponse<String> rv = otherFeign.testTra(traBody);
         if(rv.getStatus()==200){
             result = rv.getData();
             //成功后由交易人员签收办件

@@ -46,7 +46,7 @@ public class ExchangeToInnerRest {
         return rv;
     }
 
-    @RequestMapping(value = "secTra2InnerWithoutDY", method = RequestMethod.POST)
+    @RequestMapping(value = "secTra2InnerWithoutDY", method = RequestMethod.GET)
     public ObjectRestResponse<String> secTra2InnerWithoutDY(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
@@ -68,7 +68,7 @@ public class ExchangeToInnerRest {
         return rv;
     }
 
-    @RequestMapping(value = "secTra2InnerWithDY", method = RequestMethod.POST)
+    @RequestMapping(value = "secTra2InnerWithDY", method = RequestMethod.GET)
     public ObjectRestResponse<String> secTra2InnerWithDY(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
@@ -91,7 +91,7 @@ public class ExchangeToInnerRest {
     }
 
     //流程自动提交接口
-    @RequestMapping(value = "processAutoSubmit", method = RequestMethod.POST)
+    @RequestMapping(value = "processAutoSubmit", method = RequestMethod.GET)
     public ObjectRestResponse<String> processAutoSubmit(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
         System.out.println("进入自动提交");
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();

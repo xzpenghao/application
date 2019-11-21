@@ -1,14 +1,23 @@
 package com.springboot.entity.chenbin.personnel.pub_use;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 public class JYQLRXX implements Serializable {
+    @JsonProperty("qLRMC")
     private String QLRMC;
+    @JsonProperty("zJLX")
     private String ZJLX;
+    @JsonProperty("zJHM")
     private String ZJHM;
+    @JsonProperty("dH")
     private String DH;
+    @JsonProperty("gYFS")
     private String GYFS;
+    @JsonProperty("gYFE")
     private String GYFE;
+    @JsonProperty("qLRBS")
     private String QLRBS;           //买卖方
 
     public String getQLRMC() {

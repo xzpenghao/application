@@ -1,5 +1,6 @@
 package com.springboot.entity.chenbin.personnel.tra;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.springboot.entity.chenbin.personnel.pub_use.HTXX;
 import com.springboot.entity.chenbin.personnel.pub_use.JYQLRXX;
 import com.springboot.entity.chenbin.personnel.pub_use.QSXX;
@@ -9,14 +10,22 @@ import java.io.Serializable;
 import java.util.List;
 
 public class TraParamBody implements Serializable {
+    @JsonProperty("dYZT")
     private String DYZT;
+    @JsonProperty("yYZT")
     private String YYZT;
+    @JsonProperty("cFZT")
     private String CFZT;
 
+    @JsonProperty("hTXX")
     private com.springboot.entity.chenbin.personnel.pub_use.HTXX HTXX;
+    @JsonProperty("yCSLXX")
     private com.springboot.entity.chenbin.personnel.pub_use.YCSLXX YCSLXX;
+    @JsonProperty("qSXX")
     private com.springboot.entity.chenbin.personnel.pub_use.QSXX QSXX;
+    @JsonProperty("jYQLRXX")
     private List<com.springboot.entity.chenbin.personnel.pub_use.JYQLRXX> JYQLRXX;
+    @JsonProperty("jYDLRXX")
     private List<JYQLRXX> JYDLRXX;
 
     public String getDYZT() {

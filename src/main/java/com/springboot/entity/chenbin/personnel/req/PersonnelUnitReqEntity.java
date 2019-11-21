@@ -7,6 +7,7 @@ public class PersonnelUnitReqEntity implements Serializable {
     private String zjlx;
     private String zjhm;
     private String fjlj;
+    private String xczpBase64;
 
     public String getMc() {
         return mc;
@@ -38,5 +39,13 @@ public class PersonnelUnitReqEntity implements Serializable {
 
     public void setFjlj(String fjlj) {
         this.fjlj = fjlj;
+    }
+
+    public String getXczpBase64() {
+        return xczpBase64;
+    }
+
+    public void setXczpBase64(String xczpBase64) {
+        this.xczpBase64 = xczpBase64;
     }
 }

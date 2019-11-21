@@ -34,10 +34,8 @@ public class ExchangeToOtherRest {
     private ExchangeToTransactionService exc2Tran;
     @Autowired
     private ExchangeToWebService exc2Web;
-    @Autowired
-    private ExchangeInterfaceService tzBiz;
 
-    @RequestMapping(value = "exchange2Tax",method = RequestMethod.POST)
+    @RequestMapping(value = "exchange2Tax",method = RequestMethod.GET)
     public ObjectRestResponse<Object> exchange2Tax(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer){
         ObjectRestResponse<Object> rv = new ObjectRestResponse<Object>();
         try {
@@ -59,7 +57,7 @@ public class ExchangeToOtherRest {
         return rv;
     }
 
-    @RequestMapping(value = "exchange2Tra",method = RequestMethod.POST)
+    @RequestMapping(value = "exchange2Tra",method = RequestMethod.GET)
     public ObjectRestResponse<Object> exchange2Tra(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer){
         ObjectRestResponse<Object> rv = new ObjectRestResponse<Object>();
         try {

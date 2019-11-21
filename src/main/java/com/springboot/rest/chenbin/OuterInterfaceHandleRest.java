@@ -5,8 +5,11 @@ import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.PersonnelUnitEntity;
 import com.springboot.entity.chenbin.personnel.req.PersonnelUnitReqEntity;
 import com.springboot.service.chenbin.OuterInterfaceHandleService;
+import com.springboot.util.chenbin.ErrorDealUtil;
+import feign.codec.DecodeException;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,28 +30,31 @@ public class OuterInterfaceHandleRest {
     private OuterInterfaceHandleService outerIntfService;
 
     @RequestMapping(value = "/checkPersonnelUnit",method = RequestMethod.POST)
-    public ObjectRestResponse<List<PersonnelUnitEntity>> checkPersonnelUnit(@RequestBody PersonnelUnitReqEntity personnelUnit){
-        ObjectRestResponse<List<PersonnelUnitEntity>> rv = new ObjectRestResponse<List<PersonnelUnitEntity>>();
-        List<PersonnelUnitEntity> personnelUnitEntityList = null;
+    public ObjectRestResponse<Object> checkPersonnelUnit(@RequestBody PersonnelUnitReqEntity personnelUnit){
+        ObjectRestResponse<Object> rv = new ObjectRestResponse<Object>();
         try {
-            personnelUnitEntityList = outerIntfService.getPersonnelUnits(personnelUnit);
+            rv.data(outerIntfService.getPersonnelUnits(personnelUnit));
         } catch (ZtgeoBizException e){
             e.printStackTrace();
+            log.error("异常产生"+e);
             throw e;
         } catch (Exception e){
             e.printStackTrace();
-            if(e.getMessage().equals("connect timed out")){
-                throw new ZtgeoBizException("接口连接超时");
+            if(StringUtils.isNotBlank(e.getMessage())) {
+                if (e.getMessage().contains("connect timed out")) {
+                    throw new ZtgeoBizException("接口连接超时");
+                }
+                if (e.getMessage().contains("404")) {
+                    throw new ZtgeoBizException("请求地址错误");
+                }
             }
-            if(e.getMessage().contains("404")){
-                throw new ZtgeoBizException("请求地址错误");
+            if(e.getClass().equals(DecodeException.class)){
+                throw new ZtgeoBizException("公安接口调用失败");
             }
-            throw e;
+            log.error("异常产生"+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("接口请求出现未知异常，请联系管理员");
         }
-        if(personnelUnitEntityList==null || personnelUnitEntityList.size()==0){
-            throw new ZtgeoBizException("接口请求异常，返回空数据集");
-        }
-        return rv.data(personnelUnitEntityList);
+        return rv;
     }
 
     @RequestMapping(value = "/exchangePersonnelUnit",method = RequestMethod.POST)

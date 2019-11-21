@@ -14,6 +14,7 @@ public class SJ_Fjfile implements Serializable {
     private byte[] fileContent;               //文件内容（不适用ftp模式时使用）
     private String fileStatus;                //文件当前状态
     private String fileSubmissionTime;        //文件提交时间
+    private String saveType;                  //保存形式 0代表本地
     private String ext1;                      //扩展字段1
     private String ext2;                      //扩展字段2
     private String ezt3;                      //扩展字段3
@@ -122,5 +123,13 @@ public class SJ_Fjfile implements Serializable {
 
     public void setLogicPath(String logicPath) {
         this.logicPath = logicPath;
+    }
+
+    public String getSaveType() {
+        return saveType;
+    }
+
+    public void setSaveType(String saveType) {
+        this.saveType = saveType;
     }
 }

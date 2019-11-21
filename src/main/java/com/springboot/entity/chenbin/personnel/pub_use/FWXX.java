@@ -1,24 +1,42 @@
 package com.springboot.entity.chenbin.personnel.pub_use;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class FWXX implements Serializable {
+    @JsonProperty("bDCDYH")
     private String BDCDYH;  //不动产单元号
+    @JsonProperty("zL")
     private String ZL;      //坐落
+    @JsonProperty("yT")
     private String YT;      //用途
+    @JsonProperty("xMMC")
     private String XMMC;    //项目名称
+    @JsonProperty("yFCBH")
     private String YFCBH;   //原房产编号
+    @JsonProperty("tNMJ")
     private BigDecimal TNMJ;    //套内面积
+    @JsonProperty("jZMJ")
     private BigDecimal JZMJ;    //建筑面积
+    @JsonProperty("fTMJ")
     private BigDecimal FTMJ;    //分摊面积
+    @JsonProperty("fWDY")
     private String FWDY;    //单元号
+    @JsonProperty("fWFH")
     private String FWFH;    //房号
+    @JsonProperty("fWJG")
     private String FWJG;    //房屋结构
+    @JsonProperty("fWLX")
     private String FWLX;    //房屋类型
+    @JsonProperty("fWXZ")
     private String FWXZ;    //房屋性质
+    @JsonProperty("fWZL")
     private String FWZL;    //房屋坐落
+    @JsonProperty("zCS")
     private String ZCS;     //总层数
+    @JsonProperty("sZC")
     private String SZC;     //所在层
 
     public String getBDCDYH() {

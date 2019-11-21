@@ -57,7 +57,10 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
         TaxParamBody taxParamBody = BusinessDealBaseUtil.dealParamForTax(sjsq);
         System.out.println("进入税务处理，参数转换为:"+JSONObject.toJSONString(taxParamBody));
         //调用Feign,暂时取消
-//        ObjectRestResponse<String> rv = otherFeign.testTax(taxParamBody);
+//        Map<String,Object> taxBody = new HashMap<String,Object>();
+//        taxBody.put("sign","");
+//        taxBody.put("data",taxParamBody);
+//        ObjectRestResponse<String> rv = otherFeign.testTax(taxBody);
 //        if(rv.getStatus()==200){
 //            result = rv.getData();
             //成功后由税务人员签收办件

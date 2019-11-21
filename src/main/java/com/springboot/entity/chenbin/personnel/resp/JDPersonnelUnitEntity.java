@@ -1,22 +1,11 @@
 package com.springboot.entity.chenbin.personnel.resp;
 
-import com.springboot.entity.chenbin.personnel.PersonnelUnitEntity;
-
 import java.io.Serializable;
 
-public class PersonnelResponseEntity<T extends PersonnelUnitEntity> implements Serializable {
-    private String status;
+public class JDPersonnelUnitEntity implements Serializable {
     private String code;
     private String msg;
-
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    private String data;
 
     public String getCode() {
         return code;
@@ -34,4 +23,11 @@ public class PersonnelResponseEntity<T extends PersonnelUnitEntity> implements S
         this.msg = msg;
     }
 
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
 }

@@ -1,35 +1,64 @@
 package com.springboot.entity.chenbin.personnel.pub_use;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class HTXX implements Serializable {
+    @JsonProperty("hTJE")
     private String HTJE;
+    @JsonProperty("fSSS")
     private String FSSS;
+    @JsonProperty("sFCZ")
     private Integer SFCZ;
+    @JsonProperty("cZSM")
     private String CZSM;
+    @JsonProperty("sFBHFS")
     private Integer SFBHFS;		//是否包含附属设施 1 包含，0 不包含
+    @JsonProperty("sFTG")
     private Integer SFTG;			//是否资金托管 1 是，0 否
+    @JsonProperty("tGKHH")
     private String TGKHH;			//资金托管开户行
+    @JsonProperty("tGZH")
     private String TGZH;			//托管账户
+    @JsonProperty("tGMFZFNR")
     private String TGMFZFNR;		//买方支付内容
+    @JsonProperty("zFFS")
     private Integer ZFFS;			//支付方式 1 一次性付款，2 分期付款，3 贷款付款，4 其它付款方式
+    @JsonProperty("fKRQ")
     private String FKRQ;			//付款日期（付款方式2）
+    @JsonProperty("fQFKRQ1")
     private String FQFKRQ1;		//分期付款日期1（付款方式2）
+    @JsonProperty("fQFKJE1")
     private String FQFKJE1;		//分期付款金额1（付款方式2）
+    @JsonProperty("fQFKRQ2")
     private String FQFKRQ2;		//分期付款日期2（付款方式2）
+    @JsonProperty("fQFKJE2")
     private String FQFKJE2;		//分期付款金额2（付款方式2）
+    @JsonProperty("fQFKRQ3")
     private String FQFKRQ3;		//分期付款日期3（付款方式2）
+    @JsonProperty("fQFKJE3")
     private String FQFKJE3;		//分期付款金额3（付款方式2）
+    @JsonProperty("dKFS")
     private Integer DKFS;			 //贷款方式，1 银行按揭，2 公积金贷款（付款方式3）
+    @JsonProperty("sFKRQ")
     private String SFKRQ;			//首付款日期（付款方式3）
+    @JsonProperty("sFKJE")
     private String SFKJE;			 //首付款金额（付款方式3）
+    @JsonProperty("dKSQRQ")
     private String DKSQRQ;			 //贷款申请日期（付款方式3）
+    @JsonProperty("qTFKNR")
     private String QTFKNR;			 //其它付款内容（付款方式4）
+    @JsonProperty("qTFKMFZF")
     private String QTFKMFZF;			 //其它付款-买方支付（付款方式4）
+    @JsonProperty("jFCDSF")
     private Integer JFCDSF;			 //买方承担税费情况，1 独自承担（此时YFCDSF为空），2 承担各自部分
+    @JsonProperty("yFCDSF")
     private Integer YFCDSF;			 //卖方承担税费情况，1 独自承担（此时JFCDSF为空），2 承担各自部分
+    @JsonProperty("jFTS")
     private Integer JFTS;			 //交付天数
+    @JsonProperty("jFRQ")
     private String JFRQ;			  //交付日期
 
     public String getHTJE() {

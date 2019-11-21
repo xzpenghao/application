@@ -124,8 +124,8 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         //操作FTP上传附件
         List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
         log.warn("双预告附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
-        List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
-        registrationBureau.setFileInfoVoList(fileList);
+//        List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
+//        registrationBureau.setFileInfoVoList(fileList);
 
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         if (resultObject != null) {
@@ -160,7 +160,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjsq, transferRegisterPid, false, registrationOfTransfer, dealPerson, areaNo);
         TransferBizInfo transferBizInfo = BusinessDealBaseUtil.getTransferBizInfoByJyhtAndBdcqls(sjsq,idType);
         registrationBureau.setTransferBizInfo(transferBizInfo);
-        return handleCreateFlow(token,sjsq,registrationBureau);
+        return handleCreateFlow(token,sjsq,registrationBureau,true);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         }
         registrationBureau.setTransferBizInfo(transferBizInfo);
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
-        return handleCreateFlow(token,sjsq,registrationBureau);
+        return handleCreateFlow(token,sjsq,registrationBureau,true);
     }
 
     @Override
@@ -271,12 +271,14 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         return exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
     }
 
-    private String handleCreateFlow(String token,SJ_Sjsq sjsq,RegistrationBureau registrationBureau){
+
+    public String handleCreateFlow(String token,SJ_Sjsq sjsq,RegistrationBureau registrationBureau,boolean dealFile){
+        System.out.println("进入"+sjsq.getReceiptNumber()+"业务的附件获取功能");
         //处理附件
         List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
         log.warn(" 二手房转移 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
         if(fileVoList != null && fileVoList.size()>0) {
-            List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
+            List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList,dealFile);
             registrationBureau.setFileInfoVoList(fileList);
         }else{
             log.error("附件列表为空");
