@@ -8,12 +8,17 @@ import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.config.DJJUser;
 import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.*;
 import com.springboot.popj.pub_data.*;
+import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.registration.*;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.popj.warrant.ZdInfo;
+import com.springboot.service.chenbin.ExchangeToInnerService;
+import com.springboot.service.chenbin.impl.ExchangeToInnerServiceImpl;
+import com.springboot.service.chenbin.other.impl.ExchangeInterfaceServiceImpl;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
@@ -82,9 +87,17 @@ RealEstateMortgageComponent {
     private String transferMortgagePid;
     @Value("${penghao.mortgageRegistration.pid}")
     private String registrationPid;
+    @Value("${sq.bank.jt.username}")
+    private String bsryname;
+    @Value("${sq.bank.jt.password}")
+    private String bsrypassword;
 
     @Autowired
     private AnonymousInnerComponent anonymousInnerComponent;
+    @Autowired
+    private ExchangeToInnerServiceImpl exchangeToInnerService;
+    @Autowired
+    private OuterBackFeign backFeign;
 
 
     /**
@@ -135,7 +148,7 @@ RealEstateMortgageComponent {
      * @param commonInterfaceAttributer
      * @return
      */
-    public ObjectRestResponse sendRegistrationMortgageRevocation(String commonInterfaceAttributer) throws ParseException {
+    public String sendRegistrationMortgageRevocation(String commonInterfaceAttributer) throws ParseException {
         RegistrationBureau registrationBureauVo = null;
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
@@ -148,8 +161,9 @@ RealEstateMortgageComponent {
                 }
                 break;
         }
-        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureauVo);
-        return getObjectRestResponse(sjSjsq, resultObject);
+        String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
+        //做ftp操作
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,false);
     }
 
 
@@ -539,16 +553,16 @@ RealEstateMortgageComponent {
     }
 
 
-    public ObjectRestResponse getAutoRealPropertyCertificateTwo(String commonInterfaceAttributer) throws ParseException {
-        String result = "处理成功";
+    public String getAutoRealPropertyCertificateTwo(String commonInterfaceAttributer) throws ParseException {
         log.info("转JSON前：" + commonInterfaceAttributer);
         ObjectRestResponse resultRV = new ObjectRestResponse();
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, registrationPid, false, grMortgageRegistration, dealPerson, areaNo);
         registrationBureau = ClAutoRealPropertyCertificate(sjSjsq, registrationBureau);
-        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
-        return getObjectRestResponse(sjSjsq, resultObject);
+        String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
+        //做ftp操作
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,false);
     }
 
     private RegistrationBureau ClAutoRealPropertyCertificate(SJ_Sjsq sj_sjsq, RegistrationBureau registrationBureau) {

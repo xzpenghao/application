@@ -33,7 +33,6 @@ public class OtherComponent {
             immovableFile.setFileType(file.getFileExt());
             immovableFile.setFileSize(file.getFileSize());
             int sort = BusinessDealBaseUtil.getFileXh(file, fileVoList);
-
             //排序
             if (sort == 0) {
                 throw new ZtgeoBizException("附件异常");

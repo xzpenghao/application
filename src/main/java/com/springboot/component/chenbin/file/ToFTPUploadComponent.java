@@ -1,9 +1,12 @@
 package com.springboot.component.chenbin.file;
 
 import com.google.common.collect.Maps;
+import com.springboot.config.ZtgeoBizException;
 import com.springboot.util.DateUtils;
+import com.springboot.util.StrUtil;
 import com.springboot.util.chenbin.IDUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -42,6 +45,7 @@ public class ToFTPUploadComponent {
 
 
     public boolean uploadFile(String ftpPath, InputStream input) {
+        String path_temp = ftpPath;
         boolean success = false;
         FTPClient ftp = new FTPClient();
         ftp.setControlEncoding("GBK");
@@ -56,23 +60,37 @@ public class ToFTPUploadComponent {
                 return success;
             }
             ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-            String FTP_BASEPATH1 = ftpPath.substring(0, 5);
-            String FTP_BASEPATH2 = ftpPath.substring(0, 8);
-            String FTP_BASEPATH3 = ftpPath.substring(0, 11);
-            String originFileName = ftpPath.substring(12);
-            ftp.makeDirectory(FTP_BASEPATH1);
-            ftp.changeWorkingDirectory(FTP_BASEPATH1);
-            ftp.makeDirectory(FTP_BASEPATH2);
-            ftp.changeWorkingDirectory(FTP_BASEPATH2);
-            ftp.makeDirectory(FTP_BASEPATH3);
-            ftp.changeWorkingDirectory(FTP_BASEPATH3);
-            ftp.storeFile(originFileName, input);
+            if(StringUtils.isNotBlank(path_temp) && path_temp.contains("\\")){
+                path_temp = path_temp.replaceAll("\\\\","/");
+            }
+            if(StringUtils.isBlank(path_temp)){
+                throw new ZtgeoBizException("FTP路径为空");
+            }
+            String originFileName = StrUtil.getFTPFileNameByFTPPath(path_temp);
+            path_temp = StrUtil.getFTPRemotePathByFTPPath(path_temp);
+            mkDirs(ftp,path_temp);
+//            String FTP_BASEPATH1 = ftpPath.substring(0, 5);
+//            String FTP_BASEPATH2 = ftpPath.substring(0, 8);
+//            String FTP_BASEPATH3 = ftpPath.substring(0, 11);
+//            String originFileName = ftpPath.substring(12);
+//            ftp.makeDirectory(FTP_BASEPATH1);
+//            ftp.changeWorkingDirectory(FTP_BASEPATH1);
+//            ftp.makeDirectory(FTP_BASEPATH2);
+//            ftp.changeWorkingDirectory(FTP_BASEPATH2);
+//            ftp.makeDirectory(FTP_BASEPATH3);
+//            ftp.changeWorkingDirectory(FTP_BASEPATH3);
+            boolean flag = ftp.storeFile(originFileName, input);
             input.close();
             ftp.logout();
             success = true;
+            log.info("success登记平台"+flag);
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
+            log.error("附件上传出现IO异常，详细信息为："+e);
+        } catch (Exception e){
+            e.printStackTrace();
+            log.error("附件上传出现其它运行时异常，详细信息为："+e);
+        }finally {
             if (ftp.isConnected()) {
                 try {
                     ftp.disconnect();

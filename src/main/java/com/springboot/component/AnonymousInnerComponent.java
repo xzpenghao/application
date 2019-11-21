@@ -365,6 +365,7 @@ public class AnonymousInnerComponent {
         log.info("password"+password);
         List<SJ_File> sjFileList = new ArrayList<>();
         Object uploadObject=null;
+        Object djptObject=null;
         if (null != jsonObject && null == fileInfoVoList) {
             fileArray = jsonObject.getJSONArray("fileInfoList");
             log.info("fileArraySize"+fileArray.size());
@@ -409,19 +410,24 @@ public class AnonymousInnerComponent {
                 if (uploadObject == null) {
                     log.error(Msgagger.FILE_FAIL);
                     throw new ZtgeoBizException(Msgagger.FILE_FAIL);
+                 }
+                //登记平台的ftp
+                djptObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,ftpAddress,ftpPort,ftpUsername,ftpPassword);//获取上传路径和名称
+                if (djptObject == null) {
+                    log.error(Msgagger.FILE_FAIL);
+                    throw new ZtgeoBizException(Msgagger.FILE_FAIL);
                 }
-                Map<String, Object> map = (Map<String, Object>) uploadObject;
-                log.info("path:" + map.get("path").toString());
-                log.info("fileName" + map.get("fileName").toString());
+//                log.info("path:" + map.get("path").toString());
+//                log.info("fileName" + map.get("fileName").toString());
                 //覆盖原有url  名称
-                SJ_File sj_file = new SJ_File();
-                sj_file.setFileAddress(map.get("path").toString() + "\\" + map.get("fileName").toString());
-                sj_file.setFileName(map.get("fileName").toString());
-                sj_file.setFileType(fileType);
-                sj_file.setFileSequence(fileObject.getString("fileSequence"));
-                sj_file.setpName(FileTypeEnum.Sc(fileObject.getString("fileType")));
-                sjFileList.add(sj_file);
-                log.info("sjFileList"+sjFileList.size());
+//                SJ_File sj_file = new SJ_File();
+//                sj_file.setFileAddress(map.get("path").toString() + "\\" + map.get("fileName").toString());
+//                sj_file.setFileName(map.get("fileName").toString());
+//                sj_file.setFileType(fileType);
+//                sj_file.setFileSequence(fileObject.getString("fileSequence"));
+//                sj_file.setpName(FileTypeEnum.Sc(fileObject.getString("fileType")));
+//                sjFileList.add(sj_file);
+//                log.info("sjFileList"+sjFileList.size());
             }
         }
         log.info("a:"+fileArray.toString());
@@ -656,7 +662,7 @@ public class AnonymousInnerComponent {
                     }
                     //返回数据到一窗受理平台保存受理编号和登记编号
                     String resultJson = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
-                    System.err.println("result is " + resultJson);
+                   log.info("result is " + resultJson);
                     return resultJson;
                 } catch (Exception e) {
                     e.printStackTrace();

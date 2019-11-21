@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class StrUtil {
 
-
     // 通过FTP路径获取文件名
     public static String getFTPFileNameByFTPPath(String ftppath) {
         String ftpFileName = null;
@@ -32,4 +31,12 @@ public class StrUtil {
         return remotePath;
     }
 
+    public static String getFTPUrl(String path){
+        String remotePath="/"+DateUtils.getNowYear()+"/"+DateUtils.getNowYear()+"/"+DateUtils.getNowDay()+"/"+path;
+        return remotePath;
+    }
+    public static String getFTPAdress(String fileAdress){
+        String remotePath="/"+DateUtils.getNowYear()+"/"+DateUtils.getNowYear()+fileAdress;
+        return remotePath;
+    }
 }

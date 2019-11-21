@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -101,7 +102,7 @@ public class SqRealEstateMortgageComponent {
     private NetSignUtils netSignUtils;
 
 
-    public  void sqJgdyzx(RevokeRegistrationReqVo revokeRegistrationRespVo,OutputStream outputStream){
+    public void sqJgdyzx(RevokeRegistrationReqVo revokeRegistrationRespVo,OutputStream outputStream){
         ExecutorService executor = Executors.newCachedThreadPool();
         Map<String, String> mapParmeter = new HashMap<>();
         JSONObject reObject=new JSONObject();
@@ -109,7 +110,7 @@ public class SqRealEstateMortgageComponent {
             public String call() throws Exception {
                 try {
                     if (null != revokeRegistrationRespVo.getFileInfoVoList() && revokeRegistrationRespVo.getFileInfoVoList().size() != 0) {
-                        String path = StrUtil.getFTPRemotePathByFTPPath(revokeRegistrationRespVo.getFileInfoVoList().get(0).getFileAdress());
+                        String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(revokeRegistrationRespVo.getFileInfoVoList().get(0).getFileAdress()));
                         anonymousInnerComponent.getProcessingAnnex(null, mapParmeter, revokeRegistrationRespVo.getFileInfoVoList(), ftpAddress, ftpPort, ftpUsername, ftpPassword, path);
                     }
                 }catch (Exception e) {
@@ -165,11 +166,13 @@ public class SqRealEstateMortgageComponent {
             List<SJ_File> fjfileList=new ArrayList<>();
             for (FileInfoVo fileInfoVo: revokeRegistrationRespVo.getFileInfoVoList()) {
                 SJ_File sj_file = new SJ_File();
-                sj_file.setFileAddress(fileInfoVo.getFileAdress());
-                sj_file.setFileName(fileInfoVo.getFileName());
-                sj_file.setFileType(fileInfoVo.getFileType());
+                String fileAdress=StrUtil.getFTPAdress(fileInfoVo.getFileAdress()).replaceAll("/","\\");
+                String hz = fileInfoVo.getFileAdress().substring(fileInfoVo.getFileAdress().lastIndexOf(".") + 1);
+                sj_file.setFileName(fileAdress);
+                sj_file.setFileType(hz);
                 sj_file.setFileSequence(fileInfoVo.getFileSequence());
                 sj_file.setpName(FileTypeEnum.Sc(fileInfoVo.getFileType()));
+                log.info("银行发送的附件条目"+sj_file.getpName());
                 fjfileList.add(sj_file);
             }
             JSONArray jsonArray = JSONArray.fromObject(fjfileList);
@@ -284,7 +287,7 @@ public class SqRealEstateMortgageComponent {
                 JSONObject reObject = new JSONObject();
                 try {
                     if (null != mortgageRegistrationReqVo.getFileInfoVoList() && mortgageRegistrationReqVo.getFileInfoVoList().size() != 0) {
-                        String path = StrUtil.getFTPRemotePathByFTPPath(mortgageRegistrationReqVo.getFileInfoVoList().get(0).getFileAdress());
+                        String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(mortgageRegistrationReqVo.getFileInfoVoList().get(0).getFileAdress()));
                         anonymousInnerComponent.getProcessingAnnex(null, mapParmeter, mortgageRegistrationReqVo.getFileInfoVoList(), ftpAddress, ftpPort, ftpUsername, ftpPassword, path);
                     }
                 }catch (Exception e) {
@@ -342,18 +345,21 @@ public class SqRealEstateMortgageComponent {
         log.info("token" + token);
         mapParmeter.put("Authorization", token);
         JSONObject sjsqObject = JSONObject.fromObject(sj_sjsq);
-        //JSONObject sjsqObject=JSONObject.fromObject(sjsq1);
         log.info("sjsqObject" + sjsqObject.toString());
         mapParmeter.put("SJ_Sjsq", sjsqObject.toString());//收件
         if (null != mortgageRegistrationReqVo.getFileInfoVoList() && mortgageRegistrationReqVo.getFileInfoVoList().size()!=0) {
             List<SJ_File> fjfileList=new ArrayList<>();
             for (FileInfoVo fileInfoVo: mortgageRegistrationReqVo.getFileInfoVoList()) {
                 SJ_File sj_file = new SJ_File();
-                sj_file.setFileAddress(fileInfoVo.getFileAdress());
+                //先把/转成\
+                String fileAdress=StrUtil.getFTPAdress(fileInfoVo.getFileAdress()).replaceAll("/","\\");
+                String hz = fileInfoVo.getFileAdress().substring(fileInfoVo.getFileAdress().lastIndexOf(".") + 1);
+                sj_file.setFileAddress(fileAdress);
                 sj_file.setFileName(fileInfoVo.getFileName());
-                sj_file.setFileType(fileInfoVo.getFileType());
+                sj_file.setFileType(hz);
                 sj_file.setFileSequence(fileInfoVo.getFileSequence());
                 sj_file.setpName(FileTypeEnum.Sc(fileInfoVo.getFileType()));
+                log.info("银行发送的附件条目"+sj_file.getpName());
                 fjfileList.add(sj_file);
             }
             JSONArray jsonArray = JSONArray.fromObject(fjfileList);
@@ -503,6 +509,7 @@ public class SqRealEstateMortgageComponent {
 
     //处理抵押登记
     private void ClDydjxx(MortgageRegistrationReqVo mortgageRegistrationReqVo,SJ_Sjsq sj_sjsq,List<RespServiceData> respServiceDataList){
+        try {
         Sj_Info_Dyhtxx sjInfoDyhtxx=new Sj_Info_Dyhtxx();
         if (StringUtils.isNotEmpty(mortgageRegistrationReqVo.getMortgageArea())){
             sjInfoDyhtxx.setMortgageArea(new BigDecimal(mortgageRegistrationReqVo.getMortgageArea()));
@@ -514,8 +521,9 @@ public class SqRealEstateMortgageComponent {
             sjInfoDyhtxx.setValuationValue(new BigDecimal(mortgageRegistrationReqVo.getEvaluationValue()));
         }
         sjInfoDyhtxx.setMortgagePeriod(mortgageRegistrationReqVo.getMortgageTerm());
-        sjInfoDyhtxx.setMortgageStartingDate(DateUtils.parseDate(new Date(),mortgageRegistrationReqVo.getMortgageStartDate()));
-        sjInfoDyhtxx.setMortgageEndingDate(DateUtils.parseDate(new Date(),mortgageRegistrationReqVo.getMortgageEndDate()));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sjInfoDyhtxx.setMortgageStartingDate(formatter.parse(mortgageRegistrationReqVo.getMortgageStartDate()));
+        sjInfoDyhtxx.setMortgageEndingDate(formatter.parse(mortgageRegistrationReqVo.getMortgageEndDate()));
         sjInfoDyhtxx.setMortgageReason(MortgageReasonEnum.Sc(mortgageRegistrationReqVo.getMortgageReason()));
         sjInfoDyhtxx.setApplyTime(DateUtils.parseDate(new Date(),mortgageRegistrationReqVo.getMortgageApplyDate()));
         if (StringUtils.isNotEmpty(mortgageRegistrationReqVo.getAbsoluteFact())) {
@@ -585,6 +593,11 @@ public class SqRealEstateMortgageComponent {
         respServiceDataList.add(respServiceData);
         sj_sjsq.setServiceDatas(respServiceDataList);
         //respServiceDataList(sjInfoDyhtxx);
+
+        }catch (Exception e){
+            log.error("e"+e);
+            e.getMessage();
+        }
     }
 
     /**

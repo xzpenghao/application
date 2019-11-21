@@ -76,8 +76,25 @@ public class RealEstateMortgageController {
 
     @RequestMapping(value = "/getAutoRealPropertyCertificateTwo", method = RequestMethod.POST)
     @ApiOperation("不动产抵押登记（含两证）受理自动接口")
-    public ObjectRestResponse getAutoRealPropertyCertificateTwo(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
-        return realEstateMortgageComponent.getAutoRealPropertyCertificateTwo(commonInterfaceAttributer);
+    public ObjectRestResponse<String> getAutoRealPropertyCertificateTwo(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        try {
+            log.warn("二手房转移转入，本次参数为：" + commonInterfaceAttributer);
+            rv.data(realEstateMortgageComponent.getAutoRealPropertyCertificateTwo(commonInterfaceAttributer));
+        } catch (ParseException e1) {
+            log.error(ErrorDealUtil.getErrorInfo(e1));
+            rv.setStatus(20500);
+            rv.setData("转内网传入的数据格式不正确");
+        } catch (ZtgeoBizException e2) {
+            log.error(ErrorDealUtil.getErrorInfo(e2));
+            rv.setStatus(20500);
+            rv.setData(e2.getMessage());
+        } catch (Exception e3) {
+            log.error(ErrorDealUtil.getErrorInfo(e3));
+            rv.setStatus(20500);
+            rv.setData("转内网出现其它运行时异常，请排查！");
+        }
+        return rv;
     }
 
 
@@ -86,7 +103,7 @@ public class RealEstateMortgageController {
     public ObjectRestResponse sendRegistrationMortgageRevocation(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws ParseException {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
-            rv = realEstateMortgageComponent.sendRegistrationMortgageRevocation(commonInterfaceAttributer);
+            rv.data(realEstateMortgageComponent.sendRegistrationMortgageRevocation(commonInterfaceAttributer));
         } catch (ParseException e1) {
             log.error(ErrorDealUtil.getErrorInfo(e1));
             rv.setStatus(20500);
