@@ -271,3 +271,9 @@ ycsl:
 
 other:
   url: http://localhost:7780/
+
+
+PublicInspect:
+  BDCZHURL: http://10.3.2.147:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
+  DYZMHURL: http://10.3.2.147:23335/api/services/app/BdcQuery/GetBdcInfoByDYZMH?DYZMH=%s
+  YGZMHURL: http://10.3.2.147:23335/api/services/app/BdcQuery/GetBdcInfoByYGZMH?YGZMH=%s
