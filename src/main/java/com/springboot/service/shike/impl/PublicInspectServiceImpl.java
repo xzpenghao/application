@@ -30,12 +30,22 @@ public class PublicInspectServiceImpl implements PublicInspectService {
      * @return
      */
     @Override
-    public JudicialQueryVo JudicialQuery(String bdczh, String type) {
-        if (StringUtils.isBlank(bdczh)||StringUtils.isBlank(type)){
+    public JudicialQueryVo JudicialQuery(String bdczh, String type,String djjg,String inquirer,String workId,String officialId,String remark) {
+        if (StringUtils.isBlank(bdczh)||StringUtils.isBlank(type)||StringUtils.isBlank(djjg)||StringUtils.isBlank(inquirer)||StringUtils.isBlank(workId)||StringUtils.isBlank(officialId)){
             throw new BusinessException("参数格式错误");
         }
         log.info("查询的不动产单元号:{},查询类型:{}",bdczh,type);
         JudicialQueryVo judicialQueryVo = new JudicialQueryVo();
+        //登记机构
+        judicialQueryVo.setDJJG(djjg);
+        //查询人员
+        judicialQueryVo.setCXRY(inquirer);
+        //工作证号
+        judicialQueryVo.setGZZH(workId);
+        //执行公务证号
+        judicialQueryVo.setZXGWZH(officialId);
+        //备注
+        judicialQueryVo.setRemark(remark);
 
         switch (type){
             case "1":

@@ -22,11 +22,11 @@ public class PublicInspectController {
 
     @RequestMapping(value = "/JudicialQuery", method = RequestMethod.POST)
     @ApiOperation("司法查询反馈")
-    public ObjectRestResponse JudicialQuery(String bdczh,String type) {
-        if (StringUtils.isBlank(bdczh)||StringUtils.isBlank(type)){
+    public ObjectRestResponse JudicialQuery(String bdczh,String type,String djjg,String inquirer,String workId,String officialId,String remark) {
+        if (StringUtils.isBlank(bdczh)||StringUtils.isBlank(type)||StringUtils.isBlank(djjg)||StringUtils.isBlank(inquirer)||StringUtils.isBlank(workId)||StringUtils.isBlank(officialId)){
             throw new BusinessException("参数格式错误");
         }
-        return new ObjectRestResponse<>().data(publicInspectService.JudicialQuery(bdczh,type));
+        return new ObjectRestResponse<>().data(publicInspectService.JudicialQuery(bdczh,type,djjg,inquirer,workId,officialId,remark));
     }
 
 
