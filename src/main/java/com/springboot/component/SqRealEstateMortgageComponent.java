@@ -166,7 +166,8 @@ public class SqRealEstateMortgageComponent {
             List<SJ_File> fjfileList=new ArrayList<>();
             for (FileInfoVo fileInfoVo: revokeRegistrationRespVo.getFileInfoVoList()) {
                 SJ_File sj_file = new SJ_File();
-                String fileAdress=StrUtil.getFTPAdress(fileInfoVo.getFileAdress()).replaceAll("/","\\");
+                String adress=StrUtil.getFTPAdress(fileInfoVo.getFileAdress());
+                String fileAdress=adress.replaceAll("/","\\\\");
                 String hz = fileInfoVo.getFileAdress().substring(fileInfoVo.getFileAdress().lastIndexOf(".") + 1);
                 sj_file.setFileName(fileAdress);
                 sj_file.setFileType(hz);
@@ -352,7 +353,8 @@ public class SqRealEstateMortgageComponent {
             for (FileInfoVo fileInfoVo: mortgageRegistrationReqVo.getFileInfoVoList()) {
                 SJ_File sj_file = new SJ_File();
                 //先把/转成\
-                String fileAdress=StrUtil.getFTPAdress(fileInfoVo.getFileAdress()).replaceAll("/","\\");
+                String adress=StrUtil.getFTPAdress(fileInfoVo.getFileAdress());
+                String fileAdress=adress.replaceAll("/","\\\\");
                 String hz = fileInfoVo.getFileAdress().substring(fileInfoVo.getFileAdress().lastIndexOf(".") + 1);
                 sj_file.setFileAddress(fileAdress);
                 sj_file.setFileName(fileInfoVo.getFileName());

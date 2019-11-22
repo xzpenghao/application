@@ -32,11 +32,11 @@ public class StrUtil {
     }
 
     public static String getFTPUrl(String path){
-        String remotePath="/"+DateUtils.getNowYear()+"/"+DateUtils.getNowYear()+"/"+DateUtils.getNowDay()+"/"+path;
+        String remotePath="/"+DateUtils.getNowYear()+"/"+DateUtils.getNowMonth()+"/"+DateUtils.getNowDay()+path;
         return remotePath;
     }
     public static String getFTPAdress(String fileAdress){
-        String remotePath="/"+DateUtils.getNowYear()+"/"+DateUtils.getNowYear()+fileAdress;
+        String remotePath="/"+DateUtils.getNowYear()+"/"+DateUtils.getNowMonth()+"/"+DateUtils.getNowDay()+fileAdress;
         return remotePath;
     }
 }

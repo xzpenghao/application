@@ -87,9 +87,9 @@ RealEstateMortgageComponent {
     private String transferMortgagePid;
     @Value("${penghao.mortgageRegistration.pid}")
     private String registrationPid;
-    @Value("${sq.bank.jt.username}")
+    @Value("${djj.tsryname}")
     private String bsryname;
-    @Value("${sq.bank.jt.password}")
+    @Value("${djj.tsrypaaword}")
     private String bsrypassword;
 
     @Autowired

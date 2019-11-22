@@ -288,6 +288,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         Map<String,Object> map = null;
         try {
             map = immovableFeign.createFlow(registrationBureau);
+            log.info("registerNuber"+map.get("slbh"));
         } catch (Exception e){
             log.error(sjsq.getReceiptNumber()+"号二手房转移业务创建失败，失败出现在发送不动产受理阶段，抛出异常：\n"+ ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("不动产创建二手房转移业务流程失败，失败出现在发送不动产受理阶段，抛出异常：\n"+ ErrorDealUtil.getErrorInfo(e));
