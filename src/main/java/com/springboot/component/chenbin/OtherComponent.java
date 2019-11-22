@@ -66,7 +66,8 @@ public class OtherComponent {
                 }
             } else {
                 if(StringUtils.isBlank(file.getSaveType()) || !"0".equals(file.getSaveType())) {
-                    immovableFile.setFileAdress(file.getFtpPath());
+                    String path=file.getFtpPath().replaceAll("\\\\","/");
+                    immovableFile.setFileAdress(path);
                 }
             }
             if(StringUtils.isNotBlank(immovableFile.getFileAddress())) {

@@ -516,6 +516,7 @@ public class SqRealEstateMortgageComponent {
         }
         if (StringUtils.isNotEmpty(mortgageRegistrationReqVo.getCreditAmount())){
             sjInfoDyhtxx.setCreditAmount(new BigDecimal(mortgageRegistrationReqVo.getCreditAmount()));
+            sjInfoDyhtxx.setMortgageArea(new BigDecimal(mortgageRegistrationReqVo.getCreditAmount()));
         }
         if (StringUtils.isNotEmpty(mortgageRegistrationReqVo.getEvaluationValue())){
             sjInfoDyhtxx.setValuationValue(new BigDecimal(mortgageRegistrationReqVo.getEvaluationValue()));
