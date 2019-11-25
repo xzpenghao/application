@@ -1,78 +1,85 @@
 package com.springboot.entity.chenbin.personnel.pub_use;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class HTXX implements Serializable {
-    @JsonProperty("hTJE")
-    private String HTJE;
-    @JsonProperty("fSSS")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty("HTJE")
+    private Double HTJE = -999d;
+    @JsonProperty("FSSS")
     private String FSSS;
-    @JsonProperty("sFCZ")
-    private Integer SFCZ;
-    @JsonProperty("cZSM")
+    @JsonProperty("SFCZ")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Integer SFCZ = -999;
+    @JsonProperty("CZSM")
     private String CZSM;
-    @JsonProperty("sFBHFS")
-    private Integer SFBHFS;		//是否包含附属设施 1 包含，0 不包含
-    @JsonProperty("sFTG")
-    private Integer SFTG;			//是否资金托管 1 是，0 否
-    @JsonProperty("tGKHH")
+    @JsonProperty("SFBHFS")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Integer SFBHFS = -999;		//是否包含附属设施 1 包含，0 不包含
+    @JsonProperty("SFTG")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Integer SFTG = -999;			//是否资金托管 1 是，0 否
+    @JsonProperty("TGKHH")
     private String TGKHH;			//资金托管开户行
-    @JsonProperty("tGZH")
+    @JsonProperty("TGZH")
     private String TGZH;			//托管账户
-    @JsonProperty("tGMFZFNR")
+    @JsonProperty("TGMFZFNR")
     private String TGMFZFNR;		//买方支付内容
-    @JsonProperty("zFFS")
-    private Integer ZFFS;			//支付方式 1 一次性付款，2 分期付款，3 贷款付款，4 其它付款方式
-    @JsonProperty("fKRQ")
+    @JsonProperty("ZFFS")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Integer ZFFS = -999;			//支付方式 1 一次性付款，2 分期付款，3 贷款付款，4 其它付款方式
+    @JsonProperty("FKRQ")
     private String FKRQ;			//付款日期（付款方式2）
-    @JsonProperty("fQFKRQ1")
+    @JsonProperty("FQFKRQ1")
     private String FQFKRQ1;		//分期付款日期1（付款方式2）
-    @JsonProperty("fQFKJE1")
-    private String FQFKJE1;		//分期付款金额1（付款方式2）
-    @JsonProperty("fQFKRQ2")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty("FQFKJE1")
+    private Double FQFKJE1 = -999d;		//分期付款金额1（付款方式2）
+    @JsonProperty("FQFKRQ2")
     private String FQFKRQ2;		//分期付款日期2（付款方式2）
-    @JsonProperty("fQFKJE2")
-    private String FQFKJE2;		//分期付款金额2（付款方式2）
-    @JsonProperty("fQFKRQ3")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty("FQFKJE2")
+    private Double FQFKJE2 = -999d;		//分期付款金额2（付款方式2）
+    @JsonProperty("FQFKRQ3")
     private String FQFKRQ3;		//分期付款日期3（付款方式2）
-    @JsonProperty("fQFKJE3")
-    private String FQFKJE3;		//分期付款金额3（付款方式2）
-    @JsonProperty("dKFS")
-    private Integer DKFS;			 //贷款方式，1 银行按揭，2 公积金贷款（付款方式3）
-    @JsonProperty("sFKRQ")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty("FQFKJE3")
+    private Double FQFKJE3 = -999d;		//分期付款金额3（付款方式2）
+    @JsonProperty("DKFS")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Integer DKFS = -999;			 //贷款方式，1 银行按揭，2 公积金贷款（付款方式3）
+    @JsonProperty("SFKRQ")
     private String SFKRQ;			//首付款日期（付款方式3）
-    @JsonProperty("sFKJE")
-    private String SFKJE;			 //首付款金额（付款方式3）
-    @JsonProperty("dKSQRQ")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty("SFKJE")
+    private Double SFKJE = -999d;			 //首付款金额（付款方式3）
+    @JsonProperty("DKSQRQ")
     private String DKSQRQ;			 //贷款申请日期（付款方式3）
-    @JsonProperty("qTFKNR")
+    @JsonProperty("QTFKNR")
     private String QTFKNR;			 //其它付款内容（付款方式4）
-    @JsonProperty("qTFKMFZF")
+    @JsonProperty("QTFKMFZF")
     private String QTFKMFZF;			 //其它付款-买方支付（付款方式4）
-    @JsonProperty("jFCDSF")
-    private Integer JFCDSF;			 //买方承担税费情况，1 独自承担（此时YFCDSF为空），2 承担各自部分
-    @JsonProperty("yFCDSF")
-    private Integer YFCDSF;			 //卖方承担税费情况，1 独自承担（此时JFCDSF为空），2 承担各自部分
-    @JsonProperty("jFTS")
-    private Integer JFTS;			 //交付天数
-    @JsonProperty("jFRQ")
+    @JsonProperty("JFCDSF")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Integer JFCDSF = -999;			 //买方承担税费情况，1 独自承担（此时YFCDSF为空），2 承担各自部分
+    @JsonProperty("YFCDSF")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Integer YFCDSF = -999;			 //卖方承担税费情况，1 独自承担（此时JFCDSF为空），2 承担各自部分
+    @JsonProperty("JFTS")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Integer JFTS = -999;			 //交付天数
+    @JsonProperty("JFRQ")
     private String JFRQ;			  //交付日期
-
-    public String getHTJE() {
-        return HTJE;
-    }
-
-    public void setHTJE(String HTJE) {
-        this.HTJE = HTJE;
-    }
 
     public String getFSSS() {
         return FSSS;
     }
-
+    @JsonIgnore
     public void setFSSS(String FSSS) {
         this.FSSS = FSSS;
     }
@@ -80,15 +87,18 @@ public class HTXX implements Serializable {
     public Integer getSFCZ() {
         return SFCZ;
     }
-
+    @JsonIgnore
     public void setSFCZ(Integer SFCZ) {
+        if(SFCZ==null){
+            SFCZ = -999;
+        }
         this.SFCZ = SFCZ;
     }
 
     public String getCZSM() {
         return CZSM;
     }
-
+    @JsonIgnore
     public void setCZSM(String CZSM) {
         this.CZSM = CZSM;
     }
@@ -96,23 +106,29 @@ public class HTXX implements Serializable {
     public Integer getSFBHFS() {
         return SFBHFS;
     }
-
+    @JsonIgnore
     public void setSFBHFS(Integer SFBHFS) {
+        if(SFBHFS==null){
+            SFBHFS = -999;
+        }
         this.SFBHFS = SFBHFS;
     }
 
     public Integer getSFTG() {
         return SFTG;
     }
-
+    @JsonIgnore
     public void setSFTG(Integer SFTG) {
+        if(SFTG==null){
+            SFTG = -999;
+        }
         this.SFTG = SFTG;
     }
 
     public String getTGKHH() {
         return TGKHH;
     }
-
+    @JsonIgnore
     public void setTGKHH(String TGKHH) {
         this.TGKHH = TGKHH;
     }
@@ -120,7 +136,7 @@ public class HTXX implements Serializable {
     public String getTGZH() {
         return TGZH;
     }
-
+    @JsonIgnore
     public void setTGZH(String TGZH) {
         this.TGZH = TGZH;
     }
@@ -128,7 +144,7 @@ public class HTXX implements Serializable {
     public String getTGMFZFNR() {
         return TGMFZFNR;
     }
-
+    @JsonIgnore
     public void setTGMFZFNR(String TGMFZFNR) {
         this.TGMFZFNR = TGMFZFNR;
     }
@@ -136,7 +152,7 @@ public class HTXX implements Serializable {
     public Integer getZFFS() {
         return ZFFS;
     }
-
+    @JsonIgnore
     public void setZFFS(Integer ZFFS) {
         this.ZFFS = ZFFS;
     }
@@ -144,7 +160,7 @@ public class HTXX implements Serializable {
     public String getFKRQ() {
         return FKRQ;
     }
-
+    @JsonIgnore
     public void setFKRQ(String FKRQ) {
         this.FKRQ = FKRQ;
     }
@@ -152,55 +168,31 @@ public class HTXX implements Serializable {
     public String getFQFKRQ1() {
         return FQFKRQ1;
     }
-
+    @JsonIgnore
     public void setFQFKRQ1(String FQFKRQ1) {
         this.FQFKRQ1 = FQFKRQ1;
-    }
-
-    public String getFQFKJE1() {
-        return FQFKJE1;
-    }
-
-    public void setFQFKJE1(String FQFKJE1) {
-        this.FQFKJE1 = FQFKJE1;
     }
 
     public String getFQFKRQ2() {
         return FQFKRQ2;
     }
-
+    @JsonIgnore
     public void setFQFKRQ2(String FQFKRQ2) {
         this.FQFKRQ2 = FQFKRQ2;
-    }
-
-    public String getFQFKJE2() {
-        return FQFKJE2;
-    }
-
-    public void setFQFKJE2(String FQFKJE2) {
-        this.FQFKJE2 = FQFKJE2;
     }
 
     public String getFQFKRQ3() {
         return FQFKRQ3;
     }
-
+    @JsonIgnore
     public void setFQFKRQ3(String FQFKRQ3) {
         this.FQFKRQ3 = FQFKRQ3;
-    }
-
-    public String getFQFKJE3() {
-        return FQFKJE3;
-    }
-
-    public void setFQFKJE3(String FQFKJE3) {
-        this.FQFKJE3 = FQFKJE3;
     }
 
     public Integer getDKFS() {
         return DKFS;
     }
-
+    @JsonIgnore
     public void setDKFS(Integer DKFS) {
         this.DKFS = DKFS;
     }
@@ -208,23 +200,55 @@ public class HTXX implements Serializable {
     public String getSFKRQ() {
         return SFKRQ;
     }
-
+    @JsonIgnore
     public void setSFKRQ(String SFKRQ) {
         this.SFKRQ = SFKRQ;
     }
 
-    public String getSFKJE() {
-        return SFKJE;
+    public Double getHTJE() {
+        return HTJE;
+    }
+    @JsonIgnore
+    public void setHTJE(Double HTJE) {
+        this.HTJE = HTJE;
     }
 
-    public void setSFKJE(String SFKJE) {
+    public Double getFQFKJE1() {
+        return FQFKJE1;
+    }
+    @JsonIgnore
+    public void setFQFKJE1(Double FQFKJE1) {
+        this.FQFKJE1 = FQFKJE1;
+    }
+
+    public Double getFQFKJE2() {
+        return FQFKJE2;
+    }
+    @JsonIgnore
+    public void setFQFKJE2(Double FQFKJE2) {
+        this.FQFKJE2 = FQFKJE2;
+    }
+
+    public Double getFQFKJE3() {
+        return FQFKJE3;
+    }
+    @JsonIgnore
+    public void setFQFKJE3(Double FQFKJE3) {
+        this.FQFKJE3 = FQFKJE3;
+    }
+
+    public Double getSFKJE() {
+        return SFKJE;
+    }
+    @JsonIgnore
+    public void setSFKJE(Double SFKJE) {
         this.SFKJE = SFKJE;
     }
 
     public String getDKSQRQ() {
         return DKSQRQ;
     }
-
+    @JsonIgnore
     public void setDKSQRQ(String DKSQRQ) {
         this.DKSQRQ = DKSQRQ;
     }
@@ -232,7 +256,7 @@ public class HTXX implements Serializable {
     public String getQTFKNR() {
         return QTFKNR;
     }
-
+    @JsonIgnore
     public void setQTFKNR(String QTFKNR) {
         this.QTFKNR = QTFKNR;
     }
@@ -240,7 +264,7 @@ public class HTXX implements Serializable {
     public String getQTFKMFZF() {
         return QTFKMFZF;
     }
-
+    @JsonIgnore
     public void setQTFKMFZF(String QTFKMFZF) {
         this.QTFKMFZF = QTFKMFZF;
     }
@@ -248,7 +272,7 @@ public class HTXX implements Serializable {
     public Integer getJFCDSF() {
         return JFCDSF;
     }
-
+    @JsonIgnore
     public void setJFCDSF(Integer JFCDSF) {
         this.JFCDSF = JFCDSF;
     }
@@ -256,7 +280,7 @@ public class HTXX implements Serializable {
     public Integer getYFCDSF() {
         return YFCDSF;
     }
-
+    @JsonIgnore
     public void setYFCDSF(Integer YFCDSF) {
         this.YFCDSF = YFCDSF;
     }
@@ -264,7 +288,7 @@ public class HTXX implements Serializable {
     public Integer getJFTS() {
         return JFTS;
     }
-
+    @JsonIgnore
     public void setJFTS(Integer JFTS) {
         this.JFTS = JFTS;
     }
@@ -272,7 +296,7 @@ public class HTXX implements Serializable {
     public String getJFRQ() {
         return JFRQ;
     }
-
+    @JsonIgnore
     public void setJFRQ(String JFRQ) {
         this.JFRQ = JFRQ;
     }

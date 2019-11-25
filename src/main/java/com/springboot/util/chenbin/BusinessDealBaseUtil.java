@@ -1,6 +1,11 @@
 package com.springboot.util.chenbin;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.chenbin.personnel.OtherEntity.FcIndexAndTdzh;
@@ -13,7 +18,10 @@ import com.springboot.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -271,7 +279,7 @@ public class BusinessDealBaseUtil {
         return i;
     }
 
-    public static TaxParamBody dealParamForTax(SJ_Sjsq sjsq){
+    public static TaxParamBody dealParamForTax(SJ_Sjsq sjsq) throws ParseException {
         TaxParamBody taxParam = new TaxParamBody();
         List<SJ_Info_Bdcqlxgxx> bdcqls =  sjsq.getImmovableRightInfoVoList();
 
@@ -370,7 +378,7 @@ public class BusinessDealBaseUtil {
         DecimalFormat df = new DecimalFormat("#.00");
         SJ_Jyht_Detail htDetail = jyht.getHtDetail();
         HTXX HTXX = new HTXX();
-        HTXX.setHTJE(jyht.getContractAmount()!=null?df.format(jyht.getContractAmount()):null);//合同金额
+        HTXX.setHTJE(jyht.getContractAmount()!=null? Double.parseDouble(df.format(jyht.getContractAmount())):null);//合同金额
         HTXX.setFSSS(htDetail.getHouseProperties());//附属设施
         HTXX.setSFCZ(StringUtils.isNotBlank(htDetail.getIsHire())?Integer.parseInt(htDetail.getIsHire()):null);//是否出租
         HTXX.setCZSM(htDetail.getHireInstructions());//出租说明
@@ -382,14 +390,14 @@ public class BusinessDealBaseUtil {
         HTXX.setZFFS(StringUtils.isNotBlank(jyht.getPaymentMethod())?Integer.parseInt(jyht.getPaymentMethod()):null);//支付方式 1 一次性付款，2 分期付款，3 贷款付款，4 其它付款方式
         HTXX.setFKRQ(htDetail.getFullPaymentDate());//付款日期（付款方式1）
         HTXX.setFQFKRQ1(htDetail.getStagePaymentDate1());//分期付款日期1（付款方式2）
-        HTXX.setFQFKJE1(htDetail.getStagePaymentAmount1()!=null?df.format(htDetail.getStagePaymentAmount1()):null);//分期付款金额1（付款方式2）//保留两位小数
+        HTXX.setFQFKJE1(htDetail.getStagePaymentAmount1()!=null?Double.parseDouble(df.format(htDetail.getStagePaymentAmount1())):null);//分期付款金额1（付款方式2）//保留两位小数
         HTXX.setFQFKRQ2(htDetail.getStagePaymentDate2());//分期付款日期2（付款方式2）
-        HTXX.setFQFKJE2(htDetail.getStagePaymentAmount2()!=null?df.format(htDetail.getStagePaymentAmount2()):null);//分期付款金额2（付款方式2）
+        HTXX.setFQFKJE2(htDetail.getStagePaymentAmount2()!=null?Double.parseDouble(df.format(htDetail.getStagePaymentAmount2())):null);//分期付款金额2（付款方式2）
         HTXX.setFQFKRQ3(htDetail.getStagePaymentDate3());//分期付款日期3（付款方式2）
-        HTXX.setFQFKJE3(htDetail.getStagePaymentAmount3()!=null?df.format(htDetail.getStagePaymentAmount3()):null);//分期付款金额3（付款方式2）
+        HTXX.setFQFKJE3(htDetail.getStagePaymentAmount3()!=null?Double.parseDouble(df.format(htDetail.getStagePaymentAmount3())):null);//分期付款金额3（付款方式2）
         HTXX.setDKFS(StringUtils.isNotBlank(htDetail.getLoanMode())?Integer.parseInt(htDetail.getLoanMode()):null); //贷款方式，1 银行按揭，2 公积金贷款（付款方式3）
         HTXX.setSFKRQ(htDetail.getFirstPaymentDate());//首付款日期（付款方式3）
-        HTXX.setSFKJE(htDetail.getFirstPaymentAmount()!=null?df.format(htDetail.getFirstPaymentAmount()):null); //首付款金额（付款方式3）//保留两位小数
+        HTXX.setSFKJE(htDetail.getFirstPaymentAmount()!=null?Double.parseDouble(df.format(htDetail.getFirstPaymentAmount())):null); //首付款金额（付款方式3）//保留两位小数
         HTXX.setDKSQRQ(htDetail.getLoanApplyDate()); //贷款申请日期（付款方式3）
         HTXX.setQTFKNR(htDetail.getPaymentContents()); //其它付款内容（付款方式4）
         HTXX.setQTFKMFZF(htDetail.getBuyerPays()); //其它付款-买方支付（付款方式4）
@@ -422,7 +430,7 @@ public class BusinessDealBaseUtil {
         taxParam.setJYDLRXX(JYDLRXX);
         return taxParam;
     }
-    public static TraParamBody dealParamForTra(SJ_Sjsq sjsq){
+    public static TraParamBody dealParamForTra(SJ_Sjsq sjsq) throws ParseException {
         TaxParamBody taxParam = dealParamForTax(sjsq);
         TraParamBody traParam = new TraParamBody();
         traParam.setCFZT(taxParam.getCFZT());
@@ -467,5 +475,44 @@ public class BusinessDealBaseUtil {
         fwxx.setZCS(fw.getTotalStorey());
         fwxx.setSZC(fw.getLocationStorey());
         return fwxx;
+    }
+
+    public static JSONObject dealJSONForSB(Object body){
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>() {
+            @Override
+            public void serialize(Object value, JsonGenerator gen,
+                                  SerializerProvider serializers) throws IOException,
+                    JsonProcessingException {
+                gen.writeString("");
+            }
+        });
+        JSONObject jsonObj = null;
+        try {
+            String dealJsonStr = objectMapper.writeValueAsString(body);
+            System.out.println("处理进行中。。。"+dealJsonStr);
+            jsonObj = JSONObject.parseObject(dealJsonStr);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new ZtgeoBizException("json数据处理异常");
+        }
+        return jsonObj;
+    }
+
+    public static List<FJXX> convertFiles(List<ImmovableFile> files){
+        List<FJXX> fjxxs = new ArrayList<FJXX>();
+        if(files!=null){
+            for(ImmovableFile file:files){
+                FJXX fjxx = new FJXX();
+                fjxx.setFJMC(file.getFileName());
+                fjxx.setFJDX(file.getFileSize());
+                fjxx.setFJFL(file.getpName());
+                fjxx.setFJKZM(file.getFileType());
+                fjxx.setFTPDZ(file.getFileAddress());
+                fjxx.setXH(file.getFileSequence());
+                fjxxs.add(fjxx);
+            }
+        }
+        return fjxxs;
     }
 }

@@ -265,6 +265,9 @@ public class ExchangeToInnerComponent {
                 case "8":
                     zjlxString = "统一社会信用代码";
                     break;
+                default:
+                    zjlxString = zjlxCode;
+                    break;
             }
         }
         return zjlxString;
@@ -281,6 +284,9 @@ public class ExchangeToInnerComponent {
                 break;
             case "2":
                 gyfsStr = "按份共有";
+                break;
+            default:
+                gyfsStr = gyfsCode;
                 break;
         }
         return gyfsStr;

@@ -1,5 +1,6 @@
 package com.springboot.component.chenbin;
 
+import com.alibaba.fastjson.JSONArray;
 import com.springboot.component.chenbin.file.FromFTPDownloadComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.ZtgeoBizException;
@@ -8,6 +9,7 @@ import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.IDUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Component
 public class OtherComponent {
 
@@ -23,21 +26,16 @@ public class OtherComponent {
     private FromFTPDownloadComponent fromFTPDownloadComponent;
     @Autowired
     private ToFTPUploadComponent toFTPUploadComponent;
+    @Autowired
+    private HttpCallComponent httpCallComponent;
 
     public List<ImmovableFile> getInnerFileListByOut(List<SJ_Fjfile> fileVoList,boolean dealFile) {
         List<ImmovableFile> fileList = new ArrayList<ImmovableFile>();
         for (SJ_Fjfile file : fileVoList) {
-            ImmovableFile immovableFile = new ImmovableFile();
-            immovableFile.setFileName(file.getFileName());
-            immovableFile.setpName(file.getLogicPath());
-            immovableFile.setFileType(file.getFileExt());
-            immovableFile.setFileSize(file.getFileSize());
-            int sort = BusinessDealBaseUtil.getFileXh(file, fileVoList);
-            //排序
-            if (sort == 0) {
-                throw new ZtgeoBizException("附件异常");
+            ImmovableFile immovableFile = getBaseFile(file,fileVoList);
+            if(immovableFile==null){
+                throw new ZtgeoBizException("附件数据异常");
             }
-            immovableFile.setFileSequence(Integer.toString(sort));
 
             //获取附件并上传至指定地址
             System.out.println("FTP路径：" + file.getFtpPath());
@@ -75,5 +73,45 @@ public class OtherComponent {
             }
         }
         return fileList;
+    }
+
+    public List<ImmovableFile> getFileList(String receiptNumber,String token){
+        List<ImmovableFile> fileList = new ArrayList<ImmovableFile>();
+        //处理附件
+        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(receiptNumber, token);
+        log.warn(" 不动产登记 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
+        if(fileVoList != null && fileVoList.size()>0) {
+            for (SJ_Fjfile file : fileVoList) {
+                ImmovableFile immovableFile = getBaseFile(file,fileVoList);
+                if(immovableFile==null){
+                    throw new ZtgeoBizException("附件数据异常");
+                }
+                if(!(file.getSaveType()!=null && "0".equals(file.getSaveType()))){//非本地文件
+                    immovableFile.setFileAddress(file.getFtpPath());
+                }
+                fileList.add(immovableFile);
+            }
+        }else{
+            log.error("附件列表为空");
+        }
+        return fileList;
+    }
+
+    public ImmovableFile getBaseFile(SJ_Fjfile file,List<SJ_Fjfile> fileVoList){
+        if(file!=null) {
+            ImmovableFile immovableFile = new ImmovableFile();
+            immovableFile.setFileName(file.getFileName());
+            immovableFile.setpName(file.getLogicPath());
+            immovableFile.setFileType(file.getFileExt());
+            immovableFile.setFileSize(file.getFileSize());
+            int sort = BusinessDealBaseUtil.getFileXh(file, fileVoList);
+            //排序
+            if (sort == 0) {
+                throw new ZtgeoBizException("附件异常");
+            }
+            immovableFile.setFileSequence(Integer.toString(sort));
+            return immovableFile;
+        }
+        return null;
     }
 }

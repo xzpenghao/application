@@ -2,7 +2,13 @@ package com.springboot.service.chenbin.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.chenbin.OtherComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.tra.TraParamBody;
 import com.springboot.entity.chenbin.personnel.tra.TraRespBody;
@@ -10,6 +16,7 @@ import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.JwtAuthenticationRequest;
+import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.service.chenbin.ExchangeToTransactionService;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
@@ -19,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -38,6 +46,9 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
     @Autowired
     private OuterBackFeign backFeign;
 
+    @Autowired
+    private OtherComponent otherComponent;
+
     @Override
     public String deal2Tra(String commonInterfaceAttributer) throws ParseException {
         String result = "处理成功";
@@ -53,13 +64,18 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
         }
         //准备参数
         TraParamBody traParamBody = BusinessDealBaseUtil.dealParamForTra(sjsq);
+        List<ImmovableFile> files = otherComponent.getFileList(sjsq.getReceiptNumber(),token);
+        traParamBody.setFJXX(BusinessDealBaseUtil.convertFiles(files));
         System.out.println("进入交易处理，参数转换为:"+ JSONObject.toJSONString(traParamBody));
         //调用Feign
         Map<String,Object> traBody = new HashMap<String,Object>();
         traBody.put("sign","");
         traBody.put("data",traParamBody);
         log.info("交易转办最终传入数据为："+JSONObject.toJSONString(traBody));
-        ObjectRestResponse<String> rv = otherFeign.testTra(traBody);
+        JSONObject jsonObj = BusinessDealBaseUtil.dealJSONForSB(traBody);
+        System.out.println("发送交易的数据（处理后）："+JSONObject.toJSONString(jsonObj));
+        log.info("发送交易的数据（处理后）："+JSONObject.toJSONString(jsonObj));
+        ObjectRestResponse<String> rv = otherFeign.testTra(jsonObj);
         if(rv.getStatus()==200){
             result = rv.getData();
             //成功后由交易人员签收办件
