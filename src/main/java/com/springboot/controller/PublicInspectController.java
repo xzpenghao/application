@@ -3,6 +3,7 @@ package com.springboot.controller;
 import com.github.wxiaoqi.security.common.exception.base.BusinessException;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.service.shike.PublicInspectService;
+import com.springboot.vo.JudicialRecVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +23,17 @@ public class PublicInspectController {
 
     @RequestMapping(value = "/JudicialQuery", method = RequestMethod.POST)
     @ApiOperation("司法查询反馈")
-    public ObjectRestResponse JudicialQuery(String bdczh,String type,String djjg,String inquirer,String workId,String officialId,String remark) {
-        if (StringUtils.isBlank(bdczh)||StringUtils.isBlank(type)||StringUtils.isBlank(djjg)||StringUtils.isBlank(inquirer)||StringUtils.isBlank(workId)||StringUtils.isBlank(officialId)){
+    public ObjectRestResponse JudicialQuery(JudicialRecVo judicialRecVo) {
+        if (StringUtils.isBlank(judicialRecVo.getBdczh())||
+                StringUtils.isBlank(judicialRecVo.getType())||
+                StringUtils.isBlank(judicialRecVo.getDjjg())||
+                StringUtils.isBlank(judicialRecVo.getInquirer())||
+                StringUtils.isBlank(judicialRecVo.getWorkId())||
+                StringUtils.isBlank(judicialRecVo.getOfficialId())){
             throw new BusinessException("参数格式错误");
         }
-        return new ObjectRestResponse<>().data(publicInspectService.JudicialQuery(bdczh,type,djjg,inquirer,workId,officialId,remark));
+        return new ObjectRestResponse<>().data(publicInspectService.JudicialQuery(judicialRecVo.getBdczh(),
+                judicialRecVo.getType(),judicialRecVo.getDjjg(),judicialRecVo.getInquirer(),judicialRecVo.getWorkId(),judicialRecVo.getOfficialId(),judicialRecVo.getRemark()));
     }
 
 
