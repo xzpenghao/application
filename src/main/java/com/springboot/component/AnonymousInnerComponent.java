@@ -7,7 +7,6 @@ import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.EsfSdq;
-import com.springboot.entity.chenbin.personnel.other.bank.bankenum.FileTypeEnum;
 import com.springboot.entity.chenbin.personnel.other.bank.bankenum.MortgagorPtypeEnum;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.FileInfoVo;
 import com.springboot.entity.chenbin.personnel.other.bank.notice.result.ResultNoticeReqVo;
@@ -18,14 +17,13 @@ import com.springboot.mapper.ExceptionRecordMapper;
 import com.springboot.popj.*;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.HttpRequestMethedEnum;
+import com.springboot.popj.warrant.ParametricData;
 import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.util.DateUtils;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.ParamHttpClientUtil;
 import com.springboot.util.StrUtil;
-import com.springboot.util.chenbin.HttpClientUtil;
 import com.springboot.util.chenbin.IDUtil;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -37,7 +35,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -184,6 +181,8 @@ public class AnonymousInnerComponent {
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(jsonData);
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.BDCQZSDZF_SERVICE_CODE, true, getReceiving.getSlbh());//获取不动产权属信息
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
+                        String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
+                        HandleAttachementDiagram(zyxxObject,mapParmeter,null,ftpAddress,ftpPort,ftpUsername,ftpPassword,path);//附件上传
                         String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
                         JSONObject ycslObject = JSONObject.fromObject(json);
                         log.info("一窗受理返回"+json);
@@ -251,31 +250,45 @@ public class AnonymousInnerComponent {
         String array = jsonObject.getString("realEstateInfoList");
         com.alibaba.fastjson.JSONObject obj1 = jsonObject.getJSONObject("sdqInfo");
         com.alibaba.fastjson.JSONArray jsonArray = com.alibaba.fastjson.JSONArray.parseArray(array);
-
         //整理水电气部门至不动产sj
         List<SJ_Execute_depart> executeDeparts = getExecuteDeparts(obj1);
         JSONArray departArray=JSONArray.fromObject(executeDeparts);
         sjSjsq.setExecuteDeparts(executeDeparts);
+        String qzh="";
         if (null != jsonArray) {
             for (int i = 0; i < jsonArray.size(); i++) {
                 com.alibaba.fastjson.JSONObject jsonObject1 = jsonArray.getJSONObject(i);
                 //设置serviceInfo信息
                 RealPropertyCertificate realPropertyCertificate = realEstateMortgageComponent.getRealPropertyCertificatexx(jsonObject1, obj1);
+                if (StringUtils.isNotBlank(realPropertyCertificate.getImmovableCertificateNo())){
+                    qzh=realPropertyCertificate.getImmovableCertificateNo(); //获取权证号
+                }
                 realPropertyCertificateList.add(realPropertyCertificate);
             }
         }
         RespServiceData respServiceData = new RespServiceData();
         respServiceData.setServiceCode(serviceCode);
-        respServiceData.setServiceDataInfos(realPropertyCertificateList);
         List<RespServiceData> serviceDatas = new ArrayList<>();
-        serviceDatas.add(respServiceData);
         if (flag == true) {
             zlSJsqDbSj(serviceDatas);
-            sjSjsq.setServiceDatas(serviceDatas);
-            JSONArray serviceArray = JSONArray.fromObject(serviceDatas);
-            stringMap.put("serviceDatas", serviceArray.toString());
-            stringMap.put("executeDeparts",departArray.toString());
+            //根据权证号获取信息
+            ParametricData parametricData=new ParametricData();
+            parametricData.setBdczh(qzh);
+            try {
+                //权属信息
+                ObjectRestResponse objectRestResponse=realEstateMortgageComponent.getRealPropertyCertificate(parametricData);
+                respServiceData.setServiceDataInfos((List<Object>)objectRestResponse.getData());
+                serviceDatas.add(respServiceData);
+                sjSjsq.setServiceDatas(serviceDatas);
+                JSONArray serviceArray = JSONArray.fromObject(serviceDatas);
+                stringMap.put("serviceDatas", serviceArray.toString());
+                stringMap.put("executeDeparts",departArray.toString());
+            }catch (Exception e){
+              log.error("错误信息"+e);
+            }
         } else {
+            respServiceData.setServiceDataInfos(realPropertyCertificateList);
+            serviceDatas.add(respServiceData);
             //添加土地证
             sjSjsq.setServiceDatas(serviceDatas);
             sjSjsq.setRegisterNumber(registerNumber);
@@ -350,6 +363,44 @@ public class AnonymousInnerComponent {
     }
 
 
+    public void HandleAttachementDiagram(com.alibaba.fastjson.JSONObject jsonObject ,Map<String, String> stringMap, List<FileInfoVo> fileInfoVoList, String address, String port, String username, String password,String path) {
+        com.alibaba.fastjson.JSONArray fileArray = null;
+        List<SJ_File> sjFileList = new ArrayList<>();
+        Object uploadObject = null;
+        Object djptObject = null;
+        if (null != jsonObject && null == fileInfoVoList) {
+            fileArray = jsonObject.getJSONArray("householdMapInfoList");
+            log.info("fileArraySize" + fileArray.size());
+            for (int i = 0; i < fileArray.size(); i++) {
+                com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
+                String fileAddress = fileObject.getString("fileAddress");
+                log.info("fileAddress:" + fileObject.getString("fileAddress"));
+                log.info("fileType:" + fileObject.getString("fileType"));
+                String fileType = fileObject.getString("fileType");
+                byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
+                uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType, path, yftpAddress, yftpPort, yftpUsername, yftpPassword);//获取上传路径和名称
+                if (uploadObject == null) {
+                    log.error(Msgagger.FILE_FAIL);
+                    throw new ZtgeoBizException(Msgagger.FILE_FAIL);
+                }
+                Map<String, Object> map = (Map<String, Object>) uploadObject;
+                log.info("path:" + map.get("path").toString());
+                log.info("fileName" + map.get("fileName").toString());
+                //覆盖原有url  名称
+                SJ_File sj_file = new SJ_File();
+                sj_file.setFileAddress(map.get("path").toString() + "\\" + map.get("fileName").toString());
+                sj_file.setFileName(map.get("fileName").toString());
+                sj_file.setFileType(fileType);
+                sj_file.setFileSequence(fileObject.getString("fileSequence"));
+                sj_file.setpName(fileObject.getString("pName"));
+                sjFileList.add(sj_file);
+            }
+        }
+        JSONArray jsonArray = JSONArray.fromObject(sjFileList);
+        stringMap.put("fileVoList", jsonArray.toString());
+    }
+
+
     /**
      * 处理
      *ftpAddress,ftpPort,ftpUsername,ftpPassword
@@ -365,7 +416,6 @@ public class AnonymousInnerComponent {
         log.info("password"+password);
         List<SJ_File> sjFileList = new ArrayList<>();
         Object uploadObject=null;
-        Object djptObject=null;
         if (null != jsonObject && null == fileInfoVoList) {
             fileArray = jsonObject.getJSONArray("fileInfoList");
             log.info("fileArraySize"+fileArray.size());
@@ -405,7 +455,6 @@ public class AnonymousInnerComponent {
                 String fileType = fileAddress.substring(fileAddress.lastIndexOf(".") + 1);
                 byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
                 log.info("ftpAdress"+StrUtil.getFTPRemotePathByFTPPath(fileAddress));
-                log.info("");
                 uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,yftpAddress,yftpPort,yftpUsername,yftpPassword);//获取上传路径和名称
                 if (uploadObject == null) {
                     log.error(Msgagger.FILE_FAIL);
@@ -430,10 +479,8 @@ public class AnonymousInnerComponent {
 //                log.info("sjFileList"+sjFileList.size());
             }
         }
-        log.info("a:"+fileArray.toString());
-        log.info("sssssssss"+fileArray.size());
+
         JSONArray jsonArray = JSONArray.fromObject(sjFileList);
-        log.info("附件条数"+jsonArray.size());
         stringMap.put("fileVoList", jsonArray.toString());
     }
 

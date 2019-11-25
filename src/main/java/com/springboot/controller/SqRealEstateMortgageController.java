@@ -11,8 +11,7 @@ import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.ParamEntity;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.MortgageRegistrationReqVo;
 import com.springboot.entity.chenbin.personnel.other.bank.business.revok.RevokeRegistrationReqVo;
-import com.springboot.entity.chenbin.personnel.other.bank.business.revok.RevokeRegistrationRespVo;
-import com.springboot.util.StrUtil;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -59,14 +58,14 @@ public class SqRealEstateMortgageController {
         return sqRealEstateMortgageComponent.sqTaxation(htbh);
     }
 
-    @RequestMapping(value = "/sqBdcdydj", method = RequestMethod.POST)
+    @RequestMapping(value = "/sq/jt/sqBdcdydj", method = RequestMethod.POST)
     @ApiOperation("不动产抵押登记,预告及预告抵押通知接口")
     public void sqBdcdydj(@RequestBody MortgageRegistrationReqVo mortgageRegistrationReqVo, OutputStream outputStream){
          sqRealEstateMortgageComponent.sqJgdyjk(mortgageRegistrationReqVo,outputStream);
     }
 
 
-    @RequestMapping(value = "/sqBdczxdj", method = RequestMethod.POST)
+    @RequestMapping(value = "/sq/jt/sqBdczxdj", method = RequestMethod.POST)
     @ApiOperation("抵押注销通知接口")
     public void sqBdczxdj(@RequestBody RevokeRegistrationReqVo revokeRegistrationRespVo,OutputStream outputStream){
         sqRealEstateMortgageComponent.sqJgdyzx(revokeRegistrationRespVo,outputStream);

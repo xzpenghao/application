@@ -48,7 +48,7 @@ public class ParallelSectorsComponent {
         System.out.println("bdczh:"+parametricData.getBdczh());
         String json = "";
         ObjectRestResponse resultRV = new ObjectRestResponse();
-               if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeName()) && StringUtils.isNotEmpty(parametricData.getObligeeId())){
+        if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeName()) && StringUtils.isNotEmpty(parametricData.getObligeeId())){
             json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+
                     "?BDCZH=" + parametricData.getBdczh()+"&obligeeName="+parametricData.getObligeeName()+"&obligeeId="+parametricData.getObligeeId());
         }else if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeName())){
@@ -57,7 +57,9 @@ public class ParallelSectorsComponent {
         }else if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getObligeeId())){
            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh()+
                    "&obligeeId="+parametricData.getObligeeId());
-       }
+       }else if (StringUtils.isNotEmpty(parametricData.getBdczh())){
+            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh());
+               }
         if (StringUtils.isEmpty(json)){
             resultRV.setStatus(20500);
             resultRV.setMessage(Msgagger.DATA_FAILURE);

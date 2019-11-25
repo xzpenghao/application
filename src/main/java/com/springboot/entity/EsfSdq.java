@@ -11,6 +11,16 @@ EsfSdq {
     private String slbh;//受理编号
     private boolean transferred;//布尔型false表示转移前，true表示转移后
     private List<String> attDirList;//附件目录名称列表
+    private boolean householdMap;//分层分户图附件信息是否需要
+
+
+    public boolean isHouseholdMap() {
+        return householdMap;
+    }
+
+    public void setHouseholdMap(boolean householdMap) {
+        this.householdMap = householdMap;
+    }
 
     public String getSlbh() {
         return slbh;

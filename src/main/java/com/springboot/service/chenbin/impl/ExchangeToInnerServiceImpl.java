@@ -276,14 +276,28 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         System.out.println("进入"+sjsq.getReceiptNumber()+"业务的附件获取功能");
         //处理附件
         List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
+        List<ImmovableFile> immovableFileList=new ArrayList<>();
         log.warn(" 二手房转移 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
         if(fileVoList != null && fileVoList.size()>0) {
-            List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList,dealFile);
-            registrationBureau.setFileInfoVoList(fileList);
+            for (SJ_Fjfile sjFjfile:fileVoList) {
+                ImmovableFile immovableFile=new ImmovableFile();
+                immovableFile.setFileAdress(sjFjfile.getFtpPath());
+                immovableFile.setFileName(sjFjfile.getFileName());
+                immovableFile.setFileType(sjFjfile.getFileExt());
+                if (StringUtils.isEmpty(sjFjfile.getFileSize())){
+                    immovableFile.setFileSize("0"); //登机平台不允许为空
+                }else {
+                    immovableFile.setFileSize(sjFjfile.getFileSize());
+                }
+                immovableFile.setpName(sjFjfile.getLogicPath());
+                immovableFileList.add(immovableFile);
+            }
+//            List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList,dealFile);
+            registrationBureau.setFileInfoVoList(immovableFileList);
         }else{
             log.error("附件列表为空");
         }
-        System.out.println("二手房转移业务最终传入不动产数据为：\n"+JSONObject.toJSONString(registrationBureau));
+        log.info("二手房转移业务最终传入不动产数据为：\n"+JSONObject.toJSONString(registrationBureau));
         //发送登记局
         Map<String,Object> map = null;
         try {
