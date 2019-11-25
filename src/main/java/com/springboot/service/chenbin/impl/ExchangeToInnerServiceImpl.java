@@ -292,7 +292,6 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
                 immovableFile.setpName(sjFjfile.getLogicPath());
                 immovableFileList.add(immovableFile);
             }
-//            List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList,dealFile);
             registrationBureau.setFileInfoVoList(immovableFileList);
         }else{
             log.error("附件列表为空");
@@ -305,15 +304,15 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
             log.info("registerNuber"+map.get("slbh"));
         } catch (Exception e){
             log.error(sjsq.getReceiptNumber()+"号二手房转移业务创建失败，失败出现在发送不动产受理阶段，抛出异常：\n"+ ErrorDealUtil.getErrorInfo(e));
-            throw new ZtgeoBizException("不动产创建二手房转移业务流程失败，失败出现在发送不动产受理阶段，抛出异常：\n"+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("业务流程失败，失败出现在发送不动产受理阶段，抛出异常：\n"+ ErrorDealUtil.getErrorInfo(e));
         }
         if(map==null){
             log.error(sjsq.getReceiptNumber()+"号二手房转移业务创建失败，失败出现在发送不动产受理阶段，响应为空");
-            throw new ZtgeoBizException("不动产创建二手房转移业务流程失败，响应为空");
+            throw new ZtgeoBizException("业务流程失败，响应为空");
         } else {
             if(!((boolean)map.get("success"))){
                 log.error(sjsq.getReceiptNumber()+"号二手房转移业务创建失败，失败出现在发送不动产受理阶段，返回的错误信息为："+map.get("message"));
-                throw new ZtgeoBizException("不动产创建二手房转移业务流程失败，响应为空");
+                throw new ZtgeoBizException("业务流程失败，响应为空");
             }
         }
         //回填slbh至一窗受理
