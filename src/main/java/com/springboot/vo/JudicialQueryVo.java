@@ -3,7 +3,7 @@ package com.springboot.vo;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.github.wxiaoqi.security.common.exception.base.BusinessException;
+import com.springboot.config.ZtgeoBizException;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import java.math.BigDecimal;
@@ -85,7 +85,7 @@ public class JudicialQueryVo {
      */
     public JudicialQueryVo genJudicialQuery(String result,JudicialQueryVo judicialQueryVo,String flag){
         if (StringUtils.isBlank(result)||"[]".equals(result)){
-            throw new BusinessException("查询数据有误,请重试");
+            throw new ZtgeoBizException("查询数据有误,请重试");
         }
         //jsonArray为模糊查询的不动产证号集合
         JSONArray jsonArray = JSONArray.parseArray(result);
