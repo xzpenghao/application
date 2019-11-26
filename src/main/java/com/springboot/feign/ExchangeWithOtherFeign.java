@@ -16,8 +16,8 @@ public interface ExchangeWithOtherFeign {
     @RequestMapping(value = "dataShareAction.do",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=3ycpo7Cc","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
     public ObjectRestResponse<String> testTax(JSONObject taxParamBody);
 
-    @RequestMapping(value = "api/test/testTra",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=qYvkPWSr","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
-//    @RequestMapping(value = "sqservice/bdc/getOneAcceptInfo",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=qYvkPWSr","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
+//    @RequestMapping(value = "api/test/testTra",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=qYvkPWSr","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
+    @RequestMapping(value = "sqservice/bdc/getOneAcceptInfo",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=qYvkPWSr","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
     public ObjectRestResponse<String> testTra(JSONObject TraParamBody);
 
 }
