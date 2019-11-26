@@ -1,5 +1,7 @@
 package com.springboot.entity.chenbin.personnel.pub_use;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
@@ -7,28 +9,30 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class QSXX implements Serializable {
-    @JsonProperty("bDCZH")
+    @JsonProperty("BDCZH")
     private String BDCZH;
-    @JsonProperty("jZMJ")
-    private BigDecimal JZMJ;
-    @JsonProperty("tNMJ")
-    private BigDecimal TNMJ;
-    @JsonProperty("zL")
+    @JsonProperty("JZMJ")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private BigDecimal JZMJ = new BigDecimal(-999);
+    @JsonProperty("TNMJ")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private BigDecimal TNMJ = new BigDecimal(-999);
+    @JsonProperty("ZL")
     private String ZL;
-    @JsonProperty("yT")
+    @JsonProperty("YT")
     private String YT;
-    @JsonProperty("tDSYQR")
+    @JsonProperty("TDSYQR")
     private String TDSYQR;
-    @JsonProperty("tDHQFS")
+    @JsonProperty("TDHQFS")
     private String TDHQFS = "";
 
-    @JsonProperty("fWXX")
+    @JsonProperty("FWXX")
     private List<FWXX> FWXX;
 
     public String getBDCZH() {
         return BDCZH;
     }
-
+    @JsonIgnore
     public void setBDCZH(String BDCZH) {
         this.BDCZH = BDCZH;
     }
@@ -36,7 +40,7 @@ public class QSXX implements Serializable {
     public BigDecimal getJZMJ() {
         return JZMJ;
     }
-
+    @JsonIgnore
     public void setJZMJ(BigDecimal JZMJ) {
         this.JZMJ = JZMJ;
     }
@@ -44,7 +48,7 @@ public class QSXX implements Serializable {
     public BigDecimal getTNMJ() {
         return TNMJ;
     }
-
+    @JsonIgnore
     public void setTNMJ(BigDecimal TNMJ) {
         this.TNMJ = TNMJ;
     }
@@ -52,7 +56,7 @@ public class QSXX implements Serializable {
     public String getZL() {
         return ZL;
     }
-
+    @JsonIgnore
     public void setZL(String ZL) {
         this.ZL = ZL;
     }
@@ -60,7 +64,7 @@ public class QSXX implements Serializable {
     public String getYT() {
         return YT;
     }
-
+    @JsonIgnore
     public void setYT(String YT) {
         this.YT = YT;
     }
@@ -68,7 +72,7 @@ public class QSXX implements Serializable {
     public List<com.springboot.entity.chenbin.personnel.pub_use.FWXX> getFWXX() {
         return FWXX;
     }
-
+    @JsonIgnore
     public void setFWXX(List<com.springboot.entity.chenbin.personnel.pub_use.FWXX> FWXX) {
         this.FWXX = FWXX;
     }
@@ -76,7 +80,7 @@ public class QSXX implements Serializable {
     public String getTDSYQR() {
         return TDSYQR;
     }
-
+    @JsonIgnore
     public void setTDSYQR(String TDSYQR) {
         this.TDSYQR = TDSYQR;
     }
@@ -84,7 +88,7 @@ public class QSXX implements Serializable {
     public String getTDHQFS() {
         return TDHQFS;
     }
-
+    @JsonIgnore
     public void setTDHQFS(String TDHQFS) {
         if(TDHQFS!=null) {
             this.TDHQFS = TDHQFS;

@@ -2,7 +2,13 @@ package com.springboot.service.chenbin.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.chenbin.OtherComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.tax.TaxParamBody;
 import com.springboot.entity.chenbin.personnel.tax.TaxRespBody;
@@ -10,6 +16,7 @@ import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.JwtAuthenticationRequest;
+import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.service.chenbin.ExchangeToTaxService;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
@@ -19,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +48,9 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
     @Autowired
     private OuterBackFeign backFeign;
 
+    @Autowired
+    private OtherComponent otherComponent;
+
     @Override
     public String deal2Tax(String commonInterfaceAttributer) throws ParseException {
         String result = "处理成功";
@@ -55,22 +66,27 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
         }
         //整理参数
         TaxParamBody taxParamBody = BusinessDealBaseUtil.dealParamForTax(sjsq);
+        List<ImmovableFile> files = otherComponent.getFileList(sjsq.getReceiptNumber(),token);
+        taxParamBody.setFJXX(BusinessDealBaseUtil.convertFiles(files));
         System.out.println("进入税务处理，参数转换为:"+JSONObject.toJSONString(taxParamBody));
         //调用Feign,暂时取消
-//        Map<String,Object> taxBody = new HashMap<String,Object>();
-//        taxBody.put("sign","");
-//        taxBody.put("data",taxParamBody);
-//        ObjectRestResponse<String> rv = otherFeign.testTax(taxBody);
-//        if(rv.getStatus()==200){
-//            result = rv.getData();
+        Map<String,Object> taxBody = new HashMap<String,Object>();
+        taxBody.put("sign","");
+        taxBody.put("data",taxParamBody);
+        JSONObject jsonObj = BusinessDealBaseUtil.dealJSONForSB(taxBody);
+        System.out.println("发送税务的数据："+JSONObject.toJSONString(jsonObj));
+        log.info("发送税务的数据："+JSONObject.toJSONString(jsonObj));
+        ObjectRestResponse<String> rv = otherFeign.testTax(jsonObj);
+        if(rv.getStatus()==200){
+            result = rv.getData();
             //成功后由税务人员签收办件
             String receiptNumber = sjsq.getReceiptNumber();
             Map<String, String> mapParmeter = new HashMap<>();
             mapParmeter.put("receiptNumber", receiptNumber);
             backFeign.dealRecieveFromOuter1(token,mapParmeter);
-//        }else{
-//            throw new ZtgeoBizException("税务通知失败，失败原因："+rv.getMessage());
-//        }
+        }else{
+            throw new ZtgeoBizException("税务通知失败，失败原因："+rv.getMessage());
+        }
         System.out.println("税务处理返回，结果为:"+result);
         return result;
     }
