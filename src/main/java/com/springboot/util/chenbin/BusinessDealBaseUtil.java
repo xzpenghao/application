@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -492,10 +493,15 @@ public class BusinessDealBaseUtil {
             String dealJsonStr = objectMapper.writeValueAsString(body);
             System.out.println("处理进行中。。。"+dealJsonStr);
             jsonObj = JSONObject.parseObject(dealJsonStr);
+//            jsonObj = JSONObject.parseObject(new String(dealJsonStr.getBytes(),"UTF-8"));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             throw new ZtgeoBizException("json数据处理异常");
         }
+//        catch (UnsupportedEncodingException e){
+//            e.printStackTrace();
+//            throw new ZtgeoBizException("字符转码异常");
+//        }
         return jsonObj;
     }
 

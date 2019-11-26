@@ -8,8 +8,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class HTXX implements Serializable {
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty("HTJE")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Double HTJE = -999d;
     @JsonProperty("FSSS")
     private String FSSS;
@@ -37,26 +37,28 @@ public class HTXX implements Serializable {
     private String FKRQ;			//付款日期（付款方式2）
     @JsonProperty("FQFKRQ1")
     private String FQFKRQ1;		//分期付款日期1（付款方式2）
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty("FQFKJE1")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Double FQFKJE1 = -999d;		//分期付款金额1（付款方式2）
     @JsonProperty("FQFKRQ2")
     private String FQFKRQ2;		//分期付款日期2（付款方式2）
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty("FQFKJE2")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Double FQFKJE2 = -999d;		//分期付款金额2（付款方式2）
     @JsonProperty("FQFKRQ3")
     private String FQFKRQ3;		//分期付款日期3（付款方式2）
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty("FQFKJE3")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Double FQFKJE3 = -999d;		//分期付款金额3（付款方式2）
+
     @JsonProperty("DKFS")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Integer DKFS = -999;			 //贷款方式，1 银行按揭，2 公积金贷款（付款方式3）
     @JsonProperty("SFKRQ")
     private String SFKRQ;			//首付款日期（付款方式3）
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+
     @JsonProperty("SFKJE")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Double SFKJE = -999d;			 //首付款金额（付款方式3）
     @JsonProperty("DKSQRQ")
     private String DKSQRQ;			 //贷款申请日期（付款方式3）
@@ -154,6 +156,9 @@ public class HTXX implements Serializable {
     }
     @JsonIgnore
     public void setZFFS(Integer ZFFS) {
+        if(ZFFS==null){
+            ZFFS = -999;
+        }
         this.ZFFS = ZFFS;
     }
 
@@ -194,6 +199,9 @@ public class HTXX implements Serializable {
     }
     @JsonIgnore
     public void setDKFS(Integer DKFS) {
+        if(DKFS==null){
+            DKFS = -999;
+        }
         this.DKFS = DKFS;
     }
 
@@ -210,6 +218,9 @@ public class HTXX implements Serializable {
     }
     @JsonIgnore
     public void setHTJE(Double HTJE) {
+        if(HTJE==null){
+            HTJE = -999d;
+        }
         this.HTJE = HTJE;
     }
 
@@ -218,6 +229,9 @@ public class HTXX implements Serializable {
     }
     @JsonIgnore
     public void setFQFKJE1(Double FQFKJE1) {
+        if(FQFKJE1==null){
+            FQFKJE1 = -999d;
+        }
         this.FQFKJE1 = FQFKJE1;
     }
 
@@ -226,6 +240,9 @@ public class HTXX implements Serializable {
     }
     @JsonIgnore
     public void setFQFKJE2(Double FQFKJE2) {
+        if(FQFKJE2==null){
+            FQFKJE2 = -999d;
+        }
         this.FQFKJE2 = FQFKJE2;
     }
 
@@ -234,6 +251,9 @@ public class HTXX implements Serializable {
     }
     @JsonIgnore
     public void setFQFKJE3(Double FQFKJE3) {
+        if(FQFKJE3==null){
+            FQFKJE3 = -999d;
+        }
         this.FQFKJE3 = FQFKJE3;
     }
 
@@ -242,6 +262,9 @@ public class HTXX implements Serializable {
     }
     @JsonIgnore
     public void setSFKJE(Double SFKJE) {
+        if(SFKJE==null){
+            SFKJE = -999d;
+        }
         this.SFKJE = SFKJE;
     }
 
@@ -274,6 +297,9 @@ public class HTXX implements Serializable {
     }
     @JsonIgnore
     public void setJFCDSF(Integer JFCDSF) {
+        if(JFCDSF==null){
+            JFCDSF = -999;
+        }
         this.JFCDSF = JFCDSF;
     }
 
@@ -282,6 +308,9 @@ public class HTXX implements Serializable {
     }
     @JsonIgnore
     public void setYFCDSF(Integer YFCDSF) {
+        if(YFCDSF==null){
+            YFCDSF = -999;
+        }
         this.YFCDSF = YFCDSF;
     }
 
@@ -290,6 +319,9 @@ public class HTXX implements Serializable {
     }
     @JsonIgnore
     public void setJFTS(Integer JFTS) {
+        if(JFTS==null){
+            JFTS = -999;
+        }
         this.JFTS = JFTS;
     }
 

@@ -42,6 +42,9 @@ public class QSXX implements Serializable {
     }
     @JsonIgnore
     public void setJZMJ(BigDecimal JZMJ) {
+        if(JZMJ==null){
+            JZMJ = new BigDecimal(-999);
+        }
         this.JZMJ = JZMJ;
     }
 
@@ -50,6 +53,9 @@ public class QSXX implements Serializable {
     }
     @JsonIgnore
     public void setTNMJ(BigDecimal TNMJ) {
+        if(TNMJ==null){
+            TNMJ = new BigDecimal(-999);
+        }
         this.TNMJ = TNMJ;
     }
 
