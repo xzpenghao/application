@@ -576,7 +576,7 @@ public class SqRealEstateMortgageComponent {
             List<SJ_Info_Bdcqlxgxx> immovableRightInfoVoList=new ArrayList<>();
             if (!MortgageTypeEnum.Sc(mortgageRegistrationReqVo.getMortgageType()).equals(Msgagger.XJSPFYGDYDJ)) {
                 for (RealEstateInfoVo realEstateInfoVo : mortgageRegistrationReqVo.getRealEstateInfoVoList()) {
-                    immovableRightInfoVoList =  ClQsxx(realEstateInfoVo, immovableRightInfoVoList);
+                     ClQsxx(realEstateInfoVo, immovableRightInfoVoList);
                 }
                 //serviceDatas
                 RespServiceData respServiceData=new RespServiceData();
@@ -606,7 +606,7 @@ public class SqRealEstateMortgageComponent {
      * @param realEstateInfoVo
      * @param immovableRightInfoVoList
      */
-    private List<SJ_Info_Bdcqlxgxx> ClQsxx(RealEstateInfoVo realEstateInfoVo,List<SJ_Info_Bdcqlxgxx> immovableRightInfoVoList) {
+    private void ClQsxx(RealEstateInfoVo realEstateInfoVo,List<SJ_Info_Bdcqlxgxx> immovableRightInfoVoList) {
         SJ_Info_Bdcqlxgxx sj_info_bdcqlxgxx=new SJ_Info_Bdcqlxgxx();
         if (null != realEstateInfoVo.getRealEstateId()) {
             sj_info_bdcqlxgxx.setImmovableCertificateNo(realEstateInfoVo.getRealEstateId());//不动产权证
@@ -620,7 +620,6 @@ public class SqRealEstateMortgageComponent {
                 }
                 sj_info_bdcqlxgxx.setGlImmovableVoList(glImmovableVoList);
             }
-            immovableRightInfoVoList.add(sj_info_bdcqlxgxx);
         }else if (null != realEstateInfoVo.getLandCertificate()) {
             sj_info_bdcqlxgxx.setLandCertificateNo(realEstateInfoVo.getLandCertificate());//土地证号
             sj_info_bdcqlxgxx.setCertificateType(Msgagger.BDCQZ);
@@ -634,8 +633,6 @@ public class SqRealEstateMortgageComponent {
                 sj_info_bdcqlxgxx.setGlObligeeVoList(glObligeeVoList);
             }
             immovableRightInfoVoList.add(sj_info_bdcqlxgxx);
-
-        return immovableRightInfoVoList;
     }
 
     /**
