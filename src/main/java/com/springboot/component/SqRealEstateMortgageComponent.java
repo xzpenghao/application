@@ -353,8 +353,7 @@ public class SqRealEstateMortgageComponent {
             for (FileInfoVo fileInfoVo: mortgageRegistrationReqVo.getFileInfoVoList()) {
                 SJ_File sj_file = new SJ_File();
                 //先把/转成\
-                String adress=StrUtil.getFTPAdress(fileInfoVo.getFileAdress());
-                String fileAdress=adress.replaceAll("/","\\\\");
+                String fileAdress=fileInfoVo.getFileAdress().replaceAll("/","\\\\");
                 String hz = fileInfoVo.getFileAdress().substring(fileInfoVo.getFileAdress().lastIndexOf(".") + 1);
                 sj_file.setFileAddress(fileAdress);
                 sj_file.setFileName(fileInfoVo.getFileName());
@@ -575,10 +574,9 @@ public class SqRealEstateMortgageComponent {
         //不动产抵押数据
         if (null != mortgageRegistrationReqVo.getRealEstateInfoVoList() && mortgageRegistrationReqVo.getRealEstateInfoVoList().size()!=0){
             List<SJ_Info_Bdcqlxgxx> immovableRightInfoVoList=new ArrayList<>();
-
             if (!MortgageTypeEnum.Sc(mortgageRegistrationReqVo.getMortgageType()).equals(Msgagger.XJSPFYGDYDJ)) {
                 for (RealEstateInfoVo realEstateInfoVo : mortgageRegistrationReqVo.getRealEstateInfoVoList()) {
-                    ClQsxx(realEstateInfoVo, immovableRightInfoVoList);
+                    immovableRightInfoVoList =  ClQsxx(realEstateInfoVo, immovableRightInfoVoList);
                 }
                 //serviceDatas
                 RespServiceData respServiceData=new RespServiceData();
@@ -608,17 +606,11 @@ public class SqRealEstateMortgageComponent {
      * @param realEstateInfoVo
      * @param immovableRightInfoVoList
      */
-    private void ClQsxx(RealEstateInfoVo realEstateInfoVo,List<SJ_Info_Bdcqlxgxx> immovableRightInfoVoList) {
+    private List<SJ_Info_Bdcqlxgxx> ClQsxx(RealEstateInfoVo realEstateInfoVo,List<SJ_Info_Bdcqlxgxx> immovableRightInfoVoList) {
+        SJ_Info_Bdcqlxgxx sj_info_bdcqlxgxx=new SJ_Info_Bdcqlxgxx();
         if (null != realEstateInfoVo.getRealEstateId()) {
-            SJ_Info_Bdcqlxgxx sj_info_bdcqlxgxx=new SJ_Info_Bdcqlxgxx();
             sj_info_bdcqlxgxx.setImmovableCertificateNo(realEstateInfoVo.getRealEstateId());//不动产权证
-            sj_info_bdcqlxgxx.setCertificateType(Msgagger.TDZ);
-            immovableRightInfoVoList.add(sj_info_bdcqlxgxx);
-        } else if (null != realEstateInfoVo.getLandCertificate()) {
-            SJ_Info_Bdcqlxgxx sj_info_bdcqlxgxx=new SJ_Info_Bdcqlxgxx();
-            sj_info_bdcqlxgxx.setLandCertificateNo(realEstateInfoVo.getLandCertificate());//土地证号
             sj_info_bdcqlxgxx.setCertificateType(Msgagger.BDCQZ);
-            //权属信息绑定
             if (null != realEstateInfoVo.getRealEstateUnitInfoVoList() && realEstateInfoVo.getRealEstateUnitInfoVoList().size() != 0) {
                 List<SJ_Bdc_Gl> glImmovableVoList = new ArrayList<>();
                 for (RealEstateUnitInfoVo realEstateUnitInfoVo : realEstateInfoVo.getRealEstateUnitInfoVoList()) {
@@ -628,6 +620,11 @@ public class SqRealEstateMortgageComponent {
                 }
                 sj_info_bdcqlxgxx.setGlImmovableVoList(glImmovableVoList);
             }
+            immovableRightInfoVoList.add(sj_info_bdcqlxgxx);
+        }else if (null != realEstateInfoVo.getLandCertificate()) {
+            sj_info_bdcqlxgxx.setLandCertificateNo(realEstateInfoVo.getLandCertificate());//土地证号
+            sj_info_bdcqlxgxx.setCertificateType(Msgagger.BDCQZ);
+        }
             //权利人
             if (null != realEstateInfoVo.getObligeeInfoVoList() && realEstateInfoVo.getObligeeInfoVoList().size() != 0) {
                 List<SJ_Qlr_Gl> glObligeeVoList = new ArrayList<>();
@@ -637,7 +634,8 @@ public class SqRealEstateMortgageComponent {
                 sj_info_bdcqlxgxx.setGlObligeeVoList(glObligeeVoList);
             }
             immovableRightInfoVoList.add(sj_info_bdcqlxgxx);
-        }
+
+        return immovableRightInfoVoList;
     }
 
     /**

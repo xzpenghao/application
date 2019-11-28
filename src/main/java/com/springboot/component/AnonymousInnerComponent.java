@@ -23,6 +23,7 @@ import com.springboot.util.DateUtils;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.ParamHttpClientUtil;
 import com.springboot.util.StrUtil;
+import com.springboot.util.chenbin.HttpClientUtil;
 import com.springboot.util.chenbin.IDUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
@@ -416,6 +417,7 @@ public class AnonymousInnerComponent {
         log.info("password"+password);
         List<SJ_File> sjFileList = new ArrayList<>();
         Object uploadObject=null;
+        Object djptObject=null;
         if (null != jsonObject && null == fileInfoVoList) {
             fileArray = jsonObject.getJSONArray("fileInfoList");
             log.info("fileArraySize"+fileArray.size());
@@ -461,11 +463,11 @@ public class AnonymousInnerComponent {
                     throw new ZtgeoBizException(Msgagger.FILE_FAIL);
                  }
                 //登记平台的ftp
-//                djptObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,ftpAddress,ftpPort,ftpUsername,ftpPassword);//获取上传路径和名称
-//                if (djptObject == null) {
-//                    log.error(Msgagger.FILE_FAIL);
-//                    throw new ZtgeoBizException(Msgagger.FILE_FAIL);
-//                }
+                djptObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,ftpAddress,ftpPort,ftpUsername,ftpPassword);//获取上传路径和名称
+                if (djptObject == null) {
+                    log.error(Msgagger.FILE_FAIL);
+                    throw new ZtgeoBizException(Msgagger.FILE_FAIL);
+                }
 //                log.info("path:" + map.get("path").toString());
 //                log.info("fileName" + map.get("fileName").toString());
                 //覆盖原有url  名称
@@ -969,8 +971,7 @@ public class AnonymousInnerComponent {
 
 
     private String BankNotification(JSONObject jsonObject,String url) throws IOException{
-        String json = HttpClientUtils.getJsonData(
-                jsonObject, "http://" + jtIp + ":" + jtPost +"/"+url);
+        String json= HttpClientUtil.post("e4f0fbe9ac9449d3bad6edee1be5626e","Cm1AhVSR",jsonObject.toString(),"http://" + jtIp + ":" + jtPost +"/"+url);
         log.info("yinhang返回信息为：" + json);
         return json;
     }

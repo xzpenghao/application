@@ -15,9 +15,11 @@ import com.springboot.entity.chenbin.personnel.other.bank.business.revok.RevokeR
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,6 +34,9 @@ public class SqRealEstateMortgageController {
     private SqRealEstateMortgageComponent sqRealEstateMortgageComponent;
     @Autowired
     private RealEstateMortgageComponent realEstateMortgageComponent;
+    @Autowired
+    private ToFTPUploadComponent toFTPUploadComponent;
+
 
     @RequestMapping(value = "/sqTransactionContract", method = RequestMethod.POST)
     @ApiOperation("二手房交易合同信息处理")
@@ -57,6 +62,13 @@ public class SqRealEstateMortgageController {
     public ObjectRestResponse sqTaxation(@RequestParam("htbh") String htbh) throws Exception{
         return sqRealEstateMortgageComponent.sqTaxation(htbh);
     }
+
+    @RequestMapping(value = "/file", method = RequestMethod.POST)
+    @ApiOperation("测试附件")
+    public Object sqTaxation(@Param("file") MultipartFile file) throws Exception{
+        return toFTPUploadComponent.uploadFile(file);
+    }
+
 
     @RequestMapping(value = "/sq/jt/sqBdcdydj", method = RequestMethod.POST)
     @ApiOperation("不动产抵押登记,预告及预告抵押通知接口")

@@ -1,11 +1,13 @@
 package com.springboot.component.chenbin.file;
 
+import com.github.pagehelper.util.StringUtil;
 import com.google.common.collect.Maps;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.util.DateUtils;
 import com.springboot.util.StrUtil;
 import com.springboot.util.chenbin.IDUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -42,6 +44,88 @@ public class ToFTPUploadComponent {
 
 
     private static String LOCAL_CHARSET = "GBK";
+
+
+    public  String uploadFile(MultipartFile uploadFile){
+        //链接
+        FTPClient ftpClient = new FTPClient();
+        boolean returnValue  = false;
+        String fileName=null;
+        String hz=null;
+        //路径年/月/日/entryId名称
+        String path=DateUtils.getNowYear()+File.separator+DateUtils.getNowMonth()+ File.separator+DateUtils.getNowDay();
+        try {
+            log.info("进入附件处理");
+            int reply;
+            log.info("连接ftp服务器");
+            ftpClient.connect(yftpAddress, Integer.parseInt(yftpPort));// 连接FTP服务器
+            log.info("登录ftp用户");
+            ftpClient.login(yftpUsername, yftpPassword);// 登录
+            ftpClient.enterLocalPassiveMode();
+            //如果没有需求上传图片的话还ok，
+            /**
+             * 确认应答状态码是否正确完成响应
+             * 凡是 2开头的 isPositiveCompletion 都会返回 true，因为它底层判断是：
+             * return (reply >= 200 && reply < 300);
+             */
+            reply = ftpClient.getReplyCode();
+            if (!FTPReply.isPositiveCompletion(reply)) {
+                ftpClient.disconnect();
+                return null;
+            }
+            // 但是要是传图片，就需要设置一下文件类型为二进制
+            // 这样上传的图片才不会报错（记得我的错误貌似是什么ASCII编码什么的。。）
+            ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
+            ftpClient.setFileTransferMode(ftpClient.BINARY_FILE_TYPE);
+//            ftpClient.setBufferSize(10240*10240);
+            //创建目录
+            mkDirs(ftpClient,path);//创建目录
+            ftpClient.changeWorkingDirectory("/" + path);//创建完了目录需要将当前工作目录切换过来，然后直接在下面创建文件
+            if (FTPReply.isPositiveCompletion(ftpClient.sendCommand("OPTS UTF8", "ON"))) {// 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码，否则就使用本地编码（GBK）.
+                LOCAL_CHARSET = "UTF-8";
+            }
+            hz=uploadFile.getOriginalFilename().substring(uploadFile.getOriginalFilename().lastIndexOf(".")+1);
+            log.info("hz"+hz);
+            fileName=IDUtil.getFinstId()+"."+hz;
+            log.info("fileName"+fileName);
+            FTPFile[] fs = ftpClient.listFiles(fileName);
+            if (fs.length == 0) {
+                log.info("this file not exist ftp");
+            } else if (fs.length == 1) {
+                log.info("this file exist ftp");
+                ftpClient.deleteFile(fs[0].getName());
+            }
+            InputStream is = uploadFile.getInputStream();
+            log.info("is"+is);
+            returnValue = ftpClient.storeFile(new String(fileName.getBytes("UTF-8"),"iso-8859-1"),is);
+            log.info("resultValue:"+returnValue);
+            ftpClient.logout();
+            is.close();
+        } catch (Exception e) {
+            returnValue=false;
+            e.printStackTrace();
+        } finally {
+            try {
+                ftpClient.disconnect();
+                if (returnValue==false){
+                    return null;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (returnValue==true){
+            return path+File.separator+fileName;
+        }
+        return null;
+    }
+
+
+
+
+
+
+
 
 
     public boolean uploadFile(String ftpPath, InputStream input) {
@@ -149,7 +233,7 @@ public class ToFTPUploadComponent {
                 return null;
             }
             log.info("reply"+reply);
-            ftpClient.enterLocalPassiveMode();
+            ftpClient.enterLocalActiveMode();
             //如果没有需求上传图片的话还ok，
             // 但是要是传图片，就需要设置一下文件类型为二进制
             // 这样上传的图片才不会报错（记得我的错误貌似是什么ASCII编码什么的。。）

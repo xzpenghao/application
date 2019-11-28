@@ -163,7 +163,7 @@ RealEstateMortgageComponent {
         }
         String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
         //做ftp操作
-        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,false);
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureauVo,false);
     }
 
 
