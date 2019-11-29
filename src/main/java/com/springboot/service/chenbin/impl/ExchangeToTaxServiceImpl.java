@@ -54,6 +54,7 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
     @Override
     public String deal2Tax(String commonInterfaceAttributer) throws ParseException {
         String result = "处理成功";
+        log.info("开始发送");
         //token
         String token = backFeign.getToken(new JwtAuthenticationRequest(username,password)).getData();
         //处理数据
@@ -69,23 +70,32 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
         List<ImmovableFile> files = otherComponent.getFileList(sjsq.getReceiptNumber(),token);
         taxParamBody.setFJXX(BusinessDealBaseUtil.convertFiles(files));
         System.out.println("进入税务处理，参数转换为:"+JSONObject.toJSONString(taxParamBody));
+        log.info("税务转办传入基带处理数据为："+JSONObject.toJSONString(taxParamBody));
         //调用Feign,暂时取消
         Map<String,Object> taxBody = new HashMap<String,Object>();
         taxBody.put("sign","");
-        taxBody.put("data",taxParamBody);
-        JSONObject jsonObj = BusinessDealBaseUtil.dealJSONForSB(taxBody);
-        System.out.println("发送税务的数据："+JSONObject.toJSONString(jsonObj));
-        log.info("发送税务的数据："+JSONObject.toJSONString(jsonObj));
-        ObjectRestResponse<String> rv = otherFeign.testTax(jsonObj);
-        if(rv.getStatus()==200){
-            result = rv.getData();
+        JSONObject jsonObj = BusinessDealBaseUtil.dealJSONForSB(taxParamBody);
+        taxBody.put("data",jsonObj);
+        System.out.println("发送税务的数据："+JSONObject.toJSONString(taxBody));
+        log.info("发送税务的数据："+JSONObject.toJSONString(taxBody));
+        try {
+            ObjectRestResponse<String> rv = otherFeign.testTax(taxBody);
+            if(rv.getStatus()==200){
+                result = rv.getData();
+            }else{
+                log.error("税务通知失败，失败原因："+rv.getMessage());
+                throw new ZtgeoBizException("税务通知失败，失败原因："+rv.getMessage());
+            }
+            log.info("税务处理返回，结果为:"+JSONObject.toJSONString(rv));
+        } catch (Exception e){
+            log.error("税务通知异常，异常产生原因：" + e.getMessage());
+            throw new ZtgeoBizException("税务通知异常，异常产生原因：" + e.getMessage());
+        } finally {
             //成功后由税务人员签收办件
             String receiptNumber = sjsq.getReceiptNumber();
             Map<String, String> mapParmeter = new HashMap<>();
             mapParmeter.put("receiptNumber", receiptNumber);
             backFeign.dealRecieveFromOuter1(token,mapParmeter);
-        }else{
-            throw new ZtgeoBizException("税务通知失败，失败原因："+rv.getMessage());
         }
         System.out.println("税务处理返回，结果为:"+result);
         return result;
@@ -93,6 +103,8 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
 
     @Override
     public ObjectRestResponse<String> examineSuccess4Tax(TaxRespBody taxRespBody) {
+        System.out.println("解析传入数据："+JSONObject.toJSONString(taxRespBody));
+        log.info("解析传入数据："+JSONObject.toJSONString(taxRespBody));
         String result = "";
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         if(taxRespBody==null){
@@ -101,6 +113,7 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
             return rv;
         }
         System.out.println("正在获取操作用户token");
+        log.info("正在获取操作用户token");
         String token = backFeign.getToken(new JwtAuthenticationRequest(username,password)).getData();
 
         List<RespServiceData> serviceDatas = new ArrayList<>();
@@ -131,7 +144,12 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
         serviceDatas.add(serviceData);
         mapParmeter.put("serviceDatas", JSONArray.toJSONString(serviceDatas));
         System.out.println("契税处理结果："+JSONObject.toJSONString(mapParmeter));
+        log.info("契税处理结果："+JSONObject.toJSONString(mapParmeter));
         rv = backFeign.DealRecieveFromOuter2(token,mapParmeter);
+        log.info("一窗受理处理结果："+JSONObject.toJSONString(rv));
+        if(rv.getStatus()==200){
+            rv.data("操作成功");
+        }
         return rv;
     }
 }

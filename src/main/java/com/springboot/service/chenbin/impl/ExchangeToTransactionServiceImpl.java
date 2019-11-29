@@ -51,6 +51,7 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
 
     @Override
     public String deal2Tra(String commonInterfaceAttributer) throws ParseException {
+        log.info("开始发送");
         String result = "处理成功";
         //token
         String token = backFeign.getToken(new JwtAuthenticationRequest(username,password)).getData();
@@ -70,21 +71,29 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
         //调用Feign
         Map<String,Object> traBody = new HashMap<String,Object>();
         traBody.put("sign","");
-        traBody.put("data",traParamBody);
-        log.info("交易转办最终传入数据为："+JSONObject.toJSONString(traBody));
-        JSONObject jsonObj = BusinessDealBaseUtil.dealJSONForSB(traBody);
-        System.out.println("发送交易的数据（处理后）："+JSONObject.toJSONString(jsonObj));
-        log.info("发送交易的数据（处理后）："+JSONObject.toJSONString(jsonObj));
-        ObjectRestResponse<String> rv = otherFeign.testTra(jsonObj);
-        if(rv.getStatus()==200){
-            result = rv.getData();
+        log.info("交易转办传入基带处理数据为："+JSONObject.toJSONString(traParamBody));
+        JSONObject jsonObj = BusinessDealBaseUtil.dealJSONForSB(traParamBody);
+        traBody.put("data",jsonObj);
+        System.out.println("发送交易的数据（处理后）："+JSONObject.toJSONString(traBody));
+        log.info("发送交易的数据（处理后）："+JSONObject.toJSONString(traBody));
+        try {
+            ObjectRestResponse<String> rv = otherFeign.testTra(traBody);
+            if (rv.getStatus() == 200) {
+                result = rv.getData();
+            } else {
+                log.error("交易通知失败，失败原因：" + rv.getMessage());
+                throw new ZtgeoBizException("交易通知失败，失败原因：" + rv.getMessage());
+            }
+            log.info("交易处理返回，结果为:"+JSONObject.toJSONString(rv));
+        } catch (Exception e){
+            log.error("交易通知异常，异常产生原因：" + e.getMessage());
+            throw new ZtgeoBizException("交易通知异常，异常产生原因：" + e.getMessage());
+        } finally {
             //成功后由交易人员签收办件
             String receiptNumber = sjsq.getReceiptNumber();
             Map<String, String> mapParmeter = new HashMap<>();
             mapParmeter.put("receiptNumber", receiptNumber);
             backFeign.dealRecieveFromOuter1(token,mapParmeter);
-        }else{
-            throw new ZtgeoBizException("交易通知失败，失败原因："+rv.getMessage());
         }
         System.out.println("交易处理返回，结果为:"+result);
         return result;
@@ -92,6 +101,8 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
 
     @Override
     public ObjectRestResponse<String> examineSuccess4Tra(TraRespBody traRespBody) {
+        System.out.println("(交易)解析传入数据："+JSONObject.toJSONString(traRespBody));
+        log.info("解析传入数据："+JSONObject.toJSONString(traRespBody));
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         if(traRespBody==null){
             rv.setStatus(20500);
@@ -99,6 +110,7 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
             return rv;
         }
         System.out.println("正在获取操作用户token");
+        log.info("正在获取操作用户token");
         String token = backFeign.getToken(new JwtAuthenticationRequest(username,password)).getData();
 
         Map<String, String> mapParmeter = new HashMap<>();
@@ -130,8 +142,16 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
         serviceDatas.add(serviceData);
         mapParmeter.put("serviceDatas", JSONArray.toJSONString(serviceDatas));
         System.out.println("交易处理结果数据："+JSONObject.toJSONString(serviceData));
+        log.info("交易处理结果数据："+JSONObject.toJSONString(serviceData));
         //调用feign返回处理结果并提交对应流程
         rv = backFeign.DealRecieveFromOuter2(token,mapParmeter);
+        log.info("一窗受理处理结果："+JSONObject.toJSONString(rv));
+        if(rv.getStatus()==200){
+            rv.data("操作成功");
+        }
+//        else if(rv.getStatus()==20500){
+//            if(StringUtils.isNotBlank(rv.getMessage()) && "")
+//        }
         return rv;
     }
 }

@@ -1,6 +1,7 @@
 package com.springboot.component.chenbin;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.springboot.component.chenbin.file.FromFTPDownloadComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.ZtgeoBizException;
@@ -32,6 +33,7 @@ public class OtherComponent {
     public List<ImmovableFile> getInnerFileListByOut(List<SJ_Fjfile> fileVoList,boolean dealFile) {
         List<ImmovableFile> fileList = new ArrayList<ImmovableFile>();
         for (SJ_Fjfile file : fileVoList) {
+            log.info("处理附件 -- -- "+ JSONObject.toJSONString(file));
             ImmovableFile immovableFile = getBaseFile(file,fileVoList);
             if(immovableFile==null){
                 throw new ZtgeoBizException("附件数据异常");
@@ -39,7 +41,9 @@ public class OtherComponent {
 
             //获取附件并上传至指定地址
             System.out.println("FTP路径：" + file.getFtpPath());
+            log.info("FTP路径：" + file.getFtpPath()+"SAVE_TYPE:"+ file.getSaveType()+"  ");
             if(dealFile) {
+                log.info("处理FTP文件（上传下载）");
                 String applyDate = file.getFileSubmissionTime();
                 if (StringUtils.isBlank(applyDate) || applyDate.length() != 19) {
                     TimeUtil.getTimeString(new Date());
@@ -63,12 +67,14 @@ public class OtherComponent {
                     throw new ZtgeoBizException("附件下载异常");
                 }
             } else {
+                log.info("处理FTP文件（非upOrDown）或者保存为本地文件");
                 if(StringUtils.isBlank(file.getSaveType()) || !"0".equals(file.getSaveType())) {
+                    log.info("处理FTP文件（非upOrDown）");
                     String path=file.getFtpPath().replaceAll("\\\\","/");
                     immovableFile.setFileAdress(path);
                 }
             }
-            if(StringUtils.isNotBlank(immovableFile.getFileAddress())) {
+            if(StringUtils.isNotBlank(immovableFile.getFileAdress())) {
                 fileList.add(immovableFile);
             }
         }
@@ -79,7 +85,7 @@ public class OtherComponent {
         List<ImmovableFile> fileList = new ArrayList<ImmovableFile>();
         //处理附件
         List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(receiptNumber, token);
-        log.warn(" 不动产登记 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
+        log.info(" 不动产登记 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
         if(fileVoList != null && fileVoList.size()>0) {
             for (SJ_Fjfile file : fileVoList) {
                 ImmovableFile immovableFile = getBaseFile(file,fileVoList);
@@ -88,8 +94,8 @@ public class OtherComponent {
                 }
                 if(!(file.getSaveType()!=null && "0".equals(file.getSaveType()))){//非本地文件
                     immovableFile.setFileAddress(file.getFtpPath());
+                    fileList.add(immovableFile);
                 }
-                fileList.add(immovableFile);
             }
         }else{
             log.error("附件列表为空");

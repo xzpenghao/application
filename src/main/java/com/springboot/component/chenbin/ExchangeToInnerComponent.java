@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -25,7 +26,9 @@ public class ExchangeToInnerComponent {
 
     public List<SJ_Info_Bdcqlxgxx> getBdcQlInfoWithItsRights(ParametricData parametricData){
         List<SJ_Info_Bdcqlxgxx> serviceDataInfos = new ArrayList<SJ_Info_Bdcqlxgxx>();
+        log.info("执行BDC查询前："+ new Date().getTime());
         List<JSONObject> jsonImmoVoList = immovableFeign.getBdcInfoByZH(parametricData.getBdczh(),parametricData.getQlrmc(),parametricData.getObligeeId());
+        log.info("执行BDC查询后："+ new Date().getTime());
         if(jsonImmoVoList!=null) {
             for (JSONObject jsonImmov:jsonImmoVoList) {
                 SJ_Info_Bdcqlxgxx bdcqlxgxx = new SJ_Info_Bdcqlxgxx();

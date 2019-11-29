@@ -160,7 +160,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjsq, transferRegisterPid, false, registrationOfTransfer, dealPerson, areaNo);
         TransferBizInfo transferBizInfo = BusinessDealBaseUtil.getTransferBizInfoByJyhtAndBdcqls(sjsq,idType);
         registrationBureau.setTransferBizInfo(transferBizInfo);
-        return handleCreateFlow(token,sjsq,registrationBureau,true);
+        return handleCreateFlow(token,sjsq,registrationBureau,false);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         }
         registrationBureau.setTransferBizInfo(transferBizInfo);
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
-        return handleCreateFlow(token,sjsq,registrationBureau,true);
+        return handleCreateFlow(token,sjsq,registrationBureau,false);
     }
 
     @Override
@@ -274,16 +274,19 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
 
     public String handleCreateFlow(String token,SJ_Sjsq sjsq,RegistrationBureau registrationBureau,boolean dealFile){
         System.out.println("进入"+sjsq.getReceiptNumber()+"业务的附件获取功能");
+        log.info("进入"+sjsq.getReceiptNumber()+"业务的附件获取功能");
         //处理附件
         List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
-        log.warn(" 不动产登记 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
+        log.info(" 不动产登记 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
         if(fileVoList != null && fileVoList.size()>0) {
             List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList,dealFile);
+            log.info("经处理，获得的附件列表集合为："+JSONArray.toJSONString(fileList));
             registrationBureau.setFileInfoVoList(fileList);
         }else{
             log.error("附件列表为空");
         }
         System.out.println("不动产登记业务最终传入不动产数据为：\n"+JSONObject.toJSONString(registrationBureau));
+        log.info("不动产登记业务最终传入不动产数据为：\n"+JSONObject.toJSONString(registrationBureau));
         //发送登记局
         Map<String,Object> map = null;
         try {
@@ -308,6 +311,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         params.put("registerNumber",(String) map.get("slbh"));
         backFeign.dealRecieveFromOuter1(token,params);
         System.out.println("进入不动产处理，受理成功！");
+        log.info("进入不动产处理，受理成功！");
         return "转移登记同步内网办理成功";
     }
 

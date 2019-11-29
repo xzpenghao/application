@@ -106,14 +106,19 @@ public class ExchangeToOtherRest {
     @RequestMapping(value = "examineSuccess/jy", method = RequestMethod.POST)
     @ApiOperation(value = "网签备案成功通知",
             notes = "模拟交易审核网签备案成功后返回数据并驱动一窗受理平台流程继续。")
-    public ObjectRestResponse<String> examineSuccess4(@RequestBody TraRespBody traRespBody){
+    public ObjectRestResponse<String> examineSuccess4(@RequestBody Map<String,String> respMap ){
+        System.out.println("进入网签备案结果回推");
+        log.info("进入网签备案结果回推");
+        TraRespBody traRespBody = JSONObject.parseObject(respMap.get("data"),TraRespBody.class);
         return exc2Tran.examineSuccess4Tra(traRespBody);
     }
 
     @RequestMapping(value = "examineSuccess/qs", method = RequestMethod.POST)
     @ApiOperation(value = "核税成功通知",
             notes = "模拟税务局核税成功后返回数据并驱动一窗受理平台流程继续。")
-    public ObjectRestResponse<String> examineSuccess2(@RequestBody TaxRespBody taxRespBody){
+    public ObjectRestResponse<String> examineSuccess2(@RequestBody Map<String,String> respMap ){
+        log.info("进入税务完税结果回推");
+        TaxRespBody taxRespBody = JSONObject.parseObject(respMap.get("data"),TaxRespBody.class);
         return exc2Tax.examineSuccess4Tax(taxRespBody);
     }
 }

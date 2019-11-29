@@ -292,6 +292,8 @@ public class ToFTPUploadComponent {
                 if (!isDirExist(client, ps)) {
                     client.makeDirectory(ps);// 创建目录
                     client.changeWorkingDirectory(ps);// 进入创建的目录
+                }else{
+                    client.changeWorkingDirectory(ps);// 进入创建的目录
                 }
             }
         }
