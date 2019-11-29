@@ -70,6 +70,17 @@ public class ExchangeToInnerComponent {
                 if(landRightVoList!=null && landRightVoList.size()>0){
                     JSONObject landRight = landRightVoList.getJSONObject(0);
                     bdcqlxgxx.setLandUseRightOwner(landRight.getString("landUser"));
+                    bdcqlxgxx.setLandRightType(landRight.getString("landRightType"));
+                    bdcqlxgxx.setLandRightNature(landRight.getString("landRightNature"));
+                    bdcqlxgxx.setLandPurpose(landRight.getString("landUsage"));      //土地用途
+
+                    String gymj = getNotNullData(landRight.getString("commonLandArea"));
+                    String dymj = getNotNullData(landRight.getString("singleLandArea"));
+                    String ftmj = getNotNullData(landRight.getString("sharedLandArea"));
+
+                    bdcqlxgxx.setCommonLandArea(StringUtils.isNotBlank(gymj)?new BigDecimal(gymj):null);
+                    bdcqlxgxx.setSingleLandArea(StringUtils.isNotBlank(dymj)?new BigDecimal(dymj):null);
+                    bdcqlxgxx.setShareLandArea(StringUtils.isNotBlank(ftmj)?new BigDecimal(ftmj):null);
                 }
                 JSONArray houseRightVoList = jsonImmov.getJSONArray("houseRightRelatedVoList");//权利信息
                 if(houseRightVoList!=null && houseRightVoList.size()>0){                            //权利信息赋值
