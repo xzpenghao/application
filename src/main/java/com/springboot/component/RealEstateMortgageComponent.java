@@ -51,6 +51,8 @@ RealEstateMortgageComponent {
     private String areaNo;
     @Value("${businessType.dealPerson}")
     private String dealPerson;
+    @Value("${businessType.bankPerson}")
+    private String bankPerson;
     @Value("${glHouseBuyer.obligeeDyqr}")
     private String obligeeDyqr;
     @Value("${glHouseBuyer.obligeeDyr}")
@@ -152,7 +154,7 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureauVo = null;
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
-        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, mortgagePid, false, grMortgageCancellation, dealPerson, areaNo);
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, mortgagePid, true, grMortgageCancellation, bankPerson, areaNo);
         switch (sjSjsq.getBusinessType()) {
             case Msgagger.CANCELLATION_REGISTRATION:
                 registrationBureau.setBizType(grMortgageCancellation);
@@ -555,10 +557,9 @@ RealEstateMortgageComponent {
 
     public String getAutoRealPropertyCertificateTwo(String commonInterfaceAttributer) throws ParseException {
         log.info("转JSON前：" + commonInterfaceAttributer);
-        ObjectRestResponse resultRV = new ObjectRestResponse();
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
-        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, registrationPid, false, grMortgageRegistration, dealPerson, areaNo);
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, registrationPid, true, grMortgageRegistration, bankPerson, areaNo);
         registrationBureau = ClAutoRealPropertyCertificate(sjSjsq, registrationBureau);
         String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
         //做ftp操作

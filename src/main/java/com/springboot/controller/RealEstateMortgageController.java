@@ -79,7 +79,7 @@ public class RealEstateMortgageController {
     public ObjectRestResponse<String> getAutoRealPropertyCertificateTwo(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
-            log.warn("二手房转移转入，本次参数为：" + commonInterfaceAttributer);
+            log.warn("抵押登记，本次参数为：" + commonInterfaceAttributer);
             rv.data(realEstateMortgageComponent.getAutoRealPropertyCertificateTwo(commonInterfaceAttributer));
         } catch (ParseException e1) {
             log.error(ErrorDealUtil.getErrorInfo(e1));

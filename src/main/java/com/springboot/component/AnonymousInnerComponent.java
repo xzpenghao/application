@@ -105,7 +105,8 @@ public class AnonymousInnerComponent {
     private String jtIp;
     @Value("${sq.bank.jt.post}")
     private String jtPost;
-
+    @Value("${penghao.transferholdmap}")
+    private boolean transferHoldmap;
 
     @Autowired
     private ExceptionRecordMapper exceptionRecordMapper;
@@ -175,6 +176,7 @@ public class AnonymousInnerComponent {
                         EsfSdq esfSdq = new EsfSdq();
                         esfSdq.setSlbh(getReceiving.getSlbh());
                         esfSdq.setTransferred(true);
+                        esfSdq.setHouseholdMap(transferHoldmap);
                         JSONObject jsonObject = JSONObject.fromObject(esfSdq);
                         //根据受理编号查询转移信息（水电气）
                         String jsonData = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
