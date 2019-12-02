@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.other.web.RequestParamBody;
+import com.springboot.entity.chenbin.personnel.pub_use.FileEntityForOther;
 import com.springboot.entity.chenbin.personnel.tax.TaxRespBody;
 import com.springboot.entity.chenbin.personnel.tra.TraRespBody;
 import com.springboot.popj.pub_data.Sj_Info_Qsxx;
@@ -120,5 +121,14 @@ public class ExchangeToOtherRest {
         log.info("进入税务完税结果回推");
         TaxRespBody taxRespBody = JSONObject.parseObject(respMap.get("data"),TaxRespBody.class);
         return exc2Tax.examineSuccess4Tax(taxRespBody);
+    }
+
+    @RequestMapping(value = "postFileByPath", method = RequestMethod.POST)
+    @ApiOperation(value = "附件拉取接口",
+            notes = "各平行部门接收收件成功后回调拉取具体附件的接口。")
+    public ObjectRestResponse<FileEntityForOther> postFileByPath(@RequestBody Map<String,String> respMap ){
+        log.info("进入单一附件拉取");
+        FileEntityForOther fileEntity = JSONObject.parseObject(respMap.get("data"),FileEntityForOther.class);
+        return new ObjectRestResponse<FileEntityForOther>().data(null);
     }
 }

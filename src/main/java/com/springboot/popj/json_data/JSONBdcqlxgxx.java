@@ -66,6 +66,9 @@ public class JSONBdcqlxgxx implements Serializable {
     private String glAgentVoList;               //关联代理人
     private String glAgentObligorVoList;       //关联义务代理人数据
 
+    private String eBookCert;                   //PDF电子证书
+    private String bookPics;                    //宗地图，分层分户图
+
     public String getWiredNumber() {
         return wiredNumber;
     }
@@ -506,5 +509,21 @@ public class JSONBdcqlxgxx implements Serializable {
 
     public void setGlAgentObligorVoList(String glAgentObligorVoList) {
         this.glAgentObligorVoList = glAgentObligorVoList;
+    }
+
+    public String getEBookCert() {
+        return eBookCert;
+    }
+
+    public void setEBookCert(String eBookCert) {
+        this.eBookCert = eBookCert;
+    }
+
+    public String getBookPics() {
+        return bookPics;
+    }
+
+    public void setBookPics(String bookPics) {
+        this.bookPics = bookPics;
     }
 }

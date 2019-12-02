@@ -1,5 +1,6 @@
 package com.springboot.popj.pub_data;
 
+
 import com.springboot.util.TimeUtil;
 
 import java.math.BigDecimal;
@@ -47,7 +48,7 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
     private BigDecimal buildingParcelArea;                  //建筑宗地面积
 
     private String remarks;                      //备注附记
-    private String dataType;                     //数据类型（存量/新增）
+    private String dataType;                     //数据类型（主房产/附属房产）
     private String ext1;                         //扩展字段1
     private String ext2;                         //扩展字段2
     private String ext3;                         //扩展字段3
@@ -57,6 +58,9 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
     private List<SJ_Qlr_Gl> glAgentVoList;              //关联的权利代理人数据
     private List<SJ_Qlr_Gl> glAgentObligorVoList;       //关联义务代理人数据
     private List<SJ_Its_Right> itsRightVoList;          //他项权列表
+
+    private SJ_Book_Cert eBookCert;              //电子证书-PDF
+    private List<SJ_Book_Pic_ext> bookPics;      //分层分户图和宗地图
 
     public String getWiredNumber() {
         return wiredNumber;
@@ -440,5 +444,21 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
 
     public void setGlAgentObligorVoList(List<SJ_Qlr_Gl> glAgentObligorVoList) {
         this.glAgentObligorVoList = glAgentObligorVoList;
+    }
+
+    public SJ_Book_Cert getEBookCert() {
+        return eBookCert;
+    }
+
+    public void setEBookCert(SJ_Book_Cert eBookCert) {
+        this.eBookCert = eBookCert;
+    }
+
+    public List<SJ_Book_Pic_ext> getBookPics() {
+        return bookPics;
+    }
+
+    public void setBookPics(List<SJ_Book_Pic_ext> bookPics) {
+        this.bookPics = bookPics;
     }
 }

@@ -100,6 +100,8 @@ public class SysPubDataDealUtil {
             String JSON_glAgentVoList = qlxgxx.getGlAgentVoList();
             String JSON_itsRightVoList = qlxgxx.getItsRightVoList();
             String JSON_glAgentObligorVoList = qlxgxx.getGlAgentObligorVoList();//义务代理人
+            String JSON_eBookCert = qlxgxx.getEBookCert();
+            String JSON_bookPics = qlxgxx.getBookPics();
 
             if (JSON_glObligorVoList == null || JSON_glObligorVoList.length() <= 0) {
                 HaveOrNot = false;  //判断义务人是否必须
@@ -111,6 +113,8 @@ public class SysPubDataDealUtil {
             qlxgxx.setGlAgentVoList(null);
             qlxgxx.setItsRightVoList(null);
             qlxgxx.setGlAgentObligorVoList(null);
+            qlxgxx.setEBookCert(null);
+            qlxgxx.setBookPics(null);
 
             //反转出不动产权利信息
             SJ_Info_Bdcqlxgxx sj_qlxgxx = JSON.parseObject(JSON.toJSONString(qlxgxx), SJ_Info_Bdcqlxgxx.class);
@@ -148,6 +152,16 @@ public class SysPubDataDealUtil {
             if(StringUtils.isNotBlank(JSON_itsRightVoList)){
                 List<SJ_Its_Right> itsRightVoList = JSONArray.parseArray(JSON_itsRightVoList,SJ_Its_Right.class);
                 sj_qlxgxx.setItsRightVoList(itsRightVoList);
+            }
+            //PDF
+            if(StringUtils.isNotBlank(JSON_eBookCert)){
+                SJ_Book_Cert eBookCert = JSONObject.parseObject(JSON_eBookCert,SJ_Book_Cert.class);
+                sj_qlxgxx.setEBookCert(eBookCert);
+            }
+            //分层分户图
+            if(StringUtils.isNotBlank(JSON_bookPics)){
+                List<SJ_Book_Pic_ext> bookPics = JSONArray.parseArray(JSON_bookPics,SJ_Book_Pic_ext.class);
+                sj_qlxgxx.setBookPics(bookPics);
             }
             sj_qlxgxx.setGlImmovableVoList(sj_bdcgls);
             sj_qlxgxx.setGlObligeeVoList(sj_qlrgls);
