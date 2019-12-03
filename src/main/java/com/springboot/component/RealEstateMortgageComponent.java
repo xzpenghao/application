@@ -16,9 +16,8 @@ import com.springboot.popj.registration.*;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.popj.warrant.ZdInfo;
-import com.springboot.service.chenbin.ExchangeToInnerService;
 import com.springboot.service.chenbin.impl.ExchangeToInnerServiceImpl;
-import com.springboot.service.chenbin.other.impl.ExchangeInterfaceServiceImpl;
+
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
@@ -429,11 +428,19 @@ RealEstateMortgageComponent {
                 glImmovable.setImmovableType(Msgagger.FANGDI);
                 // glImmovable.setImmovableId(glImmovableObject.getString("householdId"));
                 FwInfo fwInfo = getFwInfo(glImmovableObject, jsonObject, "无");
-                realPropertyCertificate.setArchitecturalArea(fwInfo.getArchitecturalArea());//建筑面积
-                realPropertyCertificate.setHouseArchitecturalArea(fwInfo.getHouseArchitecturalArea());//套内
-                realPropertyCertificate.setApportionmentArchitecturalArea(fwInfo.getApportionmentArchitecturalArea());//分摊建筑面积
+                if (fwInfo.getArchitecturalArea() != null){
+                    realPropertyCertificate.setArchitecturalArea(fwInfo.getArchitecturalArea());//建筑面积
+                }
+                if (fwInfo.getHouseArchitecturalArea() != null){
+                    realPropertyCertificate.setHouseArchitecturalArea(fwInfo.getHouseArchitecturalArea());////套内建筑面积
+                }
+                if (fwInfo.getApportionmentArchitecturalArea()!=null){
+                    realPropertyCertificate.setApportionmentArchitecturalArea(fwInfo.getApportionmentArchitecturalArea());//分摊建筑面积
+                }
                 realPropertyCertificate.setHouseObtainingWays(glImmovableObject.getString("acquireWay"));//房屋取得方式
-                realPropertyCertificate.setHouseObtainingPrice(glImmovableObject.getString("acquirePrice"));//房屋获取价格
+                if (glImmovableObject.getString("acquirePrice") != null){
+                    realPropertyCertificate.setApportionmentArchitecturalArea(new BigDecimal(glImmovableObject.getString("acquirePrice")));//房屋获取价格
+                }
                 realPropertyCertificate.setHousePlanningPurpose(glImmovableObject.getString("plannedUsage"));//房屋规划用途
                 realPropertyCertificate.setHouseType(glImmovableObject.getString("houseType"));//房屋类型
                 realPropertyCertificate.setHouseRightType(glImmovableObject.getString("houseRightType"));//房屋权利类型
@@ -487,22 +494,22 @@ RealEstateMortgageComponent {
         //水电气信息
 //        JSONObject sdqObject=(JSONObject) JSONObject.parse(jsonObject.getString("sdqInfo"));
         if (null != obj1) {
-            if (StringUtils.isNotEmpty(obj1.getString("shhh"))) {
+            if (obj1.getString("shhh") != null) {
                 realPropertyCertificate.setWaterNumber(obj1.getString("shhh"));
             } else {
                 realPropertyCertificate.setWaterNumber(obj1.getString("xshhh"));
             }
-            if (StringUtils.isNotEmpty(obj1.getString("dhhh"))) {
+            if (obj1.getString("dhhh") != null) {
                 realPropertyCertificate.setElectricNumber(obj1.getString("dhhh"));
             } else {
                 realPropertyCertificate.setElectricNumber(obj1.getString("xdhhh"));
             }
-            if (StringUtils.isNotEmpty(obj1.getString("qhhh"))) {
+            if (obj1.getString("qhhh") != null) {
                 realPropertyCertificate.setGasNumber(obj1.getString("qhhh"));
             } else {
                 realPropertyCertificate.setGasNumber(obj1.getString("xqhhh"));
             }
-            if (StringUtils.isNotEmpty(obj1.getString("thhh"))) {
+            if (obj1.getString("thhh")!= null) {
                 realPropertyCertificate.setWiredNumber(obj1.getString("thhh"));
             } else {
                 realPropertyCertificate.setWiredNumber(obj1.getString("xthh"));
@@ -833,11 +840,17 @@ RealEstateMortgageComponent {
         fwInfo.setRemarks(glImmovableObject.getString("roomId"));//房间号
         fwInfo.setUnitMark(glImmovableObject.getString("unitId"));//单元号
         fwInfo.setProjectName(glImmovableObject.getString("projectName"));//项目名称
-        fwInfo.setArchitecturalArea(glImmovableObject.getString("architectureAera"));//建筑面积
+        if (glImmovableObject.getString("architectureArea") != null){
+            fwInfo.setArchitecturalArea(new BigDecimal(glImmovableObject.getString("architectureArea")));//建筑面积
+        }
+        if (glImmovableObject.getString("innerArchitectureArea")!=null){
+            fwInfo.setHouseArchitecturalArea(new BigDecimal(glImmovableObject.getString("innerArchitectureArea")));////套内建筑面积
+        }
+        if (glImmovableObject.getString("sharedArchitectureArea") != null){
+            fwInfo.setApportionmentArchitecturalArea(new BigDecimal(glImmovableObject.getString("sharedArchitectureArea")));//分摊建筑面积
+        }
         fwInfo.setImmovableUnitNumber(glImmovableObject.getString("realEstateUnitId"));//不动产单元号
         fwInfo.setSeatNumber(glImmovableObject.getString("buildingId"));//幢编号
-        fwInfo.setHouseArchitecturalArea(glImmovableObject.getString("innerArchitectureAera"));//套内
-        fwInfo.setApportionmentArchitecturalArea(glImmovableObject.getString("sharedArchitectureAera"));//分摊
         fwInfo.setMortgageSituation(dyqk);//不动产抵押情况
         JSONArray attachmentInfoVoList = jsonObject.getJSONArray("attachmentInfoVoList");
         if (attachmentInfoVoList == null || attachmentInfoVoList.size() == 0) {
@@ -903,7 +916,7 @@ RealEstateMortgageComponent {
         glMortgagor.setObligeeType(obligeeQlr);
         RelatedPerson relatedPerson = new RelatedPerson();
         System.out.print(glMortgageHolderObject.getString("obligeeIdType"));
-        if (StringUtils.isNotEmpty(glMortgageHolderObject.getString("obligeeIdType"))) {
+        if (glMortgageHolderObject.getString("obligeeIdType") !=null) {
             relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("obligeeIdType")));
         }
         relatedPerson.setObligeeName(glMortgageHolderObject.getString("obligeeName"));
@@ -917,7 +930,7 @@ RealEstateMortgageComponent {
         glMortgagor.setObligeeName(glMortgageHolderObject.getString("salerName"));
         glMortgagor.setObligeeType(obligeeYwr);
         RelatedPerson relatedPerson = new RelatedPerson();
-        if (StringUtils.isNotEmpty(glMortgageHolderObject.getString("salerIdType"))) {
+        if (glMortgageHolderObject.getString("salerIdType") != null) {
             relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("salerIdType")));
         }
         relatedPerson.setObligeeName(glMortgageHolderObject.getString("salerName"));

@@ -1,5 +1,7 @@
 package com.springboot.popj;
 
+import java.math.BigDecimal;
+
 public class FwInfo {
     private String householdId;    //交易合同中的户id
     private String seatId;      //交易合同中的幢id
@@ -17,20 +19,36 @@ public class FwInfo {
     private String totalStorey; //总层数
     private String locationStorey;//所在层
     private String projectName; //项目名称
-    private String architecturalArea; //建筑面积
-    private String houseArchitecturalArea;//套内建筑面积
-    private String apportionmentArchitecturalArea;  //分摊建筑面积
+    private BigDecimal architecturalArea; //建筑面积
+    private BigDecimal houseArchitecturalArea;//套内建筑面积
+    private BigDecimal apportionmentArchitecturalArea;  //分摊建筑面积
     private String mortgageSituation; //不动产当前抵押情况
     private String closureSituation;  //不动产当前查封情况
     private String objectionSituation;  //不动产当前是否存在异议
     private String remarks; //备注信息
 
-    public String getHouseArchitecturalArea() {
+    public BigDecimal getArchitecturalArea() {
+        return architecturalArea;
+    }
+
+    public void setArchitecturalArea(BigDecimal architecturalArea) {
+        this.architecturalArea = architecturalArea;
+    }
+
+    public BigDecimal getHouseArchitecturalArea() {
         return houseArchitecturalArea;
     }
 
-    public void setHouseArchitecturalArea(String houseArchitecturalArea) {
+    public void setHouseArchitecturalArea(BigDecimal houseArchitecturalArea) {
         this.houseArchitecturalArea = houseArchitecturalArea;
+    }
+
+    public BigDecimal getApportionmentArchitecturalArea() {
+        return apportionmentArchitecturalArea;
+    }
+
+    public void setApportionmentArchitecturalArea(BigDecimal apportionmentArchitecturalArea) {
+        this.apportionmentArchitecturalArea = apportionmentArchitecturalArea;
     }
 
     public String getHouseholdId() {
@@ -159,22 +177,6 @@ public class FwInfo {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
-    }
-
-    public String getArchitecturalArea() {
-        return architecturalArea;
-    }
-
-    public void setArchitecturalArea(String architecturalArea) {
-        this.architecturalArea = architecturalArea;
-    }
-
-    public String getApportionmentArchitecturalArea() {
-        return apportionmentArchitecturalArea;
-    }
-
-    public void setApportionmentArchitecturalArea(String apportionmentArchitecturalArea) {
-        this.apportionmentArchitecturalArea = apportionmentArchitecturalArea;
     }
 
     public String getMortgageSituation() {

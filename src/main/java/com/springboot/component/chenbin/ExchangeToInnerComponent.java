@@ -55,7 +55,8 @@ public class ExchangeToInnerComponent {
                     bdcqlxgxx.setCertificateType("不动产权证");
                 }
                 bdcqlxgxx.setRemarks(getNotNullData(jsonImmov.getString("remark")));                      //备注
-                bdcqlxgxx.setAcceptanceNumber(getNotNullData(jsonImmov.getString("slbh")));               //受理编号
+                bdcqlxgxx.setAcceptanceNumber(getNotNullData(jsonImmov.getString("slbh")));//受理编号
+                bdcqlxgxx.setOther(getNotNullData(jsonImmov.getString("other"))); //其他权利状况
                 try {
                     bdcqlxgxx.setRegistrationDate(TimeUtil.getTimeFromString(getNotNullData(jsonImmov.getString("registerDate"))));//登记时间
                 } catch (ParseException e) {

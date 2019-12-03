@@ -81,6 +81,7 @@ public class ToFTPUploadComponent {
             //创建目录
             mkDirs(ftpClient,path);//创建目录
             ftpClient.changeWorkingDirectory("/" + path);//创建完了目录需要将当前工作目录切换过来，然后直接在下面创建文件
+            log.info("ftp:"+ftpClient.changeWorkingDirectory("/" + path));
             if (FTPReply.isPositiveCompletion(ftpClient.sendCommand("OPTS UTF8", "ON"))) {// 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码，否则就使用本地编码（GBK）.
                 LOCAL_CHARSET = "UTF-8";
             }
@@ -207,11 +208,6 @@ public class ToFTPUploadComponent {
         System.out.println(fileName + "\t" + fileType);
         Map<String, Object> map = Maps.newHashMap();
         FTPClient ftpClient = new FTPClient();
-        log.info("ycslyAddress"+yftpAddress);
-        log.info("yftpPort"+yftpPort);
-        log.info("yftpUsername"+yftpUsername);
-        log.info("ycsladress"+yftpPassword);
-        log.info("pathGxpt:"+path);
         boolean returnValue = false;
         //路径年/月/日/entryId名称
 //        String path = ;
@@ -233,7 +229,7 @@ public class ToFTPUploadComponent {
                 return null;
             }
             log.info("reply"+reply);
-            ftpClient.enterLocalActiveMode();
+            ftpClient.enterLocalPassiveMode();
             //如果没有需求上传图片的话还ok，
             // 但是要是传图片，就需要设置一下文件类型为二进制
             // 这样上传的图片才不会报错（记得我的错误貌似是什么ASCII编码什么的。。）
@@ -284,15 +280,16 @@ public class ToFTPUploadComponent {
         if (null == p) {
             return;
         }
-
+        if(p.contains(File.separator)){
+            p = p.replaceAll("\\\\","/");
+        }
+        System.out.println("give me ptf:"+p);
         if (p != null && !"".equals(p) && !"/".equals(p)) {
-            String ps = "";
+            String ps = "/";
             for (int i = 0; i < p.split("/").length; i++) {
                 ps += p.split("/")[i] + "/";
                 if (!isDirExist(client, ps)) {
                     client.makeDirectory(ps);// 创建目录
-                    client.changeWorkingDirectory(ps);// 进入创建的目录
-                }else{
                     client.changeWorkingDirectory(ps);// 进入创建的目录
                 }
             }

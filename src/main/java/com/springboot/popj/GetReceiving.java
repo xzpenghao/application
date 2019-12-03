@@ -5,14 +5,14 @@ public class GetReceiving {
     private  String slbh;
     private  String messageType;
     private  String modelId;
-    private  String bizType;
+    private  String userCodeYCSL;
 
-    public String getBizType() {
-        return bizType;
+    public String getUserCodeYCSL() {
+        return userCodeYCSL;
     }
 
-    public void setBizType(String bizType) {
-        this.bizType = bizType;
+    public void setUserCodeYCSL(String userCodeYCSL) {
+        this.userCodeYCSL = userCodeYCSL;
     }
 
     public String getModelId() {

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,9 +62,15 @@ public class HTSoapAnalyzeComponent {
                 fwInfo.setHouseLocation((String) htfwmap.get("FWZL"));//坐落
                 fwInfo.setHouseholdId((String) htfwmap.get("HID"));//房屋户Id
                 fwInfo.setSeatId((String) htfwmap.get("ZID"));//幢id
-                fwInfo.setArchitecturalArea(htfwmap.get("JZMJ").toString());//建筑面积
-                fwInfo.setHouseArchitecturalArea(htfwmap.get("TNJZMJ").toString());//套内建筑
-                fwInfo.setApportionmentArchitecturalArea(htfwmap.get("FTJZMJ").toString());//分摊建筑面积
+                if (StringUtils.isNotEmpty(htfwmap.get("JZMJ").toString())) {
+                    fwInfo.setArchitecturalArea(new BigDecimal(htfwmap.get("JZMJ").toString()));//建筑面积
+                }
+                if (StringUtils.isNotEmpty(htfwmap.get("FTJZMJ").toString())) {
+                    fwInfo.setApportionmentArchitecturalArea(new BigDecimal(htfwmap.get("FTJZMJ").toString()));//分摊建筑面积
+                }
+                if (StringUtils.isNotEmpty(htfwmap.get("TNJZMJ").toString())) {
+                    fwInfo.setHouseArchitecturalArea(new BigDecimal(htfwmap.get("TNJZMJ").toString()));//套内建筑
+                }
                 glImmovable.setFwInfo(fwInfo);
                 businessContract.getGlImmovableVoList().add(glImmovable);
             }
@@ -165,9 +172,15 @@ public class HTSoapAnalyzeComponent {
             fwInfo.setHouseholdId((String) htfwmap.get("HID"));//房屋户Id
             fwInfo.setSeatId((String) htfwmap.get("ZID"));//幢id
             fwInfo.setHouseLocation((String) htfwmap.get("HTZL"));//坐落
-            fwInfo.setArchitecturalArea(htfwmap.get("JZMJ").toString());//建筑面积
-            fwInfo.setHouseArchitecturalArea(htfwmap.get("TNJZMJ").toString());//套内建筑
-            fwInfo.setApportionmentArchitecturalArea(htfwmap.get("FTJZMJ").toString());//分摊建筑面积
+            if (StringUtils.isNotEmpty(htfwmap.get("JZMJ").toString())) {
+                fwInfo.setArchitecturalArea(new BigDecimal(htfwmap.get("JZMJ").toString()));//建筑面积
+            }
+            if (StringUtils.isNotEmpty(htfwmap.get("TNJZMJ").toString())) {
+                fwInfo.setHouseArchitecturalArea(new BigDecimal(htfwmap.get("TNJZMJ").toString()));//套内建筑
+            }
+            if (StringUtils.isNotEmpty(htfwmap.get("JZMJ").toString())) {
+                fwInfo.setApportionmentArchitecturalArea(new BigDecimal(htfwmap.get("FTJZMJ").toString()));//分摊建筑面积
+            }
             fwInfo.setBuildingNumber((String) htfwmap.get("LPBH"));//楼盘编号
             fwInfo.setHouseNumber((String) htfwmap.get("FWBH"));//房屋编号
             glImmovable.setFwInfo(fwInfo);

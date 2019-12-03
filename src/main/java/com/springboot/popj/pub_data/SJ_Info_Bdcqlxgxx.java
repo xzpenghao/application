@@ -48,6 +48,7 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
     private BigDecimal buildingParcelArea;                  //建筑宗地面积
 
     private String remarks;                      //备注附记
+    private String other;                        //其他权利状况
     private String dataType;                     //数据类型（主房产/附属房产）
     private String ext1;                         //扩展字段1
     private String ext2;                         //扩展字段2
@@ -61,6 +62,14 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
 
     private SJ_Book_Cert eBookCert;              //电子证书-PDF
     private List<SJ_Book_Pic_ext> bookPics;      //分层分户图和宗地图
+
+    public String getOther() {
+        return other;
+    }
+
+    public void setOther(String other) {
+        this.other = other;
+    }
 
     public String getWiredNumber() {
         return wiredNumber;

@@ -16,7 +16,7 @@ import com.springboot.entity.chenbin.personnel.other.bank.business.revok.RevokeR
 import com.springboot.popj.FwInfo;
 import com.springboot.popj.GlImmovable;
 import com.springboot.popj.RelatedPerson;
-import com.springboot.popj.ReturnVo;
+
 import com.springboot.popj.netSign.BusinessContract;
 import com.springboot.popj.netSign.GlHouseBuyer;
 import com.springboot.popj.netSign.GlHouseSeller;
@@ -285,7 +285,6 @@ public class SqRealEstateMortgageComponent {
         Map<String, Object> map = new HashMap<>();
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception {
-                JSONObject reObject = new JSONObject();
                 try {
                     if (null != mortgageRegistrationReqVo.getFileInfoVoList() && mortgageRegistrationReqVo.getFileInfoVoList().size() != 0) {
                         String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(mortgageRegistrationReqVo.getFileInfoVoList().get(0).getFileAdress()));
@@ -453,10 +452,12 @@ public class SqRealEstateMortgageComponent {
         sj_sjsq.setNotifiedPersonName(mortgageRegistrationReqVo.getContacts());
         sj_sjsq.setNotifiedPersonTelephone(mortgageRegistrationReqVo.getContactsPhone());
         sj_sjsq.setNotifiedPersonAddress(mortgageRegistrationReqVo.getContactsAdress());
+        log.info("收件申请地址:"+sj_sjsq.getNotifiedPersonAddress());
         sj_sjsq.setReceiptMan(mortgageRegistrationReqVo.getOperatorName());
         sj_sjsq.setReceiptTime(DateUtils.parseDate(new Date(),mortgageRegistrationReqVo.getMortgageApplyDate()));
         sj_sjsq.setRegistrationCategory(MortgageTypeEnum.Sc(mortgageRegistrationReqVo.getMortgageType()));//登记大类
         sj_sjsq.setDistrictCode(DistrictCodeEnum.Sc(mortgageRegistrationReqVo.getBusinessAreas()));//办理区域
+
         //sj_sjsq.setImmovableType(mortgageRegistrationReqVo.getMortgageType());//一般类型
     }
 
@@ -517,7 +518,7 @@ public class SqRealEstateMortgageComponent {
         }
         if (StringUtils.isNotEmpty(mortgageRegistrationReqVo.getCreditAmount())){
             sjInfoDyhtxx.setCreditAmount(new BigDecimal(mortgageRegistrationReqVo.getCreditAmount()));
-            sjInfoDyhtxx.setMortgageArea(new BigDecimal(mortgageRegistrationReqVo.getCreditAmount()));
+            sjInfoDyhtxx.setMortgageAmount(new BigDecimal(mortgageRegistrationReqVo.getCreditAmount()));
         }
         if (StringUtils.isNotEmpty(mortgageRegistrationReqVo.getEvaluationValue())){
             sjInfoDyhtxx.setValuationValue(new BigDecimal(mortgageRegistrationReqVo.getEvaluationValue()));
@@ -621,8 +622,10 @@ public class SqRealEstateMortgageComponent {
                 sj_info_bdcqlxgxx.setGlImmovableVoList(glImmovableVoList);
             }
         }else if (null != realEstateInfoVo.getLandCertificate()) {
-            sj_info_bdcqlxgxx.setLandCertificateNo(realEstateInfoVo.getLandCertificate());//土地证号
-            sj_info_bdcqlxgxx.setCertificateType(Msgagger.BDCQZ);
+            SJ_Info_Bdcqlxgxx bdcqlxgxx=new SJ_Info_Bdcqlxgxx();
+            bdcqlxgxx.setLandCertificateNo(realEstateInfoVo.getLandCertificate());//土地证号
+            bdcqlxgxx.setCertificateType(Msgagger.TDZ);
+            immovableRightInfoVoList.add(bdcqlxgxx);
         }
             //权利人
             if (null != realEstateInfoVo.getObligeeInfoVoList() && realEstateInfoVo.getObligeeInfoVoList().size() != 0) {
@@ -867,7 +870,9 @@ public class SqRealEstateMortgageComponent {
         fwInfo.setRoomMark(jsonObject.getString("FWFH"));
         fwInfo.setTotalStorey(jsonObject.getString("LCZS"));
         fwInfo.setLocationStorey(jsonObject.getString("SZLC"));
-        fwInfo.setArchitecturalArea(jsonObject.getString("JZMJ"));
+        if (StringUtils.isNotEmpty(jsonObject.getString("JZMJ"))){
+            fwInfo.setArchitecturalArea(new BigDecimal(jsonObject.getString("JZMJ")));
+        }
         fwInfo.setImmovableUnitNumber(jsonObject.getString("BDCDYH"));
         glImmovable.setFwInfo(fwInfo);
         glImmovableList.add(glImmovable);

@@ -4,6 +4,7 @@ import com.springboot.popj.GlImmovable;
 import com.springboot.popj.GlMortgagor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,13 +16,13 @@ public class RealPropertyCertificate {
     private String landCertificateNo;            //土地证号
     private String registrationDate;             //登记日期
     private String certificateType;              //证书类型(与sjsq中证书类型保持一致）
-    private String architecturalArea;               //建筑面积
-    private String houseArchitecturalArea;          //套内建筑面积
-    private String apportionmentArchitecturalArea;  //分摊建筑面积
+    private BigDecimal architecturalArea;               //建筑面积
+    private BigDecimal houseArchitecturalArea;          //套内建筑面积
+    private BigDecimal apportionmentArchitecturalArea;  //分摊建筑面积
     private String houseObtainingWays;                   //房屋取得方式
-    private String houseObtainingPrice;             //房屋取得价格
+    private BigDecimal houseObtainingPrice;             //房屋取得价格
     private String housePlanningPurpose;                //房屋规划用途
-    private String houseValuationAmount;                //房屋评估金额
+    private BigDecimal houseValuationAmount;                //房屋评估金额
     private String houseType;                           //房屋类型
     private String houseRightType;               //房屋权利类型
     private String houseRightNature;             //房屋权利性质
@@ -170,27 +171,27 @@ public class RealPropertyCertificate {
         this.certificateType = certificateType;
     }
 
-    public String getArchitecturalArea() {
+    public BigDecimal getArchitecturalArea() {
         return architecturalArea;
     }
 
-    public void setArchitecturalArea(String architecturalArea) {
+    public void setArchitecturalArea(BigDecimal architecturalArea) {
         this.architecturalArea = architecturalArea;
     }
 
-    public String getHouseArchitecturalArea() {
+    public BigDecimal getHouseArchitecturalArea() {
         return houseArchitecturalArea;
     }
 
-    public void setHouseArchitecturalArea(String houseArchitecturalArea) {
+    public void setHouseArchitecturalArea(BigDecimal houseArchitecturalArea) {
         this.houseArchitecturalArea = houseArchitecturalArea;
     }
 
-    public String getApportionmentArchitecturalArea() {
+    public BigDecimal getApportionmentArchitecturalArea() {
         return apportionmentArchitecturalArea;
     }
 
-    public void setApportionmentArchitecturalArea(String apportionmentArchitecturalArea) {
+    public void setApportionmentArchitecturalArea(BigDecimal apportionmentArchitecturalArea) {
         this.apportionmentArchitecturalArea = apportionmentArchitecturalArea;
     }
 
@@ -202,11 +203,11 @@ public class RealPropertyCertificate {
         this.houseObtainingWays = houseObtainingWays;
     }
 
-    public String getHouseObtainingPrice() {
+    public BigDecimal getHouseObtainingPrice() {
         return houseObtainingPrice;
     }
 
-    public void setHouseObtainingPrice(String houseObtainingPrice) {
+    public void setHouseObtainingPrice(BigDecimal houseObtainingPrice) {
         this.houseObtainingPrice = houseObtainingPrice;
     }
 
@@ -218,11 +219,11 @@ public class RealPropertyCertificate {
         this.housePlanningPurpose = housePlanningPurpose;
     }
 
-    public String getHouseValuationAmount() {
+    public BigDecimal getHouseValuationAmount() {
         return houseValuationAmount;
     }
 
-    public void setHouseValuationAmount(String houseValuationAmount) {
+    public void setHouseValuationAmount(BigDecimal houseValuationAmount) {
         this.houseValuationAmount = houseValuationAmount;
     }
 
@@ -378,13 +379,11 @@ public class RealPropertyCertificate {
         this.ext3 = ext3;
     }
 
-
-
     public List<GlMortgagor> getGlObligeeVoList() {
         return glObligeeVoList;
     }
 
-    public void setGlObligeeVoList(List<GlMortgagor> glObjligeeVoList) {
+    public void setGlObligeeVoList(List<GlMortgagor> glObligeeVoList) {
         this.glObligeeVoList = glObligeeVoList;
     }
 
