@@ -709,13 +709,10 @@ public class AnonymousInnerComponent {
                                 com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.FileInfoVo fileInfoVo = new com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.FileInfoVo();
                                 com.alibaba.fastjson.JSONObject fileObject = jsonArray.getJSONObject(i);
                                 String fileAddress = fileObject.getString("fileAddress");
-                                log.info("path:" + map.get("path").toString());
-                                log.info("fileName" + map.get("fileName").toString());
                                 //覆盖原有url  名称
-                                String fileAdress=fileAddress.replaceAll("\\\\","/");
-                                log.info("fileAdress:"+fileAdress);
-                                fileInfoVo.setFileAdress(fileAdress);
-                                fileInfoVo.setFileName(map.get("fileName").toString());
+                                log.info("fileAdress:"+fileAddress);
+                                fileInfoVo.setFileAdress(fileAddress);
+                                fileInfoVo.setFileName(fileObject.get("fileName").toString());
                                 log.info("fileAdress:"+fileInfoVo.getFileName());
                                 fileInfoVo.setFileType(Msgagger.FILE_TYPE);
                                 fileInfoVo.setFileSequence(fileObject.getString("fileSequence"));
