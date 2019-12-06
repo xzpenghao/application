@@ -1,5 +1,6 @@
 package com.springboot.rest.chenbin;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
@@ -11,11 +12,14 @@ import com.springboot.popj.pub_data.Sj_Info_Qsxx;
 import com.springboot.service.chenbin.ExchangeToTaxService;
 import com.springboot.service.chenbin.ExchangeToTransactionService;
 import com.springboot.service.chenbin.ExchangeToWebService;
+import com.springboot.service.chenbin.other.ExchangeCommonService;
 import com.springboot.service.chenbin.other.ExchangeInterfaceService;
+import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +39,8 @@ public class ExchangeToOtherRest {
     private ExchangeToTransactionService exc2Tran;
     @Autowired
     private ExchangeToWebService exc2Web;
+    @Autowired
+    private ExchangeCommonService commService;
 
     @RequestMapping(value = "exchange2Tax",method = RequestMethod.GET)
     public ObjectRestResponse<Object> exchange2Tax(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer){
@@ -87,14 +93,17 @@ public class ExchangeToOtherRest {
         Object r = null;
         try {
             r = exc2Web.initWebSecReg(paramBody);
-            System.out.println("互联网+生成办件成功！"+r);
+            log.info("互联网+生成办件成功！"+r);
             JSONObject ycslRv = JSONObject.parseObject((String)r);
+            log.info("互联网+生成办件对象成功！"+ycslRv);
             rv.data(ycslRv.get("receiptNumber"));
         } catch (ZtgeoBizException e1){
+            log.error("ZTGEO异常："+ErrorDealUtil.getErrorInfo(e1));
             e1.printStackTrace();
             rv.setStatus(20500);
             rv.setMessage(e1.getMessage());
         } catch (Exception e2){
+            log.error("请求出现其它运行时异常："+ErrorDealUtil.getErrorInfo(e2));
             e2.printStackTrace();
             rv.setStatus(20500);
             rv.setMessage("请求出现其它运行时异常，请联系管理员解决");
@@ -128,7 +137,16 @@ public class ExchangeToOtherRest {
             notes = "各平行部门接收收件成功后回调拉取具体附件的接口。")
     public ObjectRestResponse<FileEntityForOther> postFileByPath(@RequestBody Map<String,String> respMap ){
         log.info("进入单一附件拉取");
-        FileEntityForOther fileEntity = JSONObject.parseObject(respMap.get("data"),FileEntityForOther.class);
-        return new ObjectRestResponse<FileEntityForOther>().data(null);
+        FileEntityForOther fileEntity = JSONObject.parseObject(BusinessDealBaseUtil.convertStr(respMap.get("data")),FileEntityForOther.class);
+        return new ObjectRestResponse<FileEntityForOther>().data(commService.getFileEntityForOther(fileEntity));
+    }
+
+    @RequestMapping(value = "postFiles", method = RequestMethod.POST)
+    @ApiOperation(value = "附件批量拉取接口",
+            notes = "各平行部门接收收件成功后回调批量拉取附件的接口。")
+    public ObjectRestResponse<FileEntityForOther> postFiles(@RequestBody Map<String,String> respMap ){
+        log.info("进入批量附件拉取");
+        List<FileEntityForOther> fileEntityArray = JSONArray.parseArray(respMap.get("data"),FileEntityForOther.class);
+        return new ObjectRestResponse<List<FileEntityForOther>>().data(commService.getFileEntityArrayForOther(fileEntityArray));
     }
 }

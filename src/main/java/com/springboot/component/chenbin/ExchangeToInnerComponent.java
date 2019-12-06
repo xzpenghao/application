@@ -6,6 +6,7 @@ import com.springboot.feign.ForImmovableFeign;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.util.TimeUtil;
+import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ public class ExchangeToInnerComponent {
         log.info("执行BDC查询前："+ new Date().getTime());
         List<JSONObject> jsonImmoVoList = immovableFeign.getBdcInfoByZH(parametricData.getBdczh(),parametricData.getQlrmc(),parametricData.getObligeeId());
         log.info("执行BDC查询后："+ new Date().getTime());
+        log.info("不动产查询数据为："+JSONArray.toJSONString(jsonImmoVoList));
         if(jsonImmoVoList!=null) {
             for (JSONObject jsonImmov:jsonImmoVoList) {
                 SJ_Info_Bdcqlxgxx bdcqlxgxx = new SJ_Info_Bdcqlxgxx();
@@ -191,6 +193,7 @@ public class ExchangeToInnerComponent {
 
                 List<SJ_Bdc_Gl> bdcgls = new ArrayList<SJ_Bdc_Gl>();
                 JSONArray realEstateUnitInfoVoList = jsonImmov.getJSONArray("realEstateUnitInfoVoList");//房地
+                boolean isFd = false;
                 if(realEstateUnitInfoVoList!=null && realEstateUnitInfoVoList.size()>0){//房屋
                     String zl = getNotNullData(realEstateUnitInfoVoList.getJSONObject(0).getString("sit"));
                     if(realEstateUnitInfoVoList.size()>1){
@@ -227,39 +230,54 @@ public class ExchangeToInnerComponent {
                         bdcGl.setFwInfo(fw);
                         bdcgls.add(bdcGl);
                     }
+                    isFd = true;
                 }
 
                 JSONArray landUnitInfoVoList = jsonImmov.getJSONArray("landUnitInfoVoList");//净地
                 if(landUnitInfoVoList!=null && landUnitInfoVoList.size()>0){
-                    String zl = getNotNullData(landUnitInfoVoList.getJSONObject(0).getString("landSit"));
-                    if(landUnitInfoVoList.size()>1){
-                        bdcqlxgxx.setImmovableSite(zl+"等");
-                    }else{
-                        bdcqlxgxx.setImmovableSite(zl);
+                    String tdzzrq = getNotNullData(landUnitInfoVoList.getJSONObject(0).getString("landRightEndDate"));
+                    if(StringUtils.isNotBlank(tdzzrq)){
+                        try {
+                            bdcqlxgxx.setLandUseRightEndingDate(TimeUtil.getDateFromString(tdzzrq));
+                        } catch (ParseException e) {
+                            log.error(ErrorDealUtil.getErrorInfo(e));
+                            e.printStackTrace();
+                        }
+                        bdcqlxgxx.setLandUseTimeLimit(tdzzrq);
                     }
-                    for(int i=0;i<landUnitInfoVoList.size();i++){
-                        JSONObject estateObj = landUnitInfoVoList.getJSONObject(i);
-                        SJ_Bdc_Gl bdcGl = new SJ_Bdc_Gl();
-                        SJ_Bdc_Zd_Info zd = new SJ_Bdc_Zd_Info();
-                        bdcGl.setImmovableType("宗地");
-                        zd.setImmovableUnitNumber(getNotNullData(estateObj.getString("realEstateUnitId")));
-                        zd.setParcelUnicode(getNotNullData(estateObj.getString("landUnicode")));//统一编码
-                        zd.setParcelType(getNotNullData(estateObj.getString("landType")));     //宗地类型
-                        zd.setCadastralNumber(getNotNullData(estateObj.getString("cadastralNumber")));//地籍号
-                        zd.setParcelLocation(getNotNullData(estateObj.getString("landSit")));//坐落
-                        zd.setLandUse(getNotNullData(estateObj.getString("landUsage")));        //用途
-                        String dytdmj = getNotNullData(estateObj.getString("singleLandArea"));
-                        String gxtdmj = getNotNullData(estateObj.getString("sharedLandArea"));
-                        zd.setPrivateLandArea(StringUtils.isNotBlank(dytdmj)?new BigDecimal(dytdmj):null);//独用土地面积
-                        zd.setApportionmentLandArea(StringUtils.isNotBlank(gxtdmj)?new BigDecimal(gxtdmj):null);//分摊土地面积
-                        bdcGl.setZdInfo(zd);
-                        bdcgls.add(bdcGl);
+                    //房地业务不给土地信息
+                    if(!isFd) {
+                        String zl = getNotNullData(landUnitInfoVoList.getJSONObject(0).getString("landSit"));
+                        if(landUnitInfoVoList.size()>1){
+                            bdcqlxgxx.setImmovableSite(zl+"等");
+                        }else{
+                            bdcqlxgxx.setImmovableSite(zl);
+                        }
+                        for (int i = 0; i < landUnitInfoVoList.size(); i++) {
+                            JSONObject estateObj = landUnitInfoVoList.getJSONObject(i);
+                            SJ_Bdc_Gl bdcGl = new SJ_Bdc_Gl();
+                            SJ_Bdc_Zd_Info zd = new SJ_Bdc_Zd_Info();
+                            bdcGl.setImmovableType("宗地");
+                            zd.setImmovableUnitNumber(getNotNullData(estateObj.getString("realEstateUnitId")));
+                            zd.setParcelUnicode(getNotNullData(estateObj.getString("landUnicode")));//统一编码
+                            zd.setParcelType(getNotNullData(estateObj.getString("landType")));     //宗地类型
+                            zd.setCadastralNumber(getNotNullData(estateObj.getString("cadastralNumber")));//地籍号
+                            zd.setParcelLocation(getNotNullData(estateObj.getString("landSit")));//坐落
+                            zd.setLandUse(getNotNullData(estateObj.getString("landUsage")));        //用途
+                            String dytdmj = getNotNullData(estateObj.getString("singleLandArea"));
+                            String gxtdmj = getNotNullData(estateObj.getString("sharedLandArea"));
+                            zd.setPrivateLandArea(StringUtils.isNotBlank(dytdmj) ? new BigDecimal(dytdmj) : null);//独用土地面积
+                            zd.setApportionmentLandArea(StringUtils.isNotBlank(gxtdmj) ? new BigDecimal(gxtdmj) : null);//分摊土地面积
+                            bdcGl.setZdInfo(zd);
+                            bdcgls.add(bdcGl);
+                        }
                     }
                 }
                 bdcqlxgxx.setGlImmovableVoList(bdcgls);
                 serviceDataInfos.add(bdcqlxgxx);
             }
         }
+        log.info("服务数据生成结束，为："+JSONArray.toJSONString(serviceDataInfos));
         return serviceDataInfos;
     }
 

@@ -14,6 +14,7 @@ import com.springboot.popj.warrant.ParametricData;
 import com.springboot.service.chenbin.ExchangeToWebService;
 import com.springboot.util.DateUtils;
 import com.springboot.util.TimeUtil;
+import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service("exc2Web")
@@ -53,6 +51,7 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
 
     @Override
     public Object initWebSecReg(RequestParamBody paramBody) {
+        log.info("接收互联网加申请");
         Map<String,String> mapParmeter= new HashMap<>();
         String returnSlbh = paramBody.getReturnSlbh();
         RequestParamSjsq sjsq_req = paramBody.getRecEntity();
@@ -61,6 +60,7 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
 
         SJ_Sjsq sjsq = getSjsqFromBaseParams(sjsq_req);
         List<String> bdcDatas = sjsq_req.getBdcDatas();
+        log.info("本次办件使用的权证号为："+JSONArray.toJSONString(bdcDatas));
 
         List<RespServiceData> serviceDatas = new ArrayList<RespServiceData>();
         //不动产权属服务数据
@@ -84,13 +84,20 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
         serviceData1.setServiceCode("OwnershipCertificateServiceWithItsRight");
         serviceData1.setServiceDataInfos(bdcqls_final);
         serviceDatas.add(serviceData1);
-
+        //坐落信息补全
+        if(StringUtils.isBlank(sjsq.getImmovableSite())){
+            sjsq.setImmovableSite(bdcqls_final.get(0).getImmovableSite());
+        }
         //交易服务数据组织
         RespServiceData serviceData2 = new RespServiceData();
         RequestParamJyht htdata = sjsq_req.getHtdata();
         List<Sj_Info_Jyhtxx> jyhtxxes = new ArrayList<Sj_Info_Jyhtxx>();
         Sj_Info_Jyhtxx jyhtxx = new Sj_Info_Jyhtxx();
         if(htdata!=null){//交易信息
+            List<SJ_Bdc_Gl> jyfcgl = JSONArray.parseArray(
+                    JSONArray.toJSONString(bdcqls_final.get(0).getGlImmovableVoList()),SJ_Bdc_Gl.class);
+            jyhtxx.setGlImmovableVoList(jyfcgl);
+
             jyhtxx.setRegistrationSubclass(sjsq_req.getRegistrationSubclass());
             jyhtxx.setRegistrationReason(sjsq_req.getRegistrationReason());
             jyhtxx.setContractType(htdata.getContractType());
@@ -121,7 +128,7 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
                     jyhtxx.setDeliveryMode("日期交付");
                 }
             }
-            System.out.println("合同细节数据"+JSONObject.toJSONString(htdata.getHtDetail()));
+            log.info("合同细节数据"+JSONObject.toJSONString(htdata.getHtDetail()));
             if(htdata.getHtDetail()!=null) {
                 if(StringUtils.isBlank(htdata.getHtDetail().getDoesIncludeHouseProperties())){//当没有给定附属设施的明确说明自己造
                     htdata.getHtDetail().setDoesIncludeHouseProperties("0");
@@ -169,22 +176,26 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
                 file.setFileType(f.getFileType());
                 file.setpName(f.getPName());
                 BASE64Decoder base64Decoder = new BASE64Decoder();
-                String pathFold = DateUtils.getNowYear()
+                String pathFold = File.separator
+                        + DateUtils.getNowYear()
                         + File.separator
                         + DateUtils.getNowMonth()
                         + File.separator + DateUtils.getNowDay();
                 try {
-                    System.out.println("巴涩："+f.getFileBase64());
-                    if(toFTPUploadComponent.uploadFileBDC(pathFold,f.getFileName(),f.getFileType(),new ByteArrayInputStream(base64Decoder.decodeBuffer(f.getFileBase64())))){
-                        file.setFileAdress(pathFold + File.separator  + file.getFileName());
-                        file.setFileAddress(pathFold + File.separator  + file.getFileName());
+//                    log.info("巴涩："+f.getFileBase64());
+                    String fileName_ftp = UUID.randomUUID().toString()+"."+f.getFileType();
+                    if(toFTPUploadComponent.uploadFileBDC(pathFold,f.getFileName(),f.getFileType(),fileName_ftp,new ByteArrayInputStream(base64Decoder.decodeBuffer(f.getFileBase64())))){
+                        file.setFileAdress(pathFold + File.separator  + fileName_ftp);
+                        file.setFileAddress(pathFold + File.separator  + fileName_ftp);
                     }
                 } catch (IOException e) {
+                    log.warn("附件base64解析异常"+ ErrorDealUtil.getErrorInfo(e));
                     e.printStackTrace();
                     throw new ZtgeoBizException("附件base64解析异常");
                 } catch (RuntimeException er){
+                    log.warn("文件上传出现其它运行时异常--"+ ErrorDealUtil.getErrorInfo(er));
                     er.printStackTrace();
-                    throw new ZtgeoBizException(er.getMessage());
+                    throw new ZtgeoBizException("文件上传出现其它运行时异常--"+er.getMessage());
                 }
                 files.add(file);
             }

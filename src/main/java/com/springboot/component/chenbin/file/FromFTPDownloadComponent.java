@@ -31,6 +31,7 @@ public class FromFTPDownloadComponent {
             ftp.connect(ftpAddress, Integer.parseInt(ftpPort));
             // 如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
             ftp.login(ftpUsername, ftpPassword);// 登录
+            ftp.enterLocalPassiveMode();      //被动模式
             reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftp.disconnect();
