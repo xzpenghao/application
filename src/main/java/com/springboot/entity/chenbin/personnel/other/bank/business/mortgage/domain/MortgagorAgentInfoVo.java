@@ -9,8 +9,8 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AgentInfoVo implements Serializable {
-    private String agentName;
-    private String agentIdType;
-    private String agentId;
+public class MortgagorAgentInfoVo implements Serializable {
+    private String mortgagorAgentName;
+    private String mortgagorAgentIdType;
+    private String mortgagorAgentId;
 }

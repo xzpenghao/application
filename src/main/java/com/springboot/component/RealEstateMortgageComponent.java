@@ -18,6 +18,7 @@ import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.popj.warrant.ZdInfo;
 import com.springboot.service.chenbin.impl.ExchangeToInnerServiceImpl;
 
+import com.springboot.util.DateUtils;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -451,9 +453,18 @@ RealEstateMortgageComponent {
                 realPropertyCertificate.setLandUseRightOwner(glImmovableObject.getString("landRightUser"));//土地使用权人
                 realPropertyCertificate.setLandUseTimeLimit(glImmovableObject.getString("landRightTerm"));//土地使用期限
                 realPropertyCertificate.setLandPurpose(glImmovableObject.getString("landUsage"));//土地用途
-                realPropertyCertificate.setCommonLandArea(glImmovableObject.getString("commonLandArea"));//共有土地面积
-                realPropertyCertificate.setShareLandArea(glImmovableObject.getString("sharedLandArea"));//分摊土地面积
-                realPropertyCertificate.setSingleLandArea(glImmovableObject.getString("singleLandArea"));//独用土地面积
+                if (glImmovableObject.getString("commonLandArea")!=null){
+                    realPropertyCertificate.setCommonLandArea(new BigDecimal(glImmovableObject.getString("commonLandArea")));//分摊建筑面积
+                }
+                if (glImmovableObject.getString("sharedLandArea")!=null){
+                    realPropertyCertificate.setShareLandArea(new BigDecimal(glImmovableObject.getString("sharedLandArea")));//分摊建筑面积
+                }
+                if (glImmovableObject.getString("singleLandArea")!=null){
+                    realPropertyCertificate.setSingleLandArea(new BigDecimal(glImmovableObject.getString("singleLandArea")));//分摊建筑面积
+                }
+                if (glImmovableObject.getString("architectureLandArea")!=null){
+                    realPropertyCertificate.setBuildingParcelArea(new BigDecimal(glImmovableObject.getString("architectureLandArea")));//分摊建筑面积
+                }
                 glImmovable.setFwInfo(fwInfo);
                 realPropertyCertificate.getGlImmovableVoList().add(glImmovable);
             }
@@ -487,7 +498,7 @@ RealEstateMortgageComponent {
         if (null != zdInfojsonArray) {
             for (int j = 0; j < zdInfojsonArray.size(); j++) {
                 JSONObject zdObject = zdInfojsonArray.getJSONObject(j);
-                GlImmovable glImmovable = getZdInfo(zdObject, jsonObject);
+                GlImmovable glImmovable = getZdInfo(zdObject, jsonObject,realPropertyCertificate);
                 realPropertyCertificate.getGlImmovableVoList().add(glImmovable);
             }
         }
@@ -771,7 +782,7 @@ RealEstateMortgageComponent {
                 if (null != zdInfojsonArray) {
                     for (int z = 0; z < zdInfojsonArray.size(); z++) {
                         JSONObject zdObject = zdInfojsonArray.getJSONObject(z);
-                        GlImmovable glImmovable = getZdInfo(zdObject, jsonObject);
+                        GlImmovable glImmovable = getZdInfo(zdObject, jsonObject,null);
                         mortgageService.getGlImmovableVoList().add(glImmovable);
                     }
                 }
@@ -869,7 +880,7 @@ RealEstateMortgageComponent {
         return fwInfo;
     }
 
-    private GlImmovable getZdInfo(JSONObject zdObject, JSONObject jsonObject) {
+    private GlImmovable getZdInfo(JSONObject zdObject, JSONObject jsonObject,RealPropertyCertificate realPropertyCertificate) {
         GlImmovable glImmovable = new GlImmovable();
         glImmovable.setImmovableType(Msgagger.ZONGDI);
 //        glImmovable.setImmovableId(zdObject.getString("landId"));
@@ -882,6 +893,11 @@ RealEstateMortgageComponent {
         zdInfo.setLandUse(zdObject.getString("landUsage"));//土地用途
         zdInfo.setPrivateLandArea(zdObject.getBigDecimal("singleLandArea"));//独用土地面积
         zdInfo.setApportionmentLandArea(zdObject.getBigDecimal("sharedLandArea"));//分摊土地面积
+        if (zdObject.getString("landRightEndDate") != null) {
+            if (null != realPropertyCertificate) {
+                realPropertyCertificate.setLandUseRightEndingDate(zdObject.getString("landRightEndDate"));
+            }
+        }
         JSONArray attachmentInfoVoList = jsonObject.getJSONArray("attachmentInfoVoList");//查封的不动产单元号
         if (attachmentInfoVoList == null || attachmentInfoVoList.size() == 0) {
             zdInfo.setClosureSituation("无");

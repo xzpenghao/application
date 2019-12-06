@@ -258,13 +258,12 @@ public class SqRealEstateMortgageComponent {
         }
         sj_info_bdcdyxgxx.setGlMortgagorVoList(glMortgagorVoList);
         List<SJ_Qlr_Gl> glAgentInfoVoList=new ArrayList<>();
-        if (null != revokeRegistrationRespVo.getAgentInfoVoList() && revokeRegistrationRespVo.getAgentInfoVoList().size()!=0) {
-            for (AgentInfoVo agentInfoVo : revokeRegistrationRespVo.getAgentInfoVoList()) {
-                ClWtdlr(agentInfoVo, glAgentInfoVoList);
+        if (null != revokeRegistrationRespVo.getMortgagorAgentInfoVoList() && revokeRegistrationRespVo.getMortgagorAgentInfoVoList().size()!=0) {
+            for (MortgagorAgentInfoVo mortgagorAgentInfoVo : revokeRegistrationRespVo.getMortgagorAgentInfoVoList()) {
+                ClDyrWtdlr(mortgagorAgentInfoVo, glAgentInfoVoList);
             }
             sj_info_bdcdyxgxx.setGlAgentInfoVoList(glAgentInfoVoList);
         }
-
         sj_info_bdcdyxgxx.setGlImmovableVoList(glImmovableVoList);
         immovableCurrentMortgageInfoVoList.add(sj_info_bdcdyxgxx);
     }
@@ -563,15 +562,26 @@ public class SqRealEstateMortgageComponent {
             }
             sjInfoDyhtxx.setGlObligorInfoVoList(glObligorInfoVoVoList);
         }
-        //委托代理人
-        if (null != mortgageRegistrationReqVo.getAgentInfoVoList() && mortgageRegistrationReqVo.getAgentInfoVoList().size()!=0){
+        //抵押人委托代理人
+        if (null != mortgageRegistrationReqVo.getMortgagorAgentInfoVoList() && mortgageRegistrationReqVo.getMortgagorAgentInfoVoList().size()!=0){
             List<SJ_Qlr_Gl> AgentInfoVoList=new ArrayList<>();
-            for (AgentInfoVo agentInfoVo:
-                    mortgageRegistrationReqVo.getAgentInfoVoList()) {
-                ClWtdlr(agentInfoVo,AgentInfoVoList);
+            for (MortgagorAgentInfoVo agentInfoVo:
+                    mortgageRegistrationReqVo.getMortgagorAgentInfoVoList()) {
+                ClDyrWtdlr(agentInfoVo,AgentInfoVoList);
             }
-            sjInfoDyhtxx.setGlAgentInfoVoList(AgentInfoVoList);
+            sjInfoDyhtxx.setGlMortgagorAgentInfoVoList(AgentInfoVoList);
         }
+
+            //抵押权人委托代理人
+            if (null != mortgageRegistrationReqVo.getMortgageeAgentInfoVoList() && mortgageRegistrationReqVo.getMortgageeAgentInfoVoList().size()!=0){
+                List<SJ_Qlr_Gl> AgentInfoVoList=new ArrayList<>();
+                for (MortgageeAgentInfoVo mortgageeAgentInfoVo:
+                        mortgageRegistrationReqVo.getMortgageeAgentInfoVoList()) {
+                    ClDyqrWtdlr(mortgageeAgentInfoVo,AgentInfoVoList);
+                }
+                sjInfoDyhtxx.setGlMortgageeAgentInfoVoList(AgentInfoVoList);
+            }
+
         //不动产抵押数据
         if (null != mortgageRegistrationReqVo.getRealEstateInfoVoList() && mortgageRegistrationReqVo.getRealEstateInfoVoList().size()!=0){
             List<SJ_Info_Bdcqlxgxx> immovableRightInfoVoList=new ArrayList<>();
@@ -725,18 +735,30 @@ public class SqRealEstateMortgageComponent {
         sj_qlr_gl.setRelatedPerson(relatedPerson);
         glObligorVoList.add(sj_qlr_gl);
     }
-    private void ClWtdlr(AgentInfoVo agentInfoVo, List<SJ_Qlr_Gl> glObligorVoList) {
+    //抵押人代理人
+    private void ClDyrWtdlr(MortgagorAgentInfoVo mortgagorAgentInfoVo, List<SJ_Qlr_Gl> glObligorVoList) {
         SJ_Qlr_Gl sj_qlr_gl=new SJ_Qlr_Gl();
-        sj_qlr_gl.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_WTDLR);
-        sj_qlr_gl.setObligeeName(agentInfoVo.getAgentName());
+        sj_qlr_gl.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_WTDYRDLR);
+        sj_qlr_gl.setObligeeName(mortgagorAgentInfoVo.getMortgagorAgentName());
         SJ_Qlr_Info relatedPerson=new SJ_Qlr_Info();
-        relatedPerson.setObligeeDocumentType(MortgageDocumentType.Sc(agentInfoVo.getAgentIdType()));
-        relatedPerson.setObligeeDocumentNumber(agentInfoVo.getAgentId());
-        relatedPerson.setObligeeName(agentInfoVo.getAgentName());
+        relatedPerson.setObligeeDocumentType(MortgageDocumentType.Sc(mortgagorAgentInfoVo.getMortgagorAgentIdType()));
+        relatedPerson.setObligeeDocumentNumber(mortgagorAgentInfoVo.getMortgagorAgentId());
+        relatedPerson.setObligeeName(mortgagorAgentInfoVo.getMortgagorAgentName());
         sj_qlr_gl.setRelatedPerson(relatedPerson);
         glObligorVoList.add(sj_qlr_gl);
     }
-
+    //抵押人代理人
+    private void ClDyqrWtdlr(MortgageeAgentInfoVo mortgageeAgentInfoVo, List<SJ_Qlr_Gl> glObligorVoList) {
+        SJ_Qlr_Gl sj_qlr_gl=new SJ_Qlr_Gl();
+        sj_qlr_gl.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_WTDYQRDLR);
+        sj_qlr_gl.setObligeeName(mortgageeAgentInfoVo.getMortgageeAgentName());
+        SJ_Qlr_Info relatedPerson=new SJ_Qlr_Info();
+        relatedPerson.setObligeeDocumentType(MortgageDocumentType.Sc(mortgageeAgentInfoVo.getMortgageeAgentIdType()));
+        relatedPerson.setObligeeDocumentNumber(mortgageeAgentInfoVo.getMortgageeAgentId());
+        relatedPerson.setObligeeName(mortgageeAgentInfoVo.getMortgageeAgentName());
+        sj_qlr_gl.setRelatedPerson(relatedPerson);
+        glObligorVoList.add(sj_qlr_gl);
+    }
 
 
     /**

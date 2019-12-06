@@ -29,7 +29,8 @@ public class MortgageRegistrationReqVo {
     private List<MortgageeInfoVo> mortgageeInfoVoList;
     private List<MortgagorInfoVo> mortgagorInfoVoList;
     private List<ObligorInfoVo> obligorInfoVoList;
-    private List<AgentInfoVo> agentInfoVoList;
+    private List<MortgagorAgentInfoVo> mortgagorAgentInfoVoList; //抵押人代理人
+    private List<MortgageeAgentInfoVo> mortgageeAgentInfoVoList; //抵押权人代理人
     private List<RealEstateInfoVo> realEstateInfoVoList;
     private List<FileInfoVo> fileInfoVoList;
     private String operatorName;

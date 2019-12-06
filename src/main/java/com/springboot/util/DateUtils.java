@@ -7,6 +7,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -54,6 +55,15 @@ public class DateUtils {
             throw new RuntimeException(Msgagger.DATE_PARSE_EXCEPTION);
         }
         return date;
+    }
+
+
+
+    public static Date strToDate(String strDate) {
+           SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+           ParsePosition pos = new ParsePosition(0);
+           Date strtodate = formatter.parse(strDate, pos);
+           return strtodate;
     }
 
     /**

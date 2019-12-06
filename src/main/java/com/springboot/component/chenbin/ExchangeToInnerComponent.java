@@ -2,9 +2,11 @@ package com.springboot.component.chenbin;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.springboot.config.Msgagger;
 import com.springboot.feign.ForImmovableFeign;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.warrant.ParametricData;
+import com.springboot.util.DateUtils;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -80,10 +82,11 @@ public class ExchangeToInnerComponent {
                     String gymj = getNotNullData(landRight.getString("commonLandArea"));
                     String dymj = getNotNullData(landRight.getString("singleLandArea"));
                     String ftmj = getNotNullData(landRight.getString("sharedLandArea"));
-
+                    String jzzjmj=getNotNullData(landRight.getString("architectureLandArea"));
                     bdcqlxgxx.setCommonLandArea(StringUtils.isNotBlank(gymj)?new BigDecimal(gymj):null);
                     bdcqlxgxx.setSingleLandArea(StringUtils.isNotBlank(dymj)?new BigDecimal(dymj):null);
                     bdcqlxgxx.setShareLandArea(StringUtils.isNotBlank(ftmj)?new BigDecimal(ftmj):null);
+                    bdcqlxgxx.setBuildingParcelArea(StringUtils.isNotBlank(jzzjmj)?new BigDecimal(jzzjmj):null);
                 }
                 JSONArray houseRightVoList = jsonImmov.getJSONArray("houseRightRelatedVoList");//权利信息
                 if(houseRightVoList!=null && houseRightVoList.size()>0){                            //权利信息赋值

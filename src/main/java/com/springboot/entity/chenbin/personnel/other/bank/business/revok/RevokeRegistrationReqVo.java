@@ -1,7 +1,7 @@
 package com.springboot.entity.chenbin.personnel.other.bank.business.revok;
 
-import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.AgentInfoVo;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.FileInfoVo;
+import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.MortgagorAgentInfoVo;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.MortgagorInfoVo;
 
 
@@ -38,9 +38,8 @@ public class RevokeRegistrationReqVo implements Serializable {
     private String removeReason;
     private String macAdress;
     private String note;
-    private List<AgentInfoVo> agentInfoVoList;
+    private List<MortgagorAgentInfoVo> mortgagorAgentInfoVoList;
     private String businessAreas;
-
     private String notifyUrl;
     private String reqDate;
     private String apiName;

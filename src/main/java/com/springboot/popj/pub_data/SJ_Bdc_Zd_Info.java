@@ -2,6 +2,7 @@ package com.springboot.popj.pub_data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class SJ_Bdc_Zd_Info implements Serializable {
     private String parcelId;                  //宗地编号
@@ -17,11 +18,21 @@ public class SJ_Bdc_Zd_Info implements Serializable {
     private String mortgageSituation;         //不动产当前抵押情况
     private String closureSituation;          //不动产当前查封情况
     private String objectionSituation;        //不动产当前是否存在异议
+    private Date landRightEndDate;            //土地终止日期
     private String remarks;                   //备注信息
     private String status;                    //不动产状态
     private String ext1;                      //扩展字段1
     private String ext2;                      //扩展字段2
     private String ext3;                      //扩展字段3
+
+
+    public Date getLandRightEndDate() {
+        return landRightEndDate;
+    }
+
+    public void setLandRightEndDate(Date landRightEndDate) {
+        this.landRightEndDate = landRightEndDate;
+    }
 
     public String getParcelId() {
         return parcelId;

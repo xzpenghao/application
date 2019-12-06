@@ -37,10 +37,10 @@ public class RealPropertyCertificate {
     private String landUseRightOwner;            //土地使用权人
     private String landUseTimeLimit;                //土地使用期限
     private String landPurpose;                     //土地用途
-    private String commonLandArea;                  //共有土地面积
-    private String singleLandArea;                  //独用土地面积
-    private String shareLandArea;                   //分摊土地面积
-    private String buildingParcelArea;                  //建筑宗地面积
+    private BigDecimal commonLandArea;                  //共有土地面积
+    private BigDecimal singleLandArea;                  //独用土地面积
+    private BigDecimal shareLandArea;                   //分摊土地面积
+    private BigDecimal buildingParcelArea;                  //建筑宗地面积
     private String[] forecastCertificateNos;        //预告证明号
     private String[] warrantNos;                    //抵押证明号
     private String remarks;                      //备注附记
@@ -51,6 +51,38 @@ public class RealPropertyCertificate {
     private List<GlImmovable> glImmovableVoList=new ArrayList<>();//不动产类型(房屋信息)
     private List<GlMortgagor> glObligeeVoList=new ArrayList<>();//权利人数据
     private List<GlMortgagor> glObligorVoList=new ArrayList<>();//义务人数据
+
+    public BigDecimal getCommonLandArea() {
+        return commonLandArea;
+    }
+
+    public void setCommonLandArea(BigDecimal commonLandArea) {
+        this.commonLandArea = commonLandArea;
+    }
+
+    public BigDecimal getSingleLandArea() {
+        return singleLandArea;
+    }
+
+    public void setSingleLandArea(BigDecimal singleLandArea) {
+        this.singleLandArea = singleLandArea;
+    }
+
+    public BigDecimal getShareLandArea() {
+        return shareLandArea;
+    }
+
+    public void setShareLandArea(BigDecimal shareLandArea) {
+        this.shareLandArea = shareLandArea;
+    }
+
+    public BigDecimal getBuildingParcelArea() {
+        return buildingParcelArea;
+    }
+
+    public void setBuildingParcelArea(BigDecimal buildingParcelArea) {
+        this.buildingParcelArea = buildingParcelArea;
+    }
 
     public String getWiredNumber() {
         return wiredNumber;
@@ -305,38 +337,6 @@ public class RealPropertyCertificate {
 
     public void setLandPurpose(String landPurpose) {
         this.landPurpose = landPurpose;
-    }
-
-    public String getCommonLandArea() {
-        return commonLandArea;
-    }
-
-    public void setCommonLandArea(String commonLandArea) {
-        this.commonLandArea = commonLandArea;
-    }
-
-    public String getSingleLandArea() {
-        return singleLandArea;
-    }
-
-    public void setSingleLandArea(String singleLandArea) {
-        this.singleLandArea = singleLandArea;
-    }
-
-    public String getShareLandArea() {
-        return shareLandArea;
-    }
-
-    public void setShareLandArea(String shareLandArea) {
-        this.shareLandArea = shareLandArea;
-    }
-
-    public String getBuildingParcelArea() {
-        return buildingParcelArea;
-    }
-
-    public void setBuildingParcelArea(String buildingParcelArea) {
-        this.buildingParcelArea = buildingParcelArea;
     }
 
     public String getRemarks() {

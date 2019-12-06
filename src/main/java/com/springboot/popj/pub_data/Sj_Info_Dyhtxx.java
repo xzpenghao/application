@@ -27,12 +27,29 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
     private List<SJ_Bdc_Gl> glImmovableVoList;          //关联的不动产数据
     private List<SJ_Qlr_Gl> glMortgagorVoList;            //关联的抵押人数据
     private List<SJ_Qlr_Gl> glObligorInfoVoList;              //关联的债务人(如果为他人借贷存在债务人，则需要上送债务人信息，允许存在多个)。
-    private List<SJ_Qlr_Gl> glAgentInfoVoList;            //关联的抵押权人代理人数据
+    private List<SJ_Qlr_Gl> glMortgagorAgentInfoVoList;            //关联的抵押人代理人数据
+    private List<SJ_Qlr_Gl> glMortgageeAgentInfoVoList;            //关联的抵押权人代理人数据
     private List<SJ_Qlr_Gl> glMortgageHolderVoList;            //关联的抵押权人数据
 
     private String registrationSubclass;                       //登记小类
     private String registrationReason;                         //登记原因
 
+
+    public List<SJ_Qlr_Gl> getGlMortgagorAgentInfoVoList() {
+        return glMortgagorAgentInfoVoList;
+    }
+
+    public void setGlMortgagorAgentInfoVoList(List<SJ_Qlr_Gl> glMortgagorAgentInfoVoList) {
+        this.glMortgagorAgentInfoVoList = glMortgagorAgentInfoVoList;
+    }
+
+    public List<SJ_Qlr_Gl> getGlMortgageeAgentInfoVoList() {
+        return glMortgageeAgentInfoVoList;
+    }
+
+    public void setGlMortgageeAgentInfoVoList(List<SJ_Qlr_Gl> glMortgageeAgentInfoVoList) {
+        this.glMortgageeAgentInfoVoList = glMortgageeAgentInfoVoList;
+    }
 
     public void setApplyTime(String applyTime) {
         this.applyTime = applyTime;
@@ -198,13 +215,6 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
         this.glObligorInfoVoList = glObligorInfoVoList;
     }
 
-    public List<SJ_Qlr_Gl> getGlAgentInfoVoList() {
-        return glAgentInfoVoList;
-    }
-
-    public void setGlAgentInfoVoList(List<SJ_Qlr_Gl> glAgentInfoVoList) {
-        this.glAgentInfoVoList = glAgentInfoVoList;
-    }
 
     public String getRegistrationSubclass() {
         return registrationSubclass;

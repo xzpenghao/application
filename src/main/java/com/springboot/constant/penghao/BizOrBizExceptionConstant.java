@@ -8,7 +8,8 @@ public class BizOrBizExceptionConstant {
     public final static String OBLIGEE_TYPE_OF_YWR = "义务人";
     public final static String OBLIGEE_TYPE_OF_DYQR = "抵押权人";
     public final static String OBLIGEE_TYPE_OF_DYR = "抵押人";
-    public final static String OBLIGEE_TYPE_OF_WTDLR = "委托代理人";
+    public final static String OBLIGEE_TYPE_OF_WTDYRDLR = "抵押人代理人";
+    public final static String OBLIGEE_TYPE_OF_WTDYQRDLR = "抵押权人代理人";
     public final static String OBLIGEE_TYPE_OF_ZWR = "债务人";
     public final static String OBLIGEE_TYPE_OF_SFZ = "售房者";
     public final static String OBLIGEE_TYPE_OF_GFZ = "购房者";
