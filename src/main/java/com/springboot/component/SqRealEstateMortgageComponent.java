@@ -502,7 +502,9 @@ public class SqRealEstateMortgageComponent {
         respServiceData.setServiceDataInfos(infoJyhtxxList);//权属信息
         respServiceData.setServiceCode(Msgagger.JYTHSERVICE_CODE);
         respServiceDataList.add(respServiceData);
+        sj_sjsq.setServiceDatas(respServiceDataList);
         sj_sjsq.setTransactionContractInfo(transactionContractInfo);
+
     }
 
 
