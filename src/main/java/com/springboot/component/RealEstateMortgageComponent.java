@@ -615,6 +615,8 @@ RealEstateMortgageComponent {
             }
             mortgageBizInfo.setMortgageeInfoVoList(dyqrGlMortgatorList);
         }
+
+
         //待抵押不动产信息列表
         List<RealEstateInfo> realEstateInfoList = new ArrayList<>();
         if (sj_sjsq.getImmovableRightInfoVoList() != null && sj_sjsq.getImmovableRightInfoVoList().size() != 0) {

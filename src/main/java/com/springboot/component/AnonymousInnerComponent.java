@@ -175,7 +175,6 @@ public class AnonymousInnerComponent {
                             log.error("存量房信息保存失败,流程未开启"+json);
                         }
                     } else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)) {
-                        List<SJ_Book_Pic_ext> bookPicExtList=new ArrayList<>();
                         log.info("开始进行二手房登簿");
                         //登簿通知
                         EsfSdq esfSdq = new EsfSdq();
@@ -189,8 +188,6 @@ public class AnonymousInnerComponent {
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(jsonData);
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.BDCQZSDZF_SERVICE_CODE, true, getReceiving.getSlbh());//获取不动产权属信息
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
-                        String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
-                        HandleAttachementDiagram(mapParmeter,zyxxObject,bookPicExtList,getReceiving.getSlbh(),ftpAddress,ftpPort,ftpUsername,ftpPassword,path);//附件上传
                         String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
                         JSONObject ycslObject = JSONObject.fromObject(json);
                         log.info("一窗受理返回"+ycslObject.toString());
@@ -250,6 +247,7 @@ public class AnonymousInnerComponent {
     private void ownershipInFormationxx(com.alibaba.fastjson.JSONObject jsonObject, Map<String, String> stringMap, String serviceCode, boolean flag, String registerNumber) {
         //先处理文件上传
         SJ_Sjsq sjSjsq = new SJ_Sjsq();
+        List<SJ_Book_Pic_ext> sjBookPicExtList=new ArrayList<>();
         sjSjsq.setNotifiedPersonName(jsonObject.getString("contacts"));//通知人姓名
         sjSjsq.setNotifiedPersonTelephone(jsonObject.getString("contactsPhone"));//通知人电话
         sjSjsq.setNotifiedPersonAddress(jsonObject.getString("contactsAdress"));//通知人地址
@@ -283,11 +281,11 @@ public class AnonymousInnerComponent {
             ParametricData parametricData=new ParametricData();
             parametricData.setBdczh(qzh);
             List<SJ_Book_Pic_ext> bookPics=new ArrayList<>();
+            String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
             try {
                 //权属信息
                 List<SJ_Info_Bdcqlxgxx> bdcqlxgxxList=exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
-                JSONArray bdcJsonArray=JSONArray.fromObject(bdcqlxgxxList);
-                stringMap.put("bdcqxgxx",bdcJsonArray.toString());
+                HandleAttachementDiagram(bdcqlxgxxList,jsonObject,registerNumber,ftpAddress,ftpPort,ftpUsername,ftpPassword,path);//附件上传
                 respServiceData.setServiceDataInfos(bdcqlxgxxList);
                 serviceDatas.add(respServiceData);
                 sjSjsq.setServiceDatas(serviceDatas);
@@ -374,8 +372,9 @@ public class AnonymousInnerComponent {
     }
 
 
-    public void HandleAttachementDiagram(Map<String,String> mapParter,com.alibaba.fastjson.JSONObject jsonObject,List<SJ_Book_Pic_ext> sjBookPicExtList,String slbh,String address, String port, String username, String password,String path) {
+    public void HandleAttachementDiagram(List<SJ_Info_Bdcqlxgxx> sj_info_bdcqlxgxxList,com.alibaba.fastjson.JSONObject jsonObject,String slbh,String address, String port, String username, String password,String path) {
         com.alibaba.fastjson.JSONArray fileArray = null;
+        List<SJ_Book_Pic_ext> sjBookPicExtList=new ArrayList<>();
         Object uploadObject = null;
         if (null != jsonObject) {
             if (null != jsonObject.getJSONArray("householdMapInfoList") && jsonObject.getJSONArray("householdMapInfoList").size() != 0) {
@@ -406,7 +405,9 @@ public class AnonymousInnerComponent {
                     }
                 }
             }
-        } else if (null != jsonObject.getJSONArray("landMapInfoList") && jsonObject.getJSONArray("landMapInfoList").size() != 0) {
+        }
+        if (null != jsonObject.getJSONArray("landMapInfoList") && jsonObject.getJSONArray("landMapInfoList").size() != 0) {
+            fileArray = jsonObject.getJSONArray("landMapInfoList");
             for (int i = 0; i < fileArray.size(); i++) {
                 com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
                 String fileAddress = fileObject.getString("fileAddress");
@@ -432,10 +433,7 @@ public class AnonymousInnerComponent {
             }
         }
         if (null != sjBookPicExtList  && sjBookPicExtList.size()!=0) {
-            String bdcqxgxx = mapParter.get("bdcqxgxx");
-            com.alibaba.fastjson.JSONArray jsonArray = (com.alibaba.fastjson.JSONArray) com.alibaba.fastjson.JSONArray.parse(bdcqxgxx);
-            List<SJ_Info_Bdcqlxgxx> bdcqlxgxxList = com.alibaba.fastjson.JSONObject.parseArray(jsonArray.toJSONString(), SJ_Info_Bdcqlxgxx.class);
-            bdcqlxgxxList.get(0).setBookPics(sjBookPicExtList);
+            sj_info_bdcqlxgxxList.get(0).setBookPics(sjBookPicExtList);
         }
     }
 
@@ -988,6 +986,12 @@ public class AnonymousInnerComponent {
         com.alibaba.fastjson.JSONObject jsonObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(json);
         System.out.println("chenbin返回信息为：" + jsonObject);
         return json;
+    }
+
+
+    public Object getUrl(JSONObject jsonObject) throws  IOException{
+        String url="/register/api/IDServices";
+        return  BankNotification(jsonObject,url);
     }
 
 

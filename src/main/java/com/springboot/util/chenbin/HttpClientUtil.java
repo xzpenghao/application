@@ -2,7 +2,9 @@ package com.springboot.util.chenbin;
 
 import com.alibaba.fastjson.JSON;
 import com.springboot.popj.register.HttpRequestMethedEnum;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
+import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
@@ -18,18 +20,17 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import java.beans.Encoder;
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
+@Slf4j
 public class HttpClientUtil {
     /**
      * httpclient使用步骤
@@ -80,9 +81,9 @@ public class HttpClientUtil {
         }
         //传入请求参数
 //        String params = JSON.toJSONString(map);
-
-        postMethod.setEntity(new StringEntity(jsonParam));
-
+        log.info("param"+jsonParam);
+        postMethod.setEntity(new StringEntity(jsonParam, Charset.forName("UTF-8")));
+        log.info("paramEncode"+jsonParam);
         response = httpClient.execute(postMethod);//获取响应
 
         int statusCode = response.getStatusLine().getStatusCode();
@@ -93,7 +94,14 @@ public class HttpClientUtil {
             System.out.println("HTTP请求未成功！HTTP Status Code:" + response.getStatusLine());
         }
         HttpEntity httpEntity = response.getEntity();
-
+        Header [] headers=response.getAllHeaders();
+        for (Header header:headers) {
+            if (header.getName().equals("gx_resp_code")){
+                log.info("gxRespCode"+header.getValue());
+            }else if (header.getName().equals("gx_resp_msg")){
+                log.error("gxRespMsg"+URLDecoder.decode(header.getValue(),"UTF-8"));
+            }
+        }
         String reponseContent = EntityUtils.toString(httpEntity);
         EntityUtils.consume(httpEntity);//释放资源
         System.out.println("响应内容：" + reponseContent);

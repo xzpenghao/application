@@ -13,6 +13,7 @@ import com.springboot.util.chenbin.ErrorDealUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -44,6 +45,15 @@ public class RealEstateMortgageController {
     private ParallelSectorsComponent parallelSectorsComponent;
     @Autowired
     private HttpCallComponent httpCallComponent;
+
+
+    @RequestMapping(value = "/ceshigxpt", method = RequestMethod.POST)
+    @ApiOperation("测试共享平台")
+    public Object ceshigxpt() throws IOException {
+        JSONObject jsonObject=new JSONObject();
+        return anonymousInner.getUrl(jsonObject);
+    }
+
 
 
     @RequestMapping(value = "/AutoBackfillData", method = RequestMethod.POST)
