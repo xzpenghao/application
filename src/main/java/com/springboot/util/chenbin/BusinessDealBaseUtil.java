@@ -15,6 +15,7 @@ import com.springboot.entity.chenbin.personnel.tra.TraParamBody;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.registration.*;
 import com.springboot.util.TimeUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -30,6 +31,7 @@ import java.util.List;
 /*
     数据处理基本UTIL工具类
  */
+@Slf4j
 public class BusinessDealBaseUtil {
     //处理基本信息
     public static RegistrationBureau dealBaseInfo(SJ_Sjsq sjsq, String pid, boolean isSubmit, String bizType, String dealPerson, String areaNo) {
@@ -38,7 +40,7 @@ public class BusinessDealBaseUtil {
         registrationBureau.setSubmitFlow(isSubmit);
         registrationBureau.setBizType(bizType);//#（抵押注销(个人)）
         registrationBureau.setOperatorName(dealPerson);//测试后续需要设置
-        registrationBureau.setContactsAdress(StringUtils.isBlank(sjsq.getImmovableSite()) ? "测试地址" : sjsq.getImmovableSite());//测试数据
+        registrationBureau.setContactsAdress(StringUtils.isBlank(sjsq.getImmovableSite()) ? "" : sjsq.getImmovableSite());//测试数据
         registrationBureau.setContacts(sjsq.getNotifiedPersonName());
         registrationBureau.setContactsPhone(sjsq.getNotifiedPersonTelephone());
         registrationBureau.setBusinessAreas(StringUtils.isNotBlank(sjsq.getDistrictCode()) ? sjsq.getDistrictCode() : areaNo);
@@ -108,7 +110,10 @@ public class BusinessDealBaseUtil {
         SJ_Info_Bdcqlxgxx immovableRightInfo_bdcqz = null;
         SJ_Info_Bdcqlxgxx immovableRightInfo_td = null;
         for(SJ_Info_Bdcqlxgxx immovableRightInfo:immovableRightInfoVoList){
-            if(StringUtils.isNotBlank(immovableRightInfo.getDataType()) && "主设施".equals(immovableRightInfo.getDataType())){
+            if(StringUtils.isNotBlank(immovableRightInfo.getDataType())
+                    && "主设施".equals(immovableRightInfo.getDataType())
+                    && !immovableRightInfo.getCertificateType().equals("土地证")
+            ){
                 immovableRightInfo_bdcqz = immovableRightInfo;
             }
             if(immovableRightInfo.getCertificateType().equals("土地证")){
@@ -309,7 +314,11 @@ public class BusinessDealBaseUtil {
                 }
             }
 
-            if (StringUtils.isNotBlank(bdcql.getDataType()) && "主设施".equals(bdcql.getDataType())) {
+            if (
+                    StringUtils.isNotBlank(bdcql.getDataType())
+                    && "主设施".equals(bdcql.getDataType())
+                    && !bdcql.getCertificateType().equals("土地证")
+            ) {
                 String bdczh = bdcql.getImmovableCertificateNo();
                 if(bdczh.contains("-")) {
                     bdczh = bdczh.substring(0,bdczh.lastIndexOf("_"))+"号";
@@ -329,7 +338,7 @@ public class BusinessDealBaseUtil {
                         }
                     }
                 }
-            } else if(!bdcql.getCertificateType().equals("土地证")){
+            } else if(!bdcql.getCertificateType().equals("土地证")){//添加附属设施到FWXX
                 List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
                 if (bdcgls != null) {
                     for (SJ_Bdc_Gl bdcgl : bdcgls) {
@@ -509,16 +518,26 @@ public class BusinessDealBaseUtil {
         List<FJXX> fjxxs = new ArrayList<FJXX>();
         if(files!=null){
             for(ImmovableFile file:files){
+                log.info("进入"+file.getFileName()+"的文件处理");
                 FJXX fjxx = new FJXX();
                 fjxx.setFJMC(file.getFileName());
                 fjxx.setFJDX(file.getFileSize());
                 fjxx.setFJFL(file.getpName());
                 fjxx.setFJKZM(file.getFileType());
-                fjxx.setFTPDZ(file.getFileAddress());
+                fjxx.setFTPDZ(convertStr(file.getFileAddress()));
                 fjxx.setXH(file.getFileSequence());
                 fjxxs.add(fjxx);
             }
         }
         return fjxxs;
+    }
+
+    public static String convertStr(String fileAddress){
+        log.info("传入的字符串："+fileAddress);
+        if(fileAddress.contains("\\")) {
+            fileAddress = fileAddress.replaceAll("\\\\","/");
+        }
+        log.info("处理后的字符串："+fileAddress);
+        return fileAddress;
     }
 }

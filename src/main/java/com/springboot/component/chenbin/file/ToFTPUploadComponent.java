@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.Map;
+import java.util.UUID;
 
 @Component("toFTPUploadComponent")
 @Slf4j
@@ -138,6 +139,7 @@ public class ToFTPUploadComponent {
             int reply;
             ftp.connect(ftpAddress, Integer.parseInt(ftpPort));// 连接FTP服务器
             ftp.login(ftpUsername, ftpPassword);// 登录
+            ftp.enterLocalPassiveMode();      //被动模式
             reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 System.out.println("FTP服务器连接失败");
@@ -309,30 +311,33 @@ public class ToFTPUploadComponent {
 
 
 
-    public boolean uploadFileBDC(String pathFold,String fileName, String fileType, InputStream is) {
+    public boolean uploadFileBDC(String pathFold,String fileName, String fileType, String fileName_ftp,InputStream is) {
+        log.info("进入"+fileName+"附件处理");
+        log.info("接收到的附件保存路径为："+pathFold);
         boolean success = false;;
         // 上传文件
         FTPClient ftp = new FTPClient();
         ftp.setControlEncoding("UTF-8");
         try {
-            String fileName_ftp = "";
-            if(!fileName.contains(fileType)) {
-                fileName_ftp = new String((fileName + "." + fileType).getBytes(),"UTF-8");
-            }else{
-                fileName_ftp = new String(fileName.getBytes(),"UTF-8");
-            }
+//            String fileName_ftp = UUID.randomUUID().toString()+"."+fileType;
+//            String fileName_ftp = "";
+//            if(!fileName.contains(fileType)) {
+//                fileName_ftp = new String((fileName + "." + fileType).getBytes(),"UTF-8");
+//            }else{
+//                fileName_ftp = new String(fileName.getBytes(),"UTF-8");
+//            }
             //路径年/月/日/entryId名称
             String mulu = pathFold;
             ftp.connect(yftpAddress, Integer.valueOf(yftpPort));
             ftp.login(yftpUsername, yftpPassword);
+            ftp.enterLocalPassiveMode();
             int reply = ftp.getReplyCode();
             log.info("FTP连接返回：" + reply);
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftp.disconnect();
             }
-            ftp.enterLocalPassiveMode();
             ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-            ftp.setBufferSize(10240 * 10240);
+//            ftp.setBufferSize(10240 * 10240);
             boolean flag = ftp.changeWorkingDirectory(mulu);
             if (!flag) {
                 mkDir(mulu,ftp);

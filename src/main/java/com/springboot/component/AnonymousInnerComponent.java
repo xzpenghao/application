@@ -537,9 +537,11 @@ public class AnonymousInnerComponent {
                     String token="";
                     log.info("执行主线程");
                     if (StringUtils.isEmpty(getReceiving.getUserCodeYCSL()) || getReceiving.getUserCodeYCSL().equals("1")) {
+                        log.info("获取用户"+tsryname+"token");
                         tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
                         token = getToken(tokenObject, "GetReceiving", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                     }else {
+                        log.info("获取用户"+bsryname+"token");
                         tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
                         token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                     }
