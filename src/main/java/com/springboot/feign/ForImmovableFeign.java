@@ -25,4 +25,7 @@ public interface ForImmovableFeign {
 
     @RequestMapping(value = "api/services/app/BdcWorkFlow/CreateFlow",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
     Map<String,Object> createFlow(RegistrationBureau registrationBureau);
+
+    @RequestMapping(value = "api/services/app/bdcWorkFlow/GetProcessUsers",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
+    Map<String,Object> postProcessUsers(Map<String,String> pMap);
 }

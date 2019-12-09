@@ -32,6 +32,7 @@ public class JSONReceiptData implements Serializable {
     private String ext4;                                       //扩展字段4
 
     private String serviceDatas;                                //服务数据
+    private String userExtVoList;                               //设定系统对接扩展用户映射
 
     public String getReceiptNumber() {
         return receiptNumber;
@@ -223,5 +224,13 @@ public class JSONReceiptData implements Serializable {
 
     public void setServiceDatas(String serviceDatas) {
         this.serviceDatas = serviceDatas;
+    }
+
+    public String getUserExtVoList() {
+        return userExtVoList;
+    }
+
+    public void setUserExtVoList(String userExtVoList) {
+        this.userExtVoList = userExtVoList;
     }
 }

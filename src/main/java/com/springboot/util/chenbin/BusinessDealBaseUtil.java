@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.constant.penghao.BizOrBizExceptionConstant;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.chenbin.personnel.OtherEntity.FcIndexAndTdzh;
 import com.springboot.entity.chenbin.personnel.pub_use.*;
@@ -36,6 +37,31 @@ public class BusinessDealBaseUtil {
     //处理基本信息
     public static RegistrationBureau dealBaseInfo(SJ_Sjsq sjsq, String pid, boolean isSubmit, String bizType, String dealPerson, String areaNo) {
         RegistrationBureau registrationBureau = new RegistrationBureau();
+        List<SJ_Sjsq_User_Ext> userExts = sjsq.getUserExtVoList();
+        SJ_Sjsq_User_Ext bdcUser = null;
+        if(userExts!=null && userExts.size()>0){
+            for(SJ_Sjsq_User_Ext userExt:userExts){
+                if(
+                        userExt!=null
+                        && StringUtils.isNotBlank(userExt.getAdaptSys())
+                        && BizOrBizExceptionConstant.BDC_BIZ_ADOBE_CODE.equals(userExt.getAdaptSys())
+                ){
+                    boolean isBreak = true;
+                    if(StringUtils.isNotBlank(userExt.getUserCode())){
+                        dealPerson = userExt.getUserCode();
+                    }else{
+                        isBreak = isBreak && false;
+                    }
+                    if(StringUtils.isNotBlank(userExt.getBizCode())){
+                        pid = userExt.getBizCode();
+                    }else{
+                        isBreak = isBreak && false;
+                    }
+                    if(isBreak)
+                        break;
+                }
+            }
+        }
         registrationBureau.setPid(pid);//测试数据
         registrationBureau.setSubmitFlow(isSubmit);
         registrationBureau.setBizType(bizType);//#（抵押注销(个人)）

@@ -106,4 +106,5 @@ public class BizOrBizExceptionConstant {
     public final static String RECIEVE_DATA_CAN_NOT_USED = "请传入正确数据";
     public final static String DO_NOT_HAVE_THIS_RECORDE = "查无此件";
     public final static String CAN_NOT_GET_RECEIPT_FROM_TASK = "无法查询到任务所属有效办件信息";
+    public final static String BDC_BIZ_ADOBE_CODE = "01";
 }

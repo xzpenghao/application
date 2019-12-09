@@ -7,13 +7,13 @@ import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.component.chenbin.ExchangeToInnerComponent;
 import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.component.chenbin.OtherComponent;
-import com.springboot.config.DJJUser;
 import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphCfxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphDyxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
+import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
 import com.springboot.feign.ForImmovableFeign;
 import com.springboot.feign.OuterBackFeign;
@@ -22,19 +22,15 @@ import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.registration.*;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.service.chenbin.ExchangeToInnerService;
-import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
-import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -271,6 +267,30 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         return exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
     }
 
+    @Override
+    public List<SJ_Sjsq_User_Ext> getBdcUsers(String pid) {
+        Map<String,String> pMap = new HashMap<String,String>();
+        pMap.put("pid",pid);
+        Map<String,Object> usersMap = immovableFeign.postProcessUsers(pMap);
+        List<SJ_Sjsq_User_Ext> bdcUsers = new ArrayList<SJ_Sjsq_User_Ext>();
+        if(usersMap!=null) {
+            String code = (String)usersMap.get("code");
+            if(code!=null && "200".equals(code)) {
+                bdcUsers = JSONArray.parseArray(JSONArray.toJSONString(usersMap.get("data")), SJ_Sjsq_User_Ext.class);
+                log.info("不动产获取用户列表为："+JSONArray.toJSONString(bdcUsers));
+                if (bdcUsers != null) {
+                    for (SJ_Sjsq_User_Ext bdcUser : bdcUsers) {
+                        bdcUser.setAdaptSys("01");      //01代表不动产
+                        bdcUser.setDataInitMethod("接口");
+                    }
+                }
+            }else{
+                throw new ZtgeoBizException("不动产用户拉取失败，错误信息："+usersMap.get("message"));
+            }
+        }
+        return bdcUsers;
+    }
+
 
     public String handleCreateFlow(String token,SJ_Sjsq sjsq,RegistrationBureau registrationBureau,boolean dealFile){
         System.out.println("进入"+sjsq.getReceiptNumber()+"业务的附件获取功能");
@@ -285,7 +305,6 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         }else{
             log.error("附件列表为空");
         }
-        System.out.println("不动产登记业务最终传入不动产数据为：\n"+JSONObject.toJSONString(registrationBureau));
         log.info("不动产登记业务最终传入不动产数据为：\n"+JSONObject.toJSONString(registrationBureau));
         //发送登记局
         Map<String,Object> map = null;

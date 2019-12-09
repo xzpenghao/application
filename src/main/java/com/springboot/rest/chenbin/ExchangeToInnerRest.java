@@ -3,6 +3,7 @@ package com.springboot.rest.chenbin;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
+import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.service.chenbin.ExchangeToInnerService;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -130,5 +132,20 @@ public class ExchangeToInnerRest {
         ObjectRestResponse rv = new ObjectRestResponse();
 
         return rv.data(exchangeToInnerService.getBdcQlInfoWithItsRights(parametricData));
+    }
+
+    @RequestMapping(value = "getBdcUsers",method = RequestMethod.GET)
+    public ObjectRestResponse<List<SJ_Sjsq_User_Ext>> getBdcUsers(@RequestParam("pid") String pid){
+        List<SJ_Sjsq_User_Ext> SJSjsqUserExts = new ArrayList<SJ_Sjsq_User_Ext>();
+        try {
+            SJSjsqUserExts = exchangeToInnerService.getBdcUsers(pid);
+        } catch (ZtgeoBizException e){
+            log.error("预知异常："+ErrorDealUtil.getErrorInfo(e));
+            throw e;
+        } catch (Exception e){
+            log.error("未知异常："+ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("未知异常:"+e.getMessage());
+        }
+        return new ObjectRestResponse<List<SJ_Sjsq_User_Ext>>().data(SJSjsqUserExts);
     }
 }

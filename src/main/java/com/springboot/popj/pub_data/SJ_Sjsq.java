@@ -2,6 +2,7 @@ package com.springboot.popj.pub_data;
 
 
 
+import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
 import com.springboot.util.TimeUtil;
 
 import java.io.Serializable;
@@ -42,6 +43,7 @@ public class SJ_Sjsq  implements Serializable {
 
     private List<RespServiceData> serviceDatas; //封装返回值数据
     private List<SJ_Execute_depart> executeDeparts; //指定执行部门
+    private List<SJ_Sjsq_User_Ext> userExtVoList;//设定系统对接扩展用户映射
 
     public String getReceiptNumber() {
         return receiptNumber;
@@ -289,5 +291,13 @@ public class SJ_Sjsq  implements Serializable {
 
     public void setTaxInfoVoList(List<Sj_Info_Qsxx> taxInfoVoList) {
         this.taxInfoVoList = taxInfoVoList;
+    }
+
+    public List<SJ_Sjsq_User_Ext> getUserExtVoList() {
+        return userExtVoList;
+    }
+
+    public void setUserExtVoList(List<SJ_Sjsq_User_Ext> userExtVoList) {
+        this.userExtVoList = userExtVoList;
     }
 }
