@@ -1,5 +1,8 @@
 package com.springboot.popj.registration;
 
+import com.springboot.util.TimeUtil;
+
+import java.util.Date;
 import java.util.List;
 
 public class MortgageBizInfo {
@@ -66,16 +69,16 @@ public class MortgageBizInfo {
         return mortgageStartDate;
     }
 
-    public void setMortgageStartDate(String mortgageStartDate) {
-        this.mortgageStartDate = mortgageStartDate;
+    public void setMortgageStartDate(Date mortgageStartDate) {
+        this.mortgageStartDate = TimeUtil.getDateString(mortgageStartDate);
     }
 
     public String getMortgageEndDate() {
         return mortgageEndDate;
     }
 
-    public void setMortgageEndDate(String mortgageEndDate) {
-        this.mortgageEndDate = mortgageEndDate;
+    public void setMortgageEndDate(Date mortgageEndDate) {
+        this.mortgageEndDate =TimeUtil.getDateString(mortgageEndDate);
     }
 
     public String getMortgageReason() {

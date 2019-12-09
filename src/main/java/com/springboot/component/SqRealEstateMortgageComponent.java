@@ -6,7 +6,6 @@ import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.config.Msgagger;
 import com.springboot.constant.penghao.BizOrBizExceptionConstant;
 import com.springboot.entity.ParamEntity;
-import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.chenbin.personnel.other.bank.bankenum.*;
 import com.springboot.entity.chenbin.personnel.other.bank.ReMortgageRegistrationVo;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.MortgageRegistrationReqVo;
@@ -390,7 +389,15 @@ public class SqRealEstateMortgageComponent {
             outputStream.write(reObject.toString().getBytes("UTF-8"));
             outputStream.flush();
             outputStream.close();
-        } else {
+        } else if ((Integer) jsonObject.get("status") == 20500){
+                log.error(jsonObject.getString("message"));
+                XySj(reMortgageRegistrationVo, mortgageRegistrationReqVo, "000004", jsonObject.getString("message"));
+                reMortgageRegistrationVo.setAcceptStatus(Msgagger.JSBAD);
+                reObject = JSONObject.fromObject(reMortgageRegistrationVo);
+                outputStream.write(reObject.toString().getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+        }else {
             log.error("流程未开启");
             XySj(reMortgageRegistrationVo, mortgageRegistrationReqVo, "000004", "流程未开启");
             reMortgageRegistrationVo.setAcceptStatus(Msgagger.JSBAD);

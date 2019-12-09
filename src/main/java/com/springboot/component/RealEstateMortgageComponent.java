@@ -595,8 +595,8 @@ RealEstateMortgageComponent {
             mortgageBizInfo.setHighestClaimAmount(mortgageContractInfo.getMaximumClaimAmount().toString());
         }
         mortgageBizInfo.setMortgageReason(mortgageContractInfo.getMortgageReason());
-        mortgageBizInfo.setMortgageStartDate(mortgageContractInfo.getMortgageStartingDate());
-        mortgageBizInfo.setMortgageEndDate(mortgageContractInfo.getMortgageEndingDate());
+        mortgageBizInfo.setMortgageStartDate(DateUtils.strToDate(mortgageContractInfo.getMortgageStartingDate()));
+        mortgageBizInfo.setMortgageEndDate(DateUtils.strToDate(mortgageContractInfo.getMortgageEndingDate()));
         if (null != mortgageContractInfo.getCreditAmount()) {
             mortgageBizInfo.setCreditAmount(mortgageContractInfo.getCreditAmount().toString());
         }

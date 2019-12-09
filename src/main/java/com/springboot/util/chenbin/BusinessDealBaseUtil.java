@@ -15,6 +15,7 @@ import com.springboot.entity.chenbin.personnel.tax.TaxParamBody;
 import com.springboot.entity.chenbin.personnel.tra.TraParamBody;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.registration.*;
+import com.springboot.util.DateUtils;
 import com.springboot.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -81,8 +82,8 @@ public class BusinessDealBaseUtil {
         mortgageBizInfo.setCreditAmount(dyht.getCreditAmount() == null ? null : dyht.getCreditAmount().toString());
         mortgageBizInfo.setEvaluationValue(dyht.getValuationValue() == null ? null : dyht.getValuationValue().toString());
         mortgageBizInfo.setMortgageTerm(dyht.getMortgagePeriod());
-        mortgageBizInfo.setMortgageStartDate(dyht.getMortgageStartingDate());
-        mortgageBizInfo.setMortgageEndDate(dyht.getMortgageEndingDate());
+        mortgageBizInfo.setMortgageStartDate(DateUtils.strToDate(dyht.getMortgageStartingDate()));
+        mortgageBizInfo.setMortgageEndDate(DateUtils.strToDate(dyht.getMortgageEndingDate()));
         mortgageBizInfo.setMortgageReason(StringUtils.isNotBlank(dyht.getMortgageReason()) ? dyht.getMortgageReason() : "购买商品房");
         mortgageBizInfo.setAbsoluteFact(dyht.getMaximumClaimConfirm());
         mortgageBizInfo.setHighestClaimAmount(dyht.getMaximumClaimAmount() == null ? null : dyht.getMaximumClaimAmount().toString());

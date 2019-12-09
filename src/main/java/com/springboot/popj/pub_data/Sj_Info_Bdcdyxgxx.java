@@ -17,8 +17,8 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
     private String mortgageAmount;                  //抵押金额
     private String valuationValue;                  //评估价值
     private String mortgagePeriod;                  //抵押期限
-    private String mortgageStartingDate;            //抵押期起
-    private String mortgageEndingDate;              //抵押期止
+    private Date mortgageStartingDate;            //抵押期起
+    private Date mortgageEndingDate;              //抵押期止
     private String mortgageReason;                  //抵押原因
     private String remarks;                         //备注附记
     private String electronicProofPath;             //电子证明存放路径
@@ -122,20 +122,20 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
         this.mortgagePeriod = mortgagePeriod;
     }
 
-    public String getMortgageStartingDate() {
+    public Date getMortgageStartingDate() {
         return mortgageStartingDate;
     }
 
     public void setMortgageStartingDate(Date mortgageStartingDate) {
-        this.mortgageStartingDate = TimeUtil.getDateString(mortgageStartingDate);
+        this.mortgageStartingDate = mortgageStartingDate;
     }
 
-    public String getMortgageEndingDate() {
+    public Date getMortgageEndingDate() {
         return mortgageEndingDate;
     }
 
     public void setMortgageEndingDate(Date mortgageEndingDate) {
-        this.mortgageEndingDate = TimeUtil.getDateString(mortgageEndingDate);
+        this.mortgageEndingDate = mortgageEndingDate;
     }
 
     public String getMortgageReason() {
