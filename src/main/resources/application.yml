@@ -133,19 +133,20 @@ businessType:
   vormerkung: YGDJ         #预告登记
   areaNo: 320301
   dealPerson: zhujun              #ADMIN
+  bankPerson: ADMIN
 
 
 
 webplus:
-  ftpAddress: 10.3.2.203     #一窗受理ftp
+  ftpAddress: 10.3.2.147     #一窗受理ftp
   ftpPort: 21
-  ftpUsername: forftp
-  ftpPassword: 123456
+  ftpUsername: ftpsvr
+  ftpPassword: 123qwe!@#
 
   ftpAddressBdc: 10.3.2.147    #不动产登记平台
-  ftpPortBdc: 54111
-  ftpUsernameBdc: ftp
-  ftpPasswordBdc: 123456
+  ftpPortBdc: 21
+  ftpUsernameBdc: ftpsvr
+  ftpPasswordBdc: 123qwe!@#
 
 logging:
   level:
@@ -197,6 +198,7 @@ chenbin:
     gs:                         #工商
       url: http://10.13.0.240:9999/z
 penghao:
+    transferholdmap: true
     mortgageCancellation:       #抵押注销登记
         pid: Proc-171013213255-X42L8440
           #Proc-180517124140-3MN26M71
@@ -265,7 +267,7 @@ gxjhpt:
 
 bdccx:
   url: http://10.3.2.147:23335/
-
+#  url: http://172.22.226.172:12201/
 ycsl:
   url: http://localhost:7780/
 

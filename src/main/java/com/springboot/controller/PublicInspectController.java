@@ -1,5 +1,6 @@
 package com.springboot.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.service.shike.PublicInspectService;
@@ -9,10 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -24,7 +22,8 @@ public class PublicInspectController {
 
     @RequestMapping(value = "/JudicialQuery", method = RequestMethod.POST)
     @ApiOperation("司法查询反馈")
-    public ObjectRestResponse JudicialQuery(JudicialRecVo judicialRecVo) {
+    public ObjectRestResponse JudicialQuery(@RequestBody JudicialRecVo judicialRecVo) {
+        System.out.println("传入参数："+ JSONObject.toJSONString(judicialRecVo));
         if (StringUtils.isBlank(judicialRecVo.getBdczh())||
                 StringUtils.isBlank(judicialRecVo.getType())||
                 StringUtils.isBlank(judicialRecVo.getDjjg())||

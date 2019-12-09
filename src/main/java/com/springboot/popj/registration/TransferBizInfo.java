@@ -13,7 +13,8 @@ public class TransferBizInfo {
     private String registerSubType;//登记小类
     private String commonWay;//共有方式
     private List<QlrGlMortgator> obligeeInfoVoList; //不动产权利人列表
-    private List<WtdlrGlMortgator> agentInfoVoList; //委托代理人信息列表
+    private List<WtdlrGlMortgator> obligeeAgentInfoVoList; //权利人代理人信息列表
+    private List<WtdlrGlMortgator> salerAgentInfoVoList; //权利人代理人信息列表
 
 
     public String getRegisterSubType() {
@@ -40,12 +41,20 @@ public class TransferBizInfo {
         this.obligeeInfoVoList = obligeeInfoVoList;
     }
 
-    public List<WtdlrGlMortgator> getAgentInfoVoList() {
-        return agentInfoVoList;
+    public List<WtdlrGlMortgator> getObligeeAgentInfoVoList() {
+        return obligeeAgentInfoVoList;
     }
 
-    public void setAgentInfoVoList(List<WtdlrGlMortgator> agentInfoVoList) {
-        this.agentInfoVoList = agentInfoVoList;
+    public void setObligeeAgentInfoVoList(List<WtdlrGlMortgator> obligeeAgentInfoVoList) {
+        this.obligeeAgentInfoVoList = obligeeAgentInfoVoList;
+    }
+
+    public List<WtdlrGlMortgator> getSalerAgentInfoVoList() {
+        return salerAgentInfoVoList;
+    }
+
+    public void setSalerAgentInfoVoList(List<WtdlrGlMortgator> salerAgentInfoVoList) {
+        this.salerAgentInfoVoList = salerAgentInfoVoList;
     }
 
     public String getRealEstateId() {

@@ -4,6 +4,7 @@ public class DyqrGlMortgator {
     private String mortgageeId;//证件号码
     private String mortgageeIdType;//证件类型编码
     private String mortgageeName;//姓名
+    private String order;//顺序
 
     public String getMortgageeId() {
         return mortgageeId;
@@ -27,5 +28,13 @@ public class DyqrGlMortgator {
 
     public void setMortgageeName(String mortgageeName) {
         this.mortgageeName = mortgageeName;
+    }
+
+    public String getOrder() {
+        return order;
+    }
+
+    public void setOrder(String order) {
+        this.order = order;
     }
 }

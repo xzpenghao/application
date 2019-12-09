@@ -93,6 +93,14 @@ public class BusinessDealBaseUtil {
         List<SJ_Qlr_Gl> dyrs = dyht.getGlMortgagorVoList();
         List<DyqrGlMortgator> mortgageeInfoVoList = getMortgageeInfoVoList(dyqrs, idType);
         List<DyrGlMortgator> mortgagorInfoVoList = getMortgagorInfoVoList(dyrs, idType);
+        List<SJ_Qlr_Gl> dyqrdls = dyht.getGlMortgageeAgentInfoVoList();//抵押权代理人
+        List<SJ_Qlr_Gl> dyrdls = dyht.getGlMortgagorAgentInfoVoList();//抵押代理人
+        if(dyqrdls!=null && dyqrdls.size()>0){
+            mortgageBizInfo.setMortgageeAgentInfoVoList(getAgentInfoVoList(dyqrdls, idType));
+        }
+        if(dyrdls!=null && dyrdls.size()>0){
+            mortgageBizInfo.setMortgagorAgentInfoVoList(getAgentInfoVoList(dyrdls, idType));
+        }
         List<RealEstateInfo> realEstateInfoVoList = getRealEstateInfoVoListByJyht(jyht, idType);
         mortgageBizInfo.setMortgageeInfoVoList(mortgageeInfoVoList);
         mortgageBizInfo.setMortgagorInfoVoList(mortgagorInfoVoList);
@@ -118,7 +126,7 @@ public class BusinessDealBaseUtil {
             mortgageBizInfo = getMortgageBizInfoByContract(sjsq.getTransactionContractInfo(),sjsq.getMortgageContractInfo(),idType);
         }else{
             if(sjsq.getImmovableRightInfoVoList()==null || sjsq.getImmovableRightInfoVoList().size()==0){
-                throw new ZtgeoBizException("转移及抵押登记缺失必要数据，检查传入参数是否包含不动产权属信息");
+                throw new ZtgeoBizException("一般抵押登记缺失必要数据，检查传入参数是否包含不动产权属信息");
             }
             mortgageBizInfo = getMortgageBizInfoByImmovList(sjsq.getImmovableRightInfoVoList(),sjsq.getMortgageContractInfo());
         }
@@ -161,9 +169,13 @@ public class BusinessDealBaseUtil {
         transferBizInfo.setCommonWay(buyers.get(0).getSharedMode());//共有方式
         List<QlrGlMortgator> obligeeInfoVoList = getObligeeInfoVoList(buyers, idType);
         transferBizInfo.setObligeeInfoVoList(obligeeInfoVoList);
-        List<SJ_Qlr_Gl> agents = sjInfoJyhtxx.getGlAgentVoList();
-        if(agents!=null && agents.size()>0){
-            transferBizInfo.setAgentInfoVoList(getAgentInfoVoList(agents, idType));
+        List<SJ_Qlr_Gl> ql_agents = sjInfoJyhtxx.getGlAgentVoList();
+        List<SJ_Qlr_Gl> yw_agents = sjInfoJyhtxx.getGlAgentSellerVoList();
+        if(ql_agents!=null && ql_agents.size()>0){
+            transferBizInfo.setObligeeAgentInfoVoList(getAgentInfoVoList(ql_agents, idType));
+        }
+        if(yw_agents!=null && yw_agents.size()>0){
+            transferBizInfo.setSalerAgentInfoVoList(getAgentInfoVoList(yw_agents, idType));
         }
         return transferBizInfo;
     }
@@ -177,6 +189,7 @@ public class BusinessDealBaseUtil {
             mortgageeInfo.setMortgageeName(person.getObligeeName());
             mortgageeInfo.setMortgageeIdType(getIdTypeNumber(person.getObligeeDocumentType(), idType));
             mortgageeInfo.setMortgageeId(person.getObligeeDocumentNumber());
+            mortgageeInfo.setOrder(dyqr.getObligeeOrder()!=null?Integer.toString(dyqr.getObligeeOrder()):null);
             mortgageeInfoVoList.add(mortgageeInfo);
         }
         return mortgageeInfoVoList;
@@ -191,6 +204,7 @@ public class BusinessDealBaseUtil {
             mortgagorInfo.setMortgagorId(person.getObligeeDocumentNumber());
             mortgagorInfo.setMortgagorIdType(getIdTypeNumber(person.getObligeeDocumentType(), idType));
             mortgagorInfo.setMortgagorName(person.getObligeeName());
+            mortgagorInfo.setOrder(dyr.getObligeeOrder()!=null?Integer.toString(dyr.getObligeeOrder()):null);
             mortgagorInfoVoList.add(mortgagorInfo);
         }
         return mortgagorInfoVoList;
@@ -221,6 +235,7 @@ public class BusinessDealBaseUtil {
             obligeeInfo.setObligeeId(person.getObligeeDocumentNumber());
             obligeeInfo.setCommonWay(buyer.getSharedMode());
             obligeeInfo.setSharedSharel(buyer.getSharedValue() == null ? null : buyer.getSharedValue().toString());
+            obligeeInfo.setOrder(buyer.getObligeeOrder()!=null?Integer.toString(buyer.getObligeeOrder()):null);
             obligeeInfoVoList.add(obligeeInfo);
         }
         return obligeeInfoVoList;
@@ -235,6 +250,7 @@ public class BusinessDealBaseUtil {
             agentInfo.setAgentName(person.getObligeeName());
             agentInfo.setAgentId(person.getObligeeDocumentNumber());
             agentInfo.setAgentIdType(getIdTypeNumber(person.getObligeeDocumentType(), idType));
+            agentInfo.setOrder(agent.getObligeeOrder()!=null?Integer.toString(agent.getObligeeOrder()):null);
             agentInfoVoList.add(agentInfo);
         }
         return agentInfoVoList;
@@ -408,7 +424,7 @@ public class BusinessDealBaseUtil {
             for(SJ_Qlr_Gl sellerAgentgl:sellerAgentgls) {
                 JYQLRXX jdlrxx = getJyqlr(sellerAgentgl);
                 jdlrxx.setQLRBS("0");
-                JYQLRXX.add(jdlrxx);
+                JYDLRXX.add(jdlrxx);
             }
         }
 

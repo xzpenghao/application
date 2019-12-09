@@ -5,6 +5,7 @@ public class WtdlrGlMortgator {
     private String agentId;//证件号码
     private String agentIdType;//证件类型编码
     private String agentName;//姓名
+    private String order;
 
     public String getAgentId() {
         return agentId;
@@ -28,5 +29,13 @@ public class WtdlrGlMortgator {
 
     public void setAgentName(String agentName) {
         this.agentName = agentName;
+    }
+
+    public String getOrder() {
+        return order;
+    }
+
+    public void setOrder(String order) {
+        this.order = order;
     }
 }

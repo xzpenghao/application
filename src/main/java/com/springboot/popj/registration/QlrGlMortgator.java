@@ -8,6 +8,7 @@ public class QlrGlMortgator {
     private String obligeeIdType;//证件类型编码
     private String commonWay;//共有方式
     private String sharedSharel;//共有份额
+    private String order;
 
     public String getCommonWay() {
         return commonWay;
@@ -47,5 +48,13 @@ public class QlrGlMortgator {
 
     public void setObligeeIdType(String obligeeIdType) {
         this.obligeeIdType = obligeeIdType;
+    }
+
+    public String getOrder() {
+        return order;
+    }
+
+    public void setOrder(String order) {
+        this.order = order;
     }
 }
