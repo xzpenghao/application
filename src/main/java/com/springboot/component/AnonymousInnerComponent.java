@@ -399,6 +399,7 @@ public class AnonymousInnerComponent {
                         SJ_Fjfile sj_file = new SJ_Fjfile();
                         sj_file.setFtpPath(map.get("path").toString() + "\\" + map.get("fileName").toString());
                         sj_file.setFileName(map.get("fileName").toString());
+                        sj_file.setFileSubmissionTime(new Date());
                         sj_file.setFileExt(fileType);
                         sjBookPicExt.setFile(sj_file);
                         sjBookPicExtList.add(sjBookPicExt);
