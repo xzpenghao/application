@@ -17,7 +17,8 @@ public class MortgageBizInfo {
     private String htbh;//合同编号
     private List<DyqrGlMortgator> mortgageeInfoVoList;//抵押权人信息
     private List<DyrGlMortgator> mortgagorInfoVoList; //抵押人信息
-    private List<WtdlrGlMortgator> agentInfoVoList; //委托代理人信息列表
+    private List<WtdlrGlMortgator> mortgageeAgentInfoVoList; //抵押权人代理人列表
+    private List<WtdlrGlMortgator> mortgagorAgentInfoVoList; //抵押人代理人列表
     private List<DyzwrGlMortgator> obligorInfoVoList; //抵押债务人信息列表
     private List<RealEstateInfo> realEstateInfoVoList; //待抵押的不动产信息列表
 
@@ -125,12 +126,20 @@ public class MortgageBizInfo {
         this.mortgagorInfoVoList = mortgagorInfoVoList;
     }
 
-    public List<WtdlrGlMortgator> getAgentInfoVoList() {
-        return agentInfoVoList;
+    public List<WtdlrGlMortgator> getMortgageeAgentInfoVoList() {
+        return mortgageeAgentInfoVoList;
     }
 
-    public void setAgentInfoVoList(List<WtdlrGlMortgator> agentInfoVoList) {
-        this.agentInfoVoList = agentInfoVoList;
+    public void setMortgageeAgentInfoVoList(List<WtdlrGlMortgator> mortgageeAgentInfoVoList) {
+        this.mortgageeAgentInfoVoList = mortgageeAgentInfoVoList;
+    }
+
+    public List<WtdlrGlMortgator> getMortgagorAgentInfoVoList() {
+        return mortgagorAgentInfoVoList;
+    }
+
+    public void setMortgagorAgentInfoVoList(List<WtdlrGlMortgator> mortgagorAgentInfoVoList) {
+        this.mortgagorAgentInfoVoList = mortgagorAgentInfoVoList;
     }
 
     public List<DyzwrGlMortgator> getObligorInfoVoList() {

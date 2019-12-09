@@ -626,7 +626,32 @@ RealEstateMortgageComponent {
             }
             mortgageBizInfo.setMortgageeInfoVoList(dyqrGlMortgatorList);
         }
-
+        //抵押权人委托代理人
+        List<WtdlrGlMortgator> dyqrWtdlrList=new ArrayList<>();
+        if (mortgageContractInfo.getGlMortgageeAgentInfoVoList() != null && mortgageContractInfo.getGlMortgageeAgentInfoVoList().size() != 0) {
+            for (SJ_Qlr_Gl dyqr : mortgageContractInfo.getGlMortgageeAgentInfoVoList()) {
+                WtdlrGlMortgator dyqrWtdlr = new WtdlrGlMortgator();
+                SJ_Qlr_Info relatedPerson = dyqr.getRelatedPerson();
+                dyqrWtdlr.setAgentId(relatedPerson.getObligeeDocumentNumber());
+                dyqrWtdlr.setAgentIdType(getZjlbx(relatedPerson.getObligeeDocumentType()));
+                dyqrWtdlr.setAgentName(dyqr.getObligeeName());
+                dyqrWtdlrList.add(dyqrWtdlr);
+            }
+            mortgageBizInfo.setMortgageeAgentInfoVoList(dyqrWtdlrList);
+        }
+        //抵押人委托代理人
+        List<WtdlrGlMortgator> dyrWtdlrList=new ArrayList<>();
+        if (mortgageContractInfo.getGlMortgagorAgentInfoVoList() != null && mortgageContractInfo.getGlMortgagorAgentInfoVoList().size() != 0) {
+            for (SJ_Qlr_Gl dyqr : mortgageContractInfo.getGlMortgagorAgentInfoVoList()) {
+                WtdlrGlMortgator dyrWtdlr = new WtdlrGlMortgator();
+                SJ_Qlr_Info relatedPerson = dyqr.getRelatedPerson();
+                dyrWtdlr.setAgentId(relatedPerson.getObligeeDocumentNumber());
+                dyrWtdlr.setAgentIdType(getZjlbx(relatedPerson.getObligeeDocumentType()));
+                dyrWtdlr.setAgentName(dyqr.getObligeeName());
+                dyrWtdlrList.add(dyrWtdlr);
+            }
+            mortgageBizInfo.setMortgagorAgentInfoVoList(dyrWtdlrList);
+        }
 
         //待抵押不动产信息列表
         List<RealEstateInfo> realEstateInfoList = new ArrayList<>();
