@@ -16,7 +16,9 @@ public class Msgagger {
     public final static String SHANZHENG="缮证";
     public final static String DENGBU="登簿";
     public final static String FILE_TYPE="MORTGAGE_EL_PROVE";
-
+    public final static String FTP_BAD="权属信息获取不到或ftp路径不对";
+    public final static String ZDT="宗地图";
+    public final static String FCFHT="分层分户图";
 
     public final static String AUTOINTECEBAD = "保存自动接口执行失败";
     public final static String ACCPETNOTICE = "acceptNotice";//受理通知

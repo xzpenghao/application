@@ -249,15 +249,6 @@ public class ToFTPUploadComponent {
             returnValue = ftpClient.storeFile(fileName, input);
             log.info("s:"+returnValue);
             log.info("jjj");
-            FTPFile[] fs = ftpClient.listFiles(fileName);
-            log.info("fsLength"+fs.length);
-            if (fs.length == 0) {
-                log.debug("this file not exist ftp");
-                System.out.println("this file not exist ftp");
-            } else if (fs.length == 1) {
-               log.info("this file exist ftp");
-                System.out.println("this file exist ftp");
-            }
             ftpClient.logout();
             input.close();
         } catch (Exception e) {

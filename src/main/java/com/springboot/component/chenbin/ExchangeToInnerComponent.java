@@ -78,7 +78,6 @@ public class ExchangeToInnerComponent {
                     bdcqlxgxx.setLandRightType(landRight.getString("landRightType"));
                     bdcqlxgxx.setLandRightNature(landRight.getString("landRightNature"));
                     bdcqlxgxx.setLandPurpose(landRight.getString("landUsage"));      //土地用途
-
                     String gymj = getNotNullData(landRight.getString("commonLandArea"));
                     String dymj = getNotNullData(landRight.getString("singleLandArea"));
                     String ftmj = getNotNullData(landRight.getString("sharedLandArea"));

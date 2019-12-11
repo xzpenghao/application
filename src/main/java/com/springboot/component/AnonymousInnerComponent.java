@@ -133,7 +133,7 @@ public class AnonymousInnerComponent {
         Map<String, String> mapHeader = new HashMap<>();
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception { //建议抛出异常
-                try {
+
                     log.info("执行主线程");
                     com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
                     String token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
@@ -183,7 +183,8 @@ public class AnonymousInnerComponent {
                         esfSdq.setHouseholdMap(transferHoldmap);
                         JSONObject jsonObject = JSONObject.fromObject(esfSdq);
                         //根据受理编号查询转移信息（水电气）
-                        String jsonData = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+//                        String jsonData = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+                        String jsonData="{\"realEstateInfoList\":[{\"realEstateId\":\"苏(2019)丰县不动产权第0019925号\",\"certificateType\":\"房屋不动产证\",\"realEstateUnitInfoVoList\":[{\"realEstateUnitId\":\"320321030001GB00026F00000000\",\"householdId\":\"10FBCD0E-D06B-418C-90E2-197102317C\",\"buildingId\":\"0003\",\"accountId\":\"0001\",\"sit\":\"测试坐落\",\"roomId\":\"101\",\"unitId\":\"1\",\"floor\":\"1\",\"totalFloor\":\"5\",\"projectName\":\"名仕雅苑一期\",\"architectureName\":\"11#\",\"architectureArea\":null,\"innerArchitectureArea\":null,\"sharedArchitectureArea\":null,\"acquireWay\":null,\"acquirePrice\":null,\"plannedUsage\":\"住宅\",\"houseType\":null,\"houseNature\":null,\"houseStructure\":\"砖混\",\"houseRightType\":\"房屋所有权\",\"houseRightNature\":\"市场化商品房\",\"landRightNature\":null,\"landRightStartDate\":null,\"landRightEndDate\":null,\"landRightUser\":null,\"landRightTerm\":null,\"landUsage\":null,\"commonLandArea\":null,\"sharedLandArea\":null,\"singleLandArea\":null}],\"landUnitInfoVoList\":null,\"obligeeInfoVoList\":[{\"id\":\"QLR-191009113457-573640I142\",\"obligeeName\":\"张三\",\"obligeeIdType\":\"其它\",\"obligeeId\":\"123\",\"commonWay\":\"单独所有\",\"sharedShare\":null}],\"salerInfoVoList\":[{\"salerName\":\"史平安\",\"salerIdType\":\"其它\",\"salerId\":null}],\"registerDate\":\"2019-12-10 15:59:08\"}],\"sdqInfo\":{\"shhh\":\"1102\",\"dhhh\":\"1103\",\"qhhh\":\"1004\",\"thhh\":null,\"xshhh\":null,\"xdhhh\":null,\"xqhhh\":null,\"xthhh\":null,\"gsdw\":\"丰县自来水公司\",\"gddw\":\"丰县供电公司\",\"gqdw\":\"丰县滨海燃气有限公司\",\"gtdw\":\"丰县有线电视\"},\"fileInfoList\":[],\"householdMapInfoList\":[{\"bdcdyh\":\"320321030001GB00026F00000000\",\"fileName\":\"分层分户草图\",\"fileType\":\"jpg\",\"fileAddress\":\"/FC_H/907E8C8C-D386-451E-84D6-3DCA28DF60FF/10FBCD0E-D06B-418C-90E2-197102317C.jpg\",\"pName\":\"分层分户图\",\"fileSequence\":\"0\"}],\"landMapInfoList\":[{\"bdcdyh\":null,\"fileName\":\"宗地草图(幢)\",\"fileType\":null,\"fileAddress\":\"/2019/12/09/Bin-191209144734-D65O0AS1Q2.JPG\",\"pName\":\"宗地图\",\"fileSequence\":\"0\"}],\"contacts\":\"张三\",\"contactsPhone\":\"15162098070\",\"contactsAdress\":null,\"businessAreas\":\"丰县\"}\n";
                         log.info("查询转移信息(水电气)"+jsonData);
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(jsonData);
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.BDCQZSDZF_SERVICE_CODE, true, getReceiving.getSlbh());//获取不动产权属信息
@@ -196,10 +197,7 @@ public class AnonymousInnerComponent {
                         JSONObject ycslObject = JSONObject.fromObject(json);
                         log.info("一窗受理返回"+ycslObject.toString());
                     }
-                } catch (Exception e) {
-                    log.error("附件错误:"+e.getMessage());
-                    throw new Exception("Callable terminated with Exception!"); // call方法可以抛出异常
-                }
+
                 return null;
             }
         });
@@ -284,9 +282,7 @@ public class AnonymousInnerComponent {
             //根据权证号获取信息
             ParametricData parametricData=new ParametricData();
             parametricData.setBdczh(qzh);
-            List<SJ_Book_Pic_ext> bookPics=new ArrayList<>();
             String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
-            try {
                 //权属信息
                 List<SJ_Info_Bdcqlxgxx> bdcqlxgxxList=exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
                 HandleAttachementDiagram(bdcqlxgxxList,jsonObject,registerNumber,ftpAddress,ftpPort,ftpUsername,ftpPassword,path);//附件上传
@@ -294,11 +290,9 @@ public class AnonymousInnerComponent {
                 serviceDatas.add(respServiceData);
                 sjSjsq.setServiceDatas(serviceDatas);
                 JSONArray serviceArray = JSONArray.fromObject(serviceDatas);
+                log.info("serviceArray"+serviceArray.toString());
                 stringMap.put("serviceDatas", serviceArray.toString());
                 stringMap.put("executeDeparts",departArray.toString());
-            }catch (Exception e){
-              log.error("错误信息"+e);
-            }
         } else {
             respServiceData.setServiceDataInfos(realPropertyCertificateList);
             serviceDatas.add(respServiceData);
@@ -380,6 +374,7 @@ public class AnonymousInnerComponent {
         com.alibaba.fastjson.JSONArray fileArray = null;
         List<SJ_Book_Pic_ext> sjBookPicExtList=new ArrayList<>();
         Object uploadObject = null;
+        try {
         if (null != jsonObject) {
             if (null != jsonObject.getJSONArray("householdMapInfoList") && jsonObject.getJSONArray("householdMapInfoList").size() != 0) {
                 fileArray = jsonObject.getJSONArray("householdMapInfoList");
@@ -399,7 +394,8 @@ public class AnonymousInnerComponent {
                         SJ_Book_Pic_ext sjBookPicExt = new SJ_Book_Pic_ext();
                         sjBookPicExt.setPicName(fileObject.getString("fileName"));
                         sjBookPicExt.setBdcdyh(fileObject.getString("bdcdyh"));
-                        sjBookPicExt.setPicType(slbh + fileObject.getString("pName"));
+                        sjBookPicExt.setPicType(Msgagger.FCFHT);
+                        sjBookPicExt.setInsertTime(null);
                         SJ_Fjfile sj_file = new SJ_Fjfile();
                         sj_file.setFtpPath(map.get("path").toString() + "\\" + map.get("fileName").toString());
                         sj_file.setFileName(map.get("fileName").toString());
@@ -428,14 +424,19 @@ public class AnonymousInnerComponent {
                 SJ_Book_Pic_ext sjBookPicExt = new SJ_Book_Pic_ext();
                 sjBookPicExt.setPicName(fileObject.getString("fileName"));
                 sjBookPicExt.setBdcdyh(fileObject.getString("bdcdyh"));
-                sjBookPicExt.setPicType(slbh + fileObject.getString("pName"));
+                sjBookPicExt.setPicType(Msgagger.ZDT);
+                sjBookPicExt.setInsertTime(null);
                 SJ_Fjfile sj_file = new SJ_Fjfile();
                 sj_file.setFtpPath(map.get("path").toString() + "\\" + map.get("fileName").toString());
                 sj_file.setFileName(map.get("fileName").toString());
                 sj_file.setFileExt(fileType);
+                sj_file.setFileSubmissionTime(new Date());
                 sjBookPicExt.setFile(sj_file);
                 sjBookPicExtList.add(sjBookPicExt);
             }
+        }
+        }catch (Exception ex){
+            sj_info_bdcqlxgxxList.get(0).setBookPics(null);
         }
         if (null != sjBookPicExtList  && sjBookPicExtList.size()!=0) {
             sj_info_bdcqlxgxxList.get(0).setBookPics(sjBookPicExtList);
