@@ -74,6 +74,18 @@ public class ExchangeToInnerComponent {
                 JSONArray landRightVoList = jsonImmov.getJSONArray("landRightRelatedVoList");//土地权利信息
                 if(landRightVoList!=null && landRightVoList.size()>0){
                     JSONObject landRight = landRightVoList.getJSONObject(0);
+
+                    String tdzzrq = getNotNullData(landRight.getString("landRightEndDate"));
+                    if(StringUtils.isNotBlank(tdzzrq) ){            //tdzzrq不为空时赋值
+                        try {
+                            bdcqlxgxx.setLandUseRightEndingDate(TimeUtil.getDateFromString(tdzzrq));
+                        } catch (ParseException e) {
+                            log.error(ErrorDealUtil.getErrorInfo(e));
+                            e.printStackTrace();
+                        }
+                        bdcqlxgxx.setLandUseTimeLimit(tdzzrq);
+                    }
+
                     bdcqlxgxx.setLandUseRightOwner(landRight.getString("landUser"));
                     bdcqlxgxx.setLandRightType(landRight.getString("landRightType"));
                     bdcqlxgxx.setLandRightNature(landRight.getString("landRightNature"));
@@ -119,7 +131,9 @@ public class ExchangeToInnerComponent {
                 JSONArray dissentInfoVoList = jsonImmov.getJSONArray("dissentInfoVoList");//存在的异议限制信息
 
                 List<SJ_Its_Right> itsRights = new ArrayList<SJ_Its_Right>();                   //他项权
-
+                log.info("查询到的不动产现势抵押："+JSONArray.toJSONString(mortgageInfoVoList));
+                log.info("查询到的不动产现势查封："+JSONArray.toJSONString(attachmentInfoVoList));
+                log.info("查询到的不动产现势异议："+JSONArray.toJSONString(dissentInfoVoList));
                 if(mortgageInfoVoList!=null && mortgageInfoVoList.size()>0){//抵押
                     for(int i=0;i<mortgageInfoVoList.size();i++){
                         JSONObject dyObj = mortgageInfoVoList.getJSONObject(i);
@@ -165,6 +179,7 @@ public class ExchangeToInnerComponent {
                         itsRights.add(itsRight);
                     }
                 }
+                log.info("该不动产限制信息为："+JSONArray.toJSONString(itsRights));
                 bdcqlxgxx.setItsRightVoList(itsRights);
 
                 JSONArray obligeeInfoVoList = jsonImmov.getJSONArray("obligeeInfoVoList");//权利人信息
@@ -239,7 +254,10 @@ public class ExchangeToInnerComponent {
                 JSONArray landUnitInfoVoList = jsonImmov.getJSONArray("landUnitInfoVoList");//净地
                 if(landUnitInfoVoList!=null && landUnitInfoVoList.size()>0){
                     String tdzzrq = getNotNullData(landUnitInfoVoList.getJSONObject(0).getString("landRightEndDate"));
-                    if(StringUtils.isNotBlank(tdzzrq)){
+                    if(
+                            StringUtils.isNotBlank(tdzzrq) &&                                   //土地权属信息里存在日期
+                            StringUtils.isNotBlank(bdcqlxgxx.getLandUseRightEndingDate())       //且不动产权属里终止日期没有被赋值
+                    ){
                         try {
                             bdcqlxgxx.setLandUseRightEndingDate(TimeUtil.getDateFromString(tdzzrq));
                         } catch (ParseException e) {

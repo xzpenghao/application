@@ -289,13 +289,17 @@ public class AnonymousInnerComponent {
             try {
                 //权属信息
                 List<SJ_Info_Bdcqlxgxx> bdcqlxgxxList=exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
+                log.info("获得权属信息为："+ com.alibaba.fastjson.JSONArray.toJSONString(bdcqlxgxxList));
                 HandleAttachementDiagram(bdcqlxgxxList,jsonObject,registerNumber,ftpAddress,ftpPort,ftpUsername,ftpPassword,path);//附件上传
+                log.info("处理权属信息为："+ com.alibaba.fastjson.JSONArray.toJSONString(bdcqlxgxxList));
                 respServiceData.setServiceDataInfos(bdcqlxgxxList);
                 serviceDatas.add(respServiceData);
                 sjSjsq.setServiceDatas(serviceDatas);
+                log.info("最终传入的数据为："+ com.alibaba.fastjson.JSONObject.toJSONString(sjSjsq));
                 JSONArray serviceArray = JSONArray.fromObject(serviceDatas);
                 stringMap.put("serviceDatas", serviceArray.toString());
                 stringMap.put("executeDeparts",departArray.toString());
+                log.info("实际传入的数据为："+ com.alibaba.fastjson.JSONObject.toJSONString(stringMap));
             }catch (Exception e){
               log.error("错误信息"+e);
             }
