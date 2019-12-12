@@ -10,7 +10,7 @@ public class SJ_Qlr_Gl implements Serializable {
     private String obligeeType;                     //权利人类型（权利人、抵押人、债务人...）
     private Integer obligeeOrder;                    //权利人顺序
     private String sharedMode;                      //共有方式
-    private Integer sharedValue;                     //共有份额
+    private String sharedValue;                     //共有份额
     private String infoTableIdentification;         //关联info表标识
     private String status;                          //状态
 
@@ -72,11 +72,11 @@ public class SJ_Qlr_Gl implements Serializable {
         this.sharedMode = sharedMode;
     }
 
-    public Integer getSharedValue() {
+    public String getSharedValue() {
         return sharedValue;
     }
 
-    public void setSharedValue(Integer sharedValue) {
+    public void setSharedValue(String sharedValue) {
         this.sharedValue = sharedValue;
     }
 

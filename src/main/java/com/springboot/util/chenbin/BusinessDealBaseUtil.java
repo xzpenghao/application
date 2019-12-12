@@ -505,7 +505,7 @@ public class BusinessDealBaseUtil {
         jyqlrxx.setZJHM(qlrInfo.getObligeeDocumentNumber());
         jyqlrxx.setDH(qlrInfo.getDh());
         jyqlrxx.setGYFS(qlrgl.getSharedMode());
-        jyqlrxx.setGYFE(qlrgl.getSharedValue()!=null?Integer.toString(qlrgl.getSharedValue()):null);
+        jyqlrxx.setGYFE(qlrgl.getSharedValue()!=null?qlrgl.getSharedValue():null);
         return jyqlrxx;
     }
 

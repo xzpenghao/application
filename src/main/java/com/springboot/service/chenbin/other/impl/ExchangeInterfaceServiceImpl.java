@@ -699,7 +699,7 @@ public class ExchangeInterfaceServiceImpl implements ExchangeInterfaceService {
         qlrgl.setObligeeName(name);
         qlrgl.setObligeeType(qlrlx);
         qlrgl.setSharedMode(gyfs);
-        qlrgl.setSharedValue(gyfe);
+        qlrgl.setSharedValue(Integer.toString(gyfe));
         qlrgl.setObligeeOrder(soap);
         return qlrgl;
     }

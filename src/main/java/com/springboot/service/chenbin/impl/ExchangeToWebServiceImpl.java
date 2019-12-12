@@ -242,7 +242,7 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
                 sjQlrGl.setObligeeType(obligeeType);
                 sjQlrGl.setObligeeOrder(StringUtils.isNotBlank(man.getObligeeOrder())?Integer.parseInt(man.getObligeeOrder()):null);
                 sjQlrGl.setSharedMode(man.getSharedMode());
-                sjQlrGl.setSharedValue(StringUtils.isNotBlank(man.getSharedValue())?Integer.parseInt(man.getSharedValue()):null);
+                sjQlrGl.setSharedValue(StringUtils.isNotBlank(man.getSharedValue())?man.getSharedValue().replaceAll("%",""):null);
                 sjQlrGl.setRelatedPerson(qlrInfo);
                 sjQlrGls.add(sjQlrGl);
             }

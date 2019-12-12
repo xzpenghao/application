@@ -202,7 +202,7 @@ public class ExchangeToInnerComponent {
                             qlrgl.setSharedMode(chooseGyfs(gyfs));
                         }
                         String gyfe = getNotNullData(qlrObj.getString("sharedShare"));
-                        qlrgl.setSharedValue(StringUtils.isNotBlank(gyfe)?Integer.parseInt(gyfe):null);
+                        qlrgl.setSharedValue(StringUtils.isNotBlank(gyfe)?gyfe.replaceAll("%",""):null);
                         qlrgls.add(qlrgl);
                     }
                 }
@@ -292,6 +292,10 @@ public class ExchangeToInnerComponent {
                             bdcgls.add(bdcGl);
                         }
                     }
+                }
+                String sit = getNotNullData(jsonImmov.getString("sit"));
+                if(StringUtils.isNotBlank(sit)){
+                    bdcqlxgxx.setImmovableSite(sit);
                 }
                 bdcqlxgxx.setGlImmovableVoList(bdcgls);
                 serviceDataInfos.add(bdcqlxgxx);

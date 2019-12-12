@@ -705,7 +705,7 @@ public class SqRealEstateMortgageComponent {
         if (obligeeInfoVo.getSharedShare().contains("%")){
             share= obligeeInfoVo.getSharedShare().replace("%","");
         }
-        sj_qlr_gl.setSharedValue(Integer.parseInt(share));
+        sj_qlr_gl.setSharedValue(share);
         relatedPerson.setObligeeName(obligeeInfoVo.getObligeeName());
         sj_qlr_gl.setRelatedPerson(relatedPerson);
         glObligeeVoList.add(sj_qlr_gl);
