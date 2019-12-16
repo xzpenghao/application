@@ -8,6 +8,7 @@ public class SJ_Qlr_Info implements Serializable {
     private String obligeeDocumentType;           //权利人证件类型
     private String obligeeDocumentNumber;         //权利人证件号码
     private String dh;
+    private String dz;
     private String status;                        //状态
     private String ext1;                          //扩展字段1
     private String ext2;                          //扩展字段2
@@ -83,5 +84,13 @@ public class SJ_Qlr_Info implements Serializable {
 
     public void setDh(String dh) {
         this.dh = dh;
+    }
+
+    public String getDz() {
+        return dz;
+    }
+
+    public void setDz(String dz) {
+        this.dz = dz;
     }
 }

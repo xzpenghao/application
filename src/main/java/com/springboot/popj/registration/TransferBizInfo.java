@@ -13,6 +13,7 @@ public class TransferBizInfo {
     private String registerSubType;//登记小类
     private String commonWay;//共有方式
     private List<QlrGlMortgator> obligeeInfoVoList; //不动产权利人列表
+    private List<BDCSalerInfo> salerInfoVoList;             //义务人列表
     private List<WtdlrGlMortgator> obligeeAgentInfoVoList; //权利人代理人信息列表
     private List<WtdlrGlMortgator> salerAgentInfoVoList; //权利人代理人信息列表
 
@@ -103,5 +104,13 @@ public class TransferBizInfo {
 
     public void setCommonWay(String commonWay) {
         this.commonWay = commonWay;
+    }
+
+    public List<BDCSalerInfo> getSalerInfoVoList() {
+        return salerInfoVoList;
+    }
+
+    public void setSalerInfoVoList(List<BDCSalerInfo> salerInfoVoList) {
+        this.salerInfoVoList = salerInfoVoList;
     }
 }

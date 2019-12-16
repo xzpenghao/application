@@ -6,6 +6,8 @@ public class DyrGlMortgator {
     private String mortgagorIdType;
     private String mortgagorName;
     private String order;
+    private String phone;
+    private String address;
 
     public String getMortgagorId() {
         return mortgagorId;
@@ -37,5 +39,21 @@ public class DyrGlMortgator {
 
     public void setOrder(String order) {
         this.order = order;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

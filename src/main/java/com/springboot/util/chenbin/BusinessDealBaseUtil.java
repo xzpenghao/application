@@ -67,7 +67,7 @@ public class BusinessDealBaseUtil {
         registrationBureau.setSubmitFlow(isSubmit);
         registrationBureau.setBizType(bizType);//#（抵押注销(个人)）
         registrationBureau.setOperatorName(dealPerson);//测试后续需要设置
-        registrationBureau.setContactsAdress(StringUtils.isBlank(sjsq.getImmovableSite()) ? "" : sjsq.getImmovableSite());//测试数据
+        registrationBureau.setContactsAdress(StringUtils.isBlank(sjsq.getNotifiedPersonAddress()) ? (StringUtils.isBlank(sjsq.getImmovableSite())?"无":sjsq.getImmovableSite()) : sjsq.getNotifiedPersonAddress());//测试数据
         registrationBureau.setContacts(sjsq.getNotifiedPersonName());
         registrationBureau.setContactsPhone(sjsq.getNotifiedPersonTelephone());
         registrationBureau.setBusinessAreas(StringUtils.isNotBlank(sjsq.getDistrictCode()) ? sjsq.getDistrictCode() : areaNo);
@@ -162,6 +162,7 @@ public class BusinessDealBaseUtil {
         transferBizInfo.setHtbh(sjInfoJyhtxx.getContractRecordNumber());//合同备案号
         transferBizInfo.setRegisterSubType(StringUtils.isBlank(sjInfoJyhtxx.getRegistrationSubclass())?sjsq.getRegistrationSubclass():sjInfoJyhtxx.getRegistrationSubclass());//登记小类
         transferBizInfo.setTransferReason(StringUtils.isBlank(sjInfoJyhtxx.getRegistrationReason())?sjsq.getRegistrationReason():sjInfoJyhtxx.getRegistrationReason());//转移原因
+        //权利人
         List<SJ_Qlr_Gl> buyers = sjInfoJyhtxx.getGlHouseBuyerVoList();
         if(buyers==null || buyers.size()==0){
             throw new ZtgeoBizException("不完备的权利人数据");
@@ -169,6 +170,10 @@ public class BusinessDealBaseUtil {
         transferBizInfo.setCommonWay(buyers.get(0).getSharedMode());//共有方式
         List<QlrGlMortgator> obligeeInfoVoList = getObligeeInfoVoList(buyers, idType);
         transferBizInfo.setObligeeInfoVoList(obligeeInfoVoList);
+        //义务人（追加）
+        List<SJ_Qlr_Gl> salers = sjInfoJyhtxx.getGlHouseSellerVoList();
+        transferBizInfo.setSalerInfoVoList(getObligorInfoVoList(salers, idType));
+        //代理人
         List<SJ_Qlr_Gl> ql_agents = sjInfoJyhtxx.getGlAgentVoList();
         List<SJ_Qlr_Gl> yw_agents = sjInfoJyhtxx.getGlAgentSellerVoList();
         if(ql_agents!=null && ql_agents.size()>0){
@@ -189,7 +194,9 @@ public class BusinessDealBaseUtil {
             mortgageeInfo.setMortgageeName(person.getObligeeName());
             mortgageeInfo.setMortgageeIdType(getIdTypeNumber(person.getObligeeDocumentType(), idType));
             mortgageeInfo.setMortgageeId(person.getObligeeDocumentNumber());
+            mortgageeInfo.setPhone(person.getDh());
             mortgageeInfo.setOrder(dyqr.getObligeeOrder()!=null?Integer.toString(dyqr.getObligeeOrder()):null);
+            mortgageeInfo.setAddress(person.getDz());
             mortgageeInfoVoList.add(mortgageeInfo);
         }
         return mortgageeInfoVoList;
@@ -205,6 +212,8 @@ public class BusinessDealBaseUtil {
             mortgagorInfo.setMortgagorIdType(getIdTypeNumber(person.getObligeeDocumentType(), idType));
             mortgagorInfo.setMortgagorName(person.getObligeeName());
             mortgagorInfo.setOrder(dyr.getObligeeOrder()!=null?Integer.toString(dyr.getObligeeOrder()):null);
+            mortgagorInfo.setAddress(person.getDz());
+            mortgagorInfo.setPhone(person.getDh());
             mortgagorInfoVoList.add(mortgagorInfo);
         }
         return mortgagorInfoVoList;
@@ -236,9 +245,30 @@ public class BusinessDealBaseUtil {
             obligeeInfo.setCommonWay(buyer.getSharedMode());
             obligeeInfo.setSharedSharel(buyer.getSharedValue() == null ? null : buyer.getSharedValue().toString());
             obligeeInfo.setOrder(buyer.getObligeeOrder()!=null?Integer.toString(buyer.getObligeeOrder()):null);
+            obligeeInfo.setPhone(buyer.getRelatedPerson().getDh());
+            obligeeInfo.setAddress(buyer.getRelatedPerson().getDz());
             obligeeInfoVoList.add(obligeeInfo);
         }
         return obligeeInfoVoList;
+    }
+
+    //义务人信息
+    public static List<BDCSalerInfo> getObligorInfoVoList(List<SJ_Qlr_Gl> salers,String idType){
+        List<BDCSalerInfo> obligorInfoVoList = new ArrayList<BDCSalerInfo>();
+        if(salers!=null && salers.size()>0){
+            for (SJ_Qlr_Gl saler:salers){
+                BDCSalerInfo obligorInfo = new BDCSalerInfo();
+                SJ_Qlr_Info person = saler.getRelatedPerson();
+                obligorInfo.setSalerId(person.getObligeeDocumentNumber());
+                obligorInfo.setSalerIdType(getIdTypeNumber(person.getObligeeDocumentType(), idType));
+                obligorInfo.setSalerName(person.getObligeeName());
+                obligorInfo.setAddress(person.getDz());
+                obligorInfo.setPhone(person.getDh());
+                obligorInfo.setOrder(saler.getObligeeOrder()!=null?Integer.toString(saler.getObligeeOrder()):null);
+                obligorInfoVoList.add(obligorInfo);
+            }
+        }
+        return obligorInfoVoList;
     }
 
     //代理人信息
@@ -251,6 +281,8 @@ public class BusinessDealBaseUtil {
             agentInfo.setAgentId(person.getObligeeDocumentNumber());
             agentInfo.setAgentIdType(getIdTypeNumber(person.getObligeeDocumentType(), idType));
             agentInfo.setOrder(agent.getObligeeOrder()!=null?Integer.toString(agent.getObligeeOrder()):null);
+            agentInfo.setPhone(person.getDh());
+            agentInfo.setAddress(person.getDz());
             agentInfoVoList.add(agentInfo);
         }
         return agentInfoVoList;

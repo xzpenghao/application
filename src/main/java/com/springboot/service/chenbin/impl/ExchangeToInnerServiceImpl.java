@@ -82,6 +82,8 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private String registrationOfTransfer;
     @Value("${businessType.transferAndMortgage}")
     private String transferAndMortgage;
+    @Value("${chenbin.isDealFtp}")
+    private boolean isDealFtp;
 
     @Autowired
     private AnonymousInnerComponent anonymousInnerComponent;
@@ -110,7 +112,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
         registrationBureau.setAdvanceBizInfo(advanceBizInfo);
 
-//        System.out.println("传入："+JSONObject.toJSONString(registrationBureau));
+        log.info("将传入不动产数据（未处理附件）："+JSONObject.toJSONString(registrationBureau));
 //        com.alibaba.fastjson.JSONObject  tokenObject = httpCallComponent.getTokenYcsl(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
 //        String token=anonymousInnerComponent.getToken(tokenObject,"YGYD2Inner",sjsq.getRegisterNumber(),"预告预抵业务转内网办件",sjsq.getReceiptNumber());
         String token = httpCallComponent.getToken(username, password);
@@ -120,8 +122,9 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         //操作FTP上传附件
         List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
         log.warn("双预告附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
-//        List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList);
-//        registrationBureau.setFileInfoVoList(fileList);
+        List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList,isDealFtp);
+        registrationBureau.setFileInfoVoList(fileList);
+        log.info("将传入不动产数据（含附件）："+JSONObject.toJSONString(registrationBureau));
 
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         if (resultObject != null) {
