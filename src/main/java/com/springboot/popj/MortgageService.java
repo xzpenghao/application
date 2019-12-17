@@ -10,7 +10,7 @@ public class MortgageService {
     private String mortgageCertificateNo;// 抵押证明号
     private String immovableCertificateNo; //权证号
     private Date registrationDate; //登记日期
-    private String mortgageMode;//抵押类型
+    private String mortgageMode;//抵押方式
     private Double mortgageArea;//抵押面积
     private Double creditAmount;//贷款金额
     private Double mortgageAmount;//抵押金额

@@ -198,7 +198,7 @@ public class ParallelSectorsComponent {
     private void getQlrxx( JSONObject  qxrJsonObject,List<SJ_Qlr_Info> obligeeVoList){
         SJ_Qlr_Info sj_qlr_info=new SJ_Qlr_Info();
         sj_qlr_info.setObligeeName(qxrJsonObject.getString("obligeeName"));
-        sj_qlr_info.setObligeeDocumentType(realEstateMortgageComponent.getZjlb(qxrJsonObject.getString("obligeeIdType")));
+        sj_qlr_info.setObligeeDocumentType(qxrJsonObject.getString("obligeeIdType"));
         sj_qlr_info.setObligeeDocumentNumber(qxrJsonObject.getString("obligeeId"));
         obligeeVoList.add(sj_qlr_info);
     }
@@ -207,7 +207,7 @@ public class ParallelSectorsComponent {
     private void getDyqrxx( JSONObject  qxrJsonObject,List<SJ_Qlr_Info> obligeeVoList){
         SJ_Qlr_Info sj_qlr_info=new SJ_Qlr_Info();
         sj_qlr_info.setObligeeName(qxrJsonObject.getString("mortgageeName"));
-        sj_qlr_info.setObligeeDocumentType(realEstateMortgageComponent.getZjlb(qxrJsonObject.getString("mortgageeIdType")));
+        sj_qlr_info.setObligeeDocumentType(qxrJsonObject.getString("mortgageeIdType"));
         sj_qlr_info.setObligeeDocumentNumber(qxrJsonObject.getString("mortgageeId"));
         obligeeVoList.add(sj_qlr_info);
     }

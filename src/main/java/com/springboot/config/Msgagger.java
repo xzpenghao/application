@@ -67,4 +67,6 @@ public class Msgagger {
     public final static String SJSEND_BAD="数据发送至登记平台失败";
     public final static String DYDJ_BAD="存量房信息保存失败,流程未开启";
     public final static String ZXDJ="注销登记";
+
+
 }

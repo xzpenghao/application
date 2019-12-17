@@ -342,7 +342,7 @@ RealEstateMortgageComponent {
         for (SJ_Qlr_Gl holder : sjQlrGlList) {
             DyqrGlMortgator dyqrGlMortgator = new DyqrGlMortgator();
             dyqrGlMortgator.setMortgageeId(holder.getRelatedPerson().getObligeeDocumentNumber());
-            dyqrGlMortgator.setMortgageeIdType(getZjlb(holder.getRelatedPerson().getObligeeDocumentType()));
+            dyqrGlMortgator.setMortgageeIdType(holder.getRelatedPerson().getObligeeDocumentType());
             dyqrGlMortgator.setMortgageeName(holder.getObligeeName());
             dyqrGlMortgators.add(dyqrGlMortgator);
         }
@@ -367,7 +367,7 @@ RealEstateMortgageComponent {
         for (SJ_Qlr_Gl sjQlrGl : sjQlrGlList) {
             DyrGlMortgator dyrGlMortgator = new DyrGlMortgator();
             dyrGlMortgator.setMortgagorId(sjQlrGl.getRelatedPerson().getObligeeDocumentNumber());
-            dyrGlMortgator.setMortgagorIdType(getZjlb(sjQlrGl.getRelatedPerson().getObligeeDocumentType()));
+            dyrGlMortgator.setMortgagorIdType(sjQlrGl.getRelatedPerson().getObligeeDocumentType());
             dyrGlMortgator.setMortgagorName(sjQlrGl.getObligeeName());
             dyqrGlMortgators.add(dyrGlMortgator);
         }
@@ -761,7 +761,7 @@ RealEstateMortgageComponent {
                     JSONObject mortgageInfo = mortgageInfojsonArray.getJSONObject(a);
                     mortgageService.setImmovableCertificateNo(jsonObject.getString("realEstateId"));
                     mortgageService.setAcceptanceNumber(mortgageInfo.getString("dySLBH"));
-                    mortgageService.setMortgageMode(mortgageInfo.getString("mortgageType"));//抵押类型
+//                    mortgageService.setMortgageMode(mortgageInfo.getString("mortgageType"));//抵押方式（暂时没传）
                     mortgageService.setMortgageCertificateNo(mortgageInfo.getString("warrantId"));//抵押证明号
                     mortgageService.setCreditAmount(mortgageInfo.getDouble("creditAmount"));//债权数额
                     mortgageService.setMortgageArea(mortgageInfo.getDouble("mortgageArea"));//抵押面积
@@ -771,7 +771,7 @@ RealEstateMortgageComponent {
                     mortgageService.setValuationValue(mortgageInfo.getDouble("evaluationValue"));//评估价值
                     mortgageService.setRegistrationDate(mortgageInfo.getDate("registerDate"));
                     mortgageService.setDataComeFromMode("接口获取");
-                    //抵押权力人
+                    //抵押权利人
                     JSONArray GlMortgagorjsonArray = (JSONArray) mortgageInfo.get("mortgagorInfoVoList");//
                     if (null != GlMortgagorjsonArray && GlMortgagorjsonArray.size() != 0) {
                         for (int j = 0; j < GlMortgagorjsonArray.size(); j++) {
@@ -946,7 +946,7 @@ RealEstateMortgageComponent {
         glMortgagor.setObligeeType(obligeeType);
         RelatedPerson relatedPerson = new RelatedPerson();
         System.out.print(glMortgageHolderObject.getString("mortgagorIdType"));
-        relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("mortgagorIdType")));
+        relatedPerson.setObligeeDocumentType(glMortgageHolderObject.getString("mortgagorIdType"));
         relatedPerson.setObligeeName(glMortgageHolderObject.getString("mortgagorName"));
         relatedPerson.setObligeeDocumentNumber(glMortgageHolderObject.getString("mortgagorId"));
         glMortgagor.setRelatedPerson(relatedPerson);
@@ -960,7 +960,7 @@ RealEstateMortgageComponent {
         RelatedPerson relatedPerson = new RelatedPerson();
         System.out.print(glMortgageHolderObject.getString("obligeeIdType"));
         if (glMortgageHolderObject.getString("obligeeIdType") !=null) {
-            relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("obligeeIdType")));
+            relatedPerson.setObligeeDocumentType(glMortgageHolderObject.getString("obligeeIdType"));
         }
         relatedPerson.setObligeeName(glMortgageHolderObject.getString("obligeeName"));
         relatedPerson.setObligeeDocumentNumber(glMortgageHolderObject.getString("obligeeId"));
@@ -974,7 +974,7 @@ RealEstateMortgageComponent {
         glMortgagor.setObligeeType(obligeeYwr);
         RelatedPerson relatedPerson = new RelatedPerson();
         if (glMortgageHolderObject.getString("salerIdType") != null) {
-            relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("salerIdType")));
+            relatedPerson.setObligeeDocumentType(glMortgageHolderObject.getString("salerIdType"));
         }
         relatedPerson.setObligeeName(glMortgageHolderObject.getString("salerName"));
         relatedPerson.setObligeeDocumentNumber(glMortgageHolderObject.getString("salerId"));
@@ -989,7 +989,7 @@ RealEstateMortgageComponent {
         glMortgageHolder.setObligeeType(obligeeType);
         RelatedPerson relatedPerson = new RelatedPerson();
         System.out.print(glMortgageHolderObject.getString("mortgageeIdType"));
-        relatedPerson.setObligeeDocumentType(getZjlb(glMortgageHolderObject.getString("mortgageeIdType")));
+        relatedPerson.setObligeeDocumentType(glMortgageHolderObject.getString("mortgageeIdType"));
         relatedPerson.setObligeeName(glMortgageHolderObject.getString("mortgageeName"));
         relatedPerson.setObligeeDocumentNumber(glMortgageHolderObject.getString("mortgageeId"));
         glMortgageHolder.setRelatedPerson(relatedPerson);

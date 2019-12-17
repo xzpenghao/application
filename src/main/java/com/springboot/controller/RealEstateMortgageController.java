@@ -65,7 +65,7 @@ public class RealEstateMortgageController {
 
     @RequestMapping(value = "/getRealEstateMortgage", method = RequestMethod.POST)
     @ApiOperation("不动产抵押信息")
-    public ObjectRestResponse getRealEstateMortgage(@RequestParam("dyzmh") String dyzmh, @RequestParam(value = "qlrmc", required = false) String qlrmc) throws Exception {
+    public ObjectRestResponse getRealEstateMortgage(@RequestParam(value = "dyzmh") String dyzmh, @RequestParam(value = "qlrmc", required = false) String qlrmc) throws Exception {
         System.out.println(dyzmh);
         return realEstateMortgageComponent.getRealEstateMortgage(dyzmh, qlrmc, false);
     }

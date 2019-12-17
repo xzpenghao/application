@@ -133,7 +133,6 @@ public class AnonymousInnerComponent {
         Map<String, String> mapHeader = new HashMap<>();
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception { //建议抛出异常
-
                     log.info("执行主线程");
                     com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
                     String token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
@@ -188,15 +187,10 @@ public class AnonymousInnerComponent {
                         com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(jsonData);
                         ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.BDCQZSDZF_SERVICE_CODE, true, getReceiving.getSlbh());//获取不动产权属信息
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
-                        if (mapParmeter.size()==1){
-                            log.error("权属信息获取不到或ftp路径不对");
-                            return Msgagger.FTP_BAD;
-                        }
                         String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
                         JSONObject ycslObject = JSONObject.fromObject(json);
                         log.info("一窗受理返回"+ycslObject.toString());
                     }
-
                 return null;
             }
         });

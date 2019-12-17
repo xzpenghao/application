@@ -185,6 +185,14 @@ public class SqRealEstateMortgageComponent {
         log.info("modelId"+mapParmeter.get("modelId"));
         SJ_Sjsq sjsq=null;
         JSONObject jsonObject = JSONObject.fromObject(json);
+        if ((Integer) jsonObject.get("status") == 20500){
+                log.error(jsonObject.getString("message"));
+                Xyfzbad(revokeRegistrationRespVo,registrationReqV,"000004",jsonObject.getString("message"));
+                reObject=JSONObject.fromObject(registrationReqV);
+                outputStream.write(reObject.toString().getBytes("UTF-8"));
+                outputStream.flush();
+                outputStream.close();
+        }
         System.out.println("jsonObject"+jsonObject.toString());
         if (jsonObject.getString("status").equals(20500)){
             Xyfzbad(revokeRegistrationRespVo,registrationReqV,"000004",jsonObject.getString("message"));
@@ -369,6 +377,15 @@ public class SqRealEstateMortgageComponent {
         JSONObject jsonObject = JSONObject.fromObject(json);
         log.info("流程返回" + json);
         log.info("返回结果" + jsonObject.get("status").toString());
+        if ((Integer) jsonObject.get("status") == 20500){
+            log.error(jsonObject.getString("message"));
+            XySj(reMortgageRegistrationVo, mortgageRegistrationReqVo, "000004", jsonObject.getString("message"));
+            reMortgageRegistrationVo.setAcceptStatus(Msgagger.JSBAD);
+            reObject = JSONObject.fromObject(reMortgageRegistrationVo);
+            outputStream.write(reObject.toString().getBytes("UTF-8"));
+            outputStream.flush();
+            outputStream.close();
+        }
         SJ_Sjsq sjsq = com.alibaba.fastjson.JSONObject.parseObject(jsonObject.getString("data"), SJ_Sjsq.class);
         if ((Integer) jsonObject.get("status") == 200 && StringUtils.isNotEmpty(sjsq.getReceiptNumber()) && StringUtils.isNotEmpty(sjsq.getRegisterNumber())) {
             log.info("流程启动成功并发送至登记平台");
@@ -389,14 +406,6 @@ public class SqRealEstateMortgageComponent {
             outputStream.write(reObject.toString().getBytes("UTF-8"));
             outputStream.flush();
             outputStream.close();
-        } else if ((Integer) jsonObject.get("status") == 20500){
-                log.error(jsonObject.getString("message"));
-                XySj(reMortgageRegistrationVo, mortgageRegistrationReqVo, "000004", jsonObject.getString("message"));
-                reMortgageRegistrationVo.setAcceptStatus(Msgagger.JSBAD);
-                reObject = JSONObject.fromObject(reMortgageRegistrationVo);
-                outputStream.write(reObject.toString().getBytes("UTF-8"));
-                outputStream.flush();
-                outputStream.close();
         }else {
             log.error("流程未开启");
             XySj(reMortgageRegistrationVo, mortgageRegistrationReqVo, "000004", "流程未开启");
