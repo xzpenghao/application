@@ -2,12 +2,9 @@ package com.springboot.service.chenbin.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
-import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.component.chenbin.ExchangeToInnerComponent;
 import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.component.chenbin.OtherComponent;
-import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphCfxx;
@@ -85,12 +82,11 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     @Value("${chenbin.isDealFtp}")
     private boolean isDealFtp;
 
-    @Autowired
-    private AnonymousInnerComponent anonymousInnerComponent;
+//    @Autowired
+//    private AnonymousInnerComponent anonymousInnerComponent;
 
     @Override
     public String dealYGYD2Inner(String commonInterfaceAttributer) throws ParseException {
-        String result = "处理成功";
         log.info("转JSON前：" + commonInterfaceAttributer);
         SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
         log.info("转JSON后：" + JSONObject.toJSONString(sjsq));
@@ -112,42 +108,9 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
         registrationBureau.setAdvanceBizInfo(advanceBizInfo);
 
-        log.info("将传入不动产数据（未处理附件）："+JSONObject.toJSONString(registrationBureau));
-//        com.alibaba.fastjson.JSONObject  tokenObject = httpCallComponent.getTokenYcsl(DJJUser.USERNAME, DJJUser.PASSWORD);//获得token
-//        String token=anonymousInnerComponent.getToken(tokenObject,"YGYD2Inner",sjsq.getRegisterNumber(),"预告预抵业务转内网办件",sjsq.getReceiptNumber());
+        log.info("将传入不动产数据（未处理附件）：" + JSONObject.toJSONString(registrationBureau));
         String token = httpCallComponent.getToken(username, password);
-        if (StringUtils.isBlank(token)) {
-            return Msgagger.USER_LOGIN_BAD;
-        }
-        //操作FTP上传附件
-        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
-        log.warn("双预告附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
-        List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList,isDealFtp);
-        registrationBureau.setFileInfoVoList(fileList);
-        log.info("将传入不动产数据（含附件）："+JSONObject.toJSONString(registrationBureau));
-
-        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
-        if (resultObject != null) {
-            if (!(boolean) resultObject.get("success")) {
-                log.error("登记局受理失败,原因:" + resultObject.getString("message"));
-                throw new ZtgeoBizException("登记局受理失败,原因:" + resultObject.getString("message"));
-            }
-        } else {
-            throw new ZtgeoBizException("内网接口请求异常，返回数据为空，错误无法判定");
-        }
-        Map<String, String> mapParmeter = new HashMap<>();
-        mapParmeter.put("receiptNumber", sjsq.getReceiptNumber());
-        mapParmeter.put("registerNumber", resultObject.getString("slbh"));
-        //返回数据到一窗受理平台保存受理编号和登记编号
-        String resultJson = httpCallComponent.preservationRegistryData(mapParmeter, token);
-        ObjectRestResponse<Object> resultRV = httpCallComponent.adaptationPreservationReturn(resultJson);
-        if (resultRV.getStatus() == 200) {
-            result = (String) resultRV.getData();
-        } else {
-            log.error((String) resultRV.getData());
-            throw new ZtgeoBizException((String) resultRV.getData());
-        }
-        return result;
+        return handleCreateFlow(token,sjsq,registrationBureau,isDealFtp);
     }
 
     @Override
@@ -159,17 +122,18 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjsq, transferRegisterPid, true, registrationOfTransfer, dealPerson, areaNo);
         TransferBizInfo transferBizInfo = BusinessDealBaseUtil.getTransferBizInfoByJyhtAndBdcqls(sjsq,idType);
         registrationBureau.setTransferBizInfo(transferBizInfo);
-        return handleCreateFlow(token,sjsq,registrationBureau,false);
+        return handleCreateFlow(token,sjsq,registrationBureau,isDealFtp);
     }
 
     @Override
     public String secTra2InnerWithDY(String commonInterfaceAttributer) throws ParseException {
         //获取一窗受理操作token
         String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
+        //处理数据
         SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjsq, transferMortgagePid, true, transferAndMortgage, dealPerson, areaNo);
-        TransferBizInfo transferBizInfo = BusinessDealBaseUtil.getTransferBizInfoByJyhtAndBdcqls(sjsq,idType);
         MortgageBizInfo mortgageBizInfo = BusinessDealBaseUtil.getMortgageBizInfoByDyhtAndBiztype(sjsq,idType,true);
+        TransferBizInfo transferBizInfo = BusinessDealBaseUtil.getTransferBizInfoByJyhtAndBdcqls(sjsq,idType);
         List<RealEstateInfo> realEstateInfos = mortgageBizInfo.getRealEstateInfoVoList();
         if(realEstateInfos!=null){
             for(RealEstateInfo realEstateInfo:realEstateInfos){
@@ -179,7 +143,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         }
         registrationBureau.setTransferBizInfo(transferBizInfo);
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
-        return handleCreateFlow(token,sjsq,registrationBureau,false);
+        return handleCreateFlow(token,sjsq,registrationBureau,isDealFtp);
     }
 
     @Override
@@ -296,44 +260,48 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
 
 
     public String handleCreateFlow(String token,SJ_Sjsq sjsq,RegistrationBureau registrationBureau,boolean dealFile){
-        System.out.println("进入"+sjsq.getReceiptNumber()+"业务的附件获取功能");
-        log.info("进入"+sjsq.getReceiptNumber()+"业务的附件获取功能");
-        //处理附件
-        List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
-        log.info(" 不动产登记 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
-        if(fileVoList != null && fileVoList.size()>0) {
-            List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList,dealFile);
-            log.info("经处理，获得的附件列表集合为："+JSONArray.toJSONString(fileList));
-            registrationBureau.setFileInfoVoList(fileList);
-        }else{
-            log.error("附件列表为空");
-        }
-        log.info("不动产登记业务最终传入不动产数据为：\n"+JSONObject.toJSONString(registrationBureau));
-        //发送登记局
-        Map<String,Object> map = null;
-        try {
-            map = immovableFeign.createFlow(registrationBureau);
-            log.info("registerNuber"+map.get("slbh"));
-        } catch (Exception e){
-            log.error(sjsq.getReceiptNumber()+"号不动产登记业务创建失败，失败出现在发送不动产受理阶段，抛出异常：\n"+ ErrorDealUtil.getErrorInfo(e));
-            throw new ZtgeoBizException("不动产创建不动产登记业务流程失败，失败出现在发送不动产受理阶段，抛出异常：\n"+ ErrorDealUtil.getErrorInfo(e));
-        }
-        if(map==null){
-            log.error(sjsq.getReceiptNumber()+"号不动产登记业务创建失败，失败出现在发送不动产受理阶段，响应为空");
-            throw new ZtgeoBizException("不动产创建不动产登记业务流程失败，响应为空");
-        } else {
-            if(!((boolean)map.get("success"))){
-                log.error(sjsq.getReceiptNumber()+"号不动产登记业务创建失败，失败出现在发送不动产受理阶段，返回的错误信息为："+map.get("message"));
-                throw new ZtgeoBizException("不动产创建不动产登记业务流程失败，响应为空");
-            }
-        }
-        //回填slbh至一窗受理
         Map<String,String> params = new HashMap<String,String>();
-        params.put("receiptNumber", sjsq.getReceiptNumber());
-        params.put("registerNumber",(String) map.get("slbh"));
-        backFeign.dealRecieveFromOuter1(token,params);
-        System.out.println("进入不动产处理，受理成功！");
-        log.info("进入不动产处理，受理成功！");
+        try {
+            log.info("进入" + sjsq.getReceiptNumber() + "业务的附件获取功能");
+            //处理附件
+            List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
+            log.info(" 不动产登记 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));
+            if (fileVoList != null && fileVoList.size() > 0) {
+                List<ImmovableFile> fileList = otherComponent.getInnerFileListByOut(fileVoList, dealFile);
+                log.info("经处理，获得的附件列表集合为：" + JSONArray.toJSONString(fileList));
+                registrationBureau.setFileInfoVoList(fileList);
+            } else {
+                log.error("附件列表为空");
+            }
+            log.info("不动产登记业务最终传入不动产数据为：\n" + JSONObject.toJSONString(registrationBureau));
+            //发送登记局
+            Map<String, Object> map = null;
+            try {
+                map = immovableFeign.createFlow(registrationBureau);
+                log.info("registerNuber" + map.get("slbh"));
+            } catch (Exception e) {
+                log.error(sjsq.getReceiptNumber() + "号不动产登记业务创建失败，失败出现在发送不动产受理阶段，抛出异常：\n" + ErrorDealUtil.getErrorInfo(e));
+                throw new ZtgeoBizException("不动产创建不动产登记业务流程失败，失败出现在发送不动产受理阶段，抛出异常：\n" + ErrorDealUtil.getErrorInfo(e));
+            }
+            if (map == null) {
+                log.error(sjsq.getReceiptNumber() + "号不动产登记业务创建失败，失败出现在发送不动产受理阶段，响应为空");
+                throw new ZtgeoBizException("不动产创建不动产登记业务流程失败，响应为空");
+            } else {
+                if (!((boolean) map.get("success"))) {
+                    log.error(sjsq.getReceiptNumber() + "号不动产登记业务创建失败，失败出现在发送不动产受理阶段，返回的错误信息为：" + map.get("message"));
+                    throw new ZtgeoBizException("不动产创建不动产登记业务流程失败，响应为空");
+                }
+            }
+            //回填slbh至一窗受理
+//            params.put("receiptNumber", sjsq.getReceiptNumber());
+            params.put("registerNumber", (String) map.get("slbh"));
+            log.info("进入不动产处理，受理成功！");
+        } catch (Exception e){
+            throw e;
+        } finally {
+            //签收办件
+            otherComponent.signPro(token,bsryname,bsrypassword,sjsq.getReceiptNumber(),params);
+        }
         return "转移登记同步内网办理成功";
     }
 

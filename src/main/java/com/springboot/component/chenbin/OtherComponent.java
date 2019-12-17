@@ -2,10 +2,13 @@ package com.springboot.component.chenbin;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.file.FromFTPDownloadComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.feign.OuterBackFeign;
+import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
@@ -15,9 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -29,6 +30,8 @@ public class OtherComponent {
     private ToFTPUploadComponent toFTPUploadComponent;
     @Autowired
     private HttpCallComponent httpCallComponent;
+    @Autowired
+    private OuterBackFeign backFeign;
 
     public List<ImmovableFile> getInnerFileListByOut(List<SJ_Fjfile> fileVoList,boolean dealFile) {
         List<ImmovableFile> fileList = new ArrayList<ImmovableFile>();
@@ -119,5 +122,21 @@ public class OtherComponent {
             return immovableFile;
         }
         return null;
+    }
+
+    //外部签收办件
+    public boolean signPro(String token,String username,String password,String receiptNumber,Map<String, String> mapParmeter){
+        if(StringUtils.isBlank(token)) {
+            token = backFeign.getToken(new JwtAuthenticationRequest(username, password)).getData();
+        }
+        if(mapParmeter==null) {
+            mapParmeter = new HashMap<>();
+        }
+        mapParmeter.put("receiptNumber", receiptNumber);
+        ObjectRestResponse<String> result = backFeign.dealRecieveFromOuter1(token,mapParmeter);
+        if(result.getStatus()==200) {
+            return true;
+        }
+        return false;
     }
 }

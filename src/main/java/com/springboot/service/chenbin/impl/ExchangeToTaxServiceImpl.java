@@ -20,6 +20,7 @@ import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.service.chenbin.ExchangeToTaxService;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
+import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,6 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
         taxBody.put("sign","");
         JSONObject jsonObj = BusinessDealBaseUtil.dealJSONForSB(taxParamBody);
         taxBody.put("data",jsonObj);
-        System.out.println("发送税务的数据："+JSONObject.toJSONString(taxBody));
         log.info("发送税务的数据："+JSONObject.toJSONString(taxBody));
         try {
             ObjectRestResponse<String> rv = otherFeign.testTax(taxBody);
@@ -97,7 +97,6 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
             mapParmeter.put("receiptNumber", receiptNumber);
             backFeign.dealRecieveFromOuter1(token,mapParmeter);
         }
-        System.out.println("税务处理返回，结果为:"+result);
         return result;
     }
 
@@ -152,4 +151,27 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
         }
         return rv;
     }
+
+    @Override
+    public ObjectRestResponse<List<String>> examineSuccess4TaxBatch(String data_str) {
+        List<String> successListForTax = new ArrayList<>();
+        JSONObject data = JSONObject.parseObject(data_str);
+        JSONArray data_array = data.getJSONArray("wsxxList");
+        List<TaxRespBody> data_jBean = data_array.toJavaList(TaxRespBody.class);
+        for(TaxRespBody taxRespBody:data_jBean){
+            try {
+                ObjectRestResponse<String> resultResp = examineSuccess4Tax(taxRespBody);
+                if (resultResp.getStatus() == 200) {
+                    successListForTax.add(taxRespBody.getReceiptNumber());
+                    log.info("‘"+taxRespBody.getReceiptNumber()+"’号办件完税结果回推成功");
+                } else if(resultResp.getStatus() == 20500){
+                    log.warn("‘"+taxRespBody.getReceiptNumber()+"’税务完税结果回推时，出现可以预见的逻辑性异常，异常说明："+resultResp.getMessage());
+                }
+            } catch (ZtgeoBizException e){
+                log.error(ErrorDealUtil.getErrorInfo(e));
+            }
+        }
+        return new ObjectRestResponse<List<String>>().data(successListForTax);
+    }
+
 }

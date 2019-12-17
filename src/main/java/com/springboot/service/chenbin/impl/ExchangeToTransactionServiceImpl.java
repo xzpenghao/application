@@ -112,7 +112,7 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
         System.out.println("正在获取操作用户token");
         log.info("正在获取操作用户token");
         String token = backFeign.getToken(new JwtAuthenticationRequest(username,password)).getData();
-
+        log.info("用户token获取成功");
         Map<String, String> mapParmeter = new HashMap<>();
         mapParmeter.put("receiptNumber",traRespBody.getReceiptNumber());
 

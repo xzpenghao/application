@@ -594,7 +594,11 @@ RealEstateMortgageComponent {
         if ( null != mortgageContractInfo.getMaximumClaimAmount() ) {
             mortgageBizInfo.setHighestClaimAmount(mortgageContractInfo.getMaximumClaimAmount().toString());
         }
-        mortgageBizInfo.setMortgageReason(mortgageContractInfo.getMortgageReason());
+        mortgageBizInfo.setMortgageReason(
+                StringUtils.isBlank(mortgageContractInfo.getMortgageReason())?
+                        (StringUtils.isBlank(mortgageContractInfo.getRegistrationReason())?"借贷":mortgageContractInfo.getRegistrationReason())
+                        :mortgageContractInfo.getMortgageReason()
+        );
         mortgageBizInfo.setMortgageStartDate(DateUtils.strToDate(mortgageContractInfo.getMortgageStartingDate()));
         mortgageBizInfo.setMortgageEndDate(DateUtils.strToDate(mortgageContractInfo.getMortgageEndingDate()));
         if (null != mortgageContractInfo.getCreditAmount()) {
