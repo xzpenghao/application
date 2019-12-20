@@ -25,6 +25,10 @@ public class IDUtil {
         return "FINST-" + date.replaceAll("-", "") + "-" + UUID.randomUUID().toString().substring(0, 12).replaceAll("-", "").toUpperCase();
     }
 
+    public static String getReqId() {
+        String date = TimeUtil.getDateString(new Date());
+        return "REQ-" + date.replaceAll("-", "") + "-" + UUID.randomUUID().toString().substring(0, 12).replaceAll("-", "").toUpperCase();
+    }
     public static String getUUId(){
         return  UUID.randomUUID().toString();
     }

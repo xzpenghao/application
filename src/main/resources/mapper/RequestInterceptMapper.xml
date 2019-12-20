@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springboot.mapper.RequestInterceptMapper">
+    <resultMap id="requestInterceptMap" type="com.springboot.entity.chenbin.personnel.pub_use.Biz_Request_Intercept"></resultMap>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="requestInterceptMap">
+        select * from biz_request_intercept where id = #{id}
+    </select>
+    <select id="selectByInputIndex" resultMap="requestInterceptMap">
+        select * from biz_request_intercept where businessId=#{businessId} and interfaceCode=#{interfaceCode}
+    </select>
+    <insert id="insertEntity" parameterType="com.springboot.entity.chenbin.personnel.pub_use.Biz_Request_Intercept">
+        insert into biz_request_intercept (
+            id,
+            businessId,
+            interfaceCode,
+            requester,
+            resultCode,
+            executResult,
+            functionDescription,
+            insertTime,
+            updateTime,
+            operationCount,
+            company,
+            status
+        ) values (
+            #{id},
+            #{businessId,jdbcType=VARCHAR},
+            #{interfaceCode,jdbcType=VARCHAR},
+            #{requester,jdbcType=VARCHAR},
+            #{resultCode,jdbcType=INTEGER},
+            #{executResult,jdbcType=VARCHAR},
+            #{functionDescription,jdbcType=VARCHAR},
+            #{insertTime,jdbcType=VARCHAR},
+            #{updateTime,jdbcType=VARCHAR},
+            #{operationCount,jdbcType=INTEGER},
+            #{company,jdbcType=VARCHAR},
+            #{status,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateEntity" parameterType="com.springboot.entity.chenbin.personnel.pub_use.Biz_Request_Intercept">
+        update biz_request_intercept set
+            businessId = #{businessId,jdbcType=VARCHAR},
+            interfaceCode = #{interfaceCode,jdbcType=VARCHAR},
+            requester = #{requester,jdbcType=VARCHAR},
+            resultCode = #{resultCode,jdbcType=INTEGER},
+            executResult = #{executResult,jdbcType=VARCHAR},
+            functionDescription = #{functionDescription,jdbcType=VARCHAR},
+            insertTime = #{insertTime,jdbcType=VARCHAR},
+            updateTime = #{updateTime,jdbcType=VARCHAR},
+            operationCount = #{operationCount,jdbcType=INTEGER},
+            company = #{company,jdbcType=VARCHAR},
+            status = #{status,jdbcType=VARCHAR}
+        where
+            id = #{id}
+    </update>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from biz_request_intercept where id = #{id}
+    </delete>
+</mapper>

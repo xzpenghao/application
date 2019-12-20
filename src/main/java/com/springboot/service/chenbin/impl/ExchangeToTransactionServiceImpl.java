@@ -9,17 +9,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.OtherComponent;
+import com.springboot.component.chenbin.RequestInterceptComponent;
+import com.springboot.config.ZtgeoActivitiException;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.constant.chenbin.BusinessConstant;
+import com.springboot.entity.chenbin.personnel.pub_use.Biz_Request_Intercept;
 import com.springboot.entity.chenbin.personnel.tra.TraParamBody;
 import com.springboot.entity.chenbin.personnel.tra.TraRespBody;
 import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.feign.OuterBackFeign;
+import com.springboot.mapper.RequestInterceptMapper;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.service.chenbin.ExchangeToTransactionService;
 import com.springboot.util.SysPubDataDealUtil;
+import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
+import com.springboot.util.chenbin.IDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +55,12 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
 
     @Autowired
     private OtherComponent otherComponent;
+
+    @Autowired
+    private RequestInterceptMapper requestInterceptMapper;
+
+    @Autowired
+    private RequestInterceptComponent requestInterceptComponent;
 
     @Override
     public String deal2Tra(String commonInterfaceAttributer) throws ParseException {
@@ -103,6 +116,18 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
     public ObjectRestResponse<String> examineSuccess4Tra(TraRespBody traRespBody) {
         System.out.println("(交易)解析传入数据："+JSONObject.toJSONString(traRespBody));
         log.info("解析传入数据："+JSONObject.toJSONString(traRespBody));
+        //验证传入数据的处理状态
+        Biz_Request_Intercept requestIntercept = requestInterceptMapper.selectByInputIndex(traRespBody.getReceiptNumber(),BusinessConstant.INTERFACE_CODE_EXAMINE_TRA);
+        if(requestIntercept!=null){
+            //请求的次数拦截限制
+            if(requestIntercept.getOperationCount()>=5){
+                throw new ZtgeoActivitiException("请求超限，请合理安排请求方式");
+            }
+            if(requestIntercept.getResultCode()==200){
+                throw new ZtgeoActivitiException("流程已被提交,请勿重复操作");
+            }
+        }
+        //处理数据
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         if(traRespBody==null){
             rv.setStatus(20500);
@@ -145,13 +170,19 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
         log.info("交易处理结果数据："+JSONObject.toJSONString(serviceData));
         //调用feign返回处理结果并提交对应流程
         rv = backFeign.DealRecieveFromOuter2(token,mapParmeter);
-        log.info("一窗受理处理结果："+JSONObject.toJSONString(rv));
+        log.info("一窗受理处理结果1："+JSONObject.toJSONString(rv));
         if(rv.getStatus()==200){
             rv.data("操作成功");
         }
-//        else if(rv.getStatus()==20500){
-//            if(StringUtils.isNotBlank(rv.getMessage()) && "")
-//        }
+        requestInterceptComponent.dealSaveThisIntercept(
+                requestIntercept,
+                rv,
+                traRespBody.getReceiptNumber(),
+                BusinessConstant.INTERFACE_CODE_EXAMINE_TRA,
+                username,
+                "本接口执行房管网签合同备案信息结果回推，成功时返回200，失败则是20500，超出限制或已被提交返回20200",
+                "宿迁市住建局"
+        );
         return rv;
     }
 }

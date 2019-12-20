@@ -1,6 +1,7 @@
 package com.springboot.handle;
 
 import com.github.wxiaoqi.security.common.msg.BaseResponse;
+import com.springboot.config.ZtgeoActivitiException;
 import com.springboot.config.ZtgeoBizException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ZtgeoBizException.class)
     public BaseResponse ztgeoBizExceptionHandler(ZtgeoBizException ex) {//所有业务异常
+        return new BaseResponse(ex.getStatus(), ex.getMessage());
+    }
+
+    @ExceptionHandler(ZtgeoActivitiException.class)
+    public BaseResponse ztgeoActExceptionHandler(ZtgeoActivitiException ex) {//所有工作流异常
         return new BaseResponse(ex.getStatus(), ex.getMessage());
     }
 }

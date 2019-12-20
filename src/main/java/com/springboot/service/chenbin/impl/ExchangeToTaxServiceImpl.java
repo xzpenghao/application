@@ -2,18 +2,17 @@ package com.springboot.service.chenbin.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.OtherComponent;
+import com.springboot.component.chenbin.RequestInterceptComponent;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.constant.chenbin.BusinessConstant;
+import com.springboot.entity.chenbin.personnel.pub_use.Biz_Request_Intercept;
 import com.springboot.entity.chenbin.personnel.tax.TaxParamBody;
 import com.springboot.entity.chenbin.personnel.tax.TaxRespBody;
 import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.feign.OuterBackFeign;
+import com.springboot.mapper.RequestInterceptMapper;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.registration.ImmovableFile;
@@ -27,12 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service("exc2Tax")
@@ -51,6 +46,12 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
 
     @Autowired
     private OtherComponent otherComponent;
+
+    @Autowired
+    private RequestInterceptMapper requestInterceptMapper;
+
+    @Autowired
+    private RequestInterceptComponent requestInterceptComponent;
 
     @Override
     public String deal2Tax(String commonInterfaceAttributer) throws ParseException {
@@ -153,25 +154,67 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
     }
 
     @Override
-    public ObjectRestResponse<List<String>> examineSuccess4TaxBatch(String data_str) {
-        List<String> successListForTax = new ArrayList<>();
+    public ObjectRestResponse<List<ObjectRestResponse>> examineSuccess4TaxBatch(String data_str) {
+        //设置返回
+        ObjectRestResponse<List<ObjectRestResponse>> rv = new ObjectRestResponse<List<ObjectRestResponse>>();
+        List<ObjectRestResponse> rvBeans = new ArrayList<ObjectRestResponse>();
+        //执行
         JSONObject data = JSONObject.parseObject(data_str);
         JSONArray data_array = data.getJSONArray("wsxxList");
         List<TaxRespBody> data_jBean = data_array.toJavaList(TaxRespBody.class);
-        for(TaxRespBody taxRespBody:data_jBean){
-            try {
+        try {
+            for(TaxRespBody taxRespBody:data_jBean){
+                ObjectRestResponse<String> rvBean = new ObjectRestResponse<String>();
+                //验证传入数据的处理状态
+                Biz_Request_Intercept requestIntercept = requestInterceptMapper.selectByInputIndex(taxRespBody.getReceiptNumber(), BusinessConstant.INTERFACE_CODE_EXAMINE_TAX);
+                if(requestIntercept!=null){
+                    //请求的次数拦截限制
+                    if(requestIntercept.getOperationCount()>=5){
+                        rvBean.setStatus(20200);
+                        rvBean.setMessage("请求超限，请合理安排请求方式");
+                        rvBean.setData(taxRespBody.getReceiptNumber());
+                        rvBeans.add(rvBean);
+                        continue;
+                    }
+                    if(requestIntercept.getResultCode()==200){
+                        rvBean.setStatus(20200);
+                        rvBean.setMessage("流程已被提交,请勿重复操作");
+                        rvBean.setData(taxRespBody.getReceiptNumber());
+                        rvBeans.add(rvBean);
+                        continue;
+                    }
+                }
                 ObjectRestResponse<String> resultResp = examineSuccess4Tax(taxRespBody);
                 if (resultResp.getStatus() == 200) {
-                    successListForTax.add(taxRespBody.getReceiptNumber());
+                    rvBean.setStatus(200);
+                    rvBean.setMessage("操作成功");
+                    rvBean.setData(taxRespBody.getReceiptNumber());
+                    rvBeans.add(rvBean);
                     log.info("‘"+taxRespBody.getReceiptNumber()+"’号办件完税结果回推成功");
                 } else if(resultResp.getStatus() == 20500){
+                    rvBean.setStatus(20500);
+                    rvBean.setMessage(resultResp.getMessage());
+                    rvBean.setData(taxRespBody.getReceiptNumber());
+                    rvBeans.add(rvBean);
                     log.warn("‘"+taxRespBody.getReceiptNumber()+"’税务完税结果回推时，出现可以预见的逻辑性异常，异常说明："+resultResp.getMessage());
                 }
-            } catch (ZtgeoBizException e){
-                log.error(ErrorDealUtil.getErrorInfo(e));
+                requestInterceptComponent.dealSaveThisIntercept(
+                        requestIntercept,
+                        rvBean,
+                        taxRespBody.getReceiptNumber(),
+                        BusinessConstant.INTERFACE_CODE_EXAMINE_TAX,
+                        username,
+                        "本接口执行税务完税信息结果回推，成功时返回200，失败则是20500，超出限制或已被提交返回20200",
+                        "宿迁市税务局"
+                );
             }
+        } catch (ZtgeoBizException e){
+            log.error(ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException(e.getMessage());
         }
-        return new ObjectRestResponse<List<String>>().data(successListForTax);
+        rv.data(rvBeans);
+        log.info("本次完税处理结果为："+JSONArray.toJSONString(rvBeans));
+        return rv;
     }
 
 }
