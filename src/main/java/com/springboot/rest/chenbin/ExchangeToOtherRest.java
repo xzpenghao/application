@@ -3,11 +3,13 @@ package com.springboot.rest.chenbin;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.other.web.RequestParamBody;
 import com.springboot.entity.chenbin.personnel.pub_use.FileEntityForOther;
 import com.springboot.entity.chenbin.personnel.tax.TaxRespBody;
 import com.springboot.entity.chenbin.personnel.tra.TraRespBody;
+import com.springboot.popj.GetReceiving;
 import com.springboot.popj.pub_data.Sj_Info_Qsxx;
 import com.springboot.service.chenbin.ExchangeToTaxService;
 import com.springboot.service.chenbin.ExchangeToTransactionService;
@@ -24,7 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +45,8 @@ public class ExchangeToOtherRest {
     private ExchangeToWebService exc2Web;
     @Autowired
     private ExchangeCommonService commService;
+    @Autowired
+    private AnonymousInnerComponent anonymousInnerComponent;
 
     @RequestMapping(value = "exchange2Tax",method = RequestMethod.GET)
     public ObjectRestResponse<Object> exchange2Tax(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer){
@@ -149,5 +155,16 @@ public class ExchangeToOtherRest {
         log.info("进入批量附件拉取");
         List<FileEntityForOther> fileEntityArray = JSONArray.parseArray(respMap.get("data"),FileEntityForOther.class);
         return new ObjectRestResponse<List<FileEntityForOther>>().data(commService.getFileEntityArrayForOther(fileEntityArray));
+    }
+
+    @RequestMapping(value = "postBookInfo",method = RequestMethod.POST)
+    public ObjectRestResponse<String> postBookInfo(@RequestBody GetReceiving getReceiving, HttpServletRequest request){
+        try {
+            anonymousInnerComponent.extractInformation(getReceiving, request.getHeader("Authorization"), new HashMap<String, Object>());
+        } catch (Exception e){
+            log.error("手动获取登簿数据时出现异常，异常信息为："+ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("登簿数据获取失败！");
+        }
+        return new ObjectRestResponse<String>().data("操作成功");
     }
 }

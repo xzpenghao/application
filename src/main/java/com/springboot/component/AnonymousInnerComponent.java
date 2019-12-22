@@ -124,20 +124,17 @@ public class AnonymousInnerComponent {
     private HttpClientUtils httpClientUtils;
 
 
-    private  void extractInformation(GetReceiving getReceiving,JwtAuthenticationRequest jwtAuthenticationRequest,Map<String, String> mapHeader,Map<String, Object> modelMap) throws Exception{
+    public void extractInformation(GetReceiving getReceiving,String token,Map<String, Object> modelMap) throws Exception{
         com.alibaba.fastjson.JSONObject tokenObject=null;
+        Map<String, String> mapHeader = new HashMap<>();
         Map<String, String> mapParmeter = new HashMap<>();
         log.info("执行主线程");
         if (
-                jwtAuthenticationRequest!=null &&
-                        StringUtils.isNotBlank(jwtAuthenticationRequest.getUsername()) &&
-                        StringUtils.isNotBlank(jwtAuthenticationRequest.getPassword())
+                StringUtils.isBlank(token)
         ) {
-            tokenObject = httpCallComponent.getTokenYcsl(jwtAuthenticationRequest.getUsername(), jwtAuthenticationRequest.getPassword());//获得token
-        }else {
             tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
+            token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
         }
-        String token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
         mapHeader.put("Authorization", token);
         if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {//受理
             mapParmeter.put("modelId" , getReceiving.getModelId());
@@ -196,16 +193,15 @@ public class AnonymousInnerComponent {
 
 
 
-    public void getSendRoom(GetReceiving getReceiving, OutputStream outputStream, JwtAuthenticationRequest jwtAuthenticationRequest) throws IOException {
+    public void getSendRoom(GetReceiving getReceiving, OutputStream outputStream, String token) throws IOException {
         ExecutorService executor = Executors.newCachedThreadPool();
         ReturnVo returnVo = new ReturnVo();
         Map<String, Object> modelMap = Maps.newHashMap();
         log.info("modelId"+getReceiving.getModelId());
         modelMap.put("modelId", getReceiving.getModelId());
-        Map<String, String> mapHeader = new HashMap<>();
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception { //建议抛出异常
-                extractInformation(getReceiving,jwtAuthenticationRequest,mapHeader,modelMap);
+                extractInformation(getReceiving,token,modelMap);
                 return null;
             }
         });
@@ -301,6 +297,16 @@ public class AnonymousInnerComponent {
                 log.info("处理权属信息为："+ com.alibaba.fastjson.JSONArray.toJSONString(bdcqlxgxxList));
                 respServiceData.setServiceDataInfos(bdcqlxgxxList);
                 serviceDatas.add(respServiceData);
+                //抵押信息
+                for(SJ_Info_Bdcqlxgxx bdcqlxgxx:bdcqlxgxxList){
+                    if(bdcqlxgxx.getItsRightVoList()!=null && bdcqlxgxx.getItsRightVoList().size()>0){
+                        RespServiceData mortgageServiceData = new RespServiceData();
+                        mortgageServiceData.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
+                        for(SJ_Its_Right itsRight : bdcqlxgxx.getItsRightVoList()){
+
+                        }
+                    }
+                }
                 sjSjsq.setServiceDatas(serviceDatas);
                 log.info("最终传入的数据为："+ com.alibaba.fastjson.JSONObject.toJSONString(sjSjsq));
                 JSONArray serviceArray = JSONArray.fromObject(serviceDatas);
