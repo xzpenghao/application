@@ -136,7 +136,11 @@ public class AnonymousInnerComponent {
             public String call() throws Exception { //建议抛出异常
                 com.alibaba.fastjson.JSONObject tokenObject=null;
                     log.info("执行主线程");
-                    if (null == jwtAuthenticationRequest) {
+                    if (
+                             jwtAuthenticationRequest!=null &&
+                                    StringUtils.isNotBlank(jwtAuthenticationRequest.getUsername()) &&
+                                    StringUtils.isNotBlank(jwtAuthenticationRequest.getPassword())
+                    ) {
                         tokenObject = httpCallComponent.getTokenYcsl(jwtAuthenticationRequest.getUsername(), jwtAuthenticationRequest.getPassword());//获得token
                     }else {
                          tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
