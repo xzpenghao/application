@@ -720,10 +720,13 @@ public class SqRealEstateMortgageComponent {
         relatedPerson.setObligeeDocumentNumber(obligeeInfoVo.getObligeeId());
         sj_qlr_gl.setSharedMode(CommonmodeEnum.Sc(obligeeInfoVo.getCommonWay()));
         String share="";
-        if (obligeeInfoVo.getSharedShare().contains("%")){
-            share= obligeeInfoVo.getSharedShare().replace("%","");
+        if (null == obligeeInfoVo.getSharedShare()){
+            sj_qlr_gl.setSharedValue(share);
+        }else {
+            if (obligeeInfoVo.getSharedShare().contains("%")){
+                share= obligeeInfoVo.getSharedShare().replace("%","");
+            }
         }
-        sj_qlr_gl.setSharedValue(share);
         relatedPerson.setObligeeName(obligeeInfoVo.getObligeeName());
         sj_qlr_gl.setRelatedPerson(relatedPerson);
         glObligeeVoList.add(sj_qlr_gl);
