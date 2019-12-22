@@ -19,6 +19,7 @@ import com.springboot.mapper.ExceptionRecordMapper;
 import com.springboot.popj.*;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.HttpRequestMethedEnum;
+import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.util.DateUtils;
@@ -123,7 +124,7 @@ public class AnonymousInnerComponent {
     private HttpClientUtils httpClientUtils;
 
 
-    public void getSendRoom(GetReceiving getReceiving, OutputStream outputStream) throws IOException {
+    public void getSendRoom(GetReceiving getReceiving, OutputStream outputStream, JwtAuthenticationRequest jwtAuthenticationRequest) throws IOException {
         ExecutorService executor = Executors.newCachedThreadPool();
         ReturnVo returnVo = new ReturnVo();
         Map<String, String> mapParmeter = new HashMap<>();
@@ -133,8 +134,13 @@ public class AnonymousInnerComponent {
         Map<String, String> mapHeader = new HashMap<>();
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception { //建议抛出异常
+                com.alibaba.fastjson.JSONObject tokenObject=null;
                     log.info("执行主线程");
-                    com.alibaba.fastjson.JSONObject tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
+                    if (null == jwtAuthenticationRequest) {
+                        tokenObject = httpCallComponent.getTokenYcsl(jwtAuthenticationRequest.getUsername(), jwtAuthenticationRequest.getPassword());//获得token
+                    }else {
+                         tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
+                    }
                     String token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                     if (token == null) {
                         return Msgagger.USER_LOGIN_BAD;
@@ -597,7 +603,7 @@ public class AnonymousInnerComponent {
                         mapParmeter.put("registerNumber", jsonObject.getString("slbh"));
                         //登簿返回信息
                         JSONArray ficateInfoArray = jsonObject.getJSONArray("certificateInfoVoList");
-                        System.out.println("sit:"+jsonObject.getString("sit")+";slbh:"+jsonObject.getString("slbh")+"certificateInfoVoList:"+ficateInfoArray);
+                        log.info("sit:"+jsonObject.getString("sit")+";slbh:"+jsonObject.getString("slbh")+"certificateInfoVoList:"+ficateInfoArray);
                         List<SJ_Info_Handle_Result> handleResultVoList = new ArrayList<>();
                         List<RespServiceData> respServiceDataList = new ArrayList<>();
                         List<String> stringList = new ArrayList<>();
@@ -993,7 +999,7 @@ public class AnonymousInnerComponent {
                 "application/json",
                 "http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + url,
                 map, header);
-        com.alibaba.fastjson.JSONObject jsonObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(json);
+        JSONObject jsonObject=JSONObject.fromObject(json);
         System.out.println("chenbin返回信息为：" + jsonObject);
         return json;
     }

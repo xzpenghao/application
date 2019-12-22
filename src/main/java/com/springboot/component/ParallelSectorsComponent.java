@@ -44,7 +44,6 @@ public class ParallelSectorsComponent {
      * @throws IOException
      */
     public ObjectRestResponse getParallelSectorsCertificate(ParametricData parametricData)  {
-
         System.out.println("bdczh:"+parametricData.getBdczh());
         String json = "";
         ObjectRestResponse resultRV = new ObjectRestResponse();

@@ -278,7 +278,6 @@ public class SqRealEstateMortgageComponent {
 
 
 
-
     /**
      * 机构调用接口不动产抵押登记（含两证） 和新建商品房预告和预告抵押
      * @param
@@ -343,6 +342,14 @@ public class SqRealEstateMortgageComponent {
         } else if (MortgageTypeEnum.Sc(mortgageRegistrationReqVo.getMortgageType()).equals(Msgagger.XJSPFYGDYDJ)) {
             mapParmeter.put("modelId", ygdy);
             ClYgydxx(mortgageRegistrationReqVo, sj_sjsq, respServiceDataList);
+        }
+        if (null == respServiceDataList ||   respServiceDataList.size() ==0){
+            XySj(reMortgageRegistrationVo, mortgageRegistrationReqVo, "000004", "请检验信息是否传入正确");
+            reMortgageRegistrationVo.setAcceptStatus(Msgagger.JSBAD);
+            reObject = JSONObject.fromObject(reMortgageRegistrationVo);
+            outputStream.write(reObject.toString().getBytes("UTF-8"));
+            outputStream.flush();
+            outputStream.close();
         }
         log.info("respServiceDataList" + respServiceDataList.size());
         mapParmeter.put("returnSlbh", "1");
@@ -644,7 +651,9 @@ public class SqRealEstateMortgageComponent {
                 List<SJ_Bdc_Gl> glImmovableVoList = new ArrayList<>();
                 for (RealEstateUnitInfoVo realEstateUnitInfoVo : realEstateInfoVo.getRealEstateUnitInfoVoList()) {
                     sj_info_bdcqlxgxx.setImmovableSite(realEstateUnitInfoVo.getSit());
-                    sj_info_bdcqlxgxx.setArchitecturalArea(new BigDecimal(realEstateUnitInfoVo.getArchitectureAera()));
+                    if (null != realEstateUnitInfoVo.getArchitectureAera() && !realEstateUnitInfoVo.getArchitectureAera().equals("")) {
+                        sj_info_bdcqlxgxx.setArchitecturalArea(new BigDecimal(realEstateUnitInfoVo.getArchitectureAera()));
+                    }
                     ClFwInfo(glImmovableVoList, realEstateUnitInfoVo);
                 }
                 sj_info_bdcqlxgxx.setGlImmovableVoList(glImmovableVoList);

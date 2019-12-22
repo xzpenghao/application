@@ -139,7 +139,7 @@ public class RealEstateMortgageController {
     @RequestMapping(value = "/getSendRoom", method = RequestMethod.POST)
     @ApiOperation(value = "登记局返回二手房受理成功数据")
     public void getSendRoom(@RequestBody GetReceiving getReceiving, OutputStream resp) throws IOException {
-        anonymousInner.getSendRoom(getReceiving, resp);
+        anonymousInner.getSendRoom(getReceiving, resp,null);
     }
 
 
