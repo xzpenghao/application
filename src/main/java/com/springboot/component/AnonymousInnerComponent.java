@@ -124,83 +124,88 @@ public class AnonymousInnerComponent {
     private HttpClientUtils httpClientUtils;
 
 
+    private  void extractInformation(GetReceiving getReceiving,JwtAuthenticationRequest jwtAuthenticationRequest,Map<String, String> mapHeader,Map<String, Object> modelMap) throws Exception{
+        com.alibaba.fastjson.JSONObject tokenObject=null;
+        Map<String, String> mapParmeter = new HashMap<>();
+        log.info("执行主线程");
+        if (
+                jwtAuthenticationRequest!=null &&
+                        StringUtils.isNotBlank(jwtAuthenticationRequest.getUsername()) &&
+                        StringUtils.isNotBlank(jwtAuthenticationRequest.getPassword())
+        ) {
+            tokenObject = httpCallComponent.getTokenYcsl(jwtAuthenticationRequest.getUsername(), jwtAuthenticationRequest.getPassword());//获得token
+        }else {
+            tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
+        }
+        String token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+        mapHeader.put("Authorization", token);
+        if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {//受理
+            mapParmeter.put("modelId" , getReceiving.getModelId());
+            //受理启动一窗受理流程
+            String entry = httpClientUtils.doGet("http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter6", modelMap, mapHeader);
+            log.info("entry"+entry);
+            JSONObject entryObject = JSONObject.fromObject(entry);
+            JSONArray entryArray = JSONArray.fromObject(entryObject.get("data"));//获取data数据
+            EsfSdq esfSdq = new EsfSdq();
+            esfSdq.setAttDirList(entryArray);
+            esfSdq.setSlbh(getReceiving.getSlbh());
+            esfSdq.setTransferred(false);
+            JSONObject paramObject = JSONObject.fromObject(esfSdq);//整理参数信息
+            System.out.println("aa"+paramObject.toString());
+            //根据受理编号查询转移信息（水电气）
+            String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+            log.info("zyxx"+zyxx);
+            com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(zyxx);                        //整理数据发送到一窗受理
+            ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.ESFSDQSERVICE_CODE, false, getReceiving.getSlbh());//获取不动产权属信息
+            log.info("sjsq"+mapParmeter.get("SJ_Sjsq"));
+            log.info("modelId"+mapParmeter.get("modelId"));
+            String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
+            getProcessingAnnex(zyxxObject,mapParmeter,null,ftpAddress,ftpPort,ftpUsername,ftpPassword,path);//附件上传
+            log.info("fileInfoList"+mapParmeter.get("fileInfoList"));
+            //发送一窗受理进行启动流程
+            String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter5");
+            JSONObject jsonObject = JSONObject.fromObject(json);
+            log.info("流程返回"+json);
+            log.info("返回结果"+jsonObject.get("status").toString());
+            if ((Integer) jsonObject.get("status") == 200) {
+                log.info("存量房水电气流程数据保存成功及流程开启成功");
+            } else {
+                log.error("存量房信息保存失败,流程未开启"+json);
+            }
+        } else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)) {
+            log.info("开始进行二手房登簿");
+            //登簿通知
+            EsfSdq esfSdq = new EsfSdq();
+            esfSdq.setSlbh(getReceiving.getSlbh());
+            esfSdq.setTransferred(true);
+            esfSdq.setHouseholdMap(transferHoldmap);
+            JSONObject jsonObject = JSONObject.fromObject(esfSdq);
+            //根据受理编号查询转移信息（水电气）
+            String jsonData = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
+            log.info("查询转移信息(水电气)"+jsonData);
+            com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(jsonData);
+            ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.BDCQZSDZF_SERVICE_CODE, true, getReceiving.getSlbh());//获取不动产权属信息
+            mapParmeter.put("registerNumber", getReceiving.getSlbh());
+            String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
+            JSONObject ycslObject = JSONObject.fromObject(json);
+            log.info("一窗受理返回"+ycslObject.toString());
+        }
+    }
+
+
+
+
+
     public void getSendRoom(GetReceiving getReceiving, OutputStream outputStream, JwtAuthenticationRequest jwtAuthenticationRequest) throws IOException {
         ExecutorService executor = Executors.newCachedThreadPool();
         ReturnVo returnVo = new ReturnVo();
-        Map<String, String> mapParmeter = new HashMap<>();
         Map<String, Object> modelMap = Maps.newHashMap();
         log.info("modelId"+getReceiving.getModelId());
         modelMap.put("modelId", getReceiving.getModelId());
         Map<String, String> mapHeader = new HashMap<>();
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception { //建议抛出异常
-                com.alibaba.fastjson.JSONObject tokenObject=null;
-                    log.info("执行主线程");
-                    if (
-                             jwtAuthenticationRequest!=null &&
-                                    StringUtils.isNotBlank(jwtAuthenticationRequest.getUsername()) &&
-                                    StringUtils.isNotBlank(jwtAuthenticationRequest.getPassword())
-                    ) {
-                        tokenObject = httpCallComponent.getTokenYcsl(jwtAuthenticationRequest.getUsername(), jwtAuthenticationRequest.getPassword());//获得token
-                    }else {
-                         tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
-                    }
-                    String token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
-                    if (token == null) {
-                        return Msgagger.USER_LOGIN_BAD;
-                    }
-                    mapHeader.put("Authorization", token);
-                    if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {//受理
-                        mapParmeter.put("modelId" , getReceiving.getModelId());
-                        //受理启动一窗受理流程
-                        String entry = httpClientUtils.doGet("http://" + windowAcceptanceIp + ":" + windowAcceptanceSeam + "/api/biz/RecService/DealRecieveFromOuter6", modelMap, mapHeader);
-                        log.info("entry"+entry);
-                        JSONObject entryObject = JSONObject.fromObject(entry);
-                        JSONArray entryArray = JSONArray.fromObject(entryObject.get("data"));//获取data数据
-                        EsfSdq esfSdq = new EsfSdq();
-                        esfSdq.setAttDirList(entryArray);
-                        esfSdq.setSlbh(getReceiving.getSlbh());
-                        esfSdq.setTransferred(false);
-                        JSONObject paramObject = JSONObject.fromObject(esfSdq);//整理参数信息
-                        System.out.println("aa"+paramObject.toString());
-                        //根据受理编号查询转移信息（水电气）
-                        String zyxx = HttpClientUtils.getJsonData(paramObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
-                        log.info("zyxx"+zyxx);
-                        com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(zyxx);                        //整理数据发送到一窗受理
-                        ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.ESFSDQSERVICE_CODE, false, getReceiving.getSlbh());//获取不动产权属信息
-                        log.info("sjsq"+mapParmeter.get("SJ_Sjsq"));
-                        log.info("modelId"+mapParmeter.get("modelId"));
-                        String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
-                        getProcessingAnnex(zyxxObject,mapParmeter,null,ftpAddress,ftpPort,ftpUsername,ftpPassword,path);//附件上传
-                        log.info("fileInfoList"+mapParmeter.get("fileInfoList"));
-                        //发送一窗受理进行启动流程
-                        String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter5");
-                        JSONObject jsonObject = JSONObject.fromObject(json);
-                        log.info("流程返回"+json);
-                        log.info("返回结果"+jsonObject.get("status").toString());
-                        if ((Integer) jsonObject.get("status") == 200) {
-                            log.info("存量房水电气流程数据保存成功及流程开启成功");
-                        } else {
-                            log.error("存量房信息保存失败,流程未开启"+json);
-                        }
-                    } else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)) {
-                        log.info("开始进行二手房登簿");
-                        //登簿通知
-                        EsfSdq esfSdq = new EsfSdq();
-                        esfSdq.setSlbh(getReceiving.getSlbh());
-                        esfSdq.setTransferred(true);
-                        esfSdq.setHouseholdMap(transferHoldmap);
-                        JSONObject jsonObject = JSONObject.fromObject(esfSdq);
-                        //根据受理编号查询转移信息（水电气）
-                        String jsonData = HttpClientUtils.getJsonData(jsonObject, "http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetZYInfo4SDQ");
-                        log.info("查询转移信息(水电气)"+jsonData);
-                        com.alibaba.fastjson.JSONObject zyxxObject = (com.alibaba.fastjson.JSONObject) com.alibaba.fastjson.JSONObject.parse(jsonData);
-                        ownershipInFormationxx(zyxxObject, mapParmeter, Msgagger.BDCQZSDZF_SERVICE_CODE, true, getReceiving.getSlbh());//获取不动产权属信息
-                        mapParmeter.put("registerNumber", getReceiving.getSlbh());
-                        String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
-                        JSONObject ycslObject = JSONObject.fromObject(json);
-                        log.info("一窗受理返回"+ycslObject.toString());
-                    }
+                extractInformation(getReceiving,jwtAuthenticationRequest,mapHeader,modelMap);
                 return null;
             }
         });
@@ -219,6 +224,7 @@ public class AnonymousInnerComponent {
             System.err.println("result is " + JSONObject.fromObject(returnVo) + ", time is " + (System.currentTimeMillis() - t));
             executor.shutdown();
         } catch (Exception e) {
+            log.error("e"+e);
             e.getStackTrace();
         }
     }
