@@ -7,6 +7,7 @@ import com.springboot.component.chenbin.file.FromFTPDownloadComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.service.chenbin.other.ExchangeInterfaceService;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
@@ -30,6 +31,8 @@ import java.util.Map;
 public class TestRest {
     @Autowired
     private HttpCallComponent httpCallComponent;
+    @Autowired
+    private OuterBackFeign outerBackFeign;
 
     @RequestMapping(value = "/getFileList", method = RequestMethod.POST)
     public ObjectRestResponse<List<ImmovableFile>> getFileList(@RequestParam("receiptNumber") String receiptNumber, @RequestParam("token") String token) {
@@ -40,9 +43,10 @@ public class TestRest {
 
     @RequestMapping(value = "/test", method = RequestMethod.POST)
     public ObjectRestResponse<Object> test(@RequestBody Map<String,String> map){
+        log.info("开始");
         Map<String,String> mapR = new HashMap<String,String>();
         mapR.put("sign","");
         mapR.put("data", JSONObject.toJSONString(map));
-        return new ObjectRestResponse<Object>().data(mapR);
+        return outerBackFeign.test("哈哈哈");
     }
 }

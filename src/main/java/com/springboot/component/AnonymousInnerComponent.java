@@ -298,14 +298,50 @@ public class AnonymousInnerComponent {
                 respServiceData.setServiceDataInfos(bdcqlxgxxList);
                 serviceDatas.add(respServiceData);
                 //抵押信息
+                List<MortgageService> mortgageServiceList = new ArrayList<MortgageService>();
                 for(SJ_Info_Bdcqlxgxx bdcqlxgxx:bdcqlxgxxList){
                     if(bdcqlxgxx.getItsRightVoList()!=null && bdcqlxgxx.getItsRightVoList().size()>0){
-                        RespServiceData mortgageServiceData = new RespServiceData();
-                        mortgageServiceData.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
+                        log.info("进入抵押信息获取");
                         for(SJ_Its_Right itsRight : bdcqlxgxx.getItsRightVoList()){
-
+                            if(StringUtils.isNotBlank(itsRight.getItsRightType()) && "抵押".equals(itsRight.getItsRightType())) {
+                                Map<String,Object> map = new HashMap<>();
+                                if(StringUtils.isNotBlank(itsRight.getRegisterNumber())) {
+                                    String slbh = itsRight.getRegisterNumber();
+                                    if(slbh.contains("-"))
+                                        slbh = slbh.substring(0,slbh.lastIndexOf("-"));
+                                    map.put("slbh", slbh);
+                                    //发送登记局获取数据整理发送一窗受理
+                                    String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
+                                    log.info("获取登簿数据成功，为：" + json);
+                                    JSONObject jsonObjectDy = JSONObject.fromObject(json);
+                                    JSONArray ficateInfoArray = jsonObjectDy.getJSONArray("certificateInfoVoList");
+                                    log.info("sit:" + jsonObjectDy.getString("sit") + ";slbh:" + jsonObjectDy.getString("slbh") + "certificateInfoVoList:" + ficateInfoArray);
+                                    for (int i = 0; i < ficateInfoArray.size(); i++) {
+                                        JSONObject verfyInfoObject = ficateInfoArray.getJSONObject(i);
+                                        if(
+                                                StringUtils.isNotBlank(verfyInfoObject.getString("certificateType")) &&
+                                                        "DYZMH".equals(verfyInfoObject.getString("certificateType"))
+                                        ) {
+                                            RespServiceData RealEstateBookData = new RespServiceData();
+                                            RespServiceData getRealEstateBooking = getRealEstateBooking(verfyInfoObject.getString("certificateType"),
+                                                    verfyInfoObject.getString("certificateId"), RealEstateBookData);
+                                            if (getRealEstateBooking.getServiceDataInfos() != null) {
+                                                for (MortgageService mortgageServiceInfo : (List<MortgageService>) getRealEstateBooking.getServiceDataInfos()) {
+                                                    mortgageServiceList.add(mortgageServiceInfo);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
+                }
+                if(mortgageServiceList!=null && mortgageServiceList.size()>0){
+                    RespServiceData mortgageServiceData = new RespServiceData();
+                    mortgageServiceData.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
+                    mortgageServiceData.setServiceDataInfos(mortgageServiceList);
+                    serviceDatas.add(mortgageServiceData);
                 }
                 sjSjsq.setServiceDatas(serviceDatas);
                 log.info("最终传入的数据为："+ com.alibaba.fastjson.JSONObject.toJSONString(sjSjsq));
