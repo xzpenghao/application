@@ -660,9 +660,11 @@ public class AnonymousInnerComponent {
                         List<RespServiceData> respServiceDataList = new ArrayList<>();
                         List<String> stringList = new ArrayList<>();
                         RespServiceData resultServiceData=null;
+                        String dbName="";
                         //获取受理编号信息
                         for (int i = 0; i < ficateInfoArray.size(); i++) {
                             JSONObject verfyInfoObject = ficateInfoArray.getJSONObject(i);
+                            dbName=verfyInfoObject.getString("registerSubType")+",";
                             stringList.add(verfyInfoObject.getString("registerSubType"));
                             RespServiceData RealEstateBookData = new RespServiceData();
                             RespServiceData getRealEstateBooking = getRealEstateBooking(verfyInfoObject.getString("certificateType"),
@@ -679,30 +681,31 @@ public class AnonymousInnerComponent {
                         mapParmeter.put("serviceData",respService.toString());
                         RespServiceData respServiceData = new RespServiceData();
                         respServiceData.setServiceCode(Msgagger.DBSERVICECODE);
+                        String name = dbName.substring(0, dbName.length() - 1);
                         //获取登记小类信息
-                        for (String string : stringList) {
-                            SJ_Info_Handle_Result handleResult = new SJ_Info_Handle_Result();
-                            handleResult.setHandleResult(string + "登簿成功");
-                            handleResult.setHandleText(Msgagger.SUCCESSFUL_DENGBUCG);
-                            handleResult.setProvideUnit(Msgagger.REGISTRATION);
-                            handleResult.setDataComeFromMode(Msgagger.SUCCESSFUL_INTERFACE);
-                            handleResultVoList.add(handleResult);
-                            respServiceData.setServiceDataInfos(handleResultVoList);
-                        }
+                        SJ_Info_Handle_Result handleResult = new SJ_Info_Handle_Result();
+                        handleResult.setHandleResult(name + "登簿成功");
+                        handleResult.setHandleText(Msgagger.SUCCESSFUL_DENGBUCG);
+                        handleResult.setProvideUnit(Msgagger.REGISTRATION);
+                        handleResult.setDataComeFromMode(Msgagger.SUCCESSFUL_INTERFACE);
+                        handleResultVoList.add(handleResult);
+                        respServiceData.setServiceDataInfos(handleResultVoList);
                         log.info("resultServiceData1"+resultServiceData);
                         log.info("resultServiceData2:\n"+respServiceData.getServiceDataInfos());
-                        //整理数据发送银行
-                        if (null !=resultServiceData) {
-                            log.info("抵押注销通知进来了");
-                            List<MortgageService> mortgageServiceList = resultServiceData.getServiceDataInfos();
-                            ResultNoticeReqVo resultNoticeReqVo = new ResultNoticeReqVo();
-                            resultNoticeReqVo.setBusinessId(getReceiving.getSlbh());
-                            ClNotice(resultNoticeReqVo, "REVOKE_REGISTER",Msgagger.DENGBU);
-                            ClDdyxxNotice(mortgageServiceList, resultNoticeReqVo);
-                            JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
-                            log.info("bankObject"+bankObject.toString());
-                            String resultJson= BankNotification(bankObject,"JSRCIS/sq/sqResultNotice.do");
-                            log.info("银行返回json"+resultJson);
+                        String [] clxx= name.split(",");
+                        for (int i=0;i<clxx.length;i++) {
+                            if (clxx.length==1 && clxx[i].equals("一般抵押权")){
+                                log.info("抵押注销通知进来了");
+                                List<MortgageService> mortgageServiceList = resultServiceData.getServiceDataInfos();
+                                ResultNoticeReqVo resultNoticeReqVo = new ResultNoticeReqVo();
+                                resultNoticeReqVo.setBusinessId(getReceiving.getSlbh());
+                                ClNotice(resultNoticeReqVo, "REVOKE_REGISTER",Msgagger.DENGBU);
+                                ClDdyxxNotice(mortgageServiceList, resultNoticeReqVo);
+                                JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
+                                log.info("bankObject"+bankObject.toString());
+                                String resultJson= BankNotification(bankObject,"JSRCIS/sq/sqResultNotice.do");
+                                log.info("银行返回json"+resultJson);
+                            }
                         }
                         respServiceDataList.add(respServiceData);
                         JSONArray jsonArray = JSONArray.fromObject(respServiceDataList);
@@ -846,6 +849,13 @@ public class AnonymousInnerComponent {
                     List<RealPropertyCertificate> realPropertyCertificateList = (List<RealPropertyCertificate>) resultRV.getData();
                     respServiceData.setServiceCode(Msgagger.YGZMSERVICE_CODE);
                     respServiceData.setServiceDataInfos(realPropertyCertificateList);
+                    break;
+                case "BDCZH":
+                    ParametricData parametricData=new ParametricData();
+                    parametricData.setBdczh(certificateId);
+                    List<SJ_Info_Bdcqlxgxx> bdcqlxgxxList = exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
+                    respServiceData.setServiceCode(Msgagger.BDCQZSDZF_SERVICE_CODE);
+                    respServiceData.setServiceDataInfos(bdcqlxgxxList);
                     break;
             }
         return respServiceData;
