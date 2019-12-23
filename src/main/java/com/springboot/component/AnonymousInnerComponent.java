@@ -826,11 +826,6 @@ public class AnonymousInnerComponent {
 
 
 
-
-
-
-
-
     /**
      * 通过类型，证号查询登记局数据
      *
