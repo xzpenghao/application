@@ -335,6 +335,7 @@ public class AnonymousInnerComponent {
                                 }
                             }
                         }
+                        bdcqlxgxx.setItsRightVoList(new ArrayList<SJ_Its_Right>());
                     }
                 }
                 if(mortgageServiceList!=null && mortgageServiceList.size()>0){
@@ -854,6 +855,9 @@ public class AnonymousInnerComponent {
                     ParametricData parametricData=new ParametricData();
                     parametricData.setBdczh(certificateId);
                     List<SJ_Info_Bdcqlxgxx> bdcqlxgxxList = exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
+                    for(SJ_Info_Bdcqlxgxx bdcqlxgxx:bdcqlxgxxList){
+                        bdcqlxgxx.setItsRightVoList(new ArrayList<SJ_Its_Right>());
+                    }
                     respServiceData.setServiceCode(Msgagger.BDCQZSDZF_SERVICE_CODE);
                     respServiceData.setServiceDataInfos(bdcqlxgxxList);
                     break;
