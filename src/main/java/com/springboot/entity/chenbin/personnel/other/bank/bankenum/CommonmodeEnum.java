@@ -1,7 +1,7 @@
 package com.springboot.entity.chenbin.personnel.other.bank.bankenum;
 
 public enum  CommonmodeEnum {
-    Dd("单独所有"),Gt("共同所有"),Af("按份所有"),Qt("其他所有");
+    Dd("单独所有"),Gt("共同共有"),Af("按份共有"),Qt("其他共有");
     //以上是枚举的成员，必须先定义，而且使用分号结束
     private final String day;
     private CommonmodeEnum(String day)

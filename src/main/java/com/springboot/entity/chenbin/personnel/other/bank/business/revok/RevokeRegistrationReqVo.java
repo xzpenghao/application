@@ -1,6 +1,7 @@
 package com.springboot.entity.chenbin.personnel.other.bank.business.revok;
 
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.FileInfoVo;
+import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.MortgageeInfoVo;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.MortgagorAgentInfoVo;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.MortgagorInfoVo;
 
@@ -26,6 +27,7 @@ public class RevokeRegistrationReqVo implements Serializable {
     private String warrantId;
     private List<RealEstateInfoVo> realEstateInfoVoList;
     private List<MortgagorInfoVo> mortgagorInfoVoList;
+    private List<MortgageeInfoVo> mortgageeInfoVoList;
     private List<FileInfoVo> fileInfoVoList;
     private String operatorName;
     private String operatorId;

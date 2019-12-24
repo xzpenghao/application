@@ -765,7 +765,11 @@ RealEstateMortgageComponent {
                     JSONObject mortgageInfo = mortgageInfojsonArray.getJSONObject(a);
                     mortgageService.setImmovableCertificateNo(jsonObject.getString("realEstateId"));
                     mortgageService.setAcceptanceNumber(mortgageInfo.getString("dySLBH"));
-                    mortgageService.setMortgageMode(mortgageInfo.getString("mortgageWay"));//抵押方式（暂时没传）
+                    if (null == mortgageInfo.getString("mortgageWay") ){ //没有的话取小类信息
+                        mortgageService.setMortgageMode(mortgageInfo.getString("mortgageType"));
+                    }else {
+                        mortgageService.setMortgageMode(mortgageInfo.getString("mortgageWay"));
+                    }
                     mortgageService.setMortgageCertificateNo(mortgageInfo.getString("warrantId"));//抵押证明号
                     mortgageService.setCreditAmount(mortgageInfo.getDouble("creditAmount"));//债权数额
                     mortgageService.setMortgageArea(mortgageInfo.getDouble("mortgageArea"));//抵押面积

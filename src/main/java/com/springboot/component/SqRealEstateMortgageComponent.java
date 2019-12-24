@@ -247,7 +247,7 @@ public class SqRealEstateMortgageComponent {
         Sj_Info_Bdcdyxgxx sj_info_bdcdyxgxx=new Sj_Info_Bdcdyxgxx();
         List<SJ_Bdc_Gl> glImmovableVoList=new ArrayList<>();
         sj_info_bdcdyxgxx.setMortgageCertificateNo(revokeRegistrationRespVo.getWarrantId());//抵押证明号
-        sj_info_bdcdyxgxx.setMortgageReason(revokeRegistrationRespVo.getRemoveReason());
+        sj_info_bdcdyxgxx.setMortgageReason(ReasonsCancellationEnum.Sc(revokeRegistrationRespVo.getRemoveReason()));
         if ( null !=realEstateInfoVo.getRealEstateUnitInfoVoList()){
             for (com.springboot.entity.chenbin.personnel.other.bank.business.revok.domain.RealEstateUnitInfoVo realEstateUnitInfoVo:realEstateInfoVo.getRealEstateUnitInfoVoList()) {
                 SJ_Bdc_Gl bdcGl=new SJ_Bdc_Gl();
@@ -263,6 +263,11 @@ public class SqRealEstateMortgageComponent {
         for (MortgagorInfoVo mortgagorInfoVo:revokeRegistrationRespVo.getMortgagorInfoVoList()) {
             ClDyr(mortgagorInfoVo,glMortgagorVoList);
         }
+        List<SJ_Qlr_Gl> glMortgageeVoList=new ArrayList<>();
+        for (MortgageeInfoVo mortgageeInfoVo:revokeRegistrationRespVo.getMortgageeInfoVoList()) {
+            ClDyqr(mortgageeInfoVo,glMortgageeVoList);
+        }
+        sj_info_bdcdyxgxx.setGlMortgageHolderVoList(glMortgageeVoList);
         sj_info_bdcdyxgxx.setGlMortgagorVoList(glMortgagorVoList);
         List<SJ_Qlr_Gl> glAgentInfoVoList=new ArrayList<>();
         if (null != revokeRegistrationRespVo.getMortgagorAgentInfoVoList() && revokeRegistrationRespVo.getMortgagorAgentInfoVoList().size()!=0) {
