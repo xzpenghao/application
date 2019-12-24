@@ -660,8 +660,8 @@ public class AnonymousInnerComponent {
                         List<SJ_Info_Handle_Result> handleResultVoList = new ArrayList<>();
                         List<RespServiceData> respServiceDataList = new ArrayList<>();
                         List<String> stringList = new ArrayList<>();
-                        RespServiceData resultServiceData=null;
-                        String dbName="";
+                        RespServiceData resultServiceData=null; //为了返回银行信息
+                        String name="";
                         //获取受理编号信息
                         for (int i = 0; i < ficateInfoArray.size(); i++) {
                             JSONObject verfyInfoObject = ficateInfoArray.getJSONObject(i);
@@ -671,7 +671,10 @@ public class AnonymousInnerComponent {
                                     verfyInfoObject.getString("certificateId"), RealEstateBookData);
                             if (verfyInfoObject.getString("registerSubType").equals(Msgagger.DYZXDJ)){
                                 getRealEstateBooking.setServiceCode(Msgagger.DYZXSERVICECODE);
-//                                resultServiceData=getRealEstateBooking;
+                                if (ficateInfoArray.size()==1){
+                                    name= verfyInfoObject.getString("certificateType");
+                                }
+                                resultServiceData=getRealEstateBooking;
                             }else if (StringUtils.isEmpty(getRealEstateBooking.getServiceCode())){
                                 getRealEstateBooking.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
                             }
@@ -691,21 +694,19 @@ public class AnonymousInnerComponent {
                         handleResultVoList.add(handleResult);
                         respServiceData.setServiceDataInfos(handleResultVoList);
                         log.info("resultServiceData2:\n"+respServiceData.getServiceDataInfos());
-//                        String [] clxx= name.split(",");
-//                        for (int i=0;i<clxx.length;i++) {
-//                            if (clxx.length==1 && clxx[i].equals("一般抵押权")){
-//                                log.info("抵押注销通知进来了");
-//                                List<MortgageService> mortgageServiceList = resultServiceData.getServiceDataInfos();
-//                                ResultNoticeReqVo resultNoticeReqVo = new ResultNoticeReqVo();
-//                                resultNoticeReqVo.setBusinessId(getReceiving.getSlbh());
-//                                ClNotice(resultNoticeReqVo, "REVOKE_REGISTER",Msgagger.DENGBU);
-//                                ClDdyxxNotice(mortgageServiceList, resultNoticeReqVo);
-//                                JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
-//                                log.info("bankObject"+bankObject.toString());
-//                                String resultJson= BankNotification(bankObject,"JSRCIS/sq/sqResultNotice.do");
-//                                log.info("银行返回json"+resultJson);
-//                            }
-//                        }
+                        if (StringUtils.isNotEmpty(name)){
+                                //如果多家银行介入进来需要判断抵押权人信息
+                                log.info("抵押注销通知进来了");
+                                List<MortgageService> mortgageServiceList = resultServiceData.getServiceDataInfos();
+                                ResultNoticeReqVo resultNoticeReqVo = new ResultNoticeReqVo();
+                                resultNoticeReqVo.setBusinessId(getReceiving.getSlbh());
+                                ClNotice(resultNoticeReqVo, "REVOKE_REGISTER",Msgagger.DENGBU);
+                                ClDdyxxNotice(mortgageServiceList, resultNoticeReqVo);
+                                JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
+                                log.info("bankObject"+bankObject.toString());
+                                String resultJson= BankNotification(bankObject,"JSRCIS/sq/sqResultNotice.do");
+                                log.info("银行返回json"+resultJson);
+                        }
                         respServiceDataList.add(respServiceData);
                         JSONArray jsonArray = JSONArray.fromObject(respServiceDataList);
                         log.info("jsonArray"+jsonArray.toString());
