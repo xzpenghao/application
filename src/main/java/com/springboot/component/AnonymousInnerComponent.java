@@ -671,7 +671,6 @@ public class AnonymousInnerComponent {
                                     verfyInfoObject.getString("certificateId"), RealEstateBookData);
                             if (verfyInfoObject.getString("registerSubType").equals(Msgagger.DYZXDJ)){
                                 getRealEstateBooking.setServiceCode(Msgagger.DYZXSERVICECODE);
-                                dbName=verfyInfoObject.getString("registerSubType")+",";
 //                                resultServiceData=getRealEstateBooking;
                             }else if (StringUtils.isEmpty(getRealEstateBooking.getServiceCode())){
                                 getRealEstateBooking.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
@@ -683,19 +682,16 @@ public class AnonymousInnerComponent {
                         mapParmeter.put("serviceData",respService.toString());
                         RespServiceData respServiceData = new RespServiceData();
                         respServiceData.setServiceCode(Msgagger.DBSERVICECODE);
-                        String name = dbName.substring(0, dbName.length() - 1);
-                        log.info("name"+name);
                         //获取登记小类信息
                         SJ_Info_Handle_Result handleResult = new SJ_Info_Handle_Result();
-                        handleResult.setHandleResult(name + "登簿成功");
+                        handleResult.setHandleResult("登簿成功");
                         handleResult.setHandleText(Msgagger.SUCCESSFUL_DENGBUCG);
                         handleResult.setProvideUnit(Msgagger.REGISTRATION);
                         handleResult.setDataComeFromMode(Msgagger.SUCCESSFUL_INTERFACE);
                         handleResultVoList.add(handleResult);
                         respServiceData.setServiceDataInfos(handleResultVoList);
                         log.info("resultServiceData2:\n"+respServiceData.getServiceDataInfos());
-                        String [] clxx= name.split(",");
-                        log.info("clxx"+clxx.length);
+//                        String [] clxx= name.split(",");
 //                        for (int i=0;i<clxx.length;i++) {
 //                            if (clxx.length==1 && clxx[i].equals("一般抵押权")){
 //                                log.info("抵押注销通知进来了");
