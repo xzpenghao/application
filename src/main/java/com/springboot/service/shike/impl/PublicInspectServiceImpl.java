@@ -1,8 +1,8 @@
 package com.springboot.service.shike.impl;
 
-import cn.hutool.http.HttpUtil;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.service.shike.PublicInspectService;
+import com.springboot.util.HttpClientUtils;
 import com.springboot.vo.JudicialQueryVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -47,10 +47,12 @@ public class PublicInspectServiceImpl implements PublicInspectService {
         //备注
         judicialQueryVo.setRemark(remark);
 
+        HttpClientUtils httpClientUtils = new HttpClientUtils();
         switch (type){
             case "1":
                 //不动产证号查询
-                String bdczhResult= HttpUtil.get(String.format(BDCZHURL,bdczh));
+//                String bdczhResult= HttpUtil.get(url);
+                String bdczhResult= httpClientUtils.paramGet(String.format(BDCZHURL,bdczh));
                 log.info("不动产证号查询结果:{}",bdczhResult);
                 if (StringUtils.isBlank(bdczhResult)||"[]".equals(bdczhResult)){
                     throw new ZtgeoBizException("未查询到信息");
@@ -60,7 +62,7 @@ public class PublicInspectServiceImpl implements PublicInspectService {
                 break;
             case "2":
                 //抵押证明号查询
-                String dyzmhResult= HttpUtil.get(String.format(DYZMHURL,bdczh));
+                String dyzmhResult= httpClientUtils.paramGet(String.format(DYZMHURL,bdczh));
                 log.info("抵押证明号查询结果:{}",dyzmhResult);
                 if (StringUtils.isBlank(dyzmhResult)||"[]".equals(dyzmhResult)){
                     throw new ZtgeoBizException("未查询到信息");
@@ -70,7 +72,7 @@ public class PublicInspectServiceImpl implements PublicInspectService {
                 break;
             case "3":
                 //预告证明号查询
-                String ygzmhResult= HttpUtil.get(String.format(YGZMHURL,bdczh));
+                String ygzmhResult= httpClientUtils.paramGet(String.format(YGZMHURL,bdczh));
                 log.info("预告证明号查询结果:{}",ygzmhResult);
                 if (StringUtils.isBlank(ygzmhResult)||"[]".equals(ygzmhResult)){
                     throw new ZtgeoBizException("未查询到信息");

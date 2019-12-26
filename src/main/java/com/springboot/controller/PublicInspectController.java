@@ -23,13 +23,17 @@ public class PublicInspectController {
     @RequestMapping(value = "/JudicialQuery", method = RequestMethod.POST)
     @ApiOperation("司法查询反馈")
     public ObjectRestResponse JudicialQuery(@RequestBody JudicialRecVo judicialRecVo) {
-        System.out.println("传入参数："+ JSONObject.toJSONString(judicialRecVo));
+        log.info("传入参数：{}",JSONObject.toJSONString(judicialRecVo));
         if (StringUtils.isBlank(judicialRecVo.getBdczh())||
                 StringUtils.isBlank(judicialRecVo.getType())||
                 StringUtils.isBlank(judicialRecVo.getDjjg())||
                 StringUtils.isBlank(judicialRecVo.getInquirer())||
                 StringUtils.isBlank(judicialRecVo.getWorkId())||
                 StringUtils.isBlank(judicialRecVo.getOfficialId())){
+            log.info("getBdczh:{},getType:{},getDjjg:{},getInquirer:{},getWorkId:{},getOfficialId:{},",
+                    judicialRecVo.getBdczh(),judicialRecVo.getType(),
+                    judicialRecVo.getDjjg(),judicialRecVo.getInquirer(),
+                    judicialRecVo.getWorkId(),judicialRecVo.getOfficialId());
             throw new ZtgeoBizException("参数格式错误");
         }
         return new ObjectRestResponse<>().data(publicInspectService.JudicialQuery(judicialRecVo.getBdczh(),
