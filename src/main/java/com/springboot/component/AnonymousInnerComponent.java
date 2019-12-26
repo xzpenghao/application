@@ -95,8 +95,8 @@ public class AnonymousInnerComponent {
     private String gxftpUsername;
     @Value("${sq.gxpt.ftpPassword}")
     private String gxftpPassword;
-
-
+    @Value("${sq.bank.orgId}")
+    private String orgId;
     @Value("${webplus.ftpAddress}")
     private String yftpAddress;
     @Value("${webplus.ftpPort}")
@@ -700,7 +700,7 @@ public class AnonymousInnerComponent {
                                 List<MortgageService> mortgageServiceList = resultServiceData.getServiceDataInfos();
                                 ResultNoticeReqVo resultNoticeReqVo = new ResultNoticeReqVo();
                                 resultNoticeReqVo.setBusinessId(getReceiving.getSlbh());
-                                ClNotice(resultNoticeReqVo, "REVOKE_REGISTER",Msgagger.DENGBU);
+                                ClNotice(resultNoticeReqVo, "REVOKE_REGISTER",Msgagger.DENGBU,orgId);
                                 ClDdyxxNotice(mortgageServiceList, resultNoticeReqVo);
                                 JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
                                 log.info("bankObject"+bankObject.toString());
@@ -875,27 +875,27 @@ public class AnonymousInnerComponent {
                 log.info("resultRV"+resultRV.getData());
                 List<MortgageService> mortgageServiceList = (List<MortgageService>) resultRV.getData();
                 //处理抵押
-                ClNotice(resultNoticeReqVo,"MORTGAGE_REGISTER",Msgagger.SHANZHENG);
+                ClNotice(resultNoticeReqVo,"MORTGAGE_REGISTER",Msgagger.SHANZHENG,orgId);
                 ClDdyxxNotice(mortgageServiceList,resultNoticeReqVo);
                 break;
             case "YGZMH":
                 resultRV = realEstateMortgageComponent.getMortgageCancellation(certificateId);
                 List<RealPropertyCertificate> realPropertyCertificateList = (List<RealPropertyCertificate>) resultRV.getData();
-                ClNotice(resultNoticeReqVo,"MORTGAGE_REGISTER",Msgagger.SHANZHENG);
+                ClNotice(resultNoticeReqVo,"MORTGAGE_REGISTER",Msgagger.SHANZHENG,orgId);
                 ClYgxxNotice(realPropertyCertificateList,resultNoticeReqVo,certificateId);
                 break;
         }
         return  resultNoticeReqVo;
     }
 
-    private void ClNotice(ResultNoticeReqVo resultNoticeReqVo,String Type,String businessNodeName){
+    private void ClNotice(ResultNoticeReqVo resultNoticeReqVo,String Type,String businessNodeName,String orgId){
         resultNoticeReqVo.setBusinessStatus("ACEPTE_SUCESS");
         resultNoticeReqVo.setBusinessType(Type);//MORTGAGE_PERSONAL
         resultNoticeReqVo.setBusinessNodeCode("1");//业务节点编码
         resultNoticeReqVo.setBusinessNodeName(businessNodeName);//业务节点名称
         resultNoticeReqVo.setCompletionTime(DateUtils.dateString(new Date(),"yyyy-MM-dd HH:mm:ss"));
         resultNoticeReqVo.setCharset("UTF-8");
-        resultNoticeReqVo.setOrgId("01398999999");//宿迁交通银行固定值
+        resultNoticeReqVo.setOrgId(orgId);//宿迁交通银行固定值
         resultNoticeReqVo.setVersion("1.0.0");
         resultNoticeReqVo.setReqDate(DateUtils.dateString(new Date(),"yyyy-MM-dd HH:mm:ss"));
         resultNoticeReqVo.setReqUniqueNo(IDUtil.getExceptionId());

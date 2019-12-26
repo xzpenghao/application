@@ -139,6 +139,7 @@ public class ExchangeToOtherRest {
         return exc2Tax.examineSuccess4TaxBatch(respMap.get("data"));
     }
 
+
     @RequestMapping(value = "postFileByPath", method = RequestMethod.POST)
     @ApiOperation(value = "附件拉取接口",
             notes = "各平行部门接收收件成功后回调拉取具体附件的接口。")

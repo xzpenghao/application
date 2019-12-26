@@ -8,6 +8,7 @@ import java.util.Date;
 
 public class JSONReceiptData implements Serializable {
     private String receiptNumber;                              //收件编号
+    private String thirdApplyId;                               //第三方申请编号
     private String businessType;                               //业务类型
     private String registrationCategory;                       //登记大类（大类字典值）
     private String registrationSubclass;                       //登记小类
@@ -33,6 +34,14 @@ public class JSONReceiptData implements Serializable {
 
     private String serviceDatas;                                //服务数据
     private String userExtVoList;                               //设定系统对接扩展用户映射
+
+    public String getThirdApplyId() {
+        return thirdApplyId;
+    }
+
+    public void setThirdApplyId(String thirdApplyId) {
+        this.thirdApplyId = thirdApplyId;
+    }
 
     public String getReceiptNumber() {
         return receiptNumber;

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 public class SJ_Sjsq  implements Serializable {
     private String receiptNumber;                              //收件编号
+    private String thirdApplyId;                                //银行申请编号(为通知返回接口记录编号)
     private String businessType;                               //业务类型
     private String registrationCategory;                       //登记大类（大类字典值）
     private String registrationSubclass;                       //登记小类
@@ -44,6 +45,14 @@ public class SJ_Sjsq  implements Serializable {
     private List<RespServiceData> serviceDatas; //封装返回值数据
     private List<SJ_Execute_depart> executeDeparts; //指定执行部门
     private List<SJ_Sjsq_User_Ext> userExtVoList;//设定系统对接扩展用户映射
+
+    public String getThirdApplyId() {
+        return thirdApplyId;
+    }
+
+    public void setThirdApplyId(String thirdApplyId) {
+        this.thirdApplyId = thirdApplyId;
+    }
 
     public String getReceiptNumber() {
         return receiptNumber;

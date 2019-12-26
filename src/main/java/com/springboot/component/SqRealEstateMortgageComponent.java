@@ -532,7 +532,6 @@ public class SqRealEstateMortgageComponent {
         respServiceDataList.add(respServiceData);
         sj_sjsq.setServiceDatas(respServiceDataList);
         sj_sjsq.setTransactionContractInfo(transactionContractInfo);
-
     }
 
 
@@ -635,7 +634,6 @@ public class SqRealEstateMortgageComponent {
         respServiceDataList.add(respServiceData);
         sj_sjsq.setServiceDatas(respServiceDataList);
         //respServiceDataList(sjInfoDyhtxx);
-
         }catch (Exception e){
             log.error("e"+e);
             e.getMessage();
