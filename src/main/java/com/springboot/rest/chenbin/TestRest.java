@@ -10,6 +10,7 @@ import com.springboot.entity.SJ_Fjfile;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.service.chenbin.other.ExchangeInterfaceService;
+import com.springboot.util.chenbin.Base64Util;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.IDUtil;
 import io.swagger.annotations.Api;
@@ -18,7 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
+import sun.misc.BASE64Decoder;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +50,26 @@ public class TestRest {
         Map<String,String> mapR = new HashMap<String,String>();
         mapR.put("sign","");
         mapR.put("data", JSONObject.toJSONString(map));
-        return outerBackFeign.test("哈哈哈");
+        BASE64Decoder base64Decoder = new BASE64Decoder();
+        try {
+            File file = new File("D:/file/test/222.pdf");
+            String paramreq = map.get("base64pdf")
+                    .replaceAll(" ","+");
+//            String paramreq = map.get("base64pdf");
+            System.out.println("base64:"+paramreq);
+//            Base64Util.base64StringToPdfForTax(paramreq,file);
+            Base64Util.base64StringToPDF(paramreq,file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ObjectRestResponse<String>().data("哈哈哈");
+    }
+
+    @RequestMapping(value = "testJson" , method = RequestMethod.POST)
+    public ObjectRestResponse<Object> testJson(@RequestBody Map map){
+        Map<String ,String> returnMap = new HashMap<String ,String>();
+        returnMap.put("sign","");
+        returnMap.put("data",JSONObject.toJSONString(map));
+        return new ObjectRestResponse<>().data(returnMap);
     }
 }

@@ -65,6 +65,8 @@ public class Sj_Info_Qsxx extends SJ_Information {
     private String bz;//备注
     @ApiModelProperty(value = "不动产单元号")
     private String bdcdyh;//不动产单元号
+    @ApiModelProperty(value = "电子税票BASE64")
+    private String dzspBase64;//电子税票base64
 
 
 
@@ -329,5 +331,13 @@ public class Sj_Info_Qsxx extends SJ_Information {
 
     public void setBdcdyh(String bdcdyh) {
         this.bdcdyh = bdcdyh;
+    }
+
+    public String getDzspBase64() {
+        return dzspBase64;
+    }
+
+    public void setDzspBase64(String dzspBase64) {
+        this.dzspBase64 = dzspBase64;
     }
 }

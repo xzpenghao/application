@@ -89,7 +89,7 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
             }
             log.info("税务处理返回，结果为:"+JSONObject.toJSONString(rv));
         } catch (Exception e){
-            log.error("税务通知异常，异常产生原因：" + e.getMessage());
+            log.error("税务通知异常，异常产生原因：" + ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("税务通知异常，异常产生原因：" + e.getMessage());
         } finally {
             //成功后由税务人员签收办件
@@ -138,6 +138,10 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
             sfxx.setReceiptNumber(taxRespBody.getReceiptNumber());
             sfxx.setDataComeFromMode("接口");
             sfxx.setDataJson(JSONObject.toJSONString(sfxx));
+            if(StringUtils.isNotBlank(sfxx.getDzspBase64())){
+                //处理电子税票
+
+            }
         }
         serviceData.setServiceCode("PayingTaxService");
         serviceData.setServiceDataInfos(sfxxList);
