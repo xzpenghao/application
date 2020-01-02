@@ -58,6 +58,8 @@ RealEstateMortgageComponent {
     private String obligeeDyqr;
     @Value("${glHouseBuyer.obligeeDyr}")
     private String obligeeDyr;
+    @Value("${glHouseBuyer.obligeeZwr}")
+    private String obligeeZwr;
     @Value("${glHouseBuyer.obligeeQlr}")
     private String obligeeQlr;
     @Value("${glHouseBuyer.obligeeYwr}")
@@ -643,6 +645,20 @@ RealEstateMortgageComponent {
             }
             mortgageBizInfo.setMortgageeAgentInfoVoList(dyqrWtdlrList);
         }
+        //抵押债务人信息
+        List<DyzwrGlMortgator> obligorInfoVoList=new ArrayList<>();
+        if (mortgageContractInfo.getGlObligorInfoVoList() != null && mortgageContractInfo.getGlObligorInfoVoList().size() != 0) {
+            for (SJ_Qlr_Gl zwr : mortgageContractInfo.getGlObligorInfoVoList()) {
+                DyzwrGlMortgator dyzwrGlMortgator = new DyzwrGlMortgator();
+                SJ_Qlr_Info relatedPerson = zwr.getRelatedPerson();
+                dyzwrGlMortgator.setObligorId(relatedPerson.getObligeeDocumentNumber());
+                dyzwrGlMortgator.setObligorIdType(getZjlbx(relatedPerson.getObligeeDocumentType()));
+                dyzwrGlMortgator.setObligorName(relatedPerson.getObligeeName());
+                obligorInfoVoList.add(dyzwrGlMortgator);
+            }
+            mortgageBizInfo.setObligorInfoVoList(obligorInfoVoList);
+        }
+
         //抵押人委托代理人
         List<WtdlrGlMortgator> dyrWtdlrList=new ArrayList<>();
         if (mortgageContractInfo.getGlMortgagorAgentInfoVoList() != null && mortgageContractInfo.getGlMortgagorAgentInfoVoList().size() != 0) {
@@ -753,6 +769,7 @@ RealEstateMortgageComponent {
             json="http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByDYZMH"+"?DYZMH="+dyzmh+"&containHistory="+containHistroy;
         }
         json=httpClientUtils.paramGet(json);
+        log.info("抵押证明号查询数据返回:"+json);
         JSONArray jsonArray = JSONArray.parseArray(json);
         List<MortgageService> mortgageServiceList = new ArrayList<>();
         if (jsonArray != null) {
@@ -784,7 +801,7 @@ RealEstateMortgageComponent {
                     if (null != GlMortgagorjsonArray && GlMortgagorjsonArray.size() != 0) {
                         for (int j = 0; j < GlMortgagorjsonArray.size(); j++) {
                             JSONObject glMortgagorObject = GlMortgagorjsonArray.getJSONObject(j);
-                            GlMortgagor glMortgagor = getGlMortgage(glMortgagorObject, obligeeDyqr);
+                            GlMortgagor glMortgagor = getGlMortgage(glMortgagorObject,obligeeDyr);
                             mortgageService.getGlMortgagorVoList().add(glMortgagor);
                         }
                     }
@@ -793,8 +810,17 @@ RealEstateMortgageComponent {
                     if (null != GlMortgageHolderjsonArray && GlMortgageHolderjsonArray.size() != 0) {
                         for (int z = 0; z < GlMortgageHolderjsonArray.size(); z++) {
                             JSONObject glMortgageHolderObject = GlMortgageHolderjsonArray.getJSONObject(z);
-                            GlMortgageHolder glMortgageHolder = getGlMortgageHolder(glMortgageHolderObject, obligeeDyr);
+                            GlMortgageHolder glMortgageHolder = getGlMortgageHolder(glMortgageHolderObject, obligeeDyqr);
                             mortgageService.getGlMortgageHolderVoList().add(glMortgageHolder);
+                        }
+                    }
+                    //债务人
+                    JSONArray ObligorInfoVojsonArray = (JSONArray) mortgageInfo.get("obligorInfoVoList");
+                    if (null != ObligorInfoVojsonArray && ObligorInfoVojsonArray.size() != 0) {
+                        for (int x = 0; x < ObligorInfoVojsonArray.size(); x++) {
+                            JSONObject obligorInfoVojsonArrayJSONObject = ObligorInfoVojsonArray.getJSONObject(x);
+                            ObligorInfoVo obligorInfoVo = getObligorInfoVo(obligorInfoVojsonArrayJSONObject, obligeeZwr);
+                            mortgageService.getGlObligorInfoVoList().add(obligorInfoVo);
                         }
                     }
                 }
@@ -1003,6 +1029,19 @@ RealEstateMortgageComponent {
         glMortgageHolder.setRelatedPerson(relatedPerson);
         return glMortgageHolder;
     }
+
+    private ObligorInfoVo getObligorInfoVo(JSONObject jsonObject, String obligeeType) {
+        ObligorInfoVo obligorInfoVo = new ObligorInfoVo();
+        obligorInfoVo.setObligeeName(jsonObject.getString("obligorName"));
+        obligorInfoVo.setObligeeType(obligeeType);
+        RelatedPerson relatedPerson = new RelatedPerson();
+        relatedPerson.setObligeeDocumentType(jsonObject.getString("obligorIdType"));
+        relatedPerson.setObligeeName(jsonObject.getString("obligorName"));
+        relatedPerson.setObligeeDocumentNumber(jsonObject.getString("obligorId"));
+        obligorInfoVo.setRelatedPerson(relatedPerson);
+        return obligorInfoVo;
+    }
+
 
 
 }

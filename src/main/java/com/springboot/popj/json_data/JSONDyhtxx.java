@@ -39,9 +39,18 @@ public class JSONDyhtxx implements Serializable {
     private String glMortgageHolderVoList;            //关联的抵押权人数据
     private String glMortgagorAgentInfoVoList;            //关联的抵押人代理人数据
     private String glMortgageeAgentInfoVoList;            //关联的抵押权人代理人数据
-
+    private String glObligorInfoVoList;                   //关联的债务人信息
     private String registrationSubclass;                       //登记小类
     private String registrationReason;                         //登记原因
+
+
+    public String getGlObligorInfoVoList() {
+        return glObligorInfoVoList;
+    }
+
+    public void setGlObligorInfoVoList(String glObligorInfoVoList) {
+        this.glObligorInfoVoList = glObligorInfoVoList;
+    }
 
     public String getInfoId() {
         return infoId;

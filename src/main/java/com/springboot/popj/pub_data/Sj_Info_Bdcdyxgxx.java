@@ -32,7 +32,15 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
     private List<SJ_Qlr_Gl> glMortgagorVoList;            //关联的抵押人数据
     private List<SJ_Qlr_Gl> glMortgageHolderVoList;            //关联的抵押权人数据
     private List<SJ_Qlr_Gl> glAgentInfoVoList;             //关联委托抵押人代理人数据
+    private List<SJ_Qlr_Gl> glObligorInfoVoList;                   //关联的债务人数据
 
+    public List<SJ_Qlr_Gl> getGlObligorInfoVoList() {
+        return glObligorInfoVoList;
+    }
+
+    public void setGlObligorInfoVoList(List<SJ_Qlr_Gl> glObligorInfoVoList) {
+        this.glObligorInfoVoList = glObligorInfoVoList;
+    }
 
     public List<SJ_Qlr_Gl> getGlAgentInfoVoList() {
         return glAgentInfoVoList;

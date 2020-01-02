@@ -96,8 +96,6 @@ public class SqRealEstateMortgageComponent {
     @Autowired
     private AnonymousInnerComponent anonymousInnerComponent;
     @Autowired
-    private HttpClientUtils httpClientUtils;
-    @Autowired
     private NetSignUtils netSignUtils;
 
 

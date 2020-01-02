@@ -195,11 +195,11 @@ public class SysPubDataDealUtil {
             String JSON_glImmovableVoList = dyxgxx.getGlImmovableVoList();//不动产json
             String JSON_glMortgagorVoList = dyxgxx.getGlMortgagorVoList();//抵押人json
             String JSON_glMortgageHolderVoList = dyxgxx.getGlMortgageHolderVoList();//抵押权人json
-
+            String JSON_glObligorInfoVoList=dyxgxx.getGlObligorInfoVoList(); //债务人
             dyxgxx.setGlImmovableVoList(null);
             dyxgxx.setGlMortgagorVoList(null);
             dyxgxx.setGlMortgageHolderVoList(null);
-
+            dyxgxx.setGlObligorInfoVoList(null);
             //反转出不动产抵押信息
             Sj_Info_Bdcdyxgxx sj_dyxgxx = JSON.parseObject(JSON.toJSONString(dyxgxx), Sj_Info_Bdcdyxgxx.class);
             baseSetting(sj_dyxgxx, serviceCode, sjsq.getReceiptNumber());
@@ -214,6 +214,12 @@ public class SysPubDataDealUtil {
              *  不动产抵押权人关联信息处理
              */
             List<SJ_Qlr_Gl> sj_dyqrgls = copyJSONQlrToSJQlr(JSON_glMortgageHolderVoList, BizOrBizExceptionConstant.IMMOVABLE_MORTGAGE_RECEIPT_SERVICE, BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_DYQR);
+
+            //债务人处理
+            if(StringUtils.isNotBlank(JSON_glObligorInfoVoList)) {
+                List<SJ_Qlr_Gl> sj_zwrgls = copyJSONQlrToSJQlr(JSON_glObligorInfoVoList, BizOrBizExceptionConstant.MORTGAGE_CONTRACT_RECEIPT_SERVICE, BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_ZWR);
+                sj_dyxgxx.setGlObligorInfoVoList(sj_zwrgls);
+            }
 
             /*
              *  不动产抵押人关联信息处理
@@ -295,9 +301,11 @@ public class SysPubDataDealUtil {
             String JSON_glMortgagorVoList = dyhtxx.getGlMortgagorVoList();//抵押人
             String JSON_glMortgageeAgentInfoVoList = dyhtxx.getGlMortgageeAgentInfoVoList();//抵押权代理人
             String JSON_glMortgagorAgentInfoVoList = dyhtxx.getGlMortgagorAgentInfoVoList();//抵押代理人
+            String JSON_glObligorInfoVoList=dyhtxx.getGlObligorInfoVoList(); //债务人
             dyhtxx.setGlMortgagorVoList(null);
             dyhtxx.setGlMortgageHolderVoList(null);
             dyhtxx.setGlImmovableVoList(null);
+            dyhtxx.setGlObligorInfoVoList(null);
             dyhtxx.setGlMortgageeAgentInfoVoList(null);
             dyhtxx.setGlMortgagorAgentInfoVoList(null);
             //反转出合同信息
@@ -313,6 +321,11 @@ public class SysPubDataDealUtil {
             if(StringUtils.isNotBlank(JSON_glMortgageeAgentInfoVoList)) {
                 List<SJ_Qlr_Gl> sj_dyqdlrgls = copyJSONQlrToSJQlr(JSON_glMortgageeAgentInfoVoList, BizOrBizExceptionConstant.MORTGAGE_CONTRACT_RECEIPT_SERVICE, BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_WTDYQRDLR);
                 sj_dyhtxx.setGlMortgageeAgentInfoVoList(sj_dyqdlrgls);
+            }
+            //债务人处理
+            if(StringUtils.isNotBlank(JSON_glMortgageeAgentInfoVoList)) {
+                List<SJ_Qlr_Gl> sj_zwrgls = copyJSONQlrToSJQlr(JSON_glObligorInfoVoList, BizOrBizExceptionConstant.MORTGAGE_CONTRACT_RECEIPT_SERVICE, BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_ZWR);
+                sj_dyhtxx.setGlObligorInfoVoList(sj_zwrgls);
             }
             //抵押代理人处理
             if(StringUtils.isNotBlank(JSON_glMortgagorAgentInfoVoList)) {

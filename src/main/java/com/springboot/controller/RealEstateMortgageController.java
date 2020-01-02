@@ -17,9 +17,13 @@ import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.ParseException;
 
@@ -65,8 +69,17 @@ public class RealEstateMortgageController {
 
     @RequestMapping(value = "/getRealEstateMortgage", method = RequestMethod.POST)
     @ApiOperation("不动产抵押信息")
-    public ObjectRestResponse getRealEstateMortgage(@RequestParam(value = "dyzmh") String dyzmh, @RequestParam(value = "qlrmc", required = false) String qlrmc) throws Exception {
-        System.out.println(dyzmh);
+    public ObjectRestResponse getRealEstateMortgage(HttpServletRequest request) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
+        StringBuffer sb=new StringBuffer();
+        String s=null;
+        while((s=br.readLine())!=null){
+            sb.append(s);
+        }
+        com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject((sb.toString()));
+        String dyzmh = jsonObject.getString("dyzmh");
+        String qlrmc = jsonObject.getString("qlrmc");
+//        @RequestParam String dyzmh, @RequestParam(value = "qlrmc", required = false) String qlrmc,
         return realEstateMortgageComponent.getRealEstateMortgage(dyzmh, qlrmc, false);
     }
 

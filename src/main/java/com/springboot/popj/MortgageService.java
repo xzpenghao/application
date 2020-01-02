@@ -23,8 +23,17 @@ public class MortgageService {
     private String dataType;//数据类型
     private String dataComeFromMode;//获取方式
     private List<GlImmovable> glImmovableVoList=new ArrayList<>();//不动产房信息
-    private List<GlMortgagor> glMortgagorVoList=new ArrayList<>();//抵押人信息
-    private List<GlMortgageHolder> glMortgageHolderVoList=new ArrayList<>();//银行信息
+    private List<GlMortgagor> glMortgagorVoList=new ArrayList<>();//抵押权人信息
+    private List<GlMortgageHolder> glMortgageHolderVoList=new ArrayList<>();//抵押人信息
+    private List<ObligorInfoVo> glObligorInfoVoList=new ArrayList<>();//债务人信息
+
+    public List<ObligorInfoVo> getGlObligorInfoVoList() {
+        return glObligorInfoVoList;
+    }
+
+    public void setGlObligorInfoVoList(List<ObligorInfoVo> glObligorInfoVoList) {
+        this.glObligorInfoVoList = glObligorInfoVoList;
+    }
 
     public List<GlMortgageHolder> getGlMortgageHolderVoList() {
         return glMortgageHolderVoList;

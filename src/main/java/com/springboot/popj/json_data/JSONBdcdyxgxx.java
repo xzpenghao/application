@@ -1,11 +1,13 @@
 package com.springboot.popj.json_data;
 
+import com.springboot.popj.pub_data.SJ_Qlr_Gl;
 import com.springboot.util.TimeUtil;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 public class JSONBdcdyxgxx implements Serializable {
     private String infoId;                          //主键
@@ -39,6 +41,15 @@ public class JSONBdcdyxgxx implements Serializable {
     private String glImmovableVoList;          //关联的不动产数据
     private String glMortgagorVoList;          //关联的抵押人数据
     private String glMortgageHolderVoList;     //关联的抵押权人数据
+    private String glObligorInfoVoList;                   //关联的债务人数据
+
+    public String getGlObligorInfoVoList() {
+        return glObligorInfoVoList;
+    }
+
+    public void setGlObligorInfoVoList(String glObligorInfoVoList) {
+        this.glObligorInfoVoList = glObligorInfoVoList;
+    }
 
     public String getInfoId() {
         return infoId;

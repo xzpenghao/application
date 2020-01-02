@@ -945,6 +945,7 @@ public class AnonymousInnerComponent {
         List<com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.RealEstateUnitInfoVo> realEstateUnitInfoVoList=new ArrayList<>();
         List<MortgagorInfoVo> mortgagorInfoVoList=new ArrayList<>();
         List<MortgageeInfoVo> mortgageeInfoVoList=new ArrayList<>();
+        List<com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.ObligorInfoVo> obligorInfoVoList=new ArrayList<>();
         RealEstateInfoVo realEstateInfoVo = new RealEstateInfoVo();
         for (MortgageService mortgageService:
                 mortgageServiceList ) {
@@ -975,6 +976,18 @@ public class AnonymousInnerComponent {
                 mortgageeInfoVo.setMortgageeId(glMortgageHolder.getRelatedPerson().getObligeeDocumentNumber());
                 mortgageeInfoVo.setMortgageeIdType(MortgagorPtypeEnum.Sc(glMortgageHolder.getRelatedPerson().getObligeeDocumentType()));
                 mortgageeInfoVoList.add(mortgageeInfoVo);
+            }
+            resultNoticeReqVo.setMortgageeInfoVoList(mortgageeInfoVoList);
+            List<ObligorInfoVo> glObligorInfoVoList=mortgageService.getGlObligorInfoVoList();
+            if (null != glImmovableList && glImmovableList.size()>0){
+                for (ObligorInfoVo obligorInfo:glObligorInfoVoList){
+                    com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.ObligorInfoVo obligorInfoVo=new com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.ObligorInfoVo();
+                    obligorInfoVo.setObligorName(obligorInfo.getObligeeName());
+                    obligorInfoVo.setObligorId(obligorInfo.getRelatedPerson().getObligeeDocumentNumber());
+                    obligorInfoVo.setObligorIdType(MortgagorPtypeEnum.Sc(obligorInfo.getRelatedPerson().getObligeeDocumentType()));
+                    obligorInfoVoList.add(obligorInfoVo);
+                }
+                resultNoticeReqVo.setObligorInfoVoList(obligorInfoVoList);
             }
             resultNoticeReqVo.setMortgageeInfoVoList(mortgageeInfoVoList);
         }
