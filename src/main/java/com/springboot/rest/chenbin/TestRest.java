@@ -53,12 +53,12 @@ public class TestRest {
         BASE64Decoder base64Decoder = new BASE64Decoder();
         try {
             File file = new File("D:/file/test/222.pdf");
-            String paramreq = map.get("base64pdf")
-                    .replaceAll(" ","+");
+            String paramreq = map.get("base64pdf");
+//                    .replaceAll(" ","+");
 //            String paramreq = map.get("base64pdf");
             System.out.println("base64:"+paramreq);
-//            Base64Util.base64StringToPdfForTax(paramreq,file);
-            Base64Util.base64StringToPDF(paramreq,file);
+            Base64Util.base64StringToPdfForTax(paramreq,file);
+//            Base64Util.base64StringToPDF(paramreq,file);
         } catch (IOException e) {
             e.printStackTrace();
         }
