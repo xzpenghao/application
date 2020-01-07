@@ -28,6 +28,7 @@ public class BdcFTPDownloadComponent {
         }
         byte imgs[] = baos.toByteArray();
         log.info("imgs"+imgs.toString());
+        baos.close();
         return imgs;
     }
 
@@ -68,6 +69,7 @@ public class BdcFTPDownloadComponent {
             log.info("走到指定文件");
             bytes = is2byte(is);
             log.info("aaa"+bytes.toString());
+            is.close();
             return bytes;
         } catch (IOException e) {
             e.printStackTrace();
