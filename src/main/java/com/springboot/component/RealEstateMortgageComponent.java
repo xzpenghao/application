@@ -686,11 +686,13 @@ RealEstateMortgageComponent {
                     if (bdcqlxgxx.getGlImmovableVoList() != null && bdcqlxgxx.getGlImmovableVoList().size() != 0) {
                         for (SJ_Bdc_Gl bdc_gl : bdcqlxgxx.getGlImmovableVoList()) {
                             RealEstateUnitInfo realEstateUnitInfo = new RealEstateUnitInfo();
-                            realEstateUnitInfo.setHouseholdId(bdc_gl.getFwInfo().getHouseholdId());
-                            realEstateUnitInfo.setRealEstateUnitId(bdc_gl.getFwInfo().getImmovableUnitNumber());
-                            log.info("不动产单元号"+realEstateUnitInfo.getRealEstateUnitId());
-                            realEstateUnitInfo.setSit(bdc_gl.getFwInfo().getHouseLocation());
-                            realEstateUnitInfoList.add(realEstateUnitInfo);
+                            if(bdc_gl.getImmovableType().equals("房地")) {
+                                realEstateUnitInfo.setHouseholdId(bdc_gl.getFwInfo().getHouseholdId());
+                                realEstateUnitInfo.setRealEstateUnitId(bdc_gl.getFwInfo().getImmovableUnitNumber());
+                                log.info("不动产单元号" + realEstateUnitInfo.getRealEstateUnitId());
+                                realEstateUnitInfo.setSit(bdc_gl.getFwInfo().getHouseLocation());
+                                realEstateUnitInfoList.add(realEstateUnitInfo);
+                            }
                         }
                     }
                     realEstateInfo.setRealEstateUnitInfoVoList(realEstateUnitInfoList);

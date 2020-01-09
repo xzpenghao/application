@@ -1,5 +1,7 @@
 package com.springboot.service.chenbin;
 
+import com.springboot.entity.chenbin.personnel.bdc.SynNewEcertEntity;
+import com.springboot.entity.chenbin.personnel.bdc.SynNewEcertsReqEntity;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
@@ -20,4 +22,5 @@ public interface ExchangeToInnerService {
     List<SJ_Info_Bdcqlxgxx> getBdcQlInfoWithItsRights(ParametricData parametricData);
 
     List<SJ_Sjsq_User_Ext> getBdcUsers(String pid);
+    List<SynNewEcertEntity> dealPostEcerts(SynNewEcertsReqEntity ecertReq);
 }

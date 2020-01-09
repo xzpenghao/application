@@ -1,11 +1,13 @@
 package com.springboot.component.chenbin.file;
 
 import com.alibaba.fastjson.JSONObject;
+import com.springboot.component.BdcFTPDownloadComponent;
 import com.springboot.entity.SJ_Fjfile;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +24,46 @@ public class FromFTPDownloadComponent {
     private String ftpUsername;
     @Value("${webplus.ftpPassword}")
     private String ftpPassword;
+
+    @Value("${webplus.ftpAddressBdc}")
+    private String ftpAddressBdc;
+    @Value("${webplus.ftpPortBdc}")
+    private String ftpPortBdc;
+    @Value("${webplus.ftpUsernameBdc}")
+    private String ftpUsernameBdc;
+    @Value("${webplus.ftpPasswordBdc}")
+    private String ftpPasswordBdc;
+
+    @Autowired
+    private BdcFTPDownloadComponent bdcFTPDownloadComponent;
+
+    public byte[] downloadFile(String ftpPath,String from_){
+        String address = ftpAddress;
+        String port = ftpPort;
+        String username = ftpUsername;
+        String password = ftpPassword;
+        if(from_!=null && "bdc".equals(from_)){
+            address = ftpAddressBdc;
+            port = ftpPortBdc;
+            username = ftpUsernameBdc;
+            password = ftpPasswordBdc;
+        }
+        String path = "";
+        String fileName = "";
+        if(ftpPath.contains("\\"))
+            ftpPath = ftpPath.replaceAll("\\\\","/");
+        if(!ftpPath.startsWith("/"))
+            ftpPath = "/"+ftpPath;
+        if(ftpPath.lastIndexOf("/")>0) {
+            path = ftpPath.substring(0, ftpPath.lastIndexOf("/"));
+            fileName = ftpPath.substring(ftpPath.lastIndexOf("/")+1);
+        }else if(ftpPath.length()>1){
+            fileName = ftpPath.substring(1);
+        }
+        System.out.println("FTP path: "+path);
+        System.out.println("fileName: "+fileName);
+        return bdcFTPDownloadComponent.downFile(path,fileName,null , address, port, username, password);
+    }
 
     public boolean downFile(String remotePath, String fileName, SJ_Fjfile fj) {
         boolean success = false;

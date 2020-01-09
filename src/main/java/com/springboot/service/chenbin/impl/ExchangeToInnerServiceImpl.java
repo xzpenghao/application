@@ -5,13 +5,21 @@ import com.alibaba.fastjson.JSONObject;
 import com.springboot.component.chenbin.ExchangeToInnerComponent;
 import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.component.chenbin.OtherComponent;
+import com.springboot.component.chenbin.file.FileHandleComponent;
+import com.springboot.component.chenbin.file.FromFTPDownloadComponent;
+import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.constant.chenbin.BusinessConstant;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.chenbin.personnel.bdc.SynNewEcertEntity;
+import com.springboot.entity.chenbin.personnel.bdc.SynNewEcertInfoEntity;
+import com.springboot.entity.chenbin.personnel.bdc.SynNewEcertsReqEntity;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphCfxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphDyxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
+import com.springboot.entity.chenbin.personnel.resp.BDCInterfaceResp;
 import com.springboot.feign.ForImmovableFeign;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.*;
@@ -19,20 +27,20 @@ import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.registration.*;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.service.chenbin.ExchangeToInnerService;
+import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service("exchangeToInnerService")
@@ -46,6 +54,12 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private ForImmovableFeign immovableFeign;
     @Autowired
     private ExchangeToInnerComponent exchangeToInnerComponent;
+    @Autowired
+    private FromFTPDownloadComponent fromFTPDownloadComponent;
+    @Autowired
+    private ToFTPUploadComponent toFTPUploadComponent;
+    @Autowired
+    private FileHandleComponent fileHandleComponent;
     @Autowired
     private OuterBackFeign backFeign;
 
@@ -258,6 +272,106 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         return bdcUsers;
     }
 
+    @Override
+    public List<SynNewEcertEntity> dealPostEcerts(SynNewEcertsReqEntity ecertReq) {
+        List<SynNewEcertEntity> ecerts = null;
+        if(ecertReq!=null){
+            boolean doesUseFTP = ecertReq.getFileDealModel();
+            List<String> slbhs = ecertReq.getRegistNumbers();
+            Map<String,List<String>> req = new HashMap<String,List<String>>();
+            req.put("prjidList",slbhs);
+            BDCInterfaceResp<List<SynNewEcertEntity>> resp = immovableFeign.postECerts(req);
+            if(resp!=null){
+                if(resp.getCode().equals("200")){
+                    if(resp.getData()!=null){
+                        ecerts = resp.getData();
+                        for(SynNewEcertEntity ecert:ecerts){
+                            if(doesUseFTP){//FTP保存附件
+                                ecert.setElecLicenseInfoList(dealECertWithFtp(ecert.getElecLicenseInfoList()));
+                            }else{//本地保存附件
+                                ecert.setElecLicenseInfoList(dealECertWithoutFtp(ecertReq.getLocalPath(),ecert.getElecLicenseInfoList()));
+                            }
+                        }
+                    }
+                }else {
+                    throw new ZtgeoBizException("电子证照获取失败，原因：" + resp.getMessage());
+                }
+            }else{
+                throw new ZtgeoBizException("电子证照获取出现异常，不动产侧返回null");
+            }
+        }
+        return ecerts;
+    }
+
+    public List<SynNewEcertInfoEntity> dealECertWithFtp(List<SynNewEcertInfoEntity> elecLicenseInfoList){
+        List<SynNewEcertInfoEntity> elecLicenseInfoList_ = new ArrayList<SynNewEcertInfoEntity>();
+        for(SynNewEcertInfoEntity elecLicenseInfo:elecLicenseInfoList){
+            elecLicenseInfo.setCertificateType(getCertificateTypeMapper(elecLicenseInfo.getCertificateType()));
+            if(isDealFtp){//使用不同FTP
+                byte[] bytes = fromFTPDownloadComponent.downloadFile(elecLicenseInfo.getFtpPath(),"bdc");
+                if(bytes!=null){
+                    String date = TimeUtil.getDateString(new Date());
+                    String path = "/"+date.substring(0,4)+"/"+date.substring(5,7)+"/"+date.substring(8);
+                    String fileName = UUID.randomUUID().toString().substring(0,10).toUpperCase()+elecLicenseInfo.getFtpPath().substring(elecLicenseInfo.getFtpPath().lastIndexOf("/")+1);
+                    String ftpPath = toFTPUploadComponent.ycslUpload(
+                            bytes,
+                            path,
+                            fileName,
+                            "ycsl"
+                    );
+                    elecLicenseInfo.setFtpPath(StringUtils.isNotBlank(ftpPath)?ftpPath.replaceAll("/","\\\\"):(path+"/"+fileName).replaceAll("/","\\\\"));
+                }else{
+                    throw new ZtgeoBizException("不动产FTP上未发现给出的“"+elecLicenseInfo.getFtpPath()+"”文件");
+                }
+            }else{
+                elecLicenseInfo.setFtpPath(elecLicenseInfo.getFtpPath().replaceAll("/","\\\\"));
+            }
+            elecLicenseInfo.setUseFtp(true);
+            System.out.println("处理后FTP path: "+elecLicenseInfo.getFtpPath());
+            elecLicenseInfoList_.add(elecLicenseInfo);
+        }
+        return elecLicenseInfoList_;
+    }
+
+    public List<SynNewEcertInfoEntity> dealECertWithoutFtp(String localPath,List<SynNewEcertInfoEntity> elecLicenseInfoList){
+        List<SynNewEcertInfoEntity> elecLicenseInfoList_ = new ArrayList<SynNewEcertInfoEntity>();
+        for(SynNewEcertInfoEntity elecLicenseInfo:elecLicenseInfoList){
+            elecLicenseInfo.setCertificateType(getCertificateTypeMapper(elecLicenseInfo.getCertificateType()));
+            byte[] bytes = fromFTPDownloadComponent.downloadFile(elecLicenseInfo.getFtpPath(),"bdc");
+            if(bytes!=null) {
+                try {
+                    elecLicenseInfo.setFtpPath(
+                            fileHandleComponent.uploadBytesToFileLocal(
+                                    localPath,
+                                    UUID.randomUUID().toString().substring(0, 10).toUpperCase() + elecLicenseInfo.getFtpPath().substring(elecLicenseInfo.getFtpPath().lastIndexOf("/") + 1),
+                                    bytes
+                            ).replaceAll("/", "\\\\")
+                    );
+                } catch (IOException oie) {
+                    log.error("下载电子证书并保存为保存本地文件时出现异常，异常信息为：" + ErrorDealUtil.getErrorInfo(oie));
+                }
+            } else {
+                throw new ZtgeoBizException("不动产FTP上未发现给出的“"+elecLicenseInfo.getFtpPath()+"”文件");
+            }
+            elecLicenseInfoList_.add(elecLicenseInfo);
+        }
+        return elecLicenseInfoList_;
+    }
+
+    public String getCertificateTypeMapper (String certificateType){
+        String certificateType_ = "";
+        switch (certificateType){
+            case "BDCZH":
+                certificateType_ = BusinessConstant.DIC_ECERT_TYPE_FWQZ;
+                break;
+            case "DYZMH":
+                certificateType_ = BusinessConstant.DIC_ECERT_TYPE_DYZM;
+                break;
+            default:
+                throw new ZtgeoBizException("未定义的不动产证书类型");
+        }
+        return certificateType_;
+    }
 
     public String handleCreateFlow(String token,SJ_Sjsq sjsq,RegistrationBureau registrationBureau,boolean dealFile){
         Map<String,String> params = new HashMap<String,String>();

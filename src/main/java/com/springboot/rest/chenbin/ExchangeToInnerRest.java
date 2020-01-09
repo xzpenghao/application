@@ -2,6 +2,8 @@ package com.springboot.rest.chenbin;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.entity.chenbin.personnel.bdc.SynNewEcertEntity;
+import com.springboot.entity.chenbin.personnel.bdc.SynNewEcertsReqEntity;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
@@ -147,5 +149,11 @@ public class ExchangeToInnerRest {
             throw new ZtgeoBizException("未知异常:"+e.getMessage());
         }
         return new ObjectRestResponse<List<SJ_Sjsq_User_Ext>>().data(SJSjsqUserExts);
+    }
+
+    @RequestMapping(value = "postEcerts",method = RequestMethod.POST)
+    public ObjectRestResponse<List<SynNewEcertEntity>> getEcerts(@RequestBody SynNewEcertsReqEntity ecertReq){
+        log.info("获取不动产电子证照");
+        return new ObjectRestResponse<List<SynNewEcertEntity>>().data(exchangeToInnerService.dealPostEcerts(ecertReq));
     }
 }

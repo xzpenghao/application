@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.Msgagger;
+import com.springboot.config.ZtgeoBizException;
 import com.springboot.popj.parallel_sectors.ImmovableMortgageInquiryInformation;
 import com.springboot.popj.parallel_sectors.ImmovableRightInquiryInformation;
 import com.springboot.popj.pub_data.SJ_Qlr_Info;
@@ -58,11 +59,16 @@ public class ParallelSectorsComponent {
                    "&obligeeId="+parametricData.getObligeeId());
        }else if (StringUtils.isNotEmpty(parametricData.getBdczh())){
             json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh());
-               }
+        }
         if (StringUtils.isEmpty(json)){
             resultRV.setStatus(20500);
             resultRV.setMessage(Msgagger.DATA_FAILURE);
             return resultRV;
+        }else{
+            JSONArray jsonArray = JSONArray.parseArray(json);
+            if(jsonArray==null || jsonArray.size()<1){
+                throw new ZtgeoBizException("未查询到有效权属信息");
+            }
         }
         return resultRV.data(getRealPropertySj(json));
     }

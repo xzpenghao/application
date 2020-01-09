@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.util.DateUtils;
 import com.springboot.util.StrUtil;
+import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.IDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -192,6 +195,27 @@ public class ToFTPUploadComponent {
         System.out.println("将要上传的地址为：" + ftpPath + "，附件大小为：" + input.length);
         ByteArrayInputStream bais = new ByteArrayInputStream(input);
         return uploadFile(ftpPath, bais);
+    }
+
+    public String ycslUpload(byte[] bytes, String path, String fileName, String from_){
+        String address = yftpAddress;
+        String port = yftpPort;
+        String username = yftpUsername;
+        String password = yftpPassword;
+        if(from_!=null && "bdc".equals(from_)){
+            address = ftpAddress;
+            port = ftpPort;
+            username = ftpUsername;
+            password = ftpPassword;
+        }
+        Object r = ycslUpload(
+                bytes,fileName,fileName.contains(".")?fileName.substring(fileName.lastIndexOf(".")):"",path,
+                address,port,username,password
+        );
+        if(r==null){
+            throw new ZtgeoBizException("电子证书上传失败");
+        }
+        return path+"/"+fileName;
     }
 
     public Object ycslUpload(byte[] bytes, String fileName, String Type,String path,String yftpAddress,String yftpPort,String yftpUsername,String yftpPassword) {
