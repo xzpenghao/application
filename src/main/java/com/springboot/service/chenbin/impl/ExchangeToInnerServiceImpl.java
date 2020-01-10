@@ -364,6 +364,9 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
             case "BDCZH":
                 certificateType_ = BusinessConstant.DIC_ECERT_TYPE_FWQZ;
                 break;
+            case "YGZMH":
+                certificateType_ = BusinessConstant.DIC_ECERT_TYPE_YGZM;
+                break;
             case "DYZMH":
                 certificateType_ = BusinessConstant.DIC_ECERT_TYPE_DYZM;
                 break;
