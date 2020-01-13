@@ -19,7 +19,6 @@ import com.springboot.mapper.ExceptionRecordMapper;
 import com.springboot.popj.*;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.HttpRequestMethedEnum;
-import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.util.DateUtils;
@@ -95,8 +94,6 @@ public class AnonymousInnerComponent {
     private String gxftpUsername;
     @Value("${sq.gxpt.ftpPassword}")
     private String gxftpPassword;
-    @Value("${sq.bank.orgId}")
-    private String orgId;
     @Value("${webplus.ftpAddress}")
     private String yftpAddress;
     @Value("${webplus.ftpPort}")
@@ -110,6 +107,8 @@ public class AnonymousInnerComponent {
     private String jtIp;
     @Value("${sq.bank.jt.post}")
     private String jtPost;
+    @Value("${sq.bank.jt.notice_url}")
+    private String noticeUrl;
     @Value("${penghao.transferholdmap}")
     private boolean transferHoldmap;
 
@@ -695,16 +694,28 @@ public class AnonymousInnerComponent {
                         respServiceData.setServiceDataInfos(handleResultVoList);
                         log.info("resultServiceData2:\n"+respServiceData.getServiceDataInfos());
                         if (StringUtils.isNotEmpty(name)){
+                            String yhOrgId="";
                                 //如果多家银行介入进来需要判断抵押权人信息
                                 log.info("抵押注销通知进来了");
+                                String url="";
                                 List<MortgageService> mortgageServiceList = resultServiceData.getServiceDataInfos();
                                 ResultNoticeReqVo resultNoticeReqVo = new ResultNoticeReqVo();
                                 resultNoticeReqVo.setBusinessId(getReceiving.getSlbh());
-                                ClNotice(resultNoticeReqVo, "REVOKE_REGISTER",Msgagger.DENGBU,orgId);
+                                ClNotice(resultNoticeReqVo, "REVOKE_REGISTER",Msgagger.DENGBU);
                                 ClDdyxxNotice(mortgageServiceList, resultNoticeReqVo);
+                                if (null != resultNoticeReqVo.getMortgageeInfoVoList() && resultNoticeReqVo.getMortgageeInfoVoList().size()>0){
+                                    List<MortgageeInfoVo> mortgageeInfoVoList =resultNoticeReqVo.getMortgageeInfoVoList();
+                                    for (MortgageeInfoVo mortgagee: mortgageeInfoVoList) {
+                                        if (mortgagee.getMortgageeName().contains("交通银行")){
+                                            yhOrgId= Msgagger.SQ_JT_ORGID; //orgId
+                                            url=noticeUrl; //通知url针对的是宿迁交通银行
+                                        }
+                                    }
+                                    resultNoticeReqVo.setOrgId(yhOrgId);
+                                }
                                 JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
                                 log.info("bankObject"+bankObject.toString());
-                                String resultJson= BankNotification(bankObject,"JSRCIS/sq/sqResultNotice.do");
+                               String resultJson= BankNotification(bankObject,url);
                                 log.info("银行返回json"+resultJson);
                         }
                         respServiceDataList.add(respServiceData);
@@ -716,6 +727,7 @@ public class AnonymousInnerComponent {
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
                     } else if (getReceiving.getMessageType().equals(Msgagger.PROCESSING)) {//缮证
                         log.info("缮证");
+                        String url="";
                         map.put("slbh", getReceiving.getSlbh());
                         String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
                         log.info("szJson"+json);
@@ -739,6 +751,7 @@ public class AnonymousInnerComponent {
                         List<MortgagorInfoVo> mortgagorInfoVoList=new ArrayList<>();
                         List<MortgageeInfoVo> mortgageeInfoVoList=new ArrayList<>();
                         ResultNoticeReqVo dyResultNotice=null;
+                        String yhOrgId="";
                         if (resultNoticeReqVoList.size()>1){
                             Iterator<ResultNoticeReqVo> iterator = resultNoticeReqVoList.iterator();
                             while (iterator.hasNext()) {
@@ -747,11 +760,19 @@ public class AnonymousInnerComponent {
                                 if (null != resultNoticeReqVo.getWarrantId() && !resultNoticeReqVo.getWarrantId().equals("")) {
                                     mortgagorInfoVoList = resultNoticeReqVo.getMortgagorInfoVoList();
                                     mortgageeInfoVoList = resultNoticeReqVo.getMortgageeInfoVoList();
+                                    if (null != mortgageeInfoVoList && mortgageeInfoVoList.size()>0){
+                                        for (MortgageeInfoVo mortgagee:mortgageeInfoVoList) {
+                                            if (mortgagee.getMortgageeName().contains("交通银行")){
+                                                yhOrgId=Msgagger.SQ_JT_ORGID;
+                                                url=noticeUrl;
+                                            }
+                                        }
+                                    }
                                     dyResultNotice = resultNoticeReqVo;
                                     iterator.remove();
                                 }
                             }
-                            log.info("3");
+                        resultNoticeReqVoList.get(0).setOrgId(yhOrgId);
                         resultNoticeReqVoList.get(0).setMortgagorInfoVoList(mortgagorInfoVoList);
                         resultNoticeReqVoList.get(0).setMortgageeInfoVoList(mortgageeInfoVoList);
                         resultNoticeReqVoList.get(0).setMortagageLandArea(dyResultNotice.getMortagageLandArea());
@@ -759,8 +780,19 @@ public class AnonymousInnerComponent {
                         resultNoticeReqVoList.get(0).setWarrantId(dyResultNotice.getWarrantId());
                         resultNoticeReqVoList.get(0).setCreditAmount(dyResultNotice.getCreditAmount());
                         resultNoticeReqVoList.get(0).setMortgageTerm(dyResultNotice.getMortgageTerm());
+                        }else {
+                            if (null != resultNoticeReqVoList && resultNoticeReqVoList.size()>0){
+                                List<MortgageeInfoVo> mortgageeList =resultNoticeReqVoList.get(0).getMortgageeInfoVoList();
+                                for (MortgageeInfoVo mortgagee: mortgageeList) {
+                                    if (mortgagee.getMortgageeName().contains("交通银行")){
+                                        yhOrgId=Msgagger.SQ_JT_ORGID;
+                                        url=noticeUrl;
+                                    }
+                                }
+                                resultNoticeReqVoList.get(0).setOrgId(yhOrgId);
+                            }
                         }
-                        log.info("resultNoticeReqVoList"+resultNoticeReqVoList.get(0).toString());
+                        log.info("resultNoticeReqVoList{}"+resultNoticeReqVoList.get(0).toString());
                         //获取附件信息
                         List<String> stringList=new ArrayList<>();
                         stringList.add(itemName);
@@ -794,7 +826,7 @@ public class AnonymousInnerComponent {
                         log.info("开始整理数据");
                         bankObject=JSONObject.fromObject(resultNoticeReqVoList.get(0));
                         log.info("bankObject"+bankObject.toString());
-                        String resultJson= BankNotification(bankObject,"JSRCIS/sq/sqResultNotice.do");
+                        String resultJson= BankNotification(bankObject,url);
                         log.info("resultJson"+resultJson);
                         return resultJson;
                     }
@@ -875,27 +907,34 @@ public class AnonymousInnerComponent {
                 log.info("resultRV"+resultRV.getData());
                 List<MortgageService> mortgageServiceList = (List<MortgageService>) resultRV.getData();
                 //处理抵押
-                ClNotice(resultNoticeReqVo,"MORTGAGE_REGISTER",Msgagger.SHANZHENG,orgId);
+                ClNotice(resultNoticeReqVo,"MORTGAGE_REGISTER",Msgagger.SHANZHENG);
                 ClDdyxxNotice(mortgageServiceList,resultNoticeReqVo);
                 break;
             case "YGZMH":
                 resultRV = realEstateMortgageComponent.getMortgageCancellation(certificateId);
                 List<RealPropertyCertificate> realPropertyCertificateList = (List<RealPropertyCertificate>) resultRV.getData();
-                ClNotice(resultNoticeReqVo,"MORTGAGE_REGISTER",Msgagger.SHANZHENG,orgId);
+                ClNotice(resultNoticeReqVo,"MORTGAGE_REGISTER",Msgagger.SHANZHENG);
                 ClYgxxNotice(realPropertyCertificateList,resultNoticeReqVo,certificateId);
                 break;
         }
         return  resultNoticeReqVo;
     }
 
-    private void ClNotice(ResultNoticeReqVo resultNoticeReqVo,String Type,String businessNodeName,String orgId){
+    /**
+     * 通知银行
+     * @param resultNoticeReqVo
+     * @param Type
+     * @param businessNodeName
+     * @param
+     * @param
+     */
+    private void ClNotice(ResultNoticeReqVo resultNoticeReqVo,String Type,String businessNodeName){
         resultNoticeReqVo.setBusinessStatus("ACEPTE_SUCESS");
         resultNoticeReqVo.setBusinessType(Type);//MORTGAGE_PERSONAL
         resultNoticeReqVo.setBusinessNodeCode("1");//业务节点编码
         resultNoticeReqVo.setBusinessNodeName(businessNodeName);//业务节点名称
         resultNoticeReqVo.setCompletionTime(DateUtils.dateString(new Date(),"yyyy-MM-dd HH:mm:ss"));
         resultNoticeReqVo.setCharset("UTF-8");
-        resultNoticeReqVo.setOrgId(orgId);//宿迁交通银行固定值
         resultNoticeReqVo.setVersion("1.0.0");
         resultNoticeReqVo.setReqDate(DateUtils.dateString(new Date(),"yyyy-MM-dd HH:mm:ss"));
         resultNoticeReqVo.setReqUniqueNo(IDUtil.getExceptionId());

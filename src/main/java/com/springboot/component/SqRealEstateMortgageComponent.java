@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.jandex.Index;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -62,6 +63,15 @@ public class SqRealEstateMortgageComponent {
     private String ip;
     @Value("${sq.jyht.post}")
     private String post;
+    @Value("${sq.jyht.spf.api_id}")
+    private String jySpfApiId;
+    @Value("${sq.jyht.spf.from_user}")
+    private String jySpfFromUser;
+    @Value("${sq.jyht.spf.ip}")
+    private String jySpfIp;
+    @Value("${sq.jyht.spf.post}")
+    private String jySpfPost;
+
     @Value("${sq.qsxx.swjgdm}")
     private String swjgdm;
     @Value("${sq.qsxx.swrydm}")
@@ -827,26 +837,57 @@ public class SqRealEstateMortgageComponent {
         return resultRV.data(qsxxList);
     }
 
-
-
     /**
      * 二手房交易合同处理
      * @param paramEntity
      * @return
      */
     public ObjectRestResponse sqTransactionContract(ParamEntity paramEntity) throws IOException {
-        ObjectRestResponse resultRV = new ObjectRestResponse();
         paramEntity.setOrgId(1);
         String param= com.alibaba.fastjson.JSONObject.toJSONString(paramEntity, SerializerFeature.PrettyFormat);
-        List<BusinessContract> businessContractList=new ArrayList<>();
         String resultJosn=HttpClientUtil.post(jyfromUser,jyapiId,param,"http://"+ip+":"+post+"/sqservice/sh/secondInfo");
+        return ClHtxx(resultJosn);
+    }
+
+    /**
+     * 一手房交易合同处理
+     * @param paramEntity
+     * @return
+     */
+    public ObjectRestResponse spfTransactionContract(ParamEntity paramEntity) throws IOException {
+        paramEntity.setOrgId(1);
+        String param= com.alibaba.fastjson.JSONObject.toJSONString(paramEntity, SerializerFeature.PrettyFormat);
+//        String resultJosn=HttpClientUtil.post(jySpfFromUser,jySpfApiId,param,"http://"+jySpfIp+":"+jySpfPost+"/sqservice/sh/firstInfo");
+        String resultJosn="{\n" +
+                "    \"dataInfo\": {\n" +
+                "        \"sInfo\": \"[{\\\"BDCDYH\\\":null,\\\"DJ\\\":2957.72,\\\"DLMC\\\":null,\\\"DZHTFullUrl\\\":\\\"http://222.187.193.194:8053/sqfc/docx/TNAV?action=runtime.Preview&tmpid=3&docid=13085929&syflag=1\\\",\\\"FWCX\\\":null,\\\"FWDY\\\":null,\\\"FWDZ\\\":\\\"宿城区隆城颐和2#1806\\\",\\\"FWFH\\\":\\\"1806\\\",\\\"FWJG\\\":\\\"钢混\\\",\\\"FWLX\\\":null,\\\"FWQDSJ\\\":null,\\\"FWXZ\\\":\\\"动迁房\\\",\\\"FWYT\\\":\\\"住宅\\\",\\\"FWZH\\\":1,\\\"GMFDHHM\\\":\\\"13812301110\\\",\\\"GMFDZ\\\":\\\"宿迁市宿城区隆城颐和2栋1806\\\",\\\"GMFGJ\\\":\\\"中国\\\",\\\"GMFXM\\\":\\\"包银珍\\\",\\\"GMFZJHM\\\":\\\"320824194208210048\\\",\\\"GMFZJLX\\\":\\\"身份证\\\",\\\"HTBAH\\\":\\\"BA-1507310022\\\",\\\"HTJE\\\":232033,\\\"HTQDRQ\\\":\\\"2015-07-31\\\",\\\"JDXZ\\\":null,\\\"JZMJ\\\":78.45,\\\"LCZS\\\":21,\\\"MFDHHM\\\":\\\"15850908245\\\",\\\"MFDZ\\\":\\\"宿迁市洪泽湖路140号建设大厦内\\\",\\\"MFGJ\\\":\\\"中国\\\",\\\"MFXM\\\":\\\"宿迁市城市建设投资（集团）有限公司\\\",\\\"MFZJHM\\\":\\\"913213007317410215\\\",\\\"MFZJLX\\\":\\\"统一社会信用代码\\\",\\\"PGJG\\\":null,\\\"SZLC\\\":19,\\\"XQMC\\\":\\\"隆城颐和小区一期\\\",\\\"XZQH\\\":\\\"老城区\\\",\\\"YWLX\\\":\\\"商品房网签合同备案\\\",\\\"ZJLXDH\\\":\\\"15850908245\\\"}]\"\n" +
+                "    },\n" +
+                "    \"success\": true,\n" +
+                "    \"errorCode\": \"0\"\n" +
+                "}";
+        return ClHtxx(resultJosn);
+    }
+
+
+    /**
+     * 处理交易合同返回数据
+     * @param resultJosn
+     * @return
+     */
+    private ObjectRestResponse ClHtxx(String resultJosn){
+        ObjectRestResponse resultRV = new ObjectRestResponse();
+        List<BusinessContract> businessContractList=new ArrayList<>();
+        JSONObject jyObject=JSONObject.fromObject(resultJosn);
         if (resultJosn.equals("0")){
             resultRV.setMessage(Msgagger.INTERCE_NULL);
             resultRV.setStatus(20500);
             return  resultRV;
+        }else if (jyObject.getBoolean("success")== false){
+            resultRV.setMessage(Msgagger.DYINTERCE_K);
+            resultRV.setStatus(20500);
+            return  resultRV;
         }
         try {
-            JSONObject jyObject=JSONObject.fromObject(resultJosn);
             JSONObject dataInfo=jyObject.getJSONObject("dataInfo");
             JSONArray sInfoArray=dataInfo.getJSONArray("sInfo");
             if (null != sInfoArray) {
@@ -861,6 +902,7 @@ public class SqRealEstateMortgageComponent {
         }
         return resultRV.data(businessContractList);
     }
+
 
 
     private void clTaxation(JSONObject jsonObject, List<Sj_Info_Qsxx> sj_info_qsxxList){
@@ -908,65 +950,93 @@ public class SqRealEstateMortgageComponent {
      * @param jsonObject
      * @param businessContractList
      */
-    private  void clTransactionContract(JSONObject jsonObject, List<BusinessContract> businessContractList){
-        BusinessContract businessContract=new BusinessContract();
+    private  void clTransactionContract(JSONObject jsonObject, List<BusinessContract> businessContractList) {
+        BusinessContract businessContract = new BusinessContract();
         businessContract.setContractRecordNumber(jsonObject.getString("HTBAH"));
         businessContract.setContractSignTime(jsonObject.getString("HTQDRQ"));
         businessContract.setContractAmount(jsonObject.getString("HTJE"));
         businessContract.setProvideUnit(Msgagger.GXPT);
         businessContract.setDataComeFromMode(Msgagger.INTERCE_DY);
         businessContract.setDataJson(jsonObject.toString());
-        List<GlImmovable> glImmovableList=new ArrayList<>();
-        GlImmovable glImmovable=new GlImmovable();
+        List<GlImmovable> glImmovableList = new ArrayList<>();
+        GlImmovable glImmovable = new GlImmovable();
         glImmovable.setImmovableType(Msgagger.FANGDI);
-        FwInfo fwInfo=new FwInfo();
-        fwInfo.setSeatNumber(jsonObject.getString("FWZH"));
+        FwInfo fwInfo = new FwInfo();
+        fwInfo.setSeatNumber(jsonObject.getString("FWZH")); //房屋证号
         fwInfo.setRoomMark(jsonObject.getString("FWFH"));
         fwInfo.setTotalStorey(jsonObject.getString("LCZS"));
         fwInfo.setLocationStorey(jsonObject.getString("SZLC"));
-        if (StringUtils.isNotEmpty(jsonObject.getString("JZMJ"))){
+        if (StringUtils.isNotEmpty(jsonObject.getString("JZMJ"))) {
             fwInfo.setArchitecturalArea(new BigDecimal(jsonObject.getString("JZMJ")));
         }
-        fwInfo.setImmovableUnitNumber(jsonObject.getString("BDCDYH"));
+        fwInfo.setHouseType(jsonObject.getString("FWLX")); //房屋类型
+        fwInfo.setHouseNature(jsonObject.getString("FWXZ"));//房屋性质
+        fwInfo.setHouseStructure(jsonObject.getString("FWJG")); //房屋结构
+        fwInfo.setHouseLocation(jsonObject.getString("FWDZ"));//房屋地址
+        fwInfo.setImmovableUnitNumber(jsonObject.getString("BDCDYH")); //不动产单元号
+        fwInfo.setImmovablePlanningUse(jsonObject.getString("FWYT"));//房屋用途
         glImmovable.setFwInfo(fwInfo);
         glImmovableList.add(glImmovable);
         businessContract.setGlImmovableVoList(glImmovableList);
         //权利人
-        List<GlHouseSeller> glHouseSellerVoList=new ArrayList<>();
-
-        if (jsonObject.getString("MFXM").contains(",")){
-            String [] obligorName=jsonObject.getString("MFXM").split(",");
-            String [] obligorZjhm=jsonObject.getString("MFZJHM").split(",");
-            String [] obligorZjlx=jsonObject.getString("MFZJLX").split(",");
-            for (int i=0;i<obligorName.length;i++) {
-                GlHouseSeller glHouseSeller=new GlHouseSeller();
-                glHouseSeller.setObligeeName(obligorName[i]);
+        List<GlHouseSeller> glHouseSellerVoList = new ArrayList<>();
+        if (StringUtils.isNotBlank(jsonObject.getString("MFXM"))) {
+            if (jsonObject.getString("MFXM").contains(",")) {
+                String[] obligorName = jsonObject.getString("MFXM").split(",");
+                String[] obligorZjhm = jsonObject.getString("MFZJHM").split(",");
+                String[] obligorZjlx = jsonObject.getString("MFZJLX").split(",");
+                for (int i = 0; i < obligorName.length; i++) {
+                    GlHouseSeller glHouseSeller = new GlHouseSeller();
+                    glHouseSeller.setObligeeName(obligorName[i]);
+                    glHouseSeller.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR);
+                    RelatedPerson relatedPerson = new RelatedPerson();
+                    relatedPerson.setObligeeDocumentType(obligorZjlx[i]);
+                    relatedPerson.setObligeeName(obligorName[i]);
+                    relatedPerson.setObligeeDocumentNumber(obligorZjhm[i]);
+                    glHouseSeller.setRelatedPerson(relatedPerson);
+                    glHouseSellerVoList.add(glHouseSeller);
+                }
+            } else {
+                GlHouseSeller glHouseSeller = new GlHouseSeller();
+                glHouseSeller.setObligeeName(jsonObject.getString("MFXM"));
                 glHouseSeller.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR);
-                RelatedPerson relatedPerson=new RelatedPerson();
-                relatedPerson.setObligeeDocumentType(obligorZjlx[i]);
-                relatedPerson.setObligeeName(obligorName[i]);
-                relatedPerson.setObligeeDocumentNumber(obligorZjhm[i]);
+                RelatedPerson relatedPerson = new RelatedPerson();
+                relatedPerson.setObligeeDocumentType(jsonObject.getString("MFZJLX"));
+                relatedPerson.setObligeeName(jsonObject.getString("MFXM"));
+                relatedPerson.setObligeeDocumentNumber(jsonObject.getString("MFZJHM"));
                 glHouseSeller.setRelatedPerson(relatedPerson);
                 glHouseSellerVoList.add(glHouseSeller);
-                businessContract.setGlHouseSellerVoList(glHouseSellerVoList);
             }
+            businessContract.setGlHouseSellerVoList(glHouseSellerVoList);
         }
         //购买人
-        List<GlHouseBuyer> glHouseBuyerList=new ArrayList<>();
-        if (jsonObject.getString("GMFXM").contains(",")){
-            String [] obligeeName=jsonObject.getString("GMFXM").split(",");
-            String [] obligeeZjhm=jsonObject.getString("GMFZJHM").split(",");
-            String [] obligeeZjhx=jsonObject.getString("GMFZJLX").split(",");
-            for (int i=0;i<obligeeName.length;i++) {
-                    GlHouseBuyer glHouseBuyer=new GlHouseBuyer();
+        List<GlHouseBuyer> glHouseBuyerList = new ArrayList<>();
+        if (StringUtils.isNotBlank(jsonObject.getString("MFXM"))) {
+            if (jsonObject.getString("GMFXM").contains(",")) {
+                String[] obligeeName = jsonObject.getString("GMFXM").split(",");
+                String[] obligeeZjhm = jsonObject.getString("GMFZJHM").split(",");
+                String[] obligeeZjhx = jsonObject.getString("GMFZJLX").split(",");
+                for (int i = 0; i < obligeeName.length; i++) {
+                    GlHouseBuyer glHouseBuyer = new GlHouseBuyer();
                     glHouseBuyer.setObligeeName(obligeeName[i]);
                     glHouseBuyer.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_GFZ);
-                    RelatedPerson gmrelatedPerson=new RelatedPerson();
+                    RelatedPerson gmrelatedPerson = new RelatedPerson();
                     gmrelatedPerson.setObligeeDocumentType(obligeeZjhx[i]);
                     gmrelatedPerson.setObligeeName(obligeeName[i]);
                     gmrelatedPerson.setObligeeDocumentNumber(obligeeZjhm[i]);
                     glHouseBuyer.setRelatedPerson(gmrelatedPerson);
                     glHouseBuyerList.add(glHouseBuyer);
+                }
+            } else {
+                GlHouseBuyer glHouseBuyer = new GlHouseBuyer();
+                glHouseBuyer.setObligeeName(jsonObject.getString("GMFXM"));
+                glHouseBuyer.setObligeeType(BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_GFZ);
+                RelatedPerson gmrelatedPerson = new RelatedPerson();
+                gmrelatedPerson.setObligeeDocumentType(jsonObject.getString("GMFZJLX"));
+                gmrelatedPerson.setObligeeName(jsonObject.getString("GMFXM"));
+                gmrelatedPerson.setObligeeDocumentNumber(jsonObject.getString("GMFZJHM"));
+                glHouseBuyer.setRelatedPerson(gmrelatedPerson);
+                glHouseBuyerList.add(glHouseBuyer);
             }
         }
         businessContract.setGlHouseBuyerVoList(glHouseBuyerList);

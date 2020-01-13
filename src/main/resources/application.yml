@@ -4,7 +4,7 @@ server:
   max-http-header-size: 4048576
 spring:
   redis:
-    password: ztgeoredis
+    password: 123456
   autoconfigure:
     exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   application:
@@ -40,7 +40,7 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://localhost:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://10.3.0.156:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -116,12 +116,13 @@ glHouseBuyer:
   obligeeDyr: 抵押人
   obligeeQlr: 权利人
   obligeeYwr: 义务人
+  obligeeZwr: 债务人
 httpclient:
   seam: 23335       #登记平台接口
-  ip: 10.3.2.147
+  ip: 10.3.0.149
   #10.3.2.147    #登记平台ip
-  windowAcceptanceIp: 10.3.2.206   #一窗受理ip
-  windowAcceptanceSeam: 7780      #一窗受理接口
+  windowAcceptanceIp: localhost   #一窗受理ip
+  windowAcceptanceSeam: 7779      #一窗受理接口
 businessType:
   clfFmortgage: MORTGAGE_OLD_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
   xjfFmortgage: MORTGAGE_NEW_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）
@@ -132,18 +133,17 @@ businessType:
   transferAndMortgage: ZY_DY         #（转移及抵押，（组合业务，转移+抵押））；
   vormerkung: YGDJ         #预告登记
   areaNo: 320301
-  dealPerson: zhujun              #ADMIN
+  dealPerson: ADMIN              #ADMIN
   bankPerson: ADMIN
 
 
-
 webplus:
-  ftpAddress: 10.3.2.203     #一窗受理ftp
+  ftpAddress: 10.3.0.151    #一窗受理ftp
   ftpPort: 21
   ftpUsername: forftp
   ftpPassword: 123456
 
-  ftpAddressBdc: 10.3.2.147    #不动产登记平台
+  ftpAddressBdc: 10.3.0.149    #不动产登记平台
   ftpPortBdc: 54111
   ftpUsernameBdc: ftp
   ftpPasswordBdc: 123456
@@ -182,7 +182,8 @@ chenbin:
     forecast:                   #预告预抵
       commercialHouse:          #商品房
         bizType: MORTGAGE_NEW_TRAILER
-        pid: Proc-171013210700-3785RA40
+        pid: Proc-191106165626-3MOK1R44
+        #Proc-171013210700-3785RA40
         # Proc-180517142329-18NT00D7 宿迁的
         isSubmit: false
     secRec:                   #二手房
@@ -201,13 +202,14 @@ chenbin:
 penghao:
     transferholdmap: true
     mortgageCancellation:       #抵押注销登记
-        pid: Proc-171013213255-X42L8440
+        pid: Proc-191106165449-7075280W
           #Proc-180517124140-3MN26M71
     mortgageRegistration:       #抵押登记pid
-        pid: Proc-171019093148-WLI15DA7  #徐州
+        pid: Proc-191106165520-XJ123752  #徐州
          # Proc-180517124205-2WM2423B 宿迁
     transferRegister:           #转移登记
-        pid: Proc-180403153139-46641AJ0
+        pid: Proc-191106165449-7075280W
+          #Proc-180403153139-46641AJ0
     transferMortgage:           #转移及抵押二手房
         pid: Proc-171019095117-0124BU48
     contractinformation:        #合同消息获取
@@ -220,12 +222,13 @@ sq:
   dyzxdj: 342501
   bank:
     jt:          #交通
-      username: testbank     #用户名
+      username: sqjtgly     #用户名
       password: 123456     #密码
       resultPdf: 1    #是否登簿传输pdf
       itemName: 电子证明
-      ip: 2.198.164.15
+      ip:
       post: 42506
+      notice_url: JSRCIS/sq/sqResultNotice.do   #通知宿迁交通银行地址
   gxpt:
       ftpAddress: 172.22.148.129   #共享平台ftp
       ftpPort: 21
@@ -233,10 +236,16 @@ sq:
       ftpPassword: 123qwe!@#
 
   jyht:     #商品房权利人信息
-    api_id: 3Rkt5FPx
+    api_id: 3Rkt5FPx    #二手房
     from_user: 0b6c220cdfc54288b6630eb1a7fa612f
     post: 8001
     ip: 10.13.0.240
+    spf:           #商品房
+      api_id: 3Rkt5FPx
+      from_user: 0b6c220cdfc54288b6630eb1a7fa612f
+      post: 8001
+      ip: 10.13.0.240
+
 
   qsxx:
     api_id: JwWtYcW7
@@ -267,16 +276,16 @@ gxjhpt:
   url: http://10.13.0.240:8001/
 
 bdccx:
-  url: http://10.3.2.147:23335/
+  url: http://10.3.0.149:23335/
 #  url: http://172.22.226.172:12201/
 ycsl:
-  url: http://localhost:7780/
+  url: http://localhost:7779/
 
 other:
-  url: http://localhost:7780/
+  url: http://localhost:7779/
 
 
 PublicInspect:
-  BDCZHURL: http://10.3.2.147:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
-  DYZMHURL: http://10.3.2.147:23335/api/services/app/BdcQuery/GetBdcInfoByDYZMH?DYZMH=%s
-  YGZMHURL: http://10.3.2.147:23335/api/services/app/BdcQuery/GetBdcInfoByYGZMH?YGZMH=%s
+  BDCZHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
+  DYZMHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByDYZMH?DYZMH=%s
+  YGZMHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByYGZMH?YGZMH=%s

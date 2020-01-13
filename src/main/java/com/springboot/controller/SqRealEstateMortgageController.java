@@ -1,8 +1,6 @@
 package com.springboot.controller;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
-import com.springboot.component.AnonymousInnerComponent;
-import com.springboot.component.BdcFTPDownloadComponent;
 import com.springboot.component.RealEstateMortgageComponent;
 import com.springboot.component.SqRealEstateMortgageComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
@@ -23,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Api(tags = "宿迁不动产api")
@@ -43,6 +42,13 @@ public class SqRealEstateMortgageController {
     public ObjectRestResponse sqTransactionContract(@RequestBody ParamEntity paramEntity)throws IOException {
         return sqRealEstateMortgageComponent.sqTransactionContract(paramEntity);
     }
+
+    @RequestMapping(value = "/spfTransactionContract", method = RequestMethod.POST)
+    @ApiOperation("一手房交易合同信息处理")
+    public ObjectRestResponse spfTransactionContract(@RequestBody ParamEntity paramEntity)throws IOException {
+        return sqRealEstateMortgageComponent.spfTransactionContract(paramEntity);
+    }
+
 
 
     @RequestMapping(value = "/sendTransferRegister", method = RequestMethod.POST)

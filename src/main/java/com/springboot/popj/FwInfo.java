@@ -8,7 +8,7 @@ public class FwInfo {
     private String buildingNumber; //交易合同中的楼盘编号
     private String houseNumber;   //交易合同中的房屋编号
     private String immovableUnicode;  //不动产统一编码
-    private String immovablePlanningUse;////房屋规划用途
+    private String immovablePlanningUse;//房屋规划用途
     private String houseLocation;//坐落信息
     private String immovableUnitNumber; //不动产单元号
     private String householdNumber; //户编号
@@ -26,6 +26,43 @@ public class FwInfo {
     private String closureSituation;  //不动产当前查封情况
     private String objectionSituation;  //不动产当前是否存在异议
     private String remarks; //备注信息
+    private String houseType;                                   //类型
+    private String houseNature;                                 //性质
+    private String houseStructure;                              //结构
+    private String oldHouseCode;                   //原房产户编号
+
+
+    public String getHouseType() {
+        return houseType;
+    }
+
+    public void setHouseType(String houseType) {
+        this.houseType = houseType;
+    }
+
+    public String getHouseNature() {
+        return houseNature;
+    }
+
+    public void setHouseNature(String houseNature) {
+        this.houseNature = houseNature;
+    }
+
+    public String getHouseStructure() {
+        return houseStructure;
+    }
+
+    public void setHouseStructure(String houseStructure) {
+        this.houseStructure = houseStructure;
+    }
+
+    public String getOldHouseCode() {
+        return oldHouseCode;
+    }
+
+    public void setOldHouseCode(String oldHouseCode) {
+        this.oldHouseCode = oldHouseCode;
+    }
 
     public BigDecimal getArchitecturalArea() {
         return architecturalArea;

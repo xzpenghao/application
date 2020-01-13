@@ -51,6 +51,7 @@ public class Msgagger {
     public final static String TO_BE_PROCESSED = "待处理";
     public final static String SHZH_BAD = "数据转换失败";
     public final static String INTERCE_NULL = "调用接口失败";
+    public final static String DYINTERCE_K="没有查询到数据";
     public final static String USER_LOGIN_BAD = "用户登录失败或连接服务没有开启";
     public static String FINST_ID_NULL = "条件实列为空，请从新选择";
     public static String FILE_FAIL = "上传一窗受理附件失败";
@@ -68,5 +69,5 @@ public class Msgagger {
     public final static String DYDJ_BAD="存量房信息保存失败,流程未开启";
     public final static String ZXDJ="注销登记";
 
-
+    public final static String SQ_JT_ORGID="01398999999";
 }

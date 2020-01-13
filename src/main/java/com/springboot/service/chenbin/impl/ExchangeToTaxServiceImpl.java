@@ -115,7 +115,6 @@ public class ExchangeToTaxServiceImpl implements ExchangeToTaxService {
         System.out.println("正在获取操作用户token");
         log.info("正在获取操作用户token");
         String token = backFeign.getToken(new JwtAuthenticationRequest(username,password)).getData();
-
         List<RespServiceData> serviceDatas = new ArrayList<>();
         RespServiceData serviceData = new RespServiceData();
 

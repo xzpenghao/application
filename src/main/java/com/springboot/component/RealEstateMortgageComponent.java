@@ -591,7 +591,11 @@ RealEstateMortgageComponent {
         //抵押业务信息
         MortgageBizInfo mortgageBizInfo = new MortgageBizInfo();
         mortgageBizInfo.setMortgageApplyDate(mortgageContractInfo.getApplyTime());
-        mortgageBizInfo.setMortgageWay(mortgageContractInfo.getMortgageMode());
+        if(StringUtils.isNotBlank(mortgageContractInfo.getMortgageMode())){
+            mortgageBizInfo.setMortgageWay(mortgageContractInfo.getMortgageMode());
+        }else {
+            mortgageBizInfo.setMortgageWay(mortgageContractInfo.getRegistrationSubclass());
+        }
         mortgageBizInfo.setMortgageTerm(mortgageContractInfo.getMortgagePeriod());
         if ( null != mortgageContractInfo.getMaximumClaimAmount() ) {
             mortgageBizInfo.setHighestClaimAmount(mortgageContractInfo.getMaximumClaimAmount().toString());
@@ -685,8 +689,8 @@ RealEstateMortgageComponent {
                     //不动产单元信息列表
                     if (bdcqlxgxx.getGlImmovableVoList() != null && bdcqlxgxx.getGlImmovableVoList().size() != 0) {
                         for (SJ_Bdc_Gl bdc_gl : bdcqlxgxx.getGlImmovableVoList()) {
-                            RealEstateUnitInfo realEstateUnitInfo = new RealEstateUnitInfo();
-                            if(bdc_gl.getImmovableType().equals("房地")) {
+                            if (bdc_gl.getImmovableType().equals(Msgagger.FANGDI)) {
+                                RealEstateUnitInfo realEstateUnitInfo = new RealEstateUnitInfo();
                                 realEstateUnitInfo.setHouseholdId(bdc_gl.getFwInfo().getHouseholdId());
                                 realEstateUnitInfo.setRealEstateUnitId(bdc_gl.getFwInfo().getImmovableUnitNumber());
                                 log.info("不动产单元号" + realEstateUnitInfo.getRealEstateUnitId());
