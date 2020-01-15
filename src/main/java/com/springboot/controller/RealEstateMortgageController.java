@@ -70,7 +70,7 @@ public class RealEstateMortgageController {
     @RequestMapping(value = "/getRealEstateMortgage", method = RequestMethod.POST)
     @ApiOperation("不动产抵押信息")
     public ObjectRestResponse getRealEstateMortgage(HttpServletRequest request) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
+        BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF-8"));
         StringBuffer sb=new StringBuffer();
         String s=null;
         while((s=br.readLine())!=null){
@@ -78,7 +78,9 @@ public class RealEstateMortgageController {
         }
         com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject((sb.toString()));
         String dyzmh = jsonObject.getString("dyzmh");
+        log.info("dyzmh"+dyzmh);
         String qlrmc = jsonObject.getString("qlrmc");
+        log.info("qlrmc"+qlrmc);
 //        @RequestParam String dyzmh, @RequestParam(value = "qlrmc", required = false) String qlrmc,
         return realEstateMortgageComponent.getRealEstateMortgage(dyzmh, qlrmc, false);
     }
