@@ -69,6 +69,8 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private String areaNo;
     @Value("${businessType.dealPerson}")
     private String dealPerson;
+    @Value("${businessType.bankPerson}")
+    private String bankPerson;
     @Value("${chenbin.registrationBureau.username}")
     private String username;
     @Value("${chenbin.registrationBureau.password}")
@@ -112,7 +114,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         if (dyht == null) {
             throw new ZtgeoBizException("预告预抵业务转内网办件时异常，交易合同信息为空");
         }
-        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjsq, pid, isSubmit, bizType, dealPerson, areaNo);
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjsq, pid, isSubmit, bizType, bankPerson, areaNo);
         MortgageBizInfo mortgageBizInfo = BusinessDealBaseUtil.getMortgageBizInfoByContract(jyht, dyht, idType);
         AdvanceBizInfo advanceBizInfo = new AdvanceBizInfo();
 //        AdvanceBizInfo advanceBizInfo = BusinessDealBaseUtil.getAdvanceBizInfoByContract(jyht,dyht,idType);
