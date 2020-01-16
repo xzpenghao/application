@@ -157,7 +157,7 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureauVo = null;
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
-        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, mortgagePid, true, grMortgageCancellation, bankPerson, areaNo);
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, mortgagePid, false, grMortgageCancellation, bankPerson, areaNo);
         switch (sjSjsq.getBusinessType()) {
             case Msgagger.CANCELLATION_REGISTRATION:
                 registrationBureau.setBizType(grMortgageCancellation);
@@ -682,8 +682,8 @@ RealEstateMortgageComponent {
         if (sj_sjsq.getImmovableRightInfoVoList() != null && sj_sjsq.getImmovableRightInfoVoList().size() != 0) {
             for (SJ_Info_Bdcqlxgxx bdcqlxgxx : sj_sjsq.getImmovableRightInfoVoList()) {
                 //房屋
+                RealEstateInfo realEstateInfo = new RealEstateInfo();
                 if (bdcqlxgxx.getCertificateType().equals(Msgagger.FCZ) || bdcqlxgxx.getCertificateType().equals(Msgagger.BDCQZ)) {
-                    RealEstateInfo realEstateInfo = new RealEstateInfo();
                     realEstateInfo.setRealEstateId(bdcqlxgxx.getImmovableCertificateNo());
                     List<RealEstateUnitInfo> realEstateUnitInfoList = new ArrayList<>();
                     //不动产单元信息列表
@@ -700,19 +700,30 @@ RealEstateMortgageComponent {
                         }
                     }
                     realEstateInfo.setRealEstateUnitInfoVoList(realEstateUnitInfoList);
-                    realEstateInfo.setObligeeInfoVoList(ClQlr(bdcqlxgxx));
+//                    realEstateInfo.setObligeeInfoVoList(ClQlr(bdcqlxgxx));
                     realEstateInfoList.add(realEstateInfo);
-                } else
+                } else if (bdcqlxgxx.getCertificateType().equals(Msgagger.TDZ)){
 //                realEstateInfo.set
                     //不动产权证号
-                    if (bdcqlxgxx.getCertificateType().equals(Msgagger.TDZ)) {
-                        RealEstateInfo realTdEstateInfo = new RealEstateInfo();
-                        realTdEstateInfo.setRealEstateId(bdcqlxgxx.getImmovableCertificateNo());
-                        realTdEstateInfo.setLandCertificate(bdcqlxgxx.getImmovableCertificateNo());
-                        realEstateInfoList.add(realTdEstateInfo);
-                    }
+                        RealEstateInfo tdRealEstateInfo=new RealEstateInfo();
+                        tdRealEstateInfo.setLandCertificate(bdcqlxgxx.getImmovableCertificateNo());
+                        realEstateInfoList.add(tdRealEstateInfo);
+                }
             }
         }
+        String landCertificateInfo="";
+        if (realEstateInfoList.size()>1){
+            Iterator<RealEstateInfo> iterator = realEstateInfoList.iterator();
+            while (iterator.hasNext()) {
+                RealEstateInfo realEstateInfo = iterator.next();
+                    //判断是否为
+                    if (null != realEstateInfo.getLandCertificate()) {
+                        landCertificateInfo = realEstateInfo.getLandCertificate();
+                        iterator.remove();
+                    }
+                }
+            realEstateInfoList.get(0).setLandCertificate(landCertificateInfo);
+            }
         mortgageBizInfo.setRealEstateInfoVoList(realEstateInfoList);
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
         return registrationBureau;
@@ -866,7 +877,7 @@ RealEstateMortgageComponent {
                 zjlb = "身份证";
                 break;
             case "8":
-                zjlb = "统一社会信用代码";
+                zjlb = "00000000000000000000";
                 break;
             default:
                 zjlb = "其它证件";

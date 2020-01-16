@@ -4,8 +4,6 @@ import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.RealEstateMortgageComponent;
 import com.springboot.component.SqRealEstateMortgageComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
-import com.springboot.config.Msgagger;
-import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.ParamEntity;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.MortgageRegistrationReqVo;
 import com.springboot.entity.chenbin.personnel.other.bank.business.revok.RevokeRegistrationReqVo;
@@ -21,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Api(tags = "宿迁不动产api")
