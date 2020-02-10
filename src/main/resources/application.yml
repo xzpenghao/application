@@ -289,3 +289,8 @@ PublicInspect:
   BDCZHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
   DYZMHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByDYZMH?DYZMH=%s
   YGZMHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByYGZMH?YGZMH=%s
+
+
+ETicket:
+  Url: http://127.0.0.1:7777/ETicket/morkData
+  LocalPath: E:/ETicket/
