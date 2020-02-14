@@ -87,7 +87,8 @@ public class Base64Util {
      * @param base64
      * @param fileName
      */
-    public static void base64ToPdf(String filePath, String base64, String fileName) {
+    public static boolean base64ToPdf(String filePath, String base64, String fileName) {
+        boolean flag = true;
         File file = null;
         //创建文件目录
         File dir = new File(filePath);
@@ -103,6 +104,7 @@ public class Base64Util {
             bos = new BufferedOutputStream(fos);
             bos.write(bytes);
         } catch (Exception e) {
+            flag = false;
             e.printStackTrace();
         } finally {
             if (bos != null) {
@@ -120,6 +122,7 @@ public class Base64Util {
                 }
             }
         }
+        return flag;
     }
 
 

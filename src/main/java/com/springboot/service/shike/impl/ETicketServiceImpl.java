@@ -4,7 +4,6 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.service.shike.ETicketService;
@@ -16,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 
 import static com.springboot.util.Base64Util.base64ToPdf;
@@ -97,13 +97,14 @@ public class ETicketServiceImpl implements ETicketService {
                         String path = "/"+date.substring(0,4)+"/"+date.substring(5,7)+"/"+date.substring(8);
                         String fileName =eTax.getDzsphm()+ "_"+ UUID.randomUUID().toString().substring(0,4)+".pdf";
                         String base64Data = eTax.getBase64();
+                        byte[] base64Byte = Base64Util.decode(base64Data);
                         String ftpPath = toFTPUploadComponent.ycslUpload(
-                                Base64Util.decode(base64Data),
+                                base64Byte,
                                 path,
                                 fileName,
                                 "ycsl"
                         ).replaceAll("/", "\\\\");
-                        dzspList.add(new TaxAttachment.ETax(eTax,ftpPath,true));
+                        dzspList.add(new TaxAttachment.ETax(eTax,ftpPath,"1",base64Byte.length));
                     }
                 }
             }
@@ -135,13 +136,14 @@ public class ETicketServiceImpl implements ETicketService {
                         String finalPath = LocalPath+datePath;
                         String fileName =eTax.getDzsphm()+ "_"+UUID.randomUUID().toString().substring(0,4)+".pdf";
                         String base64Data = eTax.getBase64();
-                        try {
-                            base64ToPdf(finalPath,base64Data,fileName);
-                            dzspList.add(new TaxAttachment.ETax(eTax,finalPath+fileName,false));
-                        }catch (Exception e){
+
+                        if (base64ToPdf(finalPath,base64Data,fileName)){
+                            String filePath = finalPath+fileName;
+                            filePath =filePath.replaceAll("/", "\\\\");
+                            dzspList.add(new TaxAttachment.ETax(eTax,filePath,"0",Base64Util.decode(base64Data).length));
+                        }else {
                             log.error("文件：{}保存错误",finalPath+fileName);
                         }
-
                     }
                 }
             }

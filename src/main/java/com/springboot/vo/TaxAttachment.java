@@ -23,19 +23,22 @@ public class TaxAttachment {
         private String tgdw;
         //Base64字符串
         private String base64;
-        //fileId
-        private String fileId;
+        //filePath
+        private String filePath;
         //isFtp
-        private boolean isFtp;
+        private String isFtp;
+        //文件大小
+        private Integer fileSize;
 
         public ETax() {
         }
 
-        public ETax(ETax eTax, String fileId, boolean isFtp){
+        public ETax(ETax eTax, String filePath, String isFtp,Integer fileSize){
             this.dzsphm = eTax.getDzsphm();
             this.tgdw = eTax.getTgdw();
-            this.fileId = fileId;
+            this.filePath = filePath;
             this.isFtp = isFtp;
+            this.fileSize = fileSize;
         }
     }
 
