@@ -40,7 +40,7 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://10.3.0.156:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://localhost:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -128,7 +128,10 @@ businessType:
   xjfFmortgage: MORTGAGE_NEW_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）
   grMortgageRegistration: MORTGAGE_PERSONAL #抵押登记(个人)
   grMortgageCancellation: DYZX  #（抵押注销(个人)）
+  cancellationOfWarrants: QZZX  #（权证注销(个人)）
   registrationOfTransfer: ZYDJ  #（转移登记）
+  registrationOfReplacement: HZDJ  #（换证登记）
+  registrationOfSupplementary: BZDJ #（补证登记）
   forewarningMortgage: YGDY     #（预告抵押）
   transferAndMortgage: ZY_DY         #（转移及抵押，（组合业务，转移+抵押））；
   vormerkung: YGDJ         #预告登记
@@ -201,6 +204,12 @@ chenbin:
       url: http://10.13.0.240:9999/z
 penghao:
     transferholdmap: true
+    realEstateRenewal:
+        pid:                    #换证登记pid
+    supplementaryEvidence:
+        pid:                    #补证登记pid
+    cancellationOfWarrants:
+        pid:                    #权证注销pid
     mortgageCancellation:       #抵押注销登记
         pid: Proc-191106165449-7075280W
           #Proc-180517124140-3MN26M71
