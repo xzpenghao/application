@@ -46,6 +46,18 @@ public class SqRealEstateMortgageController {
         return sqRealEstateMortgageComponent.spfTransactionContract(paramEntity);
     }
 
+    @RequestMapping(value = "/realEstateRenewal", method = RequestMethod.POST)
+    @ApiOperation("换证登记发送登记局收件")
+    public ObjectRestResponse realEstateRenewal(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
+        return realEstateMortgageComponent.realEstateRenewal(commonInterfaceAttributer);
+    }
+
+    @RequestMapping(value = "/supplementaryEvidence", method = RequestMethod.POST)
+    @ApiOperation("补证登记发送登记局收件")
+    public ObjectRestResponse supplementaryEvidence(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
+        return realEstateMortgageComponent.supplementaryEvidence(commonInterfaceAttributer);
+    }
+
 
 
     @RequestMapping(value = "/sendTransferRegister", method = RequestMethod.POST)
@@ -84,6 +96,12 @@ public class SqRealEstateMortgageController {
     @ApiOperation("抵押注销通知接口")
     public void sqBdczxdj(@RequestBody RevokeRegistrationReqVo revokeRegistrationRespVo,OutputStream outputStream){
         sqRealEstateMortgageComponent.sqJgdyzx(revokeRegistrationRespVo,outputStream);
+    }
+
+    @RequestMapping(value = "/cancellationOfWarrants", method = RequestMethod.POST)
+    @ApiOperation("权证注销发送至登记平台办件")
+    public ObjectRestResponse cancellationOfWarrants(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
+        return realEstateMortgageComponent.cancellationOfWarrants(commonInterfaceAttributer);
     }
 
 }

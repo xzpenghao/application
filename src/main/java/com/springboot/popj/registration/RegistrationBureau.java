@@ -32,8 +32,25 @@ public class RegistrationBureau {
     private RevokeBizInfo revokeBizInfo;//抵押注销
     private TransferBizInfo transferBizInfo;//转移登记业务信息
     private AdvanceBizInfo advanceBizInfo;//预告登记业务信息
-
+    private ReplaceBizInfo replaceBizInfo;//换证登记业务信息
+    private ReissueBizInfo reissueBizInfo;//补证登记业务信息
     private List<ImmovableFile> fileInfoVoList;
+
+    public ReplaceBizInfo getReplaceBizInfo() {
+        return replaceBizInfo;
+    }
+
+    public void setReplaceBizInfo(ReplaceBizInfo replaceBizInfo) {
+        this.replaceBizInfo = replaceBizInfo;
+    }
+
+    public ReissueBizInfo getReissueBizInfo() {
+        return reissueBizInfo;
+    }
+
+    public void setReissueBizInfo(ReissueBizInfo reissueBizInfo) {
+        this.reissueBizInfo = reissueBizInfo;
+    }
 
     public String getPid() {
         return pid;

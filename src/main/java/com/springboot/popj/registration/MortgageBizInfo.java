@@ -7,6 +7,7 @@ import java.util.List;
 
 public class MortgageBizInfo {
 
+    private String registerSubType; //登记小类
     private String mortgageApplyDate;//抵押业务申请日期
     private String mortgageWay;//抵押方式
     private String creditAmount;//债权数额
@@ -24,6 +25,14 @@ public class MortgageBizInfo {
     private List<WtdlrGlMortgator> mortgagorAgentInfoVoList; //抵押人代理人列表
     private List<DyzwrGlMortgator> obligorInfoVoList; //抵押债务人信息列表
     private List<RealEstateInfo> realEstateInfoVoList; //待抵押的不动产信息列表
+
+    public String getRegisterSubType() {
+        return registerSubType;
+    }
+
+    public void setRegisterSubType(String registerSubType) {
+        this.registerSubType = registerSubType;
+    }
 
     public String getMortgageApplyDate() {
         return mortgageApplyDate;

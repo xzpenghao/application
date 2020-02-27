@@ -22,6 +22,7 @@ import com.springboot.util.DateUtils;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,12 @@ RealEstateMortgageComponent {
     private String grMortgageRegistration;
     @Value("${businessType.registrationOfTransfer}")
     private String registrationOfTransfer;
+    @Value("${businessType.registrationOfReplacement}")
+    private String registrationOfReplacement;
+    @Value("${businessType.registrationOfSupplementary}")
+    private String registrationOfSupplementary;
+    @Value("${businessType.cancellationOfWarrants}")
+    private String cancellationOfWarrants;
     @Value("${businessType.forewarningMortgage}")
     private String forewarningMortgage;
     @Value("${businessType.transferAndMortgage}")
@@ -88,8 +95,14 @@ RealEstateMortgageComponent {
     private String mortgagePid;
     @Value("${penghao.transferRegister.pid}")
     private String transferRegisterPid;
+    @Value("${penghao.realEstateRenewal.pid}")
+    private String realEstateRenewalPid;
+    @Value("${penghao.supplementaryEvidence.pid}")
+    private String supplementaryEvidencePid;
     @Value("${penghao.transferMortgage.pid}")
     private String transferMortgagePid;
+    @Value("${penghao.cancellationOfWarrants.pid}")
+    private String cancellationOfWarrantsPid;
     @Value("${penghao.mortgageRegistration.pid}")
     private String registrationPid;
     @Value("${djj.tsryname}")
@@ -145,6 +158,154 @@ RealEstateMortgageComponent {
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         return getObjectRestResponse(sjSjsq, resultObject);
     }
+
+
+    /**
+     * 换证业务登记信息
+     * @param commonInterfaceAttributer
+     * @return
+     * @throws ParseException
+     */
+    public ObjectRestResponse realEstateRenewal(String commonInterfaceAttributer) throws ParseException {
+        //获取json数据转成收件申请
+        SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        log.info("换证业务sjsq:"+JSONObject.toJSONString(sjSjsq));
+        //加载到registrationBureau中
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, realEstateRenewalPid, true, registrationOfReplacement, dealPerson, areaNo);
+        registrationBureau = ClrealEstateRenewal(sjSjsq,registrationBureau);
+        registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
+        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
+        return getObjectRestResponse(sjSjsq, resultObject);
+    }
+
+
+    /**
+     * 补证业务登记信息
+     * @param commonInterfaceAttributer
+     * @return
+     * @throws ParseException
+     */
+    public ObjectRestResponse supplementaryEvidence(String commonInterfaceAttributer) throws ParseException {
+        //获取json数据转成收件申请
+        SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        log.info("补证业务sjsq:"+JSONObject.toJSONString(sjSjsq));
+        //加载到registrationBureau中
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, supplementaryEvidencePid, true, registrationOfSupplementary, dealPerson, areaNo);
+        registrationBureau = ClSupplementary(sjSjsq,registrationBureau);
+        registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
+        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
+        return getObjectRestResponse(sjSjsq, resultObject);
+    }
+
+
+    /**
+     * 权证注销业务登记信息
+     * @param commonInterfaceAttributer
+     * @return
+     * @throws ParseException
+     */
+    public ObjectRestResponse cancellationOfWarrants(String commonInterfaceAttributer) throws ParseException {
+        //获取json数据转成收件申请
+        SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        log.info("补证业务sjsq:"+JSONObject.toJSONString(sjSjsq));
+        //加载到registrationBureau中
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq,cancellationOfWarrantsPid, true, cancellationOfWarrants, dealPerson, areaNo);
+        registrationBureau = ClcancellationOfWarrants(sjSjsq,registrationBureau);
+        registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
+        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
+        return getObjectRestResponse(sjSjsq, resultObject);
+    }
+
+
+    /**
+     * 处理换证数据进行转内网
+     * @param sjSjsq
+     * @param registrationBureau
+     * @return
+     */
+    private RegistrationBureau ClrealEstateRenewal(SJ_Sjsq sjSjsq,RegistrationBureau registrationBureau){
+        ReplaceBizInfo replaceBizInfo=new ReplaceBizInfo();
+        if (null != sjSjsq.getImmovableRightInfoVoList() && sjSjsq.getImmovableRightInfoVoList().size()==1){
+            replaceBizInfo.setRealEstateId(sjSjsq.getImmovableRightInfoVoList().get(0).getImmovableCertificateNo());
+            replaceBizInfo.setCertificateType("BDCZH");
+        }else if (null != sjSjsq.getImmovableRightInfoVoList() && sjSjsq.getImmovableRightInfoVoList().size()>1){
+            replaceBizInfo.setCertificateType("BDCZH");
+            for (SJ_Info_Bdcqlxgxx sjInfoBdcqlxgxx:
+                 sjSjsq.getImmovableRightInfoVoList()) {
+                if (StringUtils.isNotEmpty(sjInfoBdcqlxgxx.getImmovableCertificateNo())){
+                    replaceBizInfo.setRealEstateId(sjInfoBdcqlxgxx.getImmovableCertificateNo()); //不动产权证号
+                }else if (StringUtils.isNotEmpty(sjInfoBdcqlxgxx.getLandCertificateNo())){
+                    replaceBizInfo.setLandCertificate(sjInfoBdcqlxgxx.getLandCertificateNo());//土地证号
+                }else if (StringUtils.isNotEmpty(sjInfoBdcqlxgxx.getHouseCertificateNo())){
+                    replaceBizInfo.setRealEstateId(sjInfoBdcqlxgxx.getHouseCertificateNo());//房屋证号
+                }
+            }
+        }
+        registrationBureau.setReplaceBizInfo(replaceBizInfo);
+        return  registrationBureau;
+    }
+
+
+    /**
+     * 处理补证数据进行转内网
+     * @param sjSjsq
+     * @param registrationBureau
+     * @return
+     */
+    private RegistrationBureau ClSupplementary(SJ_Sjsq sjSjsq,RegistrationBureau registrationBureau){
+        ReissueBizInfo reissueBizInfo=new ReissueBizInfo();
+        if (null != sjSjsq.getImmovableRightInfoVoList() && sjSjsq.getImmovableRightInfoVoList().size()==1){
+            reissueBizInfo.setRealEstateId(sjSjsq.getImmovableRightInfoVoList().get(0).getImmovableCertificateNo());
+            reissueBizInfo.setCertificateType("BDCZH");
+        }else if (null != sjSjsq.getImmovableRightInfoVoList() && sjSjsq.getImmovableRightInfoVoList().size()>1){
+            reissueBizInfo.setCertificateType("BDCZH");
+            for (SJ_Info_Bdcqlxgxx sjInfoBdcqlxgxx:
+                    sjSjsq.getImmovableRightInfoVoList()) {
+                if (StringUtils.isNotEmpty(sjInfoBdcqlxgxx.getImmovableCertificateNo())){
+                    reissueBizInfo.setRealEstateId(sjInfoBdcqlxgxx.getImmovableCertificateNo()); //不动产权证号
+                }else if (StringUtils.isNotEmpty(sjInfoBdcqlxgxx.getLandCertificateNo())){
+                    reissueBizInfo.setLandCertificate(sjInfoBdcqlxgxx.getLandCertificateNo());//土地证号
+                }else if (StringUtils.isNotEmpty(sjInfoBdcqlxgxx.getHouseCertificateNo())){
+                    reissueBizInfo.setRealEstateId(sjInfoBdcqlxgxx.getHouseCertificateNo());//房屋证号
+                }
+            }
+        }
+        registrationBureau.setReissueBizInfo(reissueBizInfo);
+        return  registrationBureau;
+    }
+
+
+
+    /**
+     * 处理权证注销数据进行转内网
+     * @param sjSjsq
+     * @param registrationBureau
+     * @return
+     */
+    private RegistrationBureau ClcancellationOfWarrants(SJ_Sjsq sjSjsq,RegistrationBureau registrationBureau){
+        RevokeBizInfo revokeBizInfo=new RevokeBizInfo();
+        revokeBizInfo.setRegisterSubType(sjSjsq.getRegistrationSubclass());//登记小类
+        revokeBizInfo.setRevokeReason(sjSjsq.getRegistrationReason());//登记原因
+        List<RealEstateInfo> realEstateInfoVoList=new ArrayList<>();
+        if (null != sjSjsq.getImmovableRightInfoVoList()){
+            for (SJ_Info_Bdcqlxgxx sjInfoBdcqlxgxx:
+                    sjSjsq.getImmovableRightInfoVoList()) {
+                RealEstateInfo realEstateInfo=new RealEstateInfo();
+                if (StringUtils.isNotEmpty(sjInfoBdcqlxgxx.getImmovableCertificateNo())){
+                    realEstateInfo.setRealEstateId(sjInfoBdcqlxgxx.getImmovableCertificateNo()); //不动产权证号
+                }else if (StringUtils.isNotEmpty(sjInfoBdcqlxgxx.getLandCertificateNo())){
+                    realEstateInfo.setLandCertificate(sjInfoBdcqlxgxx.getLandCertificateNo());//土地证号
+                }else if (StringUtils.isNotEmpty(sjInfoBdcqlxgxx.getHouseCertificateNo())){
+                    realEstateInfo.setRealEstateId(sjInfoBdcqlxgxx.getHouseCertificateNo());//房屋证号
+                }
+                realEstateInfoVoList.add(realEstateInfo);
+            }
+        }
+        revokeBizInfo.setRealEstateInfoVoList(realEstateInfoVoList);
+        registrationBureau.setRevokeBizInfo(revokeBizInfo);
+        return  registrationBureau;
+    }
+
 
 
     /**
@@ -591,11 +752,12 @@ RealEstateMortgageComponent {
         //抵押业务信息
         MortgageBizInfo mortgageBizInfo = new MortgageBizInfo();
         mortgageBizInfo.setMortgageApplyDate(mortgageContractInfo.getApplyTime());
-        if(StringUtils.isNotBlank(mortgageContractInfo.getMortgageMode())){
-            mortgageBizInfo.setMortgageWay(mortgageContractInfo.getMortgageMode());
-        }else {
-            mortgageBizInfo.setMortgageWay(mortgageContractInfo.getRegistrationSubclass());
+        if (StringUtils.isNotBlank(mortgageContractInfo.getRegistrationSubclass())){
+            mortgageBizInfo.setRegisterSubType(mortgageContractInfo.getRegistrationSubclass());
+        }else{
+            mortgageBizInfo.setRegisterSubType("一般抵押权");
         }
+        mortgageBizInfo.setMortgageWay(BusinessDealBaseUtil.getModeBySub(mortgageBizInfo.getRegisterSubType()));
         mortgageBizInfo.setMortgageTerm(mortgageContractInfo.getMortgagePeriod());
         if ( null != mortgageContractInfo.getMaximumClaimAmount() ) {
             mortgageBizInfo.setHighestClaimAmount(mortgageContractInfo.getMaximumClaimAmount().toString());
@@ -927,7 +1089,7 @@ RealEstateMortgageComponent {
         fwInfo.setHouseholdId(glImmovableObject.getString("householdId"));
         fwInfo.setHouseLocation(glImmovableObject.getString("sit"));//坐落
         fwInfo.setHouseholdMark(glImmovableObject.getString("accountId"));//户号
-        fwInfo.setRemarks(glImmovableObject.getString("roomId"));//房间号
+        fwInfo.setRoomMark(glImmovableObject.getString("roomId"));//房间号
         fwInfo.setUnitMark(glImmovableObject.getString("unitId"));//单元号
         fwInfo.setProjectName(glImmovableObject.getString("projectName"));//项目名称
         if (glImmovableObject.getString("architectureArea") != null){

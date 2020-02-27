@@ -74,11 +74,25 @@ public class BusinessDealBaseUtil {
         return registrationBureau;
     }
 
+    public static String getModeBySub(String djxl){
+        String mode = "一般抵押";
+        switch (djxl){
+            case "最高额抵押权":
+                mode = "最高额抵押";
+                break;
+            default:
+                mode = "一般抵押";
+                break;
+        }
+        return mode;
+    }
+
     //处理MortgageBizInfo，通过两个合同
     public static MortgageBizInfo getMortgageBizInfoByContract(Sj_Info_Jyhtxx jyht, Sj_Info_Dyhtxx dyht, String idType) {
         MortgageBizInfo mortgageBizInfo = new MortgageBizInfo();
         mortgageBizInfo.setMortgageApplyDate(StringUtils.isNotBlank(dyht.getApplyTime()) ? dyht.getApplyTime() : TimeUtil.getTimeString(new Date()));
-        mortgageBizInfo.setMortgageWay(StringUtils.isBlank(dyht.getMortgageMode())?dyht.getRegistrationSubclass():dyht.getMortgageMode());
+        mortgageBizInfo.setRegisterSubType(StringUtils.isBlank(dyht.getRegistrationSubclass())?"一般抵押权":dyht.getRegistrationSubclass());
+        mortgageBizInfo.setMortgageWay(StringUtils.isBlank(dyht.getMortgageMode())?getModeBySub(dyht.getRegistrationSubclass()):dyht.getMortgageMode());
         mortgageBizInfo.setCreditAmount(dyht.getCreditAmount() == null ? null : dyht.getCreditAmount().toString());
         mortgageBizInfo.setEvaluationValue(dyht.getValuationValue() == null ? null : dyht.getValuationValue().toString());
         mortgageBizInfo.setMortgageTerm(dyht.getMortgagePeriod());

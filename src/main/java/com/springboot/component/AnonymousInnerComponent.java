@@ -649,7 +649,7 @@ public class AnonymousInnerComponent {
                         log.info("获取token成功，为："+token);
                         //发送登记局获取数据整理发送一窗受理
                         String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
-                        log.info("获取登簿数据成功，为："+json);
+                        log.info("登记平台获取登簿数据成功，为："+json);
                         JSONObject jsonObject = JSONObject.fromObject(json);
                         mapParmeter.put("immovableSite", jsonObject.getString("sit"));
                         mapParmeter.put("registerNumber", jsonObject.getString("slbh"));
