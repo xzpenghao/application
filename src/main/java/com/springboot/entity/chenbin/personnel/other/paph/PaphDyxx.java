@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class PaphDyxx implements Serializable {
     private String dyqr;
     private String zqje;
-    private String zwlxqx;
+    private String zwlxqx;//债务履行期限
     private String dylx;
 
     public String getDyqr() {
