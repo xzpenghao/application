@@ -31,6 +31,11 @@ public interface ForImmovableFeign {
     @RequestMapping(value = "api/services/app/bdcWorkFlow/GetProcessUsers",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
     Map<String,Object> postProcessUsers(Map<String,String> pMap);
 
-    @RequestMapping(value = "api/services/app/bdcElecLicense/GetAttachList4XZ",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
+    //徐州
+//    @RequestMapping(value = "api/services/app/bdcElecLicense/GetAttachList4XZ",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
+//    BDCInterfaceResp<List<SynNewEcertEntity>> postECerts(Map<String,List<String>> req);
+
+    //宿迁
+    @RequestMapping(value = "api/services/app/bdcElecLicense/GetAttachList4SQ",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
     BDCInterfaceResp<List<SynNewEcertEntity>> postECerts(Map<String,List<String>> req);
 }
