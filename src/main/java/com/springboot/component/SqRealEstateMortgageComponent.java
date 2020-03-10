@@ -290,7 +290,6 @@ public class SqRealEstateMortgageComponent {
 
 
 
-
     /**
      * 机构调用接口不动产抵押登记（含两证） 和新建商品房预告和预告抵押
      * @param

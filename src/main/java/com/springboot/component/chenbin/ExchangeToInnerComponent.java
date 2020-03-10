@@ -33,7 +33,7 @@ public class ExchangeToInnerComponent {
         List<JSONObject> jsonImmoVoList = immovableFeign.getBdcInfoByZH(parametricData.getBdczh(),parametricData.getQlrmc(),parametricData.getObligeeId());
         log.info("执行BDC查询后："+ new Date().getTime());
         log.info("不动产查询数据为："+JSONArray.toJSONString(jsonImmoVoList));
-        if(jsonImmoVoList!=null) {
+        if(jsonImmoVoList!=null && jsonImmoVoList.size()>0) {
             for (JSONObject jsonImmov:jsonImmoVoList) {
                 SJ_Info_Bdcqlxgxx bdcqlxgxx = new SJ_Info_Bdcqlxgxx();
                 String zslx = jsonImmov.getString("certificateType");

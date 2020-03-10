@@ -132,7 +132,7 @@ public class AnonymousInnerComponent {
                 StringUtils.isBlank(token)
         ) {
             tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
-            token = getToken(tokenObject, "getSendRoom", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
+            token = getToken(tokenObject, "extractInformation", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
         }
         mapHeader.put("Authorization", token);
         if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {//受理
@@ -286,7 +286,6 @@ public class AnonymousInnerComponent {
             //根据权证号获取信息
             ParametricData parametricData=new ParametricData();
             parametricData.setBdczh(qzh);
-            List<SJ_Book_Pic_ext> bookPics=new ArrayList<>();
             String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
             try {
                 //权属信息
@@ -659,29 +658,29 @@ public class AnonymousInnerComponent {
                         List<SJ_Info_Handle_Result> handleResultVoList = new ArrayList<>();
                         List<RespServiceData> respServiceDataList = new ArrayList<>();
                         List<String> stringList = new ArrayList<>();
-                        RespServiceData resultServiceData=null; //为了返回银行信息
+                        RespServiceData resultServiceData=new RespServiceData(); //为了返回银行信息
                         String name="";
-                        //获取受理编号信息
-                        for (int i = 0; i < ficateInfoArray.size(); i++) {
-                            JSONObject verfyInfoObject = ficateInfoArray.getJSONObject(i);
-                            stringList.add(verfyInfoObject.getString("registerSubType"));
-                            RespServiceData RealEstateBookData = new RespServiceData();
-                            RespServiceData getRealEstateBooking = getRealEstateBooking(verfyInfoObject.getString("certificateType"),
-                                    verfyInfoObject.getString("certificateId"), RealEstateBookData);
-                            if (verfyInfoObject.getString("registerSubType").equals(Msgagger.DYZXDJ)){
-                                getRealEstateBooking.setServiceCode(Msgagger.DYZXSERVICECODE);
-                                if (ficateInfoArray.size()==1){
-                                    name= verfyInfoObject.getString("certificateType");
+                        //如果权证注销不需要去查询证号
+                        if (StringUtils.isNotEmpty(jsonObject.getString("bizType")) && !jsonObject.getString("bizType").equals("QZZX")){
+                            //获取受理编号信息
+                            for (int i = 0; i < ficateInfoArray.size(); i++) {
+                                JSONObject verfyInfoObject = ficateInfoArray.getJSONObject(i);
+                                stringList.add(verfyInfoObject.getString("registerSubType"));
+                                RespServiceData RealEstateBookData = new RespServiceData();
+                                RespServiceData getRealEstateBooking = getRealEstateBooking(verfyInfoObject.getString("certificateType"),
+                                        verfyInfoObject.getString("certificateId"), RealEstateBookData);
+                                if (verfyInfoObject.getString("registerSubType").equals(Msgagger.DYZXDJ)){
+                                    getRealEstateBooking.setServiceCode(Msgagger.DYZXSERVICECODE);
+                                    if (ficateInfoArray.size()==1){
+                                        name= verfyInfoObject.getString("certificateType");
+                                    }
+                                    resultServiceData=getRealEstateBooking;
+                                }else if (StringUtils.isEmpty(getRealEstateBooking.getServiceCode())){
+                                    getRealEstateBooking.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
                                 }
-                                resultServiceData=getRealEstateBooking;
-                            }else if (StringUtils.isEmpty(getRealEstateBooking.getServiceCode())){
-                                getRealEstateBooking.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
+                                respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
                             }
-                            respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
                         }
-                        JSONArray respService=JSONArray.fromObject(respServiceDataList);
-                        log.info("respService"+respService.toString());
-                        mapParmeter.put("serviceData",respService.toString());
                         RespServiceData respServiceData = new RespServiceData();
                         respServiceData.setServiceCode(Msgagger.DBSERVICECODE);
                         //获取登记小类信息
@@ -886,7 +885,9 @@ public class AnonymousInnerComponent {
                     for(SJ_Info_Bdcqlxgxx bdcqlxgxx:bdcqlxgxxList){
                         bdcqlxgxx.setItsRightVoList(new ArrayList<SJ_Its_Right>());
                     }
-                    respServiceData.setServiceCode(Msgagger.BDCQZSDZF_SERVICE_CODE);
+                    if (StringUtils.isEmpty(respServiceData.getServiceCode())) {
+                        respServiceData.setServiceCode(Msgagger.BDCQZSDZF_SERVICE_CODE);
+                    }
                     log.info("DYZMH:"+bdcqlxgxxList.get(0).toString());
                     respServiceData.setServiceDataInfos(bdcqlxgxxList);
                     break;

@@ -26,6 +26,7 @@ public class JSONBdcdyxgxx implements Serializable {
     private Date mortgageEndingDate;              //抵押期止
     private String mortgageReason;                  //抵押原因
     private String remarks;                         //备注附记
+    private String other;                           //其他权利状况
     private String electronicProofPath;             //电子证明存放路径
     private byte[] electronicProofByte;             //电子证明
     private String serviceCode;                     //服务code
@@ -42,6 +43,14 @@ public class JSONBdcdyxgxx implements Serializable {
     private String glMortgagorVoList;          //关联的抵押人数据
     private String glMortgageHolderVoList;     //关联的抵押权人数据
     private String glObligorInfoVoList;                   //关联的债务人数据
+
+    public String getOther() {
+        return other;
+    }
+
+    public void setOther(String other) {
+        this.other = other;
+    }
 
     public String getGlObligorInfoVoList() {
         return glObligorInfoVoList;

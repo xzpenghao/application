@@ -19,6 +19,7 @@ import com.springboot.popj.warrant.ZdInfo;
 import com.springboot.service.chenbin.impl.ExchangeToInnerServiceImpl;
 
 import com.springboot.util.DateUtils;
+import com.springboot.util.StrUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
@@ -142,7 +143,6 @@ RealEstateMortgageComponent {
 
     /**
      * 发送登记局数据 返回受理编号  (转移登记）
-     *
      * @param commonInterfaceAttributer 接收参数
      * @return
      */
@@ -173,7 +173,6 @@ RealEstateMortgageComponent {
         //加载到registrationBureau中
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, realEstateRenewalPid, true, registrationOfReplacement, dealPerson, areaNo);
         registrationBureau = ClrealEstateRenewal(sjSjsq,registrationBureau);
-        registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         return getObjectRestResponse(sjSjsq, resultObject);
     }
@@ -192,7 +191,6 @@ RealEstateMortgageComponent {
         //加载到registrationBureau中
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, supplementaryEvidencePid, true, registrationOfSupplementary, dealPerson, areaNo);
         registrationBureau = ClSupplementary(sjSjsq,registrationBureau);
-        registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         return getObjectRestResponse(sjSjsq, resultObject);
     }
@@ -207,11 +205,10 @@ RealEstateMortgageComponent {
     public ObjectRestResponse cancellationOfWarrants(String commonInterfaceAttributer) throws ParseException {
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
-        log.info("补证业务sjsq:"+JSONObject.toJSONString(sjSjsq));
+        log.info("权证注销业务Sjsq:"+JSONObject.toJSONString(sjSjsq));
         //加载到registrationBureau中
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq,cancellationOfWarrantsPid, true, cancellationOfWarrants, dealPerson, areaNo);
         registrationBureau = ClcancellationOfWarrants(sjSjsq,registrationBureau);
-        registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         return getObjectRestResponse(sjSjsq, resultObject);
     }
@@ -225,6 +222,8 @@ RealEstateMortgageComponent {
      */
     private RegistrationBureau ClrealEstateRenewal(SJ_Sjsq sjSjsq,RegistrationBureau registrationBureau){
         ReplaceBizInfo replaceBizInfo=new ReplaceBizInfo();
+        replaceBizInfo.setRegisterSubType(sjSjsq.getRegistrationSubclass()); //登记小类
+        replaceBizInfo.setRegisterReason(sjSjsq.getRegistrationReason());
         if (null != sjSjsq.getImmovableRightInfoVoList() && sjSjsq.getImmovableRightInfoVoList().size()==1){
             replaceBizInfo.setRealEstateId(sjSjsq.getImmovableRightInfoVoList().get(0).getImmovableCertificateNo());
             replaceBizInfo.setCertificateType("BDCZH");
@@ -254,6 +253,8 @@ RealEstateMortgageComponent {
      */
     private RegistrationBureau ClSupplementary(SJ_Sjsq sjSjsq,RegistrationBureau registrationBureau){
         ReissueBizInfo reissueBizInfo=new ReissueBizInfo();
+        reissueBizInfo.setRegisterSubType(sjSjsq.getRegistrationSubclass());
+        reissueBizInfo.setRegisterReason(sjSjsq.getRegistrationReason());
         if (null != sjSjsq.getImmovableRightInfoVoList() && sjSjsq.getImmovableRightInfoVoList().size()==1){
             reissueBizInfo.setRealEstateId(sjSjsq.getImmovableRightInfoVoList().get(0).getImmovableCertificateNo());
             reissueBizInfo.setCertificateType("BDCZH");
@@ -583,6 +584,8 @@ RealEstateMortgageComponent {
                 realPropertyCertificate.setCertificateType("土地证");
             }
         }
+        realPropertyCertificate.setRemarks(jsonObject.getString("remark"));//备注附记
+        realPropertyCertificate.setOther(jsonObject.getString("other"));//其他权利状况
         realPropertyCertificate.setRegistrationDate(jsonObject.getString("registerDate"));
         JSONArray glImmovablejsonArray = (JSONArray) jsonObject.get("realEstateUnitInfoVoList");//房屋信息
         if (null != glImmovablejsonArray) {
@@ -721,12 +724,12 @@ RealEstateMortgageComponent {
     public List<RealPropertyCertificate> getRealPropertySj(String json, String ygCancellcation) {
         List<RealPropertyCertificate> realPropertyCertificateList = new ArrayList<>();
         //判断预告证明号
-        if (StringUtils.isNotEmpty(ygCancellcation)) {
-            JSONObject jsonObject = (JSONObject) JSONObject.parse(json);
-            RealPropertyCertificate realPropertyCertificate = getRealProperty(jsonObject, null);
-            realPropertyCertificateList.add(realPropertyCertificate);
-            return realPropertyCertificateList;
-        }
+//        if (StringUtils.isNotEmpty(ygCancellcation)) {
+//            JSONObject jsonObject = (JSONObject) JSONObject.parse(json);
+//            RealPropertyCertificate realPropertyCertificate = getRealProperty(jsonObject, null);
+//            realPropertyCertificateList.add(realPropertyCertificate);
+//            return realPropertyCertificateList;
+//        }
         //不动产证号和不动产单元号 (返回list)
         JSONArray jsonArray = JSONArray.parseArray(json);
         for (int i = 0; i < jsonArray.size(); i++) {
@@ -743,8 +746,14 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, registrationPid, true, grMortgageRegistration, bankPerson, areaNo);
         registrationBureau = ClAutoRealPropertyCertificate(sjSjsq, registrationBureau);
         String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
-        //做ftp操作
-        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,false);
+//        if (sjSjsq.getExt1().equals("0")){
+//            //做ftp操作
+//            return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,false);
+//        }
+            String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+            Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);
+//            Map<String,String> map=(Map<String,String>)jsonObject;//转换map
+            return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
     }
 
     private RegistrationBureau ClAutoRealPropertyCertificate(SJ_Sjsq sj_sjsq, RegistrationBureau registrationBureau) {
@@ -957,6 +966,8 @@ RealEstateMortgageComponent {
                 for (int a = 0; a < mortgageInfojsonArray.size(); a++) {
                     //抵押信息
                     JSONObject mortgageInfo = mortgageInfojsonArray.getJSONObject(a);
+                    mortgageService.setRemarks(jsonObject.getString("remark"));//附记
+                    mortgageService.setOther(jsonObject.getString("other"));//其他状况
                     mortgageService.setImmovableCertificateNo(jsonObject.getString("realEstateId"));
                     mortgageService.setAcceptanceNumber(mortgageInfo.getString("dySLBH"));
                     if (null == mortgageInfo.getString("mortgageWay") ){ //没有的话取小类信息

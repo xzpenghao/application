@@ -44,6 +44,7 @@ public class RealPropertyCertificate {
     private String[] forecastCertificateNos;        //预告证明号
     private String[] warrantNos;                    //抵押证明号
     private String remarks;                      //备注附记
+    private String other;                        //其他状况
     private String dataType;                     //数据类型（存量/新增）
     private String ext1;                         //扩展字段1
     private String ext2;                         //扩展字段2
@@ -51,6 +52,15 @@ public class RealPropertyCertificate {
     private List<GlImmovable> glImmovableVoList=new ArrayList<>();//不动产类型(房屋信息)
     private List<GlMortgagor> glObligeeVoList=new ArrayList<>();//权利人数据
     private List<GlMortgagor> glObligorVoList=new ArrayList<>();//义务人数据
+
+
+    public String getOther() {
+        return other;
+    }
+
+    public void setOther(String other) {
+        this.other = other;
+    }
 
     public BigDecimal getCommonLandArea() {
         return commonLandArea;

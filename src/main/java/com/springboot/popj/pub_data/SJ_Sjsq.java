@@ -29,7 +29,7 @@ public class SJ_Sjsq  implements Serializable {
     private String receiptTime;                                //收件时间
     private String registerNumber;                             //内网办件受理号
     private String status;                                     //状态（正常/废弃/挂起）
-    private String ext1;                                       //扩展字段1
+    private String ext1;                                       //扩展字段1 (临时存储受理提交状态码标识)
     private String ext2;                                       //扩展字段2
     private String ext3;                                       //扩展字段3
     private String ext4;                                       //扩展字段4

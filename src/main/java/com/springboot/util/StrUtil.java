@@ -2,6 +2,9 @@ package com.springboot.util;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 public class StrUtil {
 
@@ -39,4 +42,18 @@ public class StrUtil {
         String remotePath="/"+DateUtils.getNowYear()+"/"+DateUtils.getNowMonth()+"/"+DateUtils.getNowDay()+fileAdress;
         return remotePath;
     }
+
+
+    public static Map<String,String> mapStringToMap(String str){
+        str=str.substring(1, str.length()-1);
+        String[] strs=str.split(",");
+        Map<String,String> map = new HashMap<String, String>();
+        for (String string : strs) {
+            String key=string.split("=")[0];
+            String value=string.split("=")[1];
+            map.put(key, value);
+        }
+        return map;
+    }
+
 }

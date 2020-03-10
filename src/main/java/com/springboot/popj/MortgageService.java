@@ -19,7 +19,8 @@ public class MortgageService {
     private Date mortgageStartingDate;//抵押开始时间
     private Date mortgageEndingDate;//抵押到期时间
     private String mortgageReason;//贷款原因
-    private String remarks;//备注
+    private String remarks;//备注附记
+    private String other;//其他权利状况
     private String dataType;//数据类型
     private String dataComeFromMode;//获取方式
     private List<GlImmovable> glImmovableVoList=new ArrayList<>();//不动产房信息
@@ -29,6 +30,14 @@ public class MortgageService {
 
     public List<ObligorInfoVo> getGlObligorInfoVoList() {
         return glObligorInfoVoList;
+    }
+
+    public String getOther() {
+        return other;
+    }
+
+    public void setOther(String other) {
+        this.other = other;
     }
 
     public void setGlObligorInfoVoList(List<ObligorInfoVo> glObligorInfoVoList) {

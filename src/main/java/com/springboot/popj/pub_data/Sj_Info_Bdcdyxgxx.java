@@ -21,6 +21,7 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
     private Date mortgageEndingDate;              //抵押期止
     private String mortgageReason;                  //抵押原因
     private String remarks;                         //备注附记
+    private String other;                           //其他权利状况
     private String electronicProofPath;             //电子证明存放路径
     private byte[] electronicProofByte;             //电子证明
     private String dataType;                        //数据类型（存量/新增）
@@ -33,6 +34,15 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
     private List<SJ_Qlr_Gl> glMortgageHolderVoList;            //关联的抵押权人数据
     private List<SJ_Qlr_Gl> glAgentInfoVoList;             //关联委托抵押人代理人数据
     private List<SJ_Qlr_Gl> glObligorInfoVoList;                   //关联的债务人数据
+
+
+    public String getOther() {
+        return other;
+    }
+
+    public void setOther(String other) {
+        this.other = other;
+    }
 
     public List<SJ_Qlr_Gl> getGlObligorInfoVoList() {
         return glObligorInfoVoList;

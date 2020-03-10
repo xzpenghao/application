@@ -2,12 +2,14 @@ package com.springboot.service.chenbin.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.component.chenbin.ExchangeToInnerComponent;
 import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.component.chenbin.OtherComponent;
 import com.springboot.component.chenbin.file.FileHandleComponent;
 import com.springboot.component.chenbin.file.FromFTPDownloadComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
+import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.constant.chenbin.BusinessConstant;
 import com.springboot.entity.SJ_Fjfile;
@@ -49,7 +51,13 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     @Autowired
     private HttpCallComponent httpCallComponent;
     @Autowired
+    private AnonymousInnerComponent anonymousInnerComponent;
+    @Autowired
     private OtherComponent otherComponent;
+    @Value("${djj.tsryname}")
+    private String tsryname;
+    @Value("${djj.tsrypaaword}")
+    private String tsrypaaword;
     @Autowired
     private ForImmovableFeign immovableFeign;
     @Autowired
@@ -378,6 +386,27 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         return certificateType_;
     }
 
+    public String handleAcceptance(String registerNumber,String  receiptNumber ){
+        Map<String, String> mapParmeter = new HashMap<>();
+        com.alibaba.fastjson.JSONObject tokenObject;
+        tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
+        String token =anonymousInnerComponent.getToken(tokenObject, "GetReceiving",receiptNumber, Msgagger.ACCPETNOTICE, null);
+        mapParmeter.put("slbh",registerNumber);
+        //调用受理提交接口
+        Map<String, Object> map = immovableFeign.acceptFlow(mapParmeter);
+        if (StringUtils.isNotEmpty(map.get("code").toString()) && map.get("code").equals("500")){
+            log.error(map.get("message").toString());
+        }
+        //判断受理提交是否成功
+        log.info("执行受理操作");
+        mapParmeter.put("registerNumber",registerNumber);
+        String resultJson =anonymousInnerComponent.preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
+        log.info("result is " + resultJson);
+        //执行一窗平台受理提交
+        return  resultJson;
+    }
+
+
     public String handleCreateFlow(String token,SJ_Sjsq sjsq,RegistrationBureau registrationBureau,boolean dealFile){
         Map<String,String> params = new HashMap<String,String>();
         try {
@@ -421,7 +450,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
             //签收办件
             otherComponent.signPro(token,bsryname,bsrypassword,sjsq.getReceiptNumber(),params);
         }
-        return "转移登记同步内网办理成功";
+        return params.toString();
     }
 
     private PaphEntity getBasePaph(JSONObject obj){
