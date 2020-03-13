@@ -24,6 +24,7 @@ import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+import com.sun.org.apache.bcel.internal.generic.SALOAD;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +105,8 @@ RealEstateMortgageComponent {
     private String transferMortgagePid;
     @Value("${penghao.cancellationOfWarrants.pid}")
     private String cancellationOfWarrantsPid;
+    @Value("${penghao.analysisProduction.pid}")
+    private String analysisProductionPid;
     @Value("${penghao.mortgageRegistration.pid}")
     private String registrationPid;
     @Value("${djj.tsryname}")
@@ -211,6 +214,90 @@ RealEstateMortgageComponent {
         registrationBureau = ClcancellationOfWarrants(sjSjsq,registrationBureau);
         JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
         return getObjectRestResponse(sjSjsq, resultObject);
+    }
+
+
+    /**
+     * 不动产转移(析产)业务登记信息
+     * @param commonInterfaceAttributer
+     * @return
+     * @throws ParseException
+     */
+    public ObjectRestResponse zyAnalysisProduction(String commonInterfaceAttributer) throws ParseException {
+        //获取json数据转成收件申请
+        SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        log.info("转移析产:"+JSONObject.toJSONString(sjSjsq));
+        //加载到registrationBureau中
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq,analysisProductionPid, true, registrationOfTransfer, dealPerson, areaNo);
+        registrationBureau = ClzyAnalysisProduction(sjSjsq,registrationBureau);
+        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
+        return getObjectRestResponse(sjSjsq, resultObject);
+    }
+
+    public RegistrationBureau ClzyAnalysisProduction(SJ_Sjsq sjSjsq, RegistrationBureau registrationBureau){
+        TransferBizInfo transferBizInfo=new TransferBizInfo();//转移登记
+        transferBizInfo.setRegisterSubType(sjSjsq.getRegistrationSubclass());//登记小类
+        transferBizInfo.setTransferReason(sjSjsq.getRegistrationReason());//原因
+        if (null != sjSjsq.getImmovableRightInfoVoList() && sjSjsq.getImmovableRightInfoVoList().size()>0){
+            sjSjsq.getImmovableRightInfoVoList().forEach(x->{
+                System.out.println(x.getImmovableCertificateNo());
+                transferBizInfo.setRealEstateId(x.getImmovableCertificateNo());
+                if (StringUtils.isNotEmpty(x.getLandCertificateNo())){
+                    transferBizInfo.setLandCertificate(x.getImmovableCertificateNo());
+                }
+                //权利人数据
+                if (null != x.getGlObligeeVoList() && x.getGlObligeeVoList().size()!=0){
+                    List<QlrGlMortgator> obligeeInfoVoList=new ArrayList<>();
+                    for (SJ_Qlr_Gl q:x.getGlObligeeVoList()) {
+                        QlrGlMortgator qlrGlMortgator =new QlrGlMortgator();
+                        qlrGlMortgator.setObligeeName(q.getObligeeName());
+                        qlrGlMortgator.setObligeeId(q.getRelatedPerson().getObligeeDocumentNumber());
+                        qlrGlMortgator.setSharedSharel(q.getSharedValue());
+                        qlrGlMortgator.setObligeeIdType(q.getObligeeType());
+                        obligeeInfoVoList.add(qlrGlMortgator);
+                    }
+                    transferBizInfo.setObligeeInfoVoList(obligeeInfoVoList);
+                }
+                //义务人数据
+                if (null != x.getGlObligorVoList() && x.getGlObligorVoList().size()!=0) {
+                        List<BDCSalerInfo> salerInfoVoList = new ArrayList<>();
+                    for (SJ_Qlr_Gl q:x.getGlObligeeVoList()) {
+                        BDCSalerInfo salerInfo = new BDCSalerInfo();
+                        salerInfo.setSalerName(q.getObligeeName());
+                        salerInfo.setSalerId(q.getRelatedPerson().getObligeeDocumentNumber());
+                        salerInfo.setSalerIdType(q.getObligeeType());
+                        salerInfoVoList.add(salerInfo);
+                    }
+                        transferBizInfo.setSalerInfoVoList(salerInfoVoList);
+                }
+                //权利代理人数据
+                if (null != x.getGlAgentVoList() && x.getGlAgentVoList().size()!=0){
+                        List<WtdlrGlMortgator> obligeeAgentInfoVoList = new ArrayList<>();
+                    for (SJ_Qlr_Gl q:x.getGlAgentVoList()) {
+                        WtdlrGlMortgator wtdlrGlMortgator = new WtdlrGlMortgator();
+                        wtdlrGlMortgator.setAgentName(q.getObligeeName());
+                        wtdlrGlMortgator.setAgentId(q.getRelatedPerson().getObligeeDocumentNumber());
+                        wtdlrGlMortgator.setAgentIdType(q.getObligeeType());
+                        obligeeAgentInfoVoList.add(wtdlrGlMortgator);
+                    }
+                        transferBizInfo.setObligeeAgentInfoVoList(obligeeAgentInfoVoList);
+                }
+                //义务代理人数据
+                if (null != x.getGlAgentObligorVoList() && x.getGlAgentObligorVoList().size()!=0){
+                    List<WtdlrGlMortgator> salerAgentInfoVoList = new ArrayList<>();
+                    for (SJ_Qlr_Gl q:x.getGlAgentObligorVoList()) {
+                        WtdlrGlMortgator wtdlrGlMortgator = new WtdlrGlMortgator();
+                        wtdlrGlMortgator.setAgentName(q.getObligeeName());
+                        wtdlrGlMortgator.setAgentId(q.getRelatedPerson().getObligeeDocumentNumber());
+                        wtdlrGlMortgator.setAgentIdType(q.getObligeeType());
+                        salerAgentInfoVoList.add(wtdlrGlMortgator);
+                    }
+                        transferBizInfo.setSalerAgentInfoVoList(salerAgentInfoVoList);
+                }
+            });
+        }
+        registrationBureau.setTransferBizInfo(transferBizInfo);//存储转移
+        return registrationBureau;
     }
 
 
@@ -549,7 +636,6 @@ RealEstateMortgageComponent {
         if (StringUtils.isEmpty(ygCancellcation)) {
             throw new ZtgeoBizException(Msgagger.MORTGAGE_CERTIFICATE_NULL);
         }
-//        String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByYGZMH", map, null);
         String json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByYGZMH"+ "?YGZMH=" + ygCancellcation);
         System.out.println("aa" + getRealPropertySj(json, ygCancellcation));
         return resultRV.data(getRealPropertySj(json, ygCancellcation));
@@ -723,13 +809,6 @@ RealEstateMortgageComponent {
      */
     public List<RealPropertyCertificate> getRealPropertySj(String json, String ygCancellcation) {
         List<RealPropertyCertificate> realPropertyCertificateList = new ArrayList<>();
-        //判断预告证明号
-//        if (StringUtils.isNotEmpty(ygCancellcation)) {
-//            JSONObject jsonObject = (JSONObject) JSONObject.parse(json);
-//            RealPropertyCertificate realPropertyCertificate = getRealProperty(jsonObject, null);
-//            realPropertyCertificateList.add(realPropertyCertificate);
-//            return realPropertyCertificateList;
-//        }
         //不动产证号和不动产单元号 (返回list)
         JSONArray jsonArray = JSONArray.parseArray(json);
         for (int i = 0; i < jsonArray.size(); i++) {
@@ -746,13 +825,12 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, registrationPid, true, grMortgageRegistration, bankPerson, areaNo);
         registrationBureau = ClAutoRealPropertyCertificate(sjSjsq, registrationBureau);
         String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
-//        if (sjSjsq.getExt1().equals("0")){
-//            //做ftp操作
-//            return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,false);
-//        }
+        if (sjSjsq.getExt1().equals("0")){
+            //做ftp操作
+            return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,false);
+        }
             String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
-            Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);
-//            Map<String,String> map=(Map<String,String>)jsonObject;//转换map
+            Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
             return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
     }
 

@@ -104,4 +104,10 @@ public class SqRealEstateMortgageController {
         return realEstateMortgageComponent.cancellationOfWarrants(commonInterfaceAttributer);
     }
 
+    @RequestMapping(value = "/zyAnalysisProduction", method = RequestMethod.POST)
+    @ApiOperation("不动产转移析产发送至登记平台办件")
+    public ObjectRestResponse zyAnalysisProduction(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
+        return realEstateMortgageComponent.zyAnalysisProduction(commonInterfaceAttributer);
+    }
+
 }
