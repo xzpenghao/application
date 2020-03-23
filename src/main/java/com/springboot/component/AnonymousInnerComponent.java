@@ -647,8 +647,10 @@ public class AnonymousInnerComponent {
                         map.put("slbh", getReceiving.getSlbh());
                         log.info("获取token成功，为："+token);
                         //发送登记局获取数据整理发送一窗受理
-                        String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
+                       // String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
+                        String json="{\"slbh\":\"202003200113\",\"certificateInfoVoList\":[{\"certificateId\":\"苏(2020)沛县不动产证明第0003954号\",\"certificateType\":\"YGZMH\",\"registerSubType\":\"预购商品房\",\"registerDate\":\"2020-03-20 16:45:14\"},{\"certificateId\":\"苏(2020)沛县不动产证明第0003955号\",\"certificateType\":\"DYZMH\",\"registerSubType\":\"一般抵押权\",\"registerDate\":\"2020-03-20 16:45:15\"}],\"sit\":\"上城苑A4-2-401\",\"bizType\":\"Z\"}";
                         log.info("登记平台获取登簿数据成功，为："+json);
+//                        com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(json);
                         JSONObject jsonObject = JSONObject.fromObject(json);
                         mapParmeter.put("immovableSite", jsonObject.getString("sit"));
                         mapParmeter.put("registerNumber", jsonObject.getString("slbh"));
@@ -660,27 +662,29 @@ public class AnonymousInnerComponent {
                         List<String> stringList = new ArrayList<>();
                         RespServiceData resultServiceData=new RespServiceData(); //为了返回银行信息
                         String name="";
-                        //如果权证注销不需要去查询证号
-                        if (StringUtils.isNotEmpty(jsonObject.getString("bizType")) && !jsonObject.getString("bizType").equals("QZZX")){
-                            //获取受理编号信息
-                            for (int i = 0; i < ficateInfoArray.size(); i++) {
-                                JSONObject verfyInfoObject = ficateInfoArray.getJSONObject(i);
-                                stringList.add(verfyInfoObject.getString("registerSubType"));
-                                RespServiceData RealEstateBookData = new RespServiceData();
-                                RespServiceData getRealEstateBooking = getRealEstateBooking(verfyInfoObject.getString("certificateType"),
-                                        verfyInfoObject.getString("certificateId"), RealEstateBookData);
-                                if (verfyInfoObject.getString("registerSubType").equals(Msgagger.DYZXDJ)){
-                                    getRealEstateBooking.setServiceCode(Msgagger.DYZXSERVICECODE);
-                                    if (ficateInfoArray.size()==1){
-                                        name= verfyInfoObject.getString("certificateType");
+                        //如果权证注销不需要去查询证号StringUtils.isNotEmpty(jsonObject.getString("bizType")) && !jsonObject.getString("bizType").equals("QZZX")
+                            if ( !jsonObject.containsKey("bizType") || !jsonObject.get("bizType").equals("QZZX")) {
+                                log.info("进循环");
+                                //获取受理编号信息
+                                for (int i = 0; i < ficateInfoArray.size(); i++) {
+                                    JSONObject verfyInfoObject = ficateInfoArray.getJSONObject(i);
+                                    stringList.add(verfyInfoObject.getString("registerSubType"));
+                                    RespServiceData RealEstateBookData = new RespServiceData();
+                                    RespServiceData getRealEstateBooking = getRealEstateBooking(verfyInfoObject.getString("certificateType"),
+                                            verfyInfoObject.getString("certificateId"), RealEstateBookData);
+                                    if (verfyInfoObject.getString("registerSubType").equals(Msgagger.DYZXDJ)) {
+                                        getRealEstateBooking.setServiceCode(Msgagger.DYZXSERVICECODE);
+                                        if (ficateInfoArray.size() == 1) {
+                                            name = verfyInfoObject.getString("certificateType");
+                                        }
+                                        resultServiceData = getRealEstateBooking;
+                                    } else if (StringUtils.isEmpty(getRealEstateBooking.getServiceCode())) {
+                                        getRealEstateBooking.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
                                     }
-                                    resultServiceData=getRealEstateBooking;
-                                }else if (StringUtils.isEmpty(getRealEstateBooking.getServiceCode())){
-                                    getRealEstateBooking.setServiceCode(Msgagger.DYZMHSERVICE_CODE);
+                                    respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
                                 }
-                                respServiceDataList.add(getRealEstateBooking);//不动产展示登簿信息
                             }
-                        }
+
                         RespServiceData respServiceData = new RespServiceData();
                         respServiceData.setServiceCode(Msgagger.DBSERVICECODE);
                         //获取登记小类信息
@@ -875,6 +879,7 @@ public class AnonymousInnerComponent {
                 case "YGZMH":
                     resultRV = realEstateMortgageComponent.getMortgageCancellation(certificateId);
                     List<RealPropertyCertificate> realPropertyCertificateList = (List<RealPropertyCertificate>) resultRV.getData();
+                    log.info("YGZMH:"+realPropertyCertificateList.toString());
                     respServiceData.setServiceCode(Msgagger.YGZMSERVICE_CODE);
                     respServiceData.setServiceDataInfos(realPropertyCertificateList);
                     break;
@@ -1003,7 +1008,7 @@ public class AnonymousInnerComponent {
             List<GlMortgagor> glMortgagorVoList=mortgageService.getGlMortgagorVoList();
             for (GlMortgagor glMortgagor: glMortgagorVoList) { //抵押人信息
                 MortgagorInfoVo mortgagorInfoVo=new MortgagorInfoVo();
-                mortgagorInfoVo.setMortgagorNmae(glMortgagor.getObligeeName());
+                mortgagorInfoVo.setMortgagorName(glMortgagor.getObligeeName());
                 mortgagorInfoVo.setMortgagorId(glMortgagor.getRelatedPerson().getObligeeDocumentNumber());
                 mortgagorInfoVo.setMortgagorIdType(MortgagorPtypeEnum.Sc(glMortgagor.getRelatedPerson().getObligeeDocumentType()));
                 mortgagorInfoVoList.add(mortgagorInfoVo);

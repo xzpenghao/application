@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MortgagorInfoVo {
-    private String mortgagorNmae;
+    private String mortgagorName;
     private String mortgagorIdType;
     private String mortgagorId;
 }

@@ -49,13 +49,15 @@ public class SqRealEstateMortgageController {
     @RequestMapping(value = "/realEstateRenewal", method = RequestMethod.POST)
     @ApiOperation("换证登记发送登记局收件")
     public ObjectRestResponse realEstateRenewal(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
-        return realEstateMortgageComponent.realEstateRenewal(commonInterfaceAttributer);
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        return  rv.data(realEstateMortgageComponent.realEstateRenewal(commonInterfaceAttributer));
     }
 
     @RequestMapping(value = "/supplementaryEvidence", method = RequestMethod.POST)
     @ApiOperation("补证登记发送登记局收件")
     public ObjectRestResponse supplementaryEvidence(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
-        return realEstateMortgageComponent.supplementaryEvidence(commonInterfaceAttributer);
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        return  rv.data(realEstateMortgageComponent.supplementaryEvidence(commonInterfaceAttributer));
     }
 
 
@@ -63,13 +65,15 @@ public class SqRealEstateMortgageController {
     @RequestMapping(value = "/sendTransferRegister", method = RequestMethod.POST)
     @ApiOperation("二手房转移登记发送登记局收件")
     public ObjectRestResponse sendTransferRegister(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
-        return realEstateMortgageComponent.sendTransferRegister(commonInterfaceAttributer);
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        return  rv.data(realEstateMortgageComponent.sendTransferRegister(commonInterfaceAttributer));
     }
 
     @RequestMapping(value = "/sendTransferMortgage", method = RequestMethod.POST)
     @ApiOperation("二手房转移登记及抵押发送登记局收件")
     public ObjectRestResponse sendTransferMortgage(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
-        return realEstateMortgageComponent.sendTransferMortgage(commonInterfaceAttributer);
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        return  rv.data(realEstateMortgageComponent.sendTransferMortgage(commonInterfaceAttributer));
     }
 
     @RequestMapping(value = "/sqTaxation", method = RequestMethod.POST)
@@ -101,13 +105,22 @@ public class SqRealEstateMortgageController {
     @RequestMapping(value = "/cancellationOfWarrants", method = RequestMethod.POST)
     @ApiOperation("权证注销发送至登记平台办件")
     public ObjectRestResponse cancellationOfWarrants(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
-        return realEstateMortgageComponent.cancellationOfWarrants(commonInterfaceAttributer);
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        return  rv.data(realEstateMortgageComponent.cancellationOfWarrants(commonInterfaceAttributer));
     }
 
     @RequestMapping(value = "/zyAnalysisProduction", method = RequestMethod.POST)
     @ApiOperation("不动产转移析产发送至登记平台办件")
     public ObjectRestResponse zyAnalysisProduction(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
-        return realEstateMortgageComponent.zyAnalysisProduction(commonInterfaceAttributer);
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        return  rv.data(realEstateMortgageComponent.zyAnalysisProduction(commonInterfaceAttributer));
+    }
+
+    @RequestMapping(value = "/courtRulingIndividual", method = RequestMethod.POST)
+    @ApiOperation("不动产法院裁定发送至登记平台办件")
+    public ObjectRestResponse<String> courtRulingIndividual(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        return  rv.data(realEstateMortgageComponent.courtRulingIndividual(commonInterfaceAttributer));
     }
 
 }

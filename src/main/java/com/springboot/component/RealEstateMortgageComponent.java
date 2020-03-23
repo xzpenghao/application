@@ -23,8 +23,6 @@ import com.springboot.util.StrUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
-import com.sun.org.apache.bcel.internal.generic.SALOAD;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +32,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -107,12 +104,18 @@ RealEstateMortgageComponent {
     private String cancellationOfWarrantsPid;
     @Value("${penghao.analysisProduction.pid}")
     private String analysisProductionPid;
+    @Value("${penghao.rulingIndividual.pid}")
+    private String rulingIndividualPid;
     @Value("${penghao.mortgageRegistration.pid}")
     private String registrationPid;
     @Value("${djj.tsryname}")
     private String bsryname;
     @Value("${djj.tsrypaaword}")
     private String bsrypassword;
+    @Value("${djj.tsryname}")
+    private String tsryname;
+    @Value("${djj.tsrypaaword}")
+    private String tsrypaaword;
 
     @Autowired
     private AnonymousInnerComponent anonymousInnerComponent;
@@ -128,7 +131,7 @@ RealEstateMortgageComponent {
      * @param commonInterfaceAttributer 接收参数
      * @return
      */
-    public ObjectRestResponse sendTransferMortgage(String commonInterfaceAttributer) throws ParseException {
+    public String sendTransferMortgage(String commonInterfaceAttributer) throws ParseException {
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
         //加载到registrationBureau中
@@ -138,8 +141,10 @@ RealEstateMortgageComponent {
         registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
         //加载抵押信息
         registrationBureau =ClAutoRealPropertyCertificate(sjSjsq,registrationBureau);
-        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
-        return getObjectRestResponse(sjSjsq, resultObject);
+        String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
+        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
+        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
     }
 
 
@@ -149,7 +154,7 @@ RealEstateMortgageComponent {
      * @param commonInterfaceAttributer 接收参数
      * @return
      */
-    public ObjectRestResponse sendTransferRegister(String commonInterfaceAttributer) throws ParseException {
+    public String sendTransferRegister(String commonInterfaceAttributer) throws ParseException {
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
         System.out.println("二手房转移sjsq:"+JSONObject.toJSONString(sjSjsq));
@@ -158,8 +163,10 @@ RealEstateMortgageComponent {
         //加载转移信息
         registrationBureau = getTransferRegister(sjSjsq.getTransactionContractInfo(),sjSjsq.getImmovableRightInfoVoList(),registrationBureau);
         registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
-        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
-        return getObjectRestResponse(sjSjsq, resultObject);
+        String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
+        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
+        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
     }
 
 
@@ -169,15 +176,17 @@ RealEstateMortgageComponent {
      * @return
      * @throws ParseException
      */
-    public ObjectRestResponse realEstateRenewal(String commonInterfaceAttributer) throws ParseException {
+    public String realEstateRenewal(String commonInterfaceAttributer) throws ParseException {
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
         log.info("换证业务sjsq:"+JSONObject.toJSONString(sjSjsq));
         //加载到registrationBureau中
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, realEstateRenewalPid, true, registrationOfReplacement, dealPerson, areaNo);
         registrationBureau = ClrealEstateRenewal(sjSjsq,registrationBureau);
-        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
-        return getObjectRestResponse(sjSjsq, resultObject);
+        String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
+        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
+        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
     }
 
 
@@ -187,15 +196,17 @@ RealEstateMortgageComponent {
      * @return
      * @throws ParseException
      */
-    public ObjectRestResponse supplementaryEvidence(String commonInterfaceAttributer) throws ParseException {
+    public String supplementaryEvidence(String commonInterfaceAttributer) throws ParseException {
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
         log.info("补证业务sjsq:"+JSONObject.toJSONString(sjSjsq));
         //加载到registrationBureau中
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, supplementaryEvidencePid, true, registrationOfSupplementary, dealPerson, areaNo);
         registrationBureau = ClSupplementary(sjSjsq,registrationBureau);
-        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
-        return getObjectRestResponse(sjSjsq, resultObject);
+        String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
+        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
+        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
     }
 
 
@@ -205,33 +216,55 @@ RealEstateMortgageComponent {
      * @return
      * @throws ParseException
      */
-    public ObjectRestResponse cancellationOfWarrants(String commonInterfaceAttributer) throws ParseException {
+    public String cancellationOfWarrants(String commonInterfaceAttributer) throws ParseException {
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
         log.info("权证注销业务Sjsq:"+JSONObject.toJSONString(sjSjsq));
         //加载到registrationBureau中
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq,cancellationOfWarrantsPid, true, cancellationOfWarrants, dealPerson, areaNo);
-        registrationBureau = ClcancellationOfWarrants(sjSjsq,registrationBureau);
-        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
-        return getObjectRestResponse(sjSjsq, resultObject);
+        String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
+        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
+        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
     }
 
-
     /**
-     * 不动产转移(析产)业务登记信息
+     * 不动产法院裁定个人
      * @param commonInterfaceAttributer
      * @return
      * @throws ParseException
      */
-    public ObjectRestResponse zyAnalysisProduction(String commonInterfaceAttributer) throws ParseException {
+    public String courtRulingIndividual(String commonInterfaceAttributer) throws ParseException {
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
-        log.info("转移析产:"+JSONObject.toJSONString(sjSjsq));
+        log.info("裁定个人数据:"+JSONObject.toJSONString(sjSjsq));
+        //加载到registrationBureau中
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq,rulingIndividualPid, true, registrationOfTransfer, dealPerson, areaNo);
+        registrationBureau = ClzyAnalysisProduction(sjSjsq,registrationBureau);
+        String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
+        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
+        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
+    }
+
+
+    /**
+     * 不动产转移析产业务登记信息
+     * @param commonInterfaceAttributer
+     * @return
+     * @throws ParseException
+     */
+    public String zyAnalysisProduction(String commonInterfaceAttributer) throws ParseException {
+        //获取json数据转成收件申请
+        SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        log.info("转移数据:"+JSONObject.toJSONString(sjSjsq));
         //加载到registrationBureau中
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq,analysisProductionPid, true, registrationOfTransfer, dealPerson, areaNo);
         registrationBureau = ClzyAnalysisProduction(sjSjsq,registrationBureau);
-        JSONObject resultObject = httpCallComponent.callRegistrationBureauForRegister(registrationBureau);
-        return getObjectRestResponse(sjSjsq, resultObject);
+        String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
+        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
+        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
     }
 
     public RegistrationBureau ClzyAnalysisProduction(SJ_Sjsq sjSjsq, RegistrationBureau registrationBureau){
@@ -655,6 +688,7 @@ RealEstateMortgageComponent {
     private RealPropertyCertificate getRealProperty(JSONObject jsonObject, JSONObject obj1) {
         RealPropertyCertificate realPropertyCertificate = new RealPropertyCertificate();
         if (StringUtils.isEmpty(jsonObject.getString("realEstateId"))) {
+            realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("vormerkungId"));
             realPropertyCertificate.setForecastCertificateNos(jsonObject.getString("vormerkungId").split(","));
         } else {
             realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("realEstateId"));
@@ -827,7 +861,7 @@ RealEstateMortgageComponent {
         String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
         if (sjSjsq.getExt1().equals("0")){
             //做ftp操作
-            return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,false);
+            return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
         }
             String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
             Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
