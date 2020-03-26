@@ -647,8 +647,7 @@ public class AnonymousInnerComponent {
                         map.put("slbh", getReceiving.getSlbh());
                         log.info("获取token成功，为："+token);
                         //发送登记局获取数据整理发送一窗受理
-                       // String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
-                        String json="{\"slbh\":\"202003200113\",\"certificateInfoVoList\":[{\"certificateId\":\"苏(2020)沛县不动产证明第0003954号\",\"certificateType\":\"YGZMH\",\"registerSubType\":\"预购商品房\",\"registerDate\":\"2020-03-20 16:45:14\"},{\"certificateId\":\"苏(2020)沛县不动产证明第0003955号\",\"certificateType\":\"DYZMH\",\"registerSubType\":\"一般抵押权\",\"registerDate\":\"2020-03-20 16:45:15\"}],\"sit\":\"上城苑A4-2-401\",\"bizType\":\"Z\"}";
+                        String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
                         log.info("登记平台获取登簿数据成功，为："+json);
 //                        com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(json);
                         JSONObject jsonObject = JSONObject.fromObject(json);
@@ -664,7 +663,6 @@ public class AnonymousInnerComponent {
                         String name="";
                         //如果权证注销不需要去查询证号StringUtils.isNotEmpty(jsonObject.getString("bizType")) && !jsonObject.getString("bizType").equals("QZZX")
                             if ( !jsonObject.containsKey("bizType") || !jsonObject.get("bizType").equals("QZZX")) {
-                                log.info("进循环");
                                 //获取受理编号信息
                                 for (int i = 0; i < ficateInfoArray.size(); i++) {
                                     JSONObject verfyInfoObject = ficateInfoArray.getJSONObject(i);

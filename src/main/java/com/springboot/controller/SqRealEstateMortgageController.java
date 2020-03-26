@@ -116,6 +116,13 @@ public class SqRealEstateMortgageController {
         return  rv.data(realEstateMortgageComponent.zyAnalysisProduction(commonInterfaceAttributer));
     }
 
+    @RequestMapping(value = "/transferInheritanceOrBequest", method = RequestMethod.POST)
+    @ApiOperation("继承或受遗赠发送至登记平台办件")
+    public ObjectRestResponse transferInheritanceOrBequest(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        return  rv.data(realEstateMortgageComponent.transferInheritanceOrBequest(commonInterfaceAttributer));
+    }
+
     @RequestMapping(value = "/courtRulingIndividual", method = RequestMethod.POST)
     @ApiOperation("不动产法院裁定发送至登记平台办件")
     public ObjectRestResponse<String> courtRulingIndividual(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) throws Exception {

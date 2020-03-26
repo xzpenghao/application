@@ -104,6 +104,8 @@ RealEstateMortgageComponent {
     private String cancellationOfWarrantsPid;
     @Value("${penghao.analysisProduction.pid}")
     private String analysisProductionPid;
+    @Value("${penghao.inheritanceOrBequest.pid}")
+    private String inheritanceOrBequestPid;
     @Value("${penghao.rulingIndividual.pid}")
     private String rulingIndividualPid;
     @Value("${penghao.mortgageRegistration.pid}")
@@ -142,9 +144,7 @@ RealEstateMortgageComponent {
         //加载抵押信息
         registrationBureau =ClAutoRealPropertyCertificate(sjSjsq,registrationBureau);
         String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
-        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
-        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
-        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
     }
 
 
@@ -164,9 +164,7 @@ RealEstateMortgageComponent {
         registrationBureau = getTransferRegister(sjSjsq.getTransactionContractInfo(),sjSjsq.getImmovableRightInfoVoList(),registrationBureau);
         registrationBureau.getTransferBizInfo().setRegisterSubType(sjSjsq.getBusinessType());
         String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
-        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
-        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
-        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
     }
 
 
@@ -184,9 +182,7 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, realEstateRenewalPid, true, registrationOfReplacement, dealPerson, areaNo);
         registrationBureau = ClrealEstateRenewal(sjSjsq,registrationBureau);
         String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
-        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
-        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
-        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
     }
 
 
@@ -204,9 +200,7 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, supplementaryEvidencePid, true, registrationOfSupplementary, dealPerson, areaNo);
         registrationBureau = ClSupplementary(sjSjsq,registrationBureau);
         String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
-        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
-        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
-        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
     }
 
 
@@ -223,9 +217,7 @@ RealEstateMortgageComponent {
         //加载到registrationBureau中
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq,cancellationOfWarrantsPid, true, cancellationOfWarrants, dealPerson, areaNo);
         String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
-        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
-        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
-        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
     }
 
     /**
@@ -242,9 +234,7 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq,rulingIndividualPid, true, registrationOfTransfer, dealPerson, areaNo);
         registrationBureau = ClzyAnalysisProduction(sjSjsq,registrationBureau);
         String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
-        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
-        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
-        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
     }
 
 
@@ -262,10 +252,27 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq,analysisProductionPid, true, registrationOfTransfer, dealPerson, areaNo);
         registrationBureau = ClzyAnalysisProduction(sjSjsq,registrationBureau);
         String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
-        String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
-        Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
-        return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
     }
+
+    /**
+     * 继承或受遗赠转内网接口
+     * @param commonInterfaceAttributer
+     * @return
+     * @throws ParseException
+     */
+    public String transferInheritanceOrBequest(String commonInterfaceAttributer) throws ParseException {
+        //获取json数据转成收件申请
+        SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
+        log.info("转移数据:"+JSONObject.toJSONString(sjSjsq));
+        //加载到registrationBureau中
+        RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq,inheritanceOrBequestPid, true, registrationOfTransfer, dealPerson, areaNo);
+        registrationBureau = ClzyAnalysisProduction(sjSjsq,registrationBureau);
+        String token = backFeign.getToken(new JwtAuthenticationRequest(tsryname,tsryname)).getData();
+        return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+    }
+
+
 
     public RegistrationBureau ClzyAnalysisProduction(SJ_Sjsq sjSjsq, RegistrationBureau registrationBureau){
         TransferBizInfo transferBizInfo=new TransferBizInfo();//转移登记

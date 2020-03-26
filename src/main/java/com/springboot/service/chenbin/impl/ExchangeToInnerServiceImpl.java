@@ -386,7 +386,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         return certificateType_;
     }
 
-    public String handleAcceptance(String registerNumber,String  receiptNumber ){
+    public String handleAcceptance(String registerNumber,String  receiptNumber){
         Map<String, String> mapParmeter = new HashMap<>();
         com.alibaba.fastjson.JSONObject tokenObject;
         tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
