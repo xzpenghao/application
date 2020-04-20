@@ -40,7 +40,7 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://192.168.0.109:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://192.168.0.108:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -118,7 +118,7 @@ glHouseBuyer:
   obligeeYwr: 义务人
   obligeeZwr: 债务人
 httpclient:
-  seam: 23335       #登记平台接口
+  seam: 23335       #杨智昊程序端口
   ip: 192.168.0.120
   #10.3.2.147    #登记平台ip
   windowAcceptanceIp: localhost   #一窗受理ip
@@ -210,6 +210,12 @@ penghao:
         pid: Proc-180824084529-RJ32P320                    #补证登记pid
     cancellationOfWarrants:
         pid: Proc-200305092112-365R152T                    #权证注销pid
+    analysisProduction:
+        pid: Proc-171019100547-765PA42D                    #转移析产pid
+    inheritanceOrBequest:
+        pid: Proc-180403153139-46641AJ0                    #继承或受遗赠pid
+    rulingIndividual:
+        pid: Proc-180403153139-46641AJ0                    #法院裁定个人
     mortgageCancellation:       #抵押注销登记
         pid: Proc-191106165449-7075280W
           #Proc-180517124140-3MN26M71
