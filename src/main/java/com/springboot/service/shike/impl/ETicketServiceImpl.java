@@ -1,11 +1,13 @@
 package com.springboot.service.shike.impl;
 
-import cn.hutool.http.HttpUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.http.HttpStatus;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.service.shike.ETicketService;
 import com.springboot.util.Base64Util;
 import com.springboot.util.TimeUtil;
@@ -37,6 +39,20 @@ public class ETicketServiceImpl implements ETicketService {
     @Autowired
     private ToFTPUploadComponent toFTPUploadComponent;
 
+    @Autowired(required = false)
+    private ExchangeWithOtherFeign otherFeign;
+
+    /**
+     * 描述：电子税票请求共享交换平台获取数据
+     * 作者：sk
+     * 日期：2020/4/22
+     * 参数：{
+     * @param receiptNumbers 申请编号集合
+     * @param ftpFlag ftp标志位
+     * }
+     * 返回：结果集
+     * 更新记录：更新人：{}，更新日期：{}
+    */
     @Override
     public List<TaxAttachment> ETicketQuery(List<String> receiptNumbers, String ftpFlag) {
         if (null == receiptNumbers || "".equals(receiptNumbers)||StringUtils.isBlank(ftpFlag)){
@@ -45,22 +61,22 @@ public class ETicketServiceImpl implements ETicketService {
         log.info("查询集合:{},ftp类型:{}",receiptNumbers,ftpFlag);
         //1.0请求税务接口
         HashMap<String, Object> paramMap = new HashMap<>();
-        paramMap.put("receiptNumbers", receiptNumbers);
-        String result= HttpUtil.post(ETicketUrl, paramMap);
-        log.info("查询结果:{}",result);
-        if (StringUtils.isBlank(result)||"[]".equals(result)){
-            throw new ZtgeoBizException("未查询到信息");
+        paramMap.put("sqbh", receiptNumbers.get(0));
+        ObjectRestResponse<String> result = otherFeign.getETicket(paramMap);
+        log.info("查询参数:{}",JSON.toJSONString(paramMap));
+        if (null == result){
+            throw new ZtgeoBizException("查询无响应");
         }
+        log.info("查询结果:{}",JSON.toJSONString(result));
         //2.0处理税务返回数据
-        JSONObject jsonResult = JSONObject.parseObject(result);
         List<TaxAttachment> taxAttachments;
-        if (null==jsonResult.getString("status")){
-            throw new ZtgeoBizException("查询信息异常");
-        }else if (!"200".equals(jsonResult.getString("status"))){
-            throw new ZtgeoBizException("查询信息异常"+jsonResult.getString("message"));
+        if (result.getStatus() != HttpStatus.HTTP_OK){
+            throw new ZtgeoBizException("查询信息异常："+result.getMessage());
         }else {
-            JSONArray taxAttachmentsJson = JSON.parseArray(jsonResult.getString("data"));
-            taxAttachments = taxAttachmentsJson.toJavaList(TaxAttachment.class);
+            taxAttachments = JSONArray.parseArray(result.getData(),TaxAttachment.class);
+        }
+        if (CollUtil.isEmpty(taxAttachments)){
+            throw new ZtgeoBizException("查询数据为空");
         }
 
         //3.0文件保存
@@ -72,7 +88,7 @@ public class ETicketServiceImpl implements ETicketService {
                 taxAttachments = dealETicketWithFtp(taxAttachments);
                 break;
             default:
-                throw new ZtgeoBizException("未识别的ftpFlag");
+                throw new ZtgeoBizException("未识别的ftp标志位");
         }
         return taxAttachments;
     }
@@ -91,12 +107,12 @@ public class ETicketServiceImpl implements ETicketService {
             List<TaxAttachment.ETax> dzspList = new ArrayList<>();
             if (null!=dzsps&&!"".equals(dzsps)){
                 for (TaxAttachment.ETax eTax:dzsps){
-                    log.info("base64:{}",eTax.getBase64());
-                    if (null!=eTax.getBase64()&&!"".equals(eTax.getBase64())){
+                    log.info("base64:{}",eTax.getImgBase64());
+                    if (null!=eTax.getImgBase64()&&!"".equals(eTax.getImgBase64())){
                         String date = TimeUtil.getDateString(new Date());
                         String path = "/"+date.substring(0,4)+"/"+date.substring(5,7)+"/"+date.substring(8);
                         String fileName =eTax.getDzsphm()+ "_"+ UUID.randomUUID().toString().substring(0,4)+".pdf";
-                        String base64Data = eTax.getBase64();
+                        String base64Data = eTax.getImgBase64();
                         byte[] base64Byte = Base64Util.decode(base64Data);
                         String ftpPath = toFTPUploadComponent.ycslUpload(
                                 base64Byte,
@@ -105,11 +121,14 @@ public class ETicketServiceImpl implements ETicketService {
                                 "ycsl"
                         ).replaceAll("/", "\\\\");
                         dzspList.add(new TaxAttachment.ETax(eTax,ftpPath,"1",base64Byte.length));
+                    }else{
+                        dzspList.add(eTax);
                     }
                 }
             }
             taxAttachment.setDzsps(dzspList);
-            taxAttachmentList.add(new TaxAttachment(taxAttachment));
+            TaxAttachment attachment = new TaxAttachment(taxAttachment);
+            taxAttachmentList.add(attachment);
         }
         return taxAttachmentList;
     }
@@ -129,13 +148,13 @@ public class ETicketServiceImpl implements ETicketService {
             List<TaxAttachment.ETax> dzspList = new ArrayList<>();
             if (null!=dzsps&&!"".equals(dzsps)){
                 for (TaxAttachment.ETax eTax:dzsps){
-                    log.info("base64:{}",eTax.getBase64());
-                    if (null!=eTax.getBase64()&&!"".equals(eTax.getBase64())){
+                    log.info("base64:{}",eTax.getImgBase64());
+                    if (null!=eTax.getImgBase64()&&!"".equals(eTax.getImgBase64())){
                         String date = TimeUtil.getDateString(new Date());
                         String datePath = "/"+date.substring(0,4)+"/"+date.substring(5,7)+"/"+date.substring(8)+"/";
                         String finalPath = LocalPath+datePath;
                         String fileName =eTax.getDzsphm()+ "_"+UUID.randomUUID().toString().substring(0,4)+".pdf";
-                        String base64Data = eTax.getBase64();
+                        String base64Data = eTax.getImgBase64();
 
                         if (base64ToPdf(finalPath,base64Data,fileName)){
                             String filePath = finalPath+fileName;
@@ -144,6 +163,8 @@ public class ETicketServiceImpl implements ETicketService {
                         }else {
                             log.error("文件：{}保存错误",finalPath+fileName);
                         }
+                    }else{
+                        dzspList.add(eTax);
                     }
                 }
             }

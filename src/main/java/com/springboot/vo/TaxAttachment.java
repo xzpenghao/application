@@ -22,7 +22,7 @@ public class TaxAttachment {
         //提供单位
         private String tgdw;
         //Base64字符串
-        private String base64;
+        private String imgBase64;
         //filePath
         private String filePath;
         //isFtp
