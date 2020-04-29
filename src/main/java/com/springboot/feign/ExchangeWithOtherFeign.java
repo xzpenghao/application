@@ -1,6 +1,9 @@
 package com.springboot.feign;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
+import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
+import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,4 +25,7 @@ public interface ExchangeWithOtherFeign {
     @RequestMapping(value = "ETicket/morkData",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=4i0zZlvo","from_user=1"})
 //    @RequestMapping(value = "getDzspAction.do",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=4i0zZlvo","from_user=1"})
     ObjectRestResponse<String> getETicket(@RequestBody Map<String,Object> receiptNumbers);
+
+    @RequestMapping(value = "share/electric/electric_lmgh_apply_api.action",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=4i0zZlvo","from_user=1"})
+    OtherResponseEntity<DLReturnUnitEntity> sendPowerCompany(DLReqEntity dlcs);
 }
