@@ -1,9 +1,11 @@
 package com.springboot.rest.chenbin;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.bdc.SynNewEcertEntity;
 import com.springboot.entity.chenbin.personnel.bdc.SynNewEcertsReqEntity;
+import com.springboot.entity.chenbin.personnel.bdc.SynNewSendTransferEntity;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +30,8 @@ import java.util.List;
 public class ExchangeToInnerRest {
     @Autowired
     private ExchangeToInnerService exchangeToInnerService;
+    @Autowired
+    private AnonymousInnerComponent anonymousInnerComponent;
 
     @RequestMapping(value = "YGYD2Inner", method = RequestMethod.POST)
     public ObjectRestResponse<String> YGYD2Inner(@RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer) {
@@ -156,4 +161,11 @@ public class ExchangeToInnerRest {
         log.info("获取不动产电子证照");
         return new ObjectRestResponse<List<SynNewEcertEntity>>().data(exchangeToInnerService.dealPostEcerts(ecertReq));
     }
+
+    @RequestMapping(value = "postElectric",method = RequestMethod.POST)
+    public Object get(@RequestBody SynNewSendTransferEntity transferEntity) throws IOException {
+        log.info("二手房水电气发送电部门通知");
+        return anonymousInnerComponent.getElectric(transferEntity,null);
+    }
+
 }
