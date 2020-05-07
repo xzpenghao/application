@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author chenb
  * @version 2020/4/29/029
@@ -23,6 +26,9 @@ public class ExchangeWithComponyService {
     private OuterBackFeign backFeign;
 
     public OtherResponseEntity<DLReturnUnitEntity> exchangeWithPowerCompany(DLReqEntity dlcs){
-        return otherFeign.sendPowerCompany(dlcs);
+        Map<String,Object> dlcsm = new HashMap<>();
+        dlcsm.put("sign","");
+        dlcsm.put("data",dlcs);
+        return otherFeign.sendPowerCompany(dlcsm);
     }
 }
