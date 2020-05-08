@@ -314,3 +314,4 @@ Feign:
   Tax: api/test/testTax
   Tra: api/test/testTra
   ETicket: ETicket/morkData
+  Electric: api/test/testElec

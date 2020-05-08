@@ -28,6 +28,6 @@ public interface ExchangeWithOtherFeign {
     @RequestMapping(value = "${Feign.ETicket}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=4i0zZlvo","from_user=1"})
     ObjectRestResponse<String> getETicket(@RequestBody Map<String,Object> receiptNumbers);
 
-    @RequestMapping(value = "share/electric/electric_lmgh_apply_api.action",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=la7dbtxP","from_user=e4f0fbe9ac9449d3bad6edee1be5626e"})
+    @RequestMapping(value = "${Feign.Electric}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=la7dbtxP","from_user=e4f0fbe9ac9449d3bad6edee1be5626e"})
     OtherResponseEntity<DLReturnUnitEntity> sendPowerCompany(Map<String,Object> dlcs);
 }
