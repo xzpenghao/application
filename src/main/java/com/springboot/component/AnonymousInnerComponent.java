@@ -9,6 +9,7 @@ import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.EsfSdq;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.chenbin.personnel.other.bank.bankenum.FileTypeEnum;
 import com.springboot.entity.chenbin.personnel.other.bank.bankenum.MortgagorPtypeEnum;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.FileInfoVo;
 import com.springboot.entity.chenbin.personnel.other.bank.notice.result.ResultNoticeReqVo;
@@ -210,9 +211,9 @@ public class AnonymousInnerComponent {
             returnVo.setCode(200);
             returnVo.setMessage(Msgagger.CG);
             JSONObject object = JSONObject.fromObject(returnVo);
-            outputStream.write(object.toString().getBytes("UTF-8"));
-            outputStream.flush();
-            outputStream.close();
+//            outputStream.write(object.toString().getBytes("UTF-8"));
+//            outputStream.flush();
+//            outputStream.close();
             System.out.println(JSONObject.fromObject(returnVo));
             // 创建数据
 //            String result = future.get(); //取得结果，同时设置超时执行时间为5秒。
@@ -960,7 +961,6 @@ public class AnonymousInnerComponent {
             resultNoticeReqVo.setRealEstateInfoVoList(realEstateInfoVoList);
         }
     }
-
 
     private void ClNoticeFwInfo(List<GlImmovable> glImmovableList,List<com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.RealEstateUnitInfoVo> realEstateUnitInfoVoList,
                                 List<RealEstateInfoVo> realEstateInfoVoList, RealEstateInfoVo realEstateInfoVo ){
