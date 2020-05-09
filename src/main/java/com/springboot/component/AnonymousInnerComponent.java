@@ -593,7 +593,7 @@ public class AnonymousInnerComponent {
         ReturnVo returnVo = new ReturnVo();
         Map<String, String> mapParmeter = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
-        FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
+        FutureTask<String> future = new FutureTask<String>(new Callable<String>() {//Callable接口的匿名内部类
             public String call() throws Exception { //建议抛出异常
                 try {
                     com.alibaba.fastjson.JSONObject tokenObject;

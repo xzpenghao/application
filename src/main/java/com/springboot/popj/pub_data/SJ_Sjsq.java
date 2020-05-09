@@ -41,6 +41,7 @@ public class SJ_Sjsq  implements Serializable {
     private Sj_Info_Jyhtxx transactionContractInfo;              //转移业务时网签提供的交易信息
     private List<Sj_Info_Qsxx> taxInfoVoList;                  //涉税信息
     private List<SJ_Info_Handle_Result> handleResultVoList;
+    private SJ_Info_Sdqgxx sdqgxx;
 
     private List<RespServiceData> serviceDatas; //封装返回值数据
     private List<SJ_Execute_depart> executeDeparts; //指定执行部门
@@ -268,6 +269,14 @@ public class SJ_Sjsq  implements Serializable {
 
     public void setHandleResultVoList(List<SJ_Info_Handle_Result> handleResultVoList) {
         this.handleResultVoList = handleResultVoList;
+    }
+
+    public SJ_Info_Sdqgxx getSdqgxx() {
+        return sdqgxx;
+    }
+
+    public void setSdqgxx(SJ_Info_Sdqgxx sdqgxx) {
+        this.sdqgxx = sdqgxx;
     }
 
     public List<RespServiceData> getServiceDatas() {

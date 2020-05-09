@@ -92,6 +92,9 @@ public class SysPubDataDealUtil {
                     case BizOrBizExceptionConstant.HANDLE_RESULT_SERVICE:
                         dealHandleResults(JSON_serviceDataInfos, sjsq, serviceCode);
                         break;
+                    case BizOrBizExceptionConstant.SDQG_SERVICE:
+                        dealSDQGxx(JSON_serviceDataInfos, sjsq, serviceCode);
+                        break;
                     default:
                         log.error("入库表标识为：" + serviceDataTo + "的表标识常量未定义");
                         throw new ZtgeoBizException(BizOrBizExceptionConstant.DATA_TABLE_ERROR_MSG);
@@ -375,6 +378,29 @@ public class SysPubDataDealUtil {
             sj_handleResults.add(sj_handleResult);
         }
         sjsq.setHandleResultVoList(sj_handleResults);
+    }
+
+    //处理水电气广过户信息
+    public static void dealSDQGxx(String JSON_serviceDataInfos, SJ_Sjsq sjsq, String serviceCode){
+        List<JSONSdqgxx> json_sdqgs = JSONArray.parseArray(JSON_serviceDataInfos,JSONSdqgxx.class);
+        List<SJ_Info_Sdqgxx> sj_sdqgs = new ArrayList<>();
+        if(json_sdqgs!=null && json_sdqgs.size()==1)
+            for(JSONSdqgxx json_sdqg:json_sdqgs){
+                //反转出水电气广的过户服务数据
+                SJ_Info_Sdqgxx sj_sdqg = JSON.parseObject(JSON.toJSONString(json_sdqg), SJ_Info_Sdqgxx.class);
+                baseSetting(sj_sdqg,serviceCode,sjsq.getReceiptNumber());
+                sj_sdqgs.add(sj_sdqg);
+            }
+        //应该只有一个水电气广服务数据
+        if(sj_sdqgs!=null) {
+            if (sj_sdqgs.size() > 1) {
+                log.error("水电气广服务数据数目异常");
+                throw new ZtgeoBizException(BizOrBizExceptionConstant.SDQG_COUNT_ERROR);
+            }
+            if (sj_sdqgs.size() == 1) {
+                sjsq.setSdqgxx(sj_sdqgs.get(0));
+            }
+        }
     }
 
     private static SJ_Sjsq copyJSONReceiptDataToSjsq(JSONReceiptData sjsq_JSON_str) {

@@ -1,5 +1,6 @@
 package com.springboot.rest.chenbin;
 
+import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
 import com.springboot.entity.chenbin.personnel.req.ReqSendForWEGEntity;
 import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
@@ -35,8 +36,8 @@ public class ExchangeWithComponyRest {
     }
 
     @RequestMapping(value = "exchangeWithWEGComponies",method = RequestMethod.POST)
-    public Object exchangeWithWEGComponies(@RequestBody ReqSendForWEGEntity transferEntity) throws IOException {
+    public ObjectRestResponse<Object> exchangeWithWEGComponies(@RequestBody ReqSendForWEGEntity transferEntity) throws IOException {
         log.info("二手房水电气发送电部门通知");
-        return exc2Comp.exchangeWithWEGComponies(transferEntity,null);
+        return new ObjectRestResponse<>().data(exc2Comp.exchangeWithWEGComponies(transferEntity,null));
     }
 }
