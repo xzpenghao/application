@@ -92,7 +92,8 @@ public class SqRealEstateMortgageComponent {
     private String ftpUsername;
     @Value("${sq.gxpt.ftpPassword}")
     private String ftpPassword;
-
+    @Value("${sq.bank.jt.ftpIdentical}")
+    private boolean ftpIdentical;
     @Value("${sq.bank.jt.username}")
     private String bankBsryname;
     @Value("${sq.bank.jt.password}")
@@ -173,7 +174,12 @@ public class SqRealEstateMortgageComponent {
             List<SJ_File> fjfileList=new ArrayList<>();
             for (FileInfoVo fileInfoVo: revokeRegistrationRespVo.getFileInfoVoList()) {
                 SJ_File sj_file = new SJ_File();
-                String adress=StrUtil.getFTPAdress(fileInfoVo.getFileAdress());
+                String adress="";
+                if (ftpIdentical) {
+                    adress = StrUtil.getFTPAdress(fileInfoVo.getFileAdress());
+                }else {
+                    //替换地址为设定的路径(不同ftp时)
+                }
                 String fileAdress=adress.replaceAll("/","\\\\");
                 String hz = fileInfoVo.getFileAdress().substring(fileInfoVo.getFileAdress().lastIndexOf(".") + 1);
                 sj_file.setFileName(fileAdress);
@@ -300,11 +306,11 @@ public class SqRealEstateMortgageComponent {
         Map<String, String> mapParmeter = new HashMap<>();
         JSONObject reObject=new JSONObject();
         Map<String, Object> map = new HashMap<>();
+        String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(mortgageRegistrationReqVo.getFileInfoVoList().get(0).getFileAdress()));
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception {
                 try {
                     if (null != mortgageRegistrationReqVo.getFileInfoVoList() && mortgageRegistrationReqVo.getFileInfoVoList().size() != 0) {
-                        String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(mortgageRegistrationReqVo.getFileInfoVoList().get(0).getFileAdress()));
                         anonymousInnerComponent.getProcessingAnnex(null, mapParmeter, mortgageRegistrationReqVo.getFileInfoVoList(), ftpAddress, ftpPort, ftpUsername, ftpPassword, path);
                     }
                 }catch (Exception e) {

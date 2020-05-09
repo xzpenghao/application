@@ -4,7 +4,7 @@ server:
   max-http-header-size: 4048576
 spring:
   redis:
-    password: 123456
+    password: ztgeoredis
   autoconfigure:
     exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   application:
@@ -244,6 +244,7 @@ sq:
       ip:
       post: 42506
       notice_url: JSRCIS/sq/sqResultNotice.do   #通知宿迁交通银行地址
+      ftpIdentical: true    #银行上传共享平台与一窗受理是否在同一ftp
   gxpt:
       ftpAddress: 172.22.148.129   #共享平台ftp
       ftpPort: 21

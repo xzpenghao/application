@@ -9,6 +9,7 @@ import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.EsfSdq;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.chenbin.personnel.other.bank.bankenum.FileTypeEnum;
 import com.springboot.entity.chenbin.personnel.other.bank.bankenum.MortgagorPtypeEnum;
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.FileInfoVo;
 import com.springboot.entity.chenbin.personnel.other.bank.notice.result.ResultNoticeReqVo;
