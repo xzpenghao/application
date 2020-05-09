@@ -244,7 +244,6 @@ sq:
       ip:
       post: 42506
       notice_url: JSRCIS/sq/sqResultNotice.do   #通知宿迁交通银行地址
-      ftpIdentical: true    #银行上传共享平台与一窗受理是否在同一ftp
   gxpt:
       ftpAddress: 172.22.148.129   #共享平台ftp
       ftpPort: 21
@@ -312,11 +311,6 @@ ETicket:
   LocalPath: E:/ETicket/
 
 Feign:
-  Tax: api/test/testTax
-  Tra: api/test/testTra
-<<<<<<< HEAD
-  ETicket: ETicket/morkData
-  Electric: api/test/testElec
-=======
-  ETicket: ETicket/morkData
->>>>>>> origin/master
+  Tax: dataShareAction.do
+  Tra: sqservice/bdc/getOneAcceptInfo
+  ETicket: getDzspAction.do
