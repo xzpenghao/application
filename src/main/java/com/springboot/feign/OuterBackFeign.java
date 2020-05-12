@@ -1,6 +1,7 @@
 package com.springboot.feign;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.popj.register.JwtAuthenticationRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -29,6 +30,16 @@ public interface OuterBackFeign {
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter5", method = RequestMethod.POST,consumes = "application/json")
     ObjectRestResponse<Object> DealRecieveFromOuter5(@RequestHeader(name = "Authorization") String token, Map<String, String> sjsq);
 
+    //拉取有效数据
+    @RequestMapping(value = "/DealRecieveFromOuter7", method = RequestMethod.GET)
+    ObjectRestResponse<SJ_Sjsq> DealRecieveFromOuter7(@RequestHeader(name = "Authorization") String token, @RequestParam("sqbh") String sqbh, @RequestParam("taskId") String taskId);
+
+    //拉取访问异常信息
+
+
+    //插入访问异常信息
+
+
     @RequestMapping(value = "api/test/test",method = RequestMethod.POST)
-    public ObjectRestResponse<Object> test(@RequestParam("paramsss") String paramsss);
+    ObjectRestResponse<Object> test(@RequestParam("paramsss") String paramsss);
 }

@@ -1,7 +1,10 @@
 package com.springboot.service.chenbin.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.chenbin.ExchangeWithComponyComponent;
 import com.springboot.config.Msgagger;
+import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
 import com.springboot.entity.chenbin.personnel.req.ReqSendForWEGEntity;
 import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
@@ -9,8 +12,8 @@ import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.ReturnVo;
+import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,40 +37,46 @@ public class ExchangeWithComponyService {
     @Autowired
     private ExchangeWithOtherFeign otherFeign;
     @Autowired
-    private OuterBackFeign backFeign;
+    private ExchangeWithComponyComponent exchangeWithComponyComponent;
 
-    public Object exchangeWithWEGComponies(ReqSendForWEGEntity sendTransferEntity, OutputStream outputStream) throws IOException {
+    public void exchangeWithWEGComponies(String reqKey,ReqSendForWEGEntity sendTransferEntity, OutputStream resp){
+        log.info("进入主线程");
         ExecutorService executor = Executors.newCachedThreadPool();
-        ReturnVo returnVo = new ReturnVo();
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() {//建议抛出异常
+                log.info("执行分支线程");
                 //执行发送电部门过户申请
-                System.out.println("1");
-                return null;
+                exchangeWithComponyComponent.handleExchange(reqKey,sendTransferEntity);
+                return "执行成功";
             }
         });
         executor.execute(future);
-        long t = System.currentTimeMillis();
-        ObjectRestResponse rv=new ObjectRestResponse();
-        JSONObject object= null;
         try {
-            returnVo.setCode(200);
-            returnVo.setMessage(Msgagger.CG);
-            object = JSONObject.fromObject(returnVo);
-//            outputStream.write(object.toString().getBytes("UTF-8"));
-//            outputStream.flush();
-//            outputStream.close();
-            System.out.println(JSONObject.fromObject(returnVo));
+            resp.write(JSONObject.toJSONString(new ObjectRestResponse<String>().data("水电气数据交换请求发送成功！")).getBytes("UTF-8"));
+            resp.flush();
+            resp.close();
+        } catch (IOException e){
+            log.error("主线程执行发生IO异常请处理," + ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("IO异常请处理");
+        }
+        try {
             // 创建数据
             String result = future.get(); //取得结果，同时设置超时执行时间为5秒。
-            System.out.println(result);
-            System.err.println("result is " + JSONObject.fromObject(returnVo) + ", time is " + (System.currentTimeMillis() - t));
-            executor.shutdown();
+            log.info("线程执行结果：" + result);
+        } catch (ZtgeoBizException e) {
+            //这里做异常处理(分支线程产生的)
+            log.error("水电气广同步出现逻辑异常："+ErrorDealUtil.getErrorInfo(e));
+            e = ErrorDealUtil.OnlineErrorTrans(e);
+            //调用回写异常信息进Rec
+
         } catch (Exception e) {
-            log.error("e"+e);
-            e.getStackTrace();
+            //这里做异常处理(分支线程产生的)
+            log.error("水电气广同步出现未知异常："+ErrorDealUtil.getErrorInfo(e));
+            //调用回写异常信息进Rec
+
+        } finally {
+            executor.shutdown();
         }
-        return  object ;
     }
 
     public OtherResponseEntity<DLReturnUnitEntity> exchangeWithPowerCompany(DLReqEntity dlcs){

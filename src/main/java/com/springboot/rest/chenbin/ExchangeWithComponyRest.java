@@ -1,11 +1,13 @@
 package com.springboot.rest.chenbin;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
 import com.springboot.entity.chenbin.personnel.req.ReqSendForWEGEntity;
 import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import com.springboot.service.chenbin.impl.ExchangeWithComponyService;
+import com.springboot.util.chenbin.ErrorDealUtil;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @author chenb
@@ -36,8 +40,8 @@ public class ExchangeWithComponyRest {
     }
 
     @RequestMapping(value = "exchangeWithWEGComponies",method = RequestMethod.POST)
-    public ObjectRestResponse<Object> exchangeWithWEGComponies(@RequestBody ReqSendForWEGEntity transferEntity) throws IOException {
+    public void exchangeWithWEGComponies(@RequestBody ReqSendForWEGEntity transferEntity, HttpServletRequest req, OutputStream resp){
         log.info("二手房水电气发送电部门通知");
-        return new ObjectRestResponse<>().data(exc2Comp.exchangeWithWEGComponies(transferEntity,null));
+        exc2Comp.exchangeWithWEGComponies(req.getHeader("Authorization"),transferEntity,resp);
     }
 }

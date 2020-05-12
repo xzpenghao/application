@@ -90,14 +90,14 @@ public class SqRealEstateMortgageController {
 
 
     @RequestMapping(value = "/sq/jt/sqBdcdydj", method = RequestMethod.POST)
-    @ApiOperation("不动产抵押登记,预告及预告抵押通知接口")
+    @ApiOperation("不动产抵押登记,预告及预告抵押登记银行转办接入接口")
     public void sqBdcdydj(@RequestBody MortgageRegistrationReqVo mortgageRegistrationReqVo, OutputStream outputStream){
          sqRealEstateMortgageComponent.sqJgdyjk(mortgageRegistrationReqVo,outputStream);
     }
 
 
     @RequestMapping(value = "/sq/jt/sqBdczxdj", method = RequestMethod.POST)
-    @ApiOperation("抵押注销通知接口")
+    @ApiOperation("抵押注销登记银行转办接入接口")
     public void sqBdczxdj(@RequestBody RevokeRegistrationReqVo revokeRegistrationRespVo,OutputStream outputStream){
         sqRealEstateMortgageComponent.sqJgdyzx(revokeRegistrationRespVo,outputStream);
     }

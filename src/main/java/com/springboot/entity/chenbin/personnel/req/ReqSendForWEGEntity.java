@@ -8,4 +8,5 @@ import lombok.Data;
 public class ReqSendForWEGEntity {
     private String sqbh;
     private String taskId;
+    private boolean execAgain;
 }
