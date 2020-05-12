@@ -12,6 +12,7 @@ public class FeignHeaderInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate requestTemplate) {
+        log.info("log-feign 请求的地址为："+requestTemplate.url());
         log.info("log-feign 请求的参数为："+requestTemplate.requestBody().asString());
 //        System.out.println("out 请求的参数为："+requestTemplate.requestBody().asString());
     }
