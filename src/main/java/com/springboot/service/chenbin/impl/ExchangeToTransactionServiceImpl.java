@@ -46,8 +46,8 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
     private String username;
     @Value("${tra.bsrypassword}")
     private String password;
-    @Value("${area.code}")
-    private String areaCode;
+//    @Value("${area.code}")
+//    private String areaCode;
 
     @Autowired
     private ExchangeWithOtherFeign otherFeign;
@@ -88,10 +88,7 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
         traBody.put("sign","");
         log.info("交易转办传入基带处理数据为："+JSONObject.toJSONString(traParamBody));
         JSONObject jsonObj = BusinessDealBaseUtil.dealJSONForSB(traParamBody);
-
-        //区域的税务独有个性化配置
-        jsonObj.getJSONObject("YCSLXX").put("QYBM",areaCode);
-
+//        jsonObj.getJSONObject("YCSLXX").put("QYBM",areaCode);
         traBody.put("data",jsonObj);
         System.out.println("发送交易的数据（处理后）："+JSONObject.toJSONString(traBody));
         log.info("发送交易的数据（处理后）："+JSONObject.toJSONString(traBody));
