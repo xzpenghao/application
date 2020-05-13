@@ -309,3 +309,7 @@ PublicInspect:
 ETicket:
   Url: http://127.0.0.1:7777/ETicket/morkData
   LocalPath: E:/ETicket/
+
+area:
+  code: 323324
+  name: 沭阳县
