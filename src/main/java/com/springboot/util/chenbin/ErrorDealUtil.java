@@ -32,7 +32,7 @@ public class ErrorDealUtil {
         return sw.toString();
     }
 
-    public static ZtgeoBizException OnlineErrorTrans(ZtgeoBizException e){
+    public static Exception OnlineErrorTrans(Exception e){
         if (e.getMessage().contains("connect timed out")) {
             return new ZtgeoBizException("接口连接超时");
         }

@@ -1,5 +1,6 @@
 package com.springboot.component.chenbin;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
@@ -9,7 +10,6 @@ import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.SJ_Sjsq;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +34,14 @@ public class ExchangeWithComponyComponent {
     @Autowired
     private ExchangeWithOtherFeign otherFeign;
 
+    /**
+     * 描述：
+     * 作者：chenb
+     * 日期：2020/5/12/012
+     * 参数：reqKey 传递的token
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
     public void handleExchange(String reqKey,ReqSendForWEGEntity sendTransferEntity) {
         try {
             //线程执行延后1s，为一窗受理侧准备数据留出充足时间
@@ -41,6 +49,8 @@ public class ExchangeWithComponyComponent {
         } catch (InterruptedException e){
             throw new ZtgeoBizException("分支线程出现等待错误");
         }
+        log.info("token："+reqKey);
+        log.info("参数："+ JSONObject.toJSONString(sendTransferEntity));
         /**
          * 获取一窗受理侧的办件数据
          */
@@ -76,6 +86,7 @@ public class ExchangeWithComponyComponent {
 
         }
         if(handleSign.isHandleEle()){
+            //与电进行交互
 
         }
         if(handleSign.isHandleWat()){

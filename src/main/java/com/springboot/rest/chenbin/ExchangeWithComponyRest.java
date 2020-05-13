@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -40,7 +41,7 @@ public class ExchangeWithComponyRest {
     }
 
     @RequestMapping(value = "exchangeWithWEGComponies",method = RequestMethod.POST)
-    public void exchangeWithWEGComponies(@RequestBody ReqSendForWEGEntity transferEntity, HttpServletRequest req, OutputStream resp){
+    public void exchangeWithWEGComponies(@RequestBody ReqSendForWEGEntity transferEntity, HttpServletRequest req, HttpServletResponse resp){
         log.info("二手房水电气发送电部门通知");
         exc2Comp.exchangeWithWEGComponies(req.getHeader("Authorization"),transferEntity,resp);
     }
