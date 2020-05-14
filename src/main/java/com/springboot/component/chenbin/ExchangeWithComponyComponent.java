@@ -43,14 +43,14 @@ public class ExchangeWithComponyComponent {
      * 更新记录：更新人：{}，更新日期：{}
     */
     public void handleExchange(String reqKey,ReqSendForWEGEntity sendTransferEntity) {
+        log.info("token："+reqKey);
+        log.info("参数："+ JSONObject.toJSONString(sendTransferEntity));
         try {
             //线程执行延后1s，为一窗受理侧准备数据留出充足时间
             Thread.sleep(1000);
         } catch (InterruptedException e){
             throw new ZtgeoBizException("分支线程出现等待错误");
         }
-        log.info("token："+reqKey);
-        log.info("参数："+ JSONObject.toJSONString(sendTransferEntity));
         /**
          * 获取一窗受理侧的办件数据
          */
