@@ -3,7 +3,6 @@ package com.springboot.service.chenbin.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.ExchangeWithComponyComponent;
-import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
 import com.springboot.entity.chenbin.personnel.req.ReqSendForWEGEntity;
@@ -11,7 +10,7 @@ import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.feign.OuterBackFeign;
-import com.springboot.popj.ReturnVo;
+import com.springboot.popj.pub_data.SJ_Exception_Record;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import static com.springboot.constant.chenbin.KeywordConstant.*;
 
 /**
  * @author chenb
@@ -37,6 +37,8 @@ import java.util.concurrent.FutureTask;
 public class ExchangeWithComponyService {
     @Autowired
     private ExchangeWithOtherFeign otherFeign;
+    @Autowired
+    private OuterBackFeign backFeign;
     @Autowired
     private ExchangeWithComponyComponent exchangeWithComponyComponent;
 
@@ -60,8 +62,10 @@ public class ExchangeWithComponyService {
             out.close();
         } catch (IOException e){
             log.error("主线程执行发生IO异常请处理," + ErrorDealUtil.getErrorInfo(e));
-            throw new ZtgeoBizException("IO异常请处理");
+            throw new ZtgeoBizException("水电气业务分发请求响应时出现IO异常，请处理");
         }
+
+        log.info("=================分割线（之后的异常将不会再抛出）=================");
 
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() {//建议抛出异常
@@ -75,14 +79,33 @@ public class ExchangeWithComponyService {
         try {
             // 创建数据
             String result = future.get(); //取得结果，同时设置超时执行时间为5秒。
-            log.debug("线程执行结果：" + result);
+            log.info("线程执行结果：" + result);
         } catch (Exception e) {
             log.info("捕获到执行异常");
             //这里做异常处理(分支线程产生的)
-            log.error("水电气广同步出现未知异常："+ErrorDealUtil.getErrorInfo(e));
+            log.error(sendTransferEntity.getHandleKey()+"同步出现未知异常："+ErrorDealUtil.getErrorInfo(e));
             e = ErrorDealUtil.OnlineErrorTrans(e);
-            //调用回写异常信息进Rec
-
+            //调用回写异常信息进Rec(注意此时产生的是All异常)
+            Map<String,String> params = new HashMap<>();
+            params.put("token","");
+            params.put("transferEntity",JSONObject.toJSONString(sendTransferEntity));
+            backFeign.DealRecieveFromOuter9(
+                    new SJ_Exception_Record()
+                            .initNewExcp(
+                                    sendTransferEntity.getTaskId(),
+                                    sendTransferEntity.getHandleKey()+"同步时捕获到异常:"+e.getMessage(),
+                                    sendTransferEntity.getSqbh(),
+                                    "",
+                                    EXC_DIRECTION_OUTER
+                            )
+                            .transitThisToFeign(
+                                    JSONObject.toJSONString(params),
+                                    sendTransferEntity.getHandleKey(),
+                                    sendTransferEntity.getExcutFeign(),
+                                    sendTransferEntity.getExcutMethod()
+                            )
+                            .excMsgg(sendTransferEntity.getHandleKey()+"同步时捕获到异常:"+e.getMessage())
+            );
         } finally {
             executor.shutdown();
         }

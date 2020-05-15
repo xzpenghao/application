@@ -17,6 +17,7 @@ public class EleWatGasHandle {
     boolean handleWat;   //水处理状态标识
     boolean handleGas;   //气处理状态标识
 
+    //初始化水电气的执行标志位
     public EleWatGasHandle initThis(){
         this.handleEle = true;
         this.handleWat = false;

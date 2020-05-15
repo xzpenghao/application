@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,15 +17,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DLReqEntity {
-    private String originalUserName;
-    private String originalUserCard;
-    private String newUserName;
-    private String newOriginalUserCard;
-    private String newMobile;
-    private String qxno;
-    private String bdcno;
-    private String adress;
-    private String contractId;
-    private String orgNo;
-    private List<DLFile> data;
+    private String originalUserName;        //原用户名
+    private String originalUserCard;        //原用户身份证
+    private String newUserName;             //新用户名
+    private String newOriginalUserCard;     //新用户身份证
+    private String newMobile;               //新用户联系方式
+    private String qxno;                    //新不动产权证号
+    private String bdcno;                   //不动产单元号
+    private String adress;                  //地址（坐落）
+    private String contractId;              //一窗收件编号
+    private String orgNo;                   //32413
+    private List<DLFile> data = new ArrayList<>();  //附件信息
 }
