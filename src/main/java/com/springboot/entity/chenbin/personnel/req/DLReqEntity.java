@@ -1,8 +1,12 @@
 package com.springboot.entity.chenbin.personnel.req;
 
+import com.springboot.config.ZtgeoBizException;
+import com.springboot.popj.pub_data.*;
+import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,4 +32,49 @@ public class DLReqEntity {
     private String contractId;              //一窗收件编号
     private String orgNo;                   //32413
     private List<DLFile> data = new ArrayList<>();  //附件信息
+
+    public DLReqEntity getBaseFromBdcql(SJ_Info_Bdcqlxgxx bdcql){
+        this.qxno = bdcql.getImmovableCertificateNo();
+        this.adress = bdcql.getImmovableSite();
+        List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
+        String bdcdyhs = "";
+        if(bdcgls!=null) {
+            for (SJ_Bdc_Gl bdcgl : bdcgls) {
+                if("房地".equals(bdcgl.getImmovableType())) {
+                    bdcdyhs = bdcdyhs + "," + bdcgl.getZdInfo().getImmovableUnitNumber();
+                }
+            }
+        }
+        if(bdcdyhs.contains(","))
+            bdcdyhs = bdcdyhs.substring(1);
+        this.bdcno = bdcdyhs;
+        return this;
+    }
+
+    public DLReqEntity replenishFromJyxx(String sqbh, String noticeName, String noticeMobile, Sj_Info_Jyhtxx jyxx){
+        this.contractId = sqbh;
+        this.newUserName = noticeName;
+        this.newMobile = noticeMobile;
+        List<SJ_Qlr_Gl> buys = jyxx.getGlHouseBuyerVoList();
+        SJ_Qlr_Info noticePerson = BusinessDealBaseUtil.getNeedPerson(noticeName,buys);
+        if(noticePerson == null){
+            List<SJ_Qlr_Gl> buyAgents = jyxx.getGlAgentVoList();//代理人里取
+            noticePerson = BusinessDealBaseUtil.getNeedPerson(noticeName,buyAgents);
+            if(noticePerson == null){
+                throw new ZtgeoBizException("买房通知人与权利人及代理人设置不符");
+            }
+        }
+        this.newOriginalUserCard = noticePerson.getObligeeDocumentNumber();
+        List<SJ_Qlr_Gl> sellers = jyxx.getGlHouseSellerVoList();
+        if(sellers==null || sellers.size()<1){
+            throw new ZtgeoBizException("房屋卖方不明");
+        }
+        this.originalUserName = sellers.get(0).getRelatedPerson().getObligeeName();
+        this.originalUserCard = sellers.get(0).getRelatedPerson().getObligeeDocumentNumber();
+        return this;
+    }
+
+    public void assignOrg(SJ_Info_Sdqgxx sdqgxx){
+        this.setOrgNo(sdqgxx.getElecCompony());
+    }
 }

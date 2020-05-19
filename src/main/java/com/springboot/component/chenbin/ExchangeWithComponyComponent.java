@@ -11,9 +11,11 @@ import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.SJ_Exception_Record;
+import com.springboot.popj.pub_data.SJ_Sdqg_Send_Result;
 import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.TimeUtil;
+import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +62,7 @@ public class ExchangeWithComponyComponent {
         log.info("参数："+ JSONObject.toJSONString(sendTransferEntity));
         try {
             //线程执行延后1s，为一窗受理侧准备数据留出充足时间
-            Thread.sleep(5000);
+            Thread.sleep(1000);
         } catch (InterruptedException e){
             throw new ZtgeoBizException("分支线程出现等待错误");
         }
@@ -92,7 +94,7 @@ public class ExchangeWithComponyComponent {
         }
 
         //数据转换
-        SJ_Sjsq sjsq = null;
+        SJ_Sjsq sjsq;
         try {
             sjsq = SysPubDataDealUtil.parseReceiptData(JSONObject.toJSONString(taskSjsqRv.getData()),null,null,null);
         } catch (ParseException e) {
@@ -101,12 +103,38 @@ public class ExchangeWithComponyComponent {
         }
 
         /**
-         * 处理标志位
+         * 为处理准备辅助性数据
          */
         EleWatGasHandle handleSign = new EleWatGasHandle().initThis();
         if(sendTransferEntity.isExecAgain()){
+
+            //处理handleSign
+            if(StringUtils.isBlank(sendTransferEntity.getHandleKey())){
+                throw new ZtgeoBizException("水电气异常产生后执行再次分发时，happenKey(执行关键字)未确定");
+            }
+            switch (sendTransferEntity.getHandleKey()){
+                case EXC_SDQG_HAPPEN_KEY_ALL:
+                    handleSign.initThis();
+                    break;
+                case EXC_SDQG_HAPPEN_KEY_WAT:
+                    handleSign.onlyWat();
+                    break;
+                case EXC_SDQG_HAPPEN_KEY_ELE:
+                    handleSign.onlyEle();
+                    break;
+                case EXC_SDQG_HAPPEN_KEY_GAS:
+                    handleSign.onlyGas();
+                    break;
+                case EXC_SDQG_HAPPEN_KEY_TV:
+                    handleSign.allNoExec();
+                    break;
+                default:
+                    throw new ZtgeoBizException("水电气异常产生后执行再次分发时，happenKey(执行关键字)不在目前使用范围");
+            }
+
             //取Rec中记录的TASK异常
             ObjectRestResponse<List<SJ_Exception_Record>> excsrv = backFeign.DealRecieveFromOuter8(
+                    reqKey,
                     new SJ_Exception_Record().valuationTaskAndType(sendTransferEntity.getTaskId(),EXC_TYPE_FEIGNERROR,sendTransferEntity.getHandleKey())
             );
             if(excsrv!=null && excsrv.getStatus()==200 && excsrv.getData()!=null){
@@ -127,6 +155,7 @@ public class ExchangeWithComponyComponent {
          * 执行分发
          */
         handleExchange(reqKey,sendTransferEntity,handleSign,sjsq);
+
     }
 
     public void handleExchange(String reqKey,ReqSendForWEGEntity sendTransferEntity,EleWatGasHandle handleSign,SJ_Sjsq s){
@@ -172,6 +201,32 @@ public class ExchangeWithComponyComponent {
                 //执行气分发线程任务
                 executor.execute(futureGas);
             }
+
+            //处理结果获取
+            if(handleSign.isHandleEle())
+                log.info("电处理结果返回："+futureEle.get());
+            if(handleSign.isHandleWat())
+                log.info("水处理结果返回："+futureWater.get());
+            if(handleSign.isHandleGas())
+                log.info("气处理结果返回："+futureGas.get());
+
+            if(sendTransferEntity.isExecAgain()){   //二次触发时处理
+                SJ_Exception_Record exc = sendTransferEntity.getExc();
+                if(EXC_SDQG_HAPPEN_KEY_ALL.equals(sendTransferEntity.getHandleKey())){//处理全部时
+                    if(StringUtils.isBlank(exc.getHandleStatus())){//没给出明确处理结果为成功
+                        exc.setHandleStatus("1");
+                        exc.setHandleResult("success");
+                    }
+                    //修改异常处理状态
+                    backFeign.DealRecieveFromOuter10(reqKey,exc);//无论怎么样都会给出处理意见
+                }else{//处理独立分支时
+                    if(StringUtils.isNotBlank(exc.getHandleStatus()) && "1".equals(exc.getHandleStatus())){//明确给出处理成功为成功
+                        exc.setHandleResult("success");
+                        //修改异常处理状态
+                        backFeign.DealRecieveFromOuter10(reqKey,exc);//成功时，将异常设置为已处理
+                    }
+                }
+            }
         } catch (Exception e){
             log.error("水电气数据分发异常，详细信息：" + ErrorDealUtil.getErrorInfo(e));
         } finally {
@@ -184,14 +239,70 @@ public class ExchangeWithComponyComponent {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e){
-            throw new ZtgeoBizException("电分支线程出现等待错误");
+            log.error("电分支线程出现等待错误");
         }
+        boolean isDealExc;
+        String excMsg = "";
+        try {
+            DLReqEntity dlcs = BusinessDealBaseUtil.dealParamForEle(sjsq);
+            Map<String, Object> dlcsm = new HashMap<>();
+            dlcsm.put("sign", "");
+            dlcsm.put("data", dlcs);
+            OtherResponseEntity<DLReturnUnitEntity> dlBaskResult = otherFeign.sendPowerCompany(dlcsm);
 
-        DLReqEntity dlcs = new DLReqEntity();
-        Map<String,Object> dlcsm = new HashMap<>();
-        dlcsm.put("sign","");
-        dlcsm.put("data",dlcs);
-        OtherResponseEntity<DLReturnUnitEntity> dlBaskResult = otherFeign.sendPowerCompany(dlcsm);
+            if(dlBaskResult==null){
+                log.error("共享交换平台捕获了异常，联系处理");
+                isDealExc = true;
+                excMsg = "共享交换平台捕获了异常，联系处理";
+            }else{
+                if(!dlBaskResult.getCode().equals("0000")){
+                    log.error(dlBaskResult.getMsg());
+                    isDealExc = true;
+                    excMsg = dlBaskResult.getMsg();
+                }else{
+                    DLReturnUnitEntity dlrue = dlBaskResult.getData();
+                    if(dlrue==null){
+                        log.error("电力过户返回结果的data接收为null，联系电力公司解决");
+                        isDealExc = true;
+                        excMsg = "电力过户返回结果的data接收为null，联系电力公司解决";
+                    } else if(StringUtils.isBlank(dlrue.getResult())){
+                        log.error("电力过户返回结果的data已接收但未给出过户result，联系电力公司解决");
+                        isDealExc = true;
+                        excMsg = "电力过户返回结果的data已接收但未给出过户result，联系电力公司解决";
+                    } else {
+                        SJ_Sdqg_Send_Result eleResult = new SJ_Sdqg_Send_Result().initSuccessFromWEGEntity(sendTransferEntity,EXC_SDQG_HAPPEN_KEY_ELE);
+                        eleResult.setSendCompony(dlcs.getOrgNo());
+                        eleResult.setResult(dlrue.getResult());
+                        eleResult.setResultStr(dlrue.getMessage());
+                        eleResult.setResultJson(JSONObject.toJSONString(dlBaskResult));
+                        if ("0".equals(dlrue.getResult())) {
+                            log.error("电力过户同步失败，电力公司方给出失败原因：" + dlrue.getMessage());
+                            isDealExc = true;
+                            excMsg = "电力过户同步失败，电力公司方给出失败原因：" + dlrue.getMessage();
+                        } else {
+                            isDealExc = false;
+                            //明确给出处理成功
+                            if (sendTransferEntity.isExecAgain() && EXC_SDQG_HAPPEN_KEY_ELE.equals(sendTransferEntity.getHandleKey())) {
+                                sendTransferEntity.getExc().setHandleStatus("1");
+                            }
+                        }
+                        //将过户结果回写(有-更新/无-插入)
+                        backFeign.DealRecieveFromOuter11(reqKey, eleResult);
+                    }
+                }
+            }
+        } catch (ZtgeoBizException e){
+            log.error("电力过户同步失败，出现可以预知的异常："+e.getMessage());
+            isDealExc = true;
+            excMsg = "电力过户同步失败，出现可以预知的异常："+e.getMessage();
+        } catch (Exception e){
+            log.error("电力过户同步失败，出现未知的异常："+ErrorDealUtil.getErrorInfo(e));
+            isDealExc = true;
+            excMsg = "电力过户同步失败，出现未知的异常："+ErrorDealUtil.getErrorInfo(e);
+        }
+        if(isDealExc){
+            handleDealExc(reqKey,EXC_SDQG_HAPPEN_KEY_ELE,sendTransferEntity,excMsg);
+        }
         log.info("结束电分发线程,结束时间："+ TimeUtil.getTimeString(new Date()));
     }
 
@@ -199,8 +310,25 @@ public class ExchangeWithComponyComponent {
         log.info("开始水分发线程,开始时间："+ TimeUtil.getTimeString(new Date()));
         try {
             Thread.sleep(10000);
-        } catch (InterruptedException e){
-            throw new ZtgeoBizException("水分支线程出现等待错误");
+        } catch (InterruptedException e) {
+            log.error("水分支线程出现等待错误");
+        }
+        boolean isDealExc;
+        String excMsg = "自来水过户失败了";
+        try {
+            OtherResponseEntity<DLReturnUnitEntity> dlBaskResult = otherFeign.sendPowerCompany(getTestData(sjsq,"water"));
+            isDealExc = dealTestResult(reqKey,sendTransferEntity,dlBaskResult,"water",EXC_SDQG_HAPPEN_KEY_WAT);
+        } catch (ZtgeoBizException e){
+            log.error("自来水过户同步失败，出现可以预知的异常："+e.getMessage());
+            isDealExc = true;
+            excMsg = "自来水过户同步失败，出现可以预知的异常："+e.getMessage();
+        } catch (Exception e){
+            log.error("自来水过户同步失败，出现未知的异常："+ErrorDealUtil.getErrorInfo(e));
+            isDealExc = true;
+            excMsg = "自来水过户同步失败，出现未知的异常："+ErrorDealUtil.getErrorInfo(e);
+        }
+        if(isDealExc){
+            handleDealExc(reqKey,EXC_SDQG_HAPPEN_KEY_WAT,sendTransferEntity,excMsg);
         }
         log.info("结束水分发线程,结束时间："+ TimeUtil.getTimeString(new Date()));
     }
@@ -210,8 +338,126 @@ public class ExchangeWithComponyComponent {
         try {
             Thread.sleep(15000);
         } catch (InterruptedException e){
-            throw new ZtgeoBizException("气分支线程出现等待错误");
+            log.error("气分支线程出现等待错误");
+        }
+        boolean isDealExc;
+        String excMsg = "燃气过户失败了";
+        try {
+            OtherResponseEntity<DLReturnUnitEntity> dlBaskResult = otherFeign.sendPowerCompany(getTestData(sjsq,"gas"));
+            isDealExc = dealTestResult(reqKey,sendTransferEntity,dlBaskResult,"gas",EXC_SDQG_HAPPEN_KEY_GAS);
+        } catch (ZtgeoBizException e){
+            log.error("燃气过户同步失败，出现可以预知的异常："+e.getMessage());
+            isDealExc = true;
+            excMsg = "燃气过户同步失败，出现可以预知的异常："+e.getMessage();
+        } catch (Exception e){
+            log.error("燃气过户同步失败，出现未知的异常："+ErrorDealUtil.getErrorInfo(e));
+            isDealExc = true;
+            excMsg = "燃气过户同步失败，出现未知的异常："+ErrorDealUtil.getErrorInfo(e);
+        }
+        if(isDealExc){
+            handleDealExc(reqKey,EXC_SDQG_HAPPEN_KEY_GAS,sendTransferEntity,excMsg);
         }
         log.info("结束气分发线程,结束时间："+ TimeUtil.getTimeString(new Date()));
+    }
+
+    public ReqSendForWEGEntity initNewWEGEntityAgin(String handleKey ,ReqSendForWEGEntity example){
+        ReqSendForWEGEntity newWEGEntity = new ReqSendForWEGEntity();
+        newWEGEntity.setTaskId(example.getTaskId());
+        newWEGEntity.setSqbh(example.getSqbh());
+        newWEGEntity.setHandleKey(handleKey);
+        newWEGEntity.setExcutFeign(example.getExcutFeign());
+        newWEGEntity.setExcutMethod(example.getExcutMethod());
+        newWEGEntity.setExecAgain(true);
+        return newWEGEntity;
+    }
+
+    public void handleDealExc(String reqKey,String handleKey,ReqSendForWEGEntity sendTransferEntity,String excMsg){
+        ReqSendForWEGEntity newEntity = initNewWEGEntityAgin(handleKey,sendTransferEntity);
+        Map<String,String> params = new HashMap<>();
+        params.put("token","");
+        params.put("transferEntity",JSONObject.toJSONString(newEntity));
+        SJ_Exception_Record exceptionRecord;
+        if(sendTransferEntity.isExecAgain()){
+            exceptionRecord = sendTransferEntity.getExc();
+            if(EXC_SDQG_HAPPEN_KEY_ALL.equals(sendTransferEntity.getHandleKey())){
+                sendTransferEntity.getExc().setHandleResult("unsuccessful");
+                sendTransferEntity.getExc().setHandleStatus("1");
+            }
+        } else {
+            exceptionRecord = new SJ_Exception_Record()
+                    .initNewExcp(
+                            sendTransferEntity.getTaskId(),
+                            excMsg,
+                            sendTransferEntity.getSqbh(),
+                            "",
+                            EXC_DIRECTION_OUTER
+                    )
+                    .transitThisToFeign(
+                            JSONObject.toJSONString(params),
+                            handleKey,
+                            sendTransferEntity.getExcutFeign(),
+                            sendTransferEntity.getExcutMethod()
+                    );
+        }
+        exceptionRecord.setHappenKey(handleKey);
+        exceptionRecord.setFeignNoticeExecutParams(JSONObject.toJSONString(params));
+        exceptionRecord.setExcMsg(excMsg);
+        backFeign.DealRecieveFromOuter9(reqKey,exceptionRecord);
+    }
+
+    /**
+     * 以下部分属于测试需要
+     * @param sjsq
+     * @return
+     */
+
+    public Map<String,Object> getTestData(SJ_Sjsq sjsq,String type){
+        Map<String, Object> dlcsm = new HashMap<>();
+        dlcsm.put("sign", "");
+        DLReqEntity p = BusinessDealBaseUtil.dealParamForEle(sjsq);
+        p.setOrgNo(type);
+        dlcsm.put("data", p);
+        return dlcsm;
+    }
+
+    public boolean dealTestResult(String reqKey,ReqSendForWEGEntity sendTransferEntity,OtherResponseEntity<DLReturnUnitEntity> dlBaskResult,String compony,String handleKey){
+        boolean isDealExc;
+        if(dlBaskResult==null){
+            log.error("共享交换平台捕获了异常，联系处理");
+            isDealExc = true;
+        }else{
+            if(!dlBaskResult.getCode().equals("0000")){
+                log.error(dlBaskResult.getMsg());
+                isDealExc = true;
+            }else{
+                DLReturnUnitEntity dlrue = dlBaskResult.getData();
+                if(dlrue==null){
+                    log.error(handleKey+"过户返回结果的data接收为null，联系相应公司解决");
+                    isDealExc = true;
+                } else if(StringUtils.isBlank(dlrue.getResult())){
+                    log.error(handleKey+"过户返回结果的data已接收但未给出过户result，联系相应公司解决");
+                    isDealExc = true;
+                } else {
+                    SJ_Sdqg_Send_Result testResult = new SJ_Sdqg_Send_Result().initSuccessFromWEGEntity(sendTransferEntity,handleKey);
+                    testResult.setSendCompony(compony);
+                    testResult.setResult(dlrue.getResult());
+                    testResult.setResultStr(dlrue.getMessage());
+                    testResult.setResultJson(JSONObject.toJSONString(dlBaskResult));
+                    if ("0".equals(dlrue.getResult())) {
+                        log.error(handleKey+"过户同步失败，相应公司给出失败原因：" + dlrue.getMessage());
+                        isDealExc = true;
+                    } else {
+                        isDealExc = false;
+                        //明确给出处理成功
+                        if (sendTransferEntity.isExecAgain() && handleKey.equals(sendTransferEntity.getHandleKey())) {
+                            sendTransferEntity.getExc().setHandleStatus("1");
+                        }
+                    }
+                    //将过户结果回写(有-更新/无-插入)
+                    backFeign.DealRecieveFromOuter11(reqKey, testResult);
+                }
+            }
+        }
+        return isDealExc;
     }
 }

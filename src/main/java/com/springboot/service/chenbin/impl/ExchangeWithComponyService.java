@@ -90,6 +90,7 @@ public class ExchangeWithComponyService {
             params.put("token","");
             params.put("transferEntity",JSONObject.toJSONString(sendTransferEntity));
             backFeign.DealRecieveFromOuter9(
+                    reqKey,
                     new SJ_Exception_Record()
                             .initNewExcp(
                                     sendTransferEntity.getTaskId(),

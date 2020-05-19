@@ -6,11 +6,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.constant.penghao.BizOrBizExceptionConstant;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.chenbin.personnel.OtherEntity.FcIndexAndTdzh;
 import com.springboot.entity.chenbin.personnel.pub_use.*;
+import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
 import com.springboot.entity.chenbin.personnel.tax.TaxParamBody;
 import com.springboot.entity.chenbin.personnel.tra.TraParamBody;
 import com.springboot.popj.pub_data.*;
@@ -75,7 +77,7 @@ public class BusinessDealBaseUtil {
     }
 
     public static String getModeBySub(String djxl){
-        String mode = "一般抵押";
+        String mode;
         switch (djxl){
             case "最高额抵押权":
                 mode = "最高额抵押";
@@ -628,5 +630,38 @@ public class BusinessDealBaseUtil {
         }
         log.info("处理后的字符串："+fileAddress);
         return fileAddress;
+    }
+
+    public static DLReqEntity dealParamForEle(SJ_Sjsq sjsq){
+        DLReqEntity dlcs = new DLReqEntity();
+        List<SJ_Info_Bdcqlxgxx> bdcqls = sjsq.getImmovableRightInfoVoList();
+        if(bdcqls!=null && bdcqls.size()>0) {
+            SJ_Info_Bdcqlxgxx bdcql_book = null;
+            for(SJ_Info_Bdcqlxgxx bdcql:bdcqls){
+                if(bdcql.getServiceCode().equals(Msgagger.BDCQZSDZF_SERVICE_CODE)){
+                    bdcql_book = bdcql;
+                    break;
+                }
+            }
+            if(bdcql_book==null){
+                throw new ZtgeoBizException("一窗业务登簿时缺失必要服务（不动产登簿）数据");
+            }
+            dlcs.getBaseFromBdcql(bdcql_book);
+        }else{
+            throw new ZtgeoBizException("水电气数据分发前请先登簿");
+        }
+        Sj_Info_Jyhtxx jyhtxx = sjsq.getTransactionContractInfo();
+        dlcs.replenishFromJyxx(sjsq.getReceiptNumber(),sjsq.getNotifiedPersonName(),sjsq.getNotifiedPersonTelephone(),jyhtxx);
+        dlcs.assignOrg(sjsq.getSdqgxx());
+        return dlcs;
+    }
+
+    public static SJ_Qlr_Info getNeedPerson(String exampleName,List<SJ_Qlr_Gl> people){
+        for(SJ_Qlr_Gl person:people){
+            if(person.getObligeeName().equals(exampleName)){
+                return person.getRelatedPerson();
+            }
+        }
+        return null;
     }
 }
