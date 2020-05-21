@@ -11,15 +11,17 @@ import java.util.Map;
 @FeignClient(name = "otherFeign", url = "${other.url}")
 public interface ExchangeWithOtherFeign {
 
-//    @RequestMapping(value = "api/test/testTax",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=c2ehamw4","from_user=1"})
-    @RequestMapping(value = "dataShareSuyAction.do",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=c2ehamw4","from_user=1"})
+    @RequestMapping(value = "${Feign.Tax}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=3ycpo7Cc","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
     ObjectRestResponse<String> testTax(Map<String,Object> taxParamBody);
 
-    @RequestMapping(value = "api/test/testTra",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=qYvkPWSr","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
-//    @RequestMapping(value = "sqservice/bdc/getOneAcceptInfo",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=qYvkPWSr","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
+    @RequestMapping(value = "${Feign.Tra}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=qYvkPWSr","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
     ObjectRestResponse<String> testTra(Map<String,Object> TraParamBody);
 
-    @RequestMapping(value = "ETicket/morkData",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=4i0zZlvo","from_user=1"})
-//    @RequestMapping(value = "getDzspAction.do",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=4i0zZlvo","from_user=1"})
+    /**
+     * 电子税票请求共享交换平台
+     * @param receiptNumbers 申请编号
+     * @return 请求结果
+     */
+    @RequestMapping(value = "${Feign.ETicket}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=4i0zZlvo","from_user=1"})
     ObjectRestResponse<String> getETicket(@RequestBody Map<String,Object> receiptNumbers);
 }
