@@ -41,7 +41,7 @@ public class DLReqEntity {
         if(bdcgls!=null) {
             for (SJ_Bdc_Gl bdcgl : bdcgls) {
                 if("房地".equals(bdcgl.getImmovableType())) {
-                    bdcdyhs = bdcdyhs + "," + bdcgl.getZdInfo().getImmovableUnitNumber();
+                    bdcdyhs = bdcdyhs + "," + bdcgl.getFwInfo().getImmovableUnitNumber();
                 }
             }
         }

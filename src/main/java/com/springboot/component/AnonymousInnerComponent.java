@@ -22,10 +22,7 @@ import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.HttpRequestMethedEnum;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.popj.warrant.RealPropertyCertificate;
-import com.springboot.util.DateUtils;
-import com.springboot.util.HttpClientUtils;
-import com.springboot.util.ParamHttpClientUtil;
-import com.springboot.util.StrUtil;
+import com.springboot.util.*;
 import com.springboot.util.chenbin.HttpClientUtil;
 import com.springboot.util.chenbin.IDUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -590,6 +587,7 @@ public class AnonymousInnerComponent {
 
 
     public void GetReceiving(GetReceiving getReceiving, OutputStream outputStream) throws IOException {
+        log.info("BDC->YCSL：开始执行不动产数据向一窗同步");
         ExecutorService executor = Executors.newCachedThreadPool();
         ReturnVo returnVo = new ReturnVo();
         Map<String, String> mapParmeter = new HashMap<>();
@@ -599,22 +597,22 @@ public class AnonymousInnerComponent {
                 try {
                     com.alibaba.fastjson.JSONObject tokenObject;
                     String token="";
-                    log.info("执行主线程");
+                    log.info("BDC->YCSL：执行业务逻辑处理线程（拉取不动产数据并向一窗进行同步）");
                     if (StringUtils.isEmpty(getReceiving.getUserCodeYCSL()) || getReceiving.getUserCodeYCSL().equals("1")) {
-                        log.info("获取用户"+tsryname+"token");
+                        log.info("BDC->YCSL：获取用户"+tsryname+"token");
                         tokenObject = httpCallComponent.getTokenYcsl(tsryname, tsrypaaword);//获得token
                         token = getToken(tokenObject, "GetReceiving", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                     }else {
-                        log.info("获取用户"+bsryname+"token");
+                        log.info("BDC->YCSL：获取用户"+bsryname+"token");
                         tokenObject = httpCallComponent.getTokenYcsl(bsryname, bsrypassword);//获得token
                         token = getToken(tokenObject, "getRegistrationBureau", getReceiving.getSlbh(), getReceiving.getMessageType(), null);
                     }
                     if (token == null) {
                         return Msgagger.USER_LOGIN_BAD;
                     }
-                    log.info("type"+getReceiving.getMessageType());
+                    log.info("BDC->YCSL：type"+getReceiving.getMessageType());
                     if (getReceiving.getMessageType().equals(Msgagger.VERIFYNOTICE)) {//审核
-                        log.info("进入审核");
+                        log.info("BDC->YCSL：进入审核");
                         map.put("slbh", getReceiving.getSlbh());
                         //发送登记局获取数据整理发送一窗受理
                         String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetVerifyInfo", map, null);
@@ -640,23 +638,22 @@ public class AnonymousInnerComponent {
                         respServiceData.setServiceDataInfos(handleResultVoList);
                         serviceDatas.add(respServiceData);
                         JSONArray jsonArray = JSONArray.fromObject(serviceDatas);
-                        System.out.println("servicedatas" + jsonArray);
                         mapParmeter.put("serviceDatas", jsonArray.toString());
                         mapParmeter.put("registerNumber", jsonObject.getString("slbh"));//受理编号)
                     } else if (getReceiving.getMessageType().equals(Msgagger.RESULTNOTICE)) {//登簿审核
-                        log.info("进入登簿");
+                        log.info("BDC->YCSL：进入登簿");
                         map.put("slbh", getReceiving.getSlbh());
-                        log.info("获取token成功，为："+token);
+                        log.info("BDC->YCSL：获取token成功，为："+token);
                         //发送登记局获取数据整理发送一窗受理
                         String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
-                        log.info("登记平台获取登簿数据成功，为："+json);
+                        log.info("BDC->YCSL：登记平台获取登簿数据成功，为："+json);
 //                        com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(json);
                         JSONObject jsonObject = JSONObject.fromObject(json);
                         mapParmeter.put("immovableSite", jsonObject.getString("sit"));
                         mapParmeter.put("registerNumber", jsonObject.getString("slbh"));
                         //登簿返回信息
                         JSONArray ficateInfoArray = jsonObject.getJSONArray("certificateInfoVoList");
-                        log.info("sit:"+jsonObject.getString("sit")+";slbh:"+jsonObject.getString("slbh")+"certificateInfoVoList:"+ficateInfoArray);
+                        log.info("BDC->YCSL：sit:"+jsonObject.getString("sit")+";slbh:"+jsonObject.getString("slbh")+"certificateInfoVoList:"+ficateInfoArray);
                         List<SJ_Info_Handle_Result> handleResultVoList = new ArrayList<>();
                         List<RespServiceData> respServiceDataList = new ArrayList<>();
                         List<String> stringList = new ArrayList<>();
@@ -725,10 +722,10 @@ public class AnonymousInnerComponent {
                         log.info("jsonArray"+jsonArray.toString());
                         mapParmeter.put("serviceDatas", jsonArray.toString());
                     } else if (getReceiving.getMessageType().equals(Msgagger.ACCPETNOTICE)) {
-                        log.info("执行受理操作");
+                        log.info("BDC->YCSL：执行受理操作");
                         mapParmeter.put("registerNumber", getReceiving.getSlbh());
                     } else if (getReceiving.getMessageType().equals(Msgagger.PROCESSING)) {//缮证
-                        log.info("缮证");
+                        log.info("BDC->YCSL：缮证");
                         String url="";
                         map.put("slbh", getReceiving.getSlbh());
                         String json = httpClientUtils.doGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetCertificateInfo", map, null);
@@ -736,7 +733,7 @@ public class AnonymousInnerComponent {
                         JSONObject jsonObject = JSONObject.fromObject(json);
                         JSONObject bankObject=null;
                         if (jsonObject.getJSONArray("certificateInfoVoList") == null){
-                            log.error("登记平台无法查询到受理编号信息");
+                            log.error("BDC->YCSL：登记平台无法查询到受理编号信息");
                         }
                         //登簿返回信息
                         JSONArray ficateInfoArray = jsonObject.getJSONArray("certificateInfoVoList");
@@ -825,19 +822,20 @@ public class AnonymousInnerComponent {
                             }
                             resultNoticeReqVoList.get(0).setFileInfoVoList(fileInfoVoList);
                         }
-                        log.info("开始整理数据");
+                        log.info("BDC->YCSL：开始整理数据");
                         bankObject=JSONObject.fromObject(resultNoticeReqVoList.get(0));
-                        log.info("bankObject"+bankObject.toString());
+                        log.info("BDC->YCSL：bankObject"+bankObject.toString());
                         String resultJson= BankNotification(bankObject,url);
-                        log.info("resultJson"+resultJson);
+                        log.info("BDC->YCSL：resultJson"+resultJson);
                         return resultJson;
                     }
                     //返回数据到一窗受理平台保存受理编号和登记编号
+                    log.info("BDC->YCSL：开始发送数据向一窗REC");
                     String resultJson = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
-                   log.info("result is " + resultJson);
+                   log.info("BDC->YCSL：收到一窗REC的DealRecieveFromOuter2接口的响应数据：" + resultJson);
                     return resultJson;
                 } catch (Exception e) {
-                    log.error("e"+e);
+                    log.error("BDC->YCSL：e"+e);
                     e.printStackTrace();
                     throw new Exception("Callable terminated with Exception!"); // call方法可以抛出异常
                 }
@@ -846,6 +844,7 @@ public class AnonymousInnerComponent {
         executor.execute(future);
         long t = System.currentTimeMillis();
 //        try {
+        log.info("BDC->YCSL：主线程继续执行（发送对不动产该次请求的响应）");
         returnVo.setCode(200);
         returnVo.setMessage(Msgagger.CG);
         JSONObject object = JSONObject.fromObject(returnVo);

@@ -47,7 +47,7 @@ public class ExchangeWithComponyService {
             ReqSendForWEGEntity sendTransferEntity,
             HttpServletResponse resp
     ){
-        log.info("进入主线程");
+        log.info("YCSL->SDQG：进入主线程");
         /**
          * 实例化分支线程的执行容器，
          * 为防止finally中shutdown抛null异常，
@@ -61,29 +61,29 @@ public class ExchangeWithComponyService {
             out.flush();
             out.close();
         } catch (IOException e){
-            log.error("主线程执行发生IO异常请处理," + ErrorDealUtil.getErrorInfo(e));
+            log.error("YCSL->SDQG：主线程执行发生IO异常请处理," + ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("水电气业务分发请求响应时出现IO异常，请处理");
         }
 
-        log.info("=================分割线（之后的异常将不会再抛出）=================");
+        log.info("=================YCSL->SDQG：分割线（之后的异常将不会再抛出）=================");
 
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() {//建议抛出异常
-                log.info("执行分支线程");
+                log.info("YCSL->SDQG：执行分支线程");
                 //执行发送电部门过户申请
                 exchangeWithComponyComponent.handleExchange(reqKey,sendTransferEntity);
-                return "执行成功";
+                return "分支线程执行结束";
             }
         });
         executor.execute(future);
         try {
             // 创建数据
             String result = future.get(); //取得结果，同时设置超时执行时间为5秒。
-            log.info("线程执行结果：" + result);
+            log.info("YCSL->SDQG：分支线程执行结果：" + result);
         } catch (Exception e) {
-            log.info("捕获到执行异常");
+            log.info("YCSL->SDQG：分支线程捕获到执行异常");
             //这里做异常处理(分支线程产生的)
-            log.error(sendTransferEntity.getHandleKey()+"同步出现未知异常："+ErrorDealUtil.getErrorInfo(e));
+            log.error(sendTransferEntity.getHandleKey()+"YCSL->SDQG：分支线程同步出现未知异常："+ErrorDealUtil.getErrorInfo(e));
             e = ErrorDealUtil.OnlineErrorTrans(e);
             //调用回写异常信息进Rec(注意此时产生的是All异常)
             Map<String,String> params = new HashMap<>();

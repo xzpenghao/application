@@ -42,7 +42,7 @@ public class ExchangeWithComponyRest {
 
     @RequestMapping(value = "exchangeWithWEGComponies",method = RequestMethod.POST)
     public void exchangeWithWEGComponies(@RequestBody ReqSendForWEGEntity transferEntity, HttpServletRequest req, HttpServletResponse resp){
-        log.info("二手房水电气发送电部门通知");
+        log.info("YCSL->SDQG：二手房水电气发送电部门通知");
         exc2Comp.exchangeWithWEGComponies(req.getHeader("Authorization"),transferEntity,resp);
     }
 }

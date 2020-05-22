@@ -22,7 +22,7 @@ public class SysPubDataDealUtil {
 
     public static SJ_Sjsq parseReceiptData(String receiptData, String serviceCode, String serviceDataTo, String receiptNumber) throws ParseException {
         JSONReceiptData sjsq_JSON_str = JSON.parseObject(receiptData, JSONReceiptData.class);//json转实体类
-        System.out.println(JSONObject.toJSONString(sjsq_JSON_str));
+        log.info("收件数据处理，传入数据："+JSONObject.toJSONString(sjsq_JSON_str));
         SJ_Sjsq sjsq = parseReceiptData(sjsq_JSON_str, serviceCode, serviceDataTo, receiptNumber);
         return sjsq;
     }
@@ -112,7 +112,6 @@ public class SysPubDataDealUtil {
 
         for (JSONBdcqlxgxx qlxgxx : qlxgxxs) {
             boolean HaveOrNot = true;   //是否传入了义务人的情况
-            System.out.println("11:" + qlxgxx.getRegistrationDate());
             String JSON_glImmovableVoList = qlxgxx.getGlImmovableVoList();
             String JSON_glObligeeVoList = qlxgxx.getGlObligeeVoList();
             String JSON_glObligorVoList = qlxgxx.getGlObligorVoList();

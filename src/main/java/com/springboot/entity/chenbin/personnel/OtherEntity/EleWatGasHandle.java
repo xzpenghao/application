@@ -21,8 +21,8 @@ public class EleWatGasHandle {
     //初始化水电气的执行标志位
     public EleWatGasHandle initThis(){
         this.handleEle = true;
-        this.handleWat = false;
-        this.handleGas = false;
+        this.handleWat = true;
+        this.handleGas = true;
         return this;
     }
 

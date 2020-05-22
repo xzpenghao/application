@@ -13,6 +13,7 @@ import com.springboot.service.chenbin.other.ExchangeInterfaceService;
 import com.springboot.util.chenbin.Base64Util;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.IDUtil;
+import feign.RetryableException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -71,5 +72,19 @@ public class TestRest {
         returnMap.put("sign","");
         returnMap.put("data",JSONObject.toJSONString(map));
         return new ObjectRestResponse<>().data(returnMap);
+    }
+
+    //测试超时
+    @RequestMapping(value = "testTimeOut" , method = RequestMethod.GET)
+    public ObjectRestResponse<Object> testTimeOut(){
+        try {
+            return outerBackFeign.testTimeOut();
+        }catch ( RetryableException e){
+            e.printStackTrace();
+            if(e.getMessage().contains("timed out"))
+                log.info("访问超时");
+            log.info(e.getCause().getMessage());
+        }
+        return null;
     }
 }

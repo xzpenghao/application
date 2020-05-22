@@ -31,24 +31,27 @@ public interface OuterBackFeign {
     ObjectRestResponse<Object> DealRecieveFromOuter5(@RequestHeader(name = "Authorization") String token, Map<String, String> sjsq);
 
     //拉取有效数据
-    @RequestMapping(value = "/DealRecieveFromOuter7", method = RequestMethod.GET)
-    ObjectRestResponse<SJ_Sjsq> DealRecieveFromOuter7(@RequestHeader(name = "Authorization") String token, @RequestParam("sqbh") String sqbh, @RequestParam("taskId") String taskId);
+    @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter7", method = RequestMethod.GET)
+    ObjectRestResponse<String> DealRecieveFromOuter7(@RequestHeader(name = "Authorization") String token, @RequestParam("sqbh") String sqbh, @RequestParam("taskId") String taskId);
 
     //拉取访问异常信息
-    @RequestMapping(value = "/DealRecieveFromOuter8", method = RequestMethod.POST,consumes = "application/json")
+    @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter8", method = RequestMethod.POST,consumes = "application/json")
     ObjectRestResponse<List<SJ_Exception_Record>> DealRecieveFromOuter8(@RequestHeader(name = "Authorization") String token,SJ_Exception_Record exc);
 
     //插入访问异常信息
-    @RequestMapping(value = "/DealRecieveFromOuter9", method = RequestMethod.POST,consumes = "application/json")
+    @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter9", method = RequestMethod.POST,consumes = "application/json")
     ObjectRestResponse<String> DealRecieveFromOuter9(@RequestHeader(name = "Authorization") String token,SJ_Exception_Record exc);
 
     //异常外部处理
-    @RequestMapping(value = "/DealRecieveFromOuter10", method = RequestMethod.POST,consumes = "application/json")
+    @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter10", method = RequestMethod.POST,consumes = "application/json")
     ObjectRestResponse<String> DealRecieveFromOuter10(@RequestHeader(name = "Authorization") String token,SJ_Exception_Record exc);
 
-    @RequestMapping(value = "/DealRecieveFromOuter11", method = RequestMethod.POST,consumes = "application/json")
+    @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter11", method = RequestMethod.POST,consumes = "application/json")
     ObjectRestResponse<String> DealRecieveFromOuter11(@RequestHeader(name = "Authorization") String token, SJ_Sdqg_Send_Result result);
 
     @RequestMapping(value = "api/test/test",method = RequestMethod.POST)
     ObjectRestResponse<Object> test(@RequestParam("paramsss") String paramsss);
+
+    @RequestMapping(value = "api/test/testTimeOut",method = RequestMethod.GET)
+    ObjectRestResponse<Object> testTimeOut();
 }

@@ -40,7 +40,7 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://192.168.0.108:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://localhost:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -119,10 +119,10 @@ glHouseBuyer:
   obligeeZwr: 债务人
 httpclient:
   seam: 23335       #杨智昊程序端口
-  ip: 192.168.0.120
+  ip: 10.3.0.149
   #10.3.2.147    #登记平台ip
   windowAcceptanceIp: localhost   #一窗受理ip
-  windowAcceptanceSeam: 7779      #一窗受理接口
+  windowAcceptanceSeam: 7780      #一窗受理接口
 businessType:
   clfFmortgage: MORTGAGE_OLD_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
   xjfFmortgage: MORTGAGE_NEW_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）
@@ -173,7 +173,7 @@ mapper:
   mappers: com.github.wxiaoqi.security.common.mapper.CommonMapper
 
 machine:
-  ip: 10.3.2.206
+  ip: localhost
   post: 7777
 
 chenbin:
@@ -271,7 +271,7 @@ sq:
     swrydm: 13213730007
 
 djj:
-  bsryname: testdjj
+  bsryname: sqbdc
   bsrypassword: 123456
   tsryname: tsdjj
   tsrypaaword: 123456
@@ -292,19 +292,19 @@ gxjhpt:
   url: http://10.13.0.240:8001/
 
 bdccx:
-  url: http://192.168.0.120:23335/
+  url: http://10.3.0.149:23335/
 #  url: http://172.22.226.172:12201/
 ycsl:
-  url: http://localhost:7779/
+  url: http://localhost:7780/
 
 other:
-  url: http://localhost:7779/
+  url: http://localhost:7780/
 
 
 PublicInspect:
-  BDCZHURL: http://192.168.0.120:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
-  DYZMHURL: http://192.168.0.120:23335/api/services/app/BdcQuery/GetBdcInfoByDYZMH?DYZMH=%s
-  YGZMHURL: http://192.168.0.120:23335/api/services/app/BdcQuery/GetBdcInfoByYGZMH?YGZMH=%s
+  BDCZHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
+  DYZMHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByDYZMH?DYZMH=%s
+  YGZMHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByYGZMH?YGZMH=%s
 
 
 ETicket:

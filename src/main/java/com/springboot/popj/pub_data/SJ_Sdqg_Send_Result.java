@@ -1,12 +1,17 @@
 package com.springboot.popj.pub_data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.springboot.entity.chenbin.personnel.req.ReqSendForWEGEntity;
+import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
+import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author chenb
@@ -16,16 +21,16 @@ import javax.persistence.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SJ_Sdqg_Send_Result {
+public class SJ_Sdqg_Send_Result implements Serializable {
     private String id;
     private String sqbh;            //收件编号
     private String taskId;          //任务ID
     private String sendKey;         //关键字
     private String sendCompony;     //发送的公司
+    private String resultJson;      //原结果
     private String result;          //结果
     private String resultStr;       //结果字符串
-    private String resultJson;      //原结果
-    private String insertTime;      //入库时间，不做赋值
+    private Date insertTime;      //入库时间，不做赋值
 
     public SJ_Sdqg_Send_Result initSuccessFromWEGEntity(ReqSendForWEGEntity sendTransferEntity,String sendKey){
         this.sqbh = sendTransferEntity.getSqbh();
