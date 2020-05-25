@@ -40,7 +40,8 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://192.168.0.108:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+#          url: jdbc:mysql://192.168.0.108:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://10.3.0.156:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -289,10 +290,10 @@ tra:
   bsrypassword: 123456
 
 gxjhpt:
-  url: http://10.13.0.240:8001/
+  url: http://127.0.0.1:7779/
 
 bdccx:
-  url: http://192.168.0.120:23335/
+  url: http://10.3.0.149:23335/
 #  url: http://172.22.226.172:12201/
 ycsl:
   url: http://localhost:7779/
@@ -316,3 +317,6 @@ Feign:
   Tra: api/test/testTra
   ETicket: ETicket/morkData
   Electric: api/test/testElec
+
+HouseSet:
+  Bdc: http://10.3.0.149:23335/api/services/app/bdcQuery/GetHouseInfoByMember

@@ -314,3 +314,6 @@ Feign:
   Tax: dataShareAction.do
   Tra: sqservice/bdc/getOneAcceptInfo
   ETicket: getDzspAction.do
+
+HouseSet:
+  Bdc: http://10.3.0.149:23335/api/services/app/bdcQuery/GetHouseInfoByMember
