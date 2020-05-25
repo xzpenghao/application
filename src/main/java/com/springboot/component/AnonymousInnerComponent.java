@@ -109,6 +109,8 @@ public class AnonymousInnerComponent {
     private String noticeUrl;
     @Value("${penghao.transferholdmap}")
     private boolean transferHoldmap;
+    @Value("${sq.bank.jt.ftpIdentical}")
+    private boolean ftpIdentical;
 
     @Autowired
     private ExceptionRecordMapper exceptionRecordMapper;
@@ -546,14 +548,16 @@ public class AnonymousInnerComponent {
             }
         }else {
             fileArray = com.alibaba.fastjson.JSONArray.parseArray(com.alibaba.fastjson.JSONObject.toJSONString(fileInfoVoList));
-            for (int i = 0; i < fileArray.size(); i++) {
-                com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
-                String fileAddress="";
-                fileAddress  = fileObject.getString("fileAddress");
-                if (StringUtils.isEmpty(fileAddress)){
-                    fileAddress=fileObject.getString("fileAdress");
-                }
-                String fileType = fileAddress.substring(fileAddress.lastIndexOf(".") + 1);
+            if (!ftpIdentical){
+                    for (int i = 0; i < fileArray.size(); i++) {
+                        com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
+                        String fileAddress = "";
+                        fileAddress = fileObject.getString("fileAddress");
+                        if (StringUtils.isEmpty(fileAddress)) {
+                            fileAddress = fileObject.getString("fileAdress");
+                        }
+                        String fileType = fileAddress.substring(fileAddress.lastIndexOf(".") + 1);
+                    }
 //                byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
 //                log.info("ftpAdress"+StrUtil.getFTPRemotePathByFTPPath(fileAddress));
 //                uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,yftpAddress,yftpPort,yftpUsername,yftpPassword);//获取上传路径和名称

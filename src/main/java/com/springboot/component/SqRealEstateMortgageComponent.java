@@ -306,11 +306,11 @@ public class SqRealEstateMortgageComponent {
         Map<String, String> mapParmeter = new HashMap<>();
         JSONObject reObject=new JSONObject();
         Map<String, Object> map = new HashMap<>();
-        String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(mortgageRegistrationReqVo.getFileInfoVoList().get(0).getFileAdress()));
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception {
                 try {
                     if (null != mortgageRegistrationReqVo.getFileInfoVoList() && mortgageRegistrationReqVo.getFileInfoVoList().size() != 0) {
+                        String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(mortgageRegistrationReqVo.getFileInfoVoList().get(0).getFileAdress()));
                         anonymousInnerComponent.getProcessingAnnex(null, mapParmeter, mortgageRegistrationReqVo.getFileInfoVoList(), ftpAddress, ftpPort, ftpUsername, ftpPassword, path);
                     }
                 }catch (Exception e) {
