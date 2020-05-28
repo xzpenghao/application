@@ -886,8 +886,9 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, registrationPid, true, grMortgageRegistration, bankPerson, areaNo);
         registrationBureau = ClAutoRealPropertyCertificate(sjSjsq, registrationBureau);
         String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
+        //做ftp操作
         if (sjSjsq.getExt1().equals("0")){
-            //做ftp操作
+            exchangeToInnerService.ClRegistrationOfficePerson(registrationBureau);
             return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
         }
             exchangeToInnerService.ClRegistrationOfficePerson(registrationBureau);
