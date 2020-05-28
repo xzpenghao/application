@@ -9,6 +9,7 @@ import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.popj.GetReceiving;
 import com.springboot.popj.warrant.ParametricData;
+import com.springboot.service.chenbin.ExchangeToInnerService;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,6 +49,7 @@ public class RealEstateMortgageController {
     private ParallelSectorsComponent parallelSectorsComponent;
     @Autowired
     private HttpCallComponent httpCallComponent;
+
 
 
     @RequestMapping(value = "/ceshigxpt", method = RequestMethod.POST)
@@ -120,6 +122,7 @@ public class RealEstateMortgageController {
         }
         return rv;
     }
+
 
 
     @RequestMapping(value = "/sendRegistrationMortgageRevocation", method = RequestMethod.POST)

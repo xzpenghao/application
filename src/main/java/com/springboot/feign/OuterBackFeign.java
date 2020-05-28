@@ -34,6 +34,10 @@ public interface OuterBackFeign {
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter7", method = RequestMethod.GET)
     ObjectRestResponse<String> DealRecieveFromOuter7(@RequestHeader(name = "Authorization") String token, @RequestParam("sqbh") String sqbh, @RequestParam("taskId") String taskId);
 
+    //拉取银行收件人员token信息
+    @RequestMapping(value = "api/user/getBankToken", method = RequestMethod.POST)
+    ObjectRestResponse<String> getBankToken(@RequestHeader(name = "Authorization") String token, @RequestParam("mortgageApplyId") String mortgageApplyId,@RequestParam("modelId") String modelId);
+
     //拉取访问异常信息
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter8", method = RequestMethod.POST,consumes = "application/json")
     ObjectRestResponse<List<SJ_Exception_Record>> DealRecieveFromOuter8(@RequestHeader(name = "Authorization") String token,SJ_Exception_Record exc);
