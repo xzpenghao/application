@@ -133,7 +133,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         advanceBizInfo.setRealEstateInfoVoList(mortgageBizInfo.getRealEstateInfoVoList());
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
         registrationBureau.setAdvanceBizInfo(advanceBizInfo);
-
+        ClRegistrationOfficePerson(registrationBureau);
         log.info("将传入不动产数据（未处理附件）：" + JSONObject.toJSONString(registrationBureau));
         String token = httpCallComponent.getToken(username, password);
         return handleCreateFlow(token,sjsq,registrationBureau,isDealFtp);
@@ -431,7 +431,6 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         Map<String,String> params = new HashMap<String,String>();
         try {
             log.info("进入" + sjsq.getReceiptNumber() + "业务的附件获取功能");
-            ClRegistrationOfficePerson(registrationBureau); //根据银行分享
             //处理附件
             List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
             log.info(" 不动产登记 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));

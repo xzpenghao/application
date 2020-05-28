@@ -890,6 +890,7 @@ RealEstateMortgageComponent {
             //做ftp操作
             return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
         }
+            exchangeToInnerService.ClRegistrationOfficePerson(registrationBureau);
             String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
             Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
             return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
