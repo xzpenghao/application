@@ -89,18 +89,21 @@ public class SJ_Exception_Record implements Serializable {
     //获取样例
     public SJ_Exception_Record giveAnExample(){
         SJ_Exception_Record example = new SJ_Exception_Record();
-
-        example.setTaskId(this.getTaskId());
-        example.setExcType(this.getExcType());
-        example.setReceiptNumber(this.getReceiptNumber());
-        example.setTaskDirection(this.getTaskDirection());
         if(StringUtils.isBlank(this.getExcType()) || EXC_TYPE_JINTERROR.equals(this.getExcType())){
-            example.setBusinessName(this.getBusinessName());
+            example.setTaskId(this.getTaskId());
+            example.setExcType(this.getExcType());
+            example.setReceiptNumber(this.getReceiptNumber());
         } else if(EXC_TYPE_FEIGNERROR.equals(this.getExcType())){
+            example.setTaskId(this.getTaskId());
+            example.setExcType(this.getExcType());
+            example.setReceiptNumber(this.getReceiptNumber());
             example.setHappenFeign(this.getHappenFeign());
             example.setHappenMethod(this.getHappenMethod());
             example.setHappenKey(this.getHappenKey());
         } else if(EXC_TYPE_NOTICEERROR.equals(this.getExcType())){
+            example.setTaskId(this.getTaskId());
+            example.setExcType(this.getExcType());
+            example.setRegisterNumber(this.getReceiptNumber());
             example.setNoticeType(this.getNoticeType());
         } else {
             //未定义的异常类型，理论上准予记录（返回整体就行）

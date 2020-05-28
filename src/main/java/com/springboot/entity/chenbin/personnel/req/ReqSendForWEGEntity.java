@@ -1,6 +1,5 @@
 package com.springboot.entity.chenbin.personnel.req;
 
-import com.alibaba.fastjson.JSONObject;
 import com.springboot.popj.pub_data.SJ_Exception_Record;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,15 +16,4 @@ public class ReqSendForWEGEntity {
     private String excutMethod;                         //执行方法
     private boolean execAgain;                          //是否再次执行
     private SJ_Exception_Record exc;                    //异常记录
-
-    public ReqSendForWEGEntity copyThisFailed(){
-        ReqSendForWEGEntity reqSendForWEGEntity = new ReqSendForWEGEntity();
-        reqSendForWEGEntity.setSqbh(this.getSqbh());
-        reqSendForWEGEntity.setTaskId(this.getTaskId());
-        reqSendForWEGEntity.setHandleKey(this.getHandleKey());
-        reqSendForWEGEntity.setExcutFeign(this.getExcutFeign());
-        reqSendForWEGEntity.setExcutMethod(this.getExcutMethod());
-        reqSendForWEGEntity.setExecAgain(true);
-        return reqSendForWEGEntity;
-    }
 }

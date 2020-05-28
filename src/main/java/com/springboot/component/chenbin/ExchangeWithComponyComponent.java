@@ -18,7 +18,6 @@ import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
-import feign.Request;
 import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -72,6 +71,7 @@ public class ExchangeWithComponyComponent {
         } catch (InterruptedException e){
             throw new ZtgeoBizException("分支线程出现等待错误");
         }
+
         /**
          * 获取一窗受理侧的办件数据
          */
@@ -215,27 +215,12 @@ public class ExchangeWithComponyComponent {
             }
 
             //处理结果获取
-            if(handleSign.isHandleEle()) {
-                try {
-                    log.info("YCSL->SDQG->>->>ELE：电处理结果返回：" + futureEle.get());
-                } catch (Exception e) {
-                    log.error("YCSL->SDQG->>->>ELE：电处理出现不受监控的异常：" + ErrorDealUtil.getErrorInfo(e));
-                }
-            }
-            if(handleSign.isHandleWat()) {
-                try {
-                    log.info("YCSL->SDQG->>->>WAT：水处理结果返回：" + futureWater.get());
-                } catch (Exception e) {
-                    log.error("YCSL->SDQG->>->>WAT：水处理出现不受监控的异常：" + ErrorDealUtil.getErrorInfo(e));
-                }
-            }
-            if(handleSign.isHandleGas()) {
-                try {
-                    log.info("YCSL->SDQG->>->>GAS：气处理结果返回：" + futureGas.get());
-                } catch (Exception e){
-                    log.error("YCSL->SDQG->>->>GAS：气处理出现不受监控的异常：" + ErrorDealUtil.getErrorInfo(e));
-                }
-            }
+            if(handleSign.isHandleEle())
+                log.info("YCSL->SDQG->>->>ELE：电处理结果返回："+futureEle.get());
+            if(handleSign.isHandleWat())
+                log.info("YCSL->SDQG->>->>WAT：水处理结果返回："+futureWater.get());
+            if(handleSign.isHandleGas())
+                log.info("YCSL->SDQG->>->>GAS：气处理结果返回："+futureGas.get());
 
             if(sendTransferEntity.isExecAgain()){   //二次触发时处理
                 SJ_Exception_Record exc = sendTransferEntity.getExc();
@@ -263,11 +248,11 @@ public class ExchangeWithComponyComponent {
 
     public void handleExchangeWithEle(String reqKey,ReqSendForWEGEntity sendTransferEntity,SJ_Sjsq sjsq){
         log.info("YCSL->SDQG->>->>ELE：开始电分发线程,开始时间："+ TimeUtil.getTimeString(new Date()));
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e){
-//            log.error("电分支线程出现等待错误");
-//        }
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e){
+            log.error("电分支线程出现等待错误");
+        }
         boolean isDealExc;
         String excMsg = "";
         try {
@@ -290,8 +275,6 @@ public class ExchangeWithComponyComponent {
                     dlBaskResult.setCode("0000");
                     dlBaskResult.setMsg("成功");
                     dlBaskResult.setData(dlreturn);
-                }else{
-                    throw e;
                 }
             }
 
@@ -353,11 +336,11 @@ public class ExchangeWithComponyComponent {
 
     public void handleExchangeWithWat(String reqKey,ReqSendForWEGEntity sendTransferEntity,SJ_Sjsq sjsq){
         log.info("YCSL->SDQG->>->>WAT：开始水分发线程,开始时间："+ TimeUtil.getTimeString(new Date()));
-//        try {
-//            Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//            log.error("YCSL->SDQG->>->>WAT：水分支线程出现等待错误");
-//        }
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            log.error("YCSL->SDQG->>->>WAT：水分支线程出现等待错误");
+        }
         boolean isDealExc;
         String excMsg = "自来水过户失败了";
         try {
@@ -380,11 +363,11 @@ public class ExchangeWithComponyComponent {
 
     public void handleExchangeWithGas(String reqKey,ReqSendForWEGEntity sendTransferEntity,SJ_Sjsq sjsq){
         log.info("YCSL->SDQG->>->>GAS：开始气分发线程,开始时间："+ TimeUtil.getTimeString(new Date()));
-//        try {
-//            Thread.sleep(15000);
-//        } catch (InterruptedException e){
-//            log.error("YCSL->SDQG->>->>GAS：气分支线程出现等待错误");
-//        }
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e){
+            log.error("YCSL->SDQG->>->>GAS：气分支线程出现等待错误");
+        }
         boolean isDealExc;
         String excMsg = "燃气过户失败了";
         try {
@@ -423,7 +406,7 @@ public class ExchangeWithComponyComponent {
         params.put("transferEntity",JSONObject.toJSONString(newEntity));
         SJ_Exception_Record exceptionRecord;
         if(sendTransferEntity.isExecAgain()){
-            exceptionRecord = sendTransferEntity.getExc().giveAnExample();
+            exceptionRecord = sendTransferEntity.getExc();
             if(EXC_SDQG_HAPPEN_KEY_ALL.equals(sendTransferEntity.getHandleKey())){
                 sendTransferEntity.getExc().setHandleResult("unsuccessful");
                 sendTransferEntity.getExc().setHandleStatus("1");
