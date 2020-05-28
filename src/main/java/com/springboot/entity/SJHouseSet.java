@@ -40,5 +40,7 @@ public class SJHouseSet {
     private String floor;
     /** 总层数 */
     private String totalFloor;
+    /** 债权人类型 0 卖方（义务人），1买方（权利人） */
+    private String obligeeType;
 
 }

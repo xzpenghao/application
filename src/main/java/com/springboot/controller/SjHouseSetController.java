@@ -3,6 +3,7 @@ package com.springboot.controller;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.entity.SJHouseSet;
 import com.springboot.service.shike.SjHouseSetService;
+import com.springboot.vo.Obligee;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,22 @@ public class SjHouseSetController {
 
     @RequestMapping(value = "/queryBdcHouseSet", method = RequestMethod.POST)
     @ApiOperation("获取不动产房屋套次信息")
-    public ObjectRestResponse queryBdcHouseSetByObligeeList(@RequestBody String obligeeList){
+    public ObjectRestResponse queryBdcHouseSetByObligeeList(@RequestBody List<Obligee> obligeeList){
         return new ObjectRestResponse<List<SJHouseSet>>().data(sjHouseSetService.queryBdcHouseSetByObligeeList(obligeeList));
+    }
+
+    @RequestMapping(value = "/taxPush", method = RequestMethod.POST)
+    @ApiOperation("税务推送")
+    public ObjectRestResponse taxPush(String slbh, String jyfbs,@RequestBody List<SJHouseSet> SJHouseSetList){
+        return new ObjectRestResponse<>().data(sjHouseSetService.taxPush(slbh,jyfbs,SJHouseSetList));
+    }
+
+    @RequestMapping(value = "/mockTax", method = RequestMethod.POST)
+    @ApiOperation("mock税务响应")
+    public ObjectRestResponse mockTax(@RequestBody String data){
+        log.info(data);
+        ObjectRestResponse response = new ObjectRestResponse();
+        response.setMessage("操作成功");
+        return response;
     }
 }
