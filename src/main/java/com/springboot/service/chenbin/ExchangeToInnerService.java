@@ -6,7 +6,6 @@ import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
 import com.springboot.popj.pub_data.SJ_Info_Bdcqlxgxx;
-import com.springboot.popj.registration.RegistrationBureau;
 import com.springboot.popj.warrant.ParametricData;
 
 import java.text.ParseException;
@@ -21,6 +20,7 @@ public interface ExchangeToInnerService {
     List<PaphEntity> getPaphMortBefore(PaphReqEntity paph);
     List<PaphEntity> getPaphMortAfter(PaphReqEntity paph);
     List<SJ_Info_Bdcqlxgxx> getBdcQlInfoWithItsRights(ParametricData parametricData);
+
     List<SJ_Sjsq_User_Ext> getBdcUsers(String pid);
     List<SynNewEcertEntity> dealPostEcerts(SynNewEcertsReqEntity ecertReq);
 }

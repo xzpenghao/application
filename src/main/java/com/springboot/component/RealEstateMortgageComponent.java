@@ -1,12 +1,10 @@
 package com.springboot.component;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.HttpCallComponent;
-import com.springboot.config.BankManager;
 import com.springboot.config.DJJUser;
 import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
@@ -437,22 +435,6 @@ RealEstateMortgageComponent {
     }
 
 
-    public void  ClRevocationOfficePerson(SJ_Sjsq sjSjsq,RegistrationBureau registrationBureau){
-        if (CollectionUtil.isNotEmpty(sjSjsq.getImmovableCurrentMortgageInfoVoList().get(0).getGlMortgageHolderVoList())){
-            sjSjsq.getImmovableCurrentMortgageInfoVoList().get(0).getGlMortgageHolderVoList().stream().forEach(mortgagee->{
-                switch (mortgagee.getObligeeName()){
-                    case BankManager.SQPING_AN_NAME:
-                        registrationBureau.setOperatorName(BankManager.SQPING_AN_OPERATORNAME);
-                        break;
-                    case BankManager.SQJIAO_TONG_NAME:
-                        registrationBureau.setOperatorName(BankManager.SJIAO_TONG_OPERATORNAME);
-                    default:
-                        break;
-                }
-            });
-        }
-    }
-
 
     /**
      * 发送登记局数据 返回受理编号 (抵押注销登记)
@@ -464,12 +446,10 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureauVo = null;
         //获取json数据转成收件申请
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
-        sjSjsq.getImmovableCurrentMortgageInfoVoList().get(0).getGlMortgageHolderVoList().get(0).setObligeeName(BankManager.SQJIAO_TONG_NAME);
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, mortgagePid, false, grMortgageCancellation, bankPerson, areaNo);
         switch (sjSjsq.getBusinessType()) {
             case Msgagger.CANCELLATION_REGISTRATION:
                 registrationBureau.setBizType(grMortgageCancellation);
-                ClRevocationOfficePerson(sjSjsq,registrationBureau);
                 if (null != sjSjsq.getImmovableCurrentMortgageInfoVoList() || sjSjsq.getImmovableCurrentMortgageInfoVoList().size() != 0) {
                     registrationBureauVo = getRevokeBizInfo(sjSjsq.getImmovableCurrentMortgageInfoVoList(), registrationBureau);
                 }
