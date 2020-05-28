@@ -1,5 +1,6 @@
 package com.springboot.service.chenbin.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.component.AnonymousInnerComponent;
@@ -9,6 +10,7 @@ import com.springboot.component.chenbin.OtherComponent;
 import com.springboot.component.chenbin.file.FileHandleComponent;
 import com.springboot.component.chenbin.file.FromFTPDownloadComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
+import com.springboot.config.BankManager;
 import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.constant.chenbin.BusinessConstant;
@@ -406,11 +408,30 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         return  resultJson;
     }
 
+    public void  ClRegistrationOfficePerson(RegistrationBureau registrationBureau){
+        if (CollectionUtil.isNotEmpty(registrationBureau.getMortgageBizInfo().getMortgageeInfoVoList())){
+            registrationBureau.getMortgageeInfoVoList().stream().forEach(mortgagee->{
+                switch (mortgagee.getMortgageeName()){
+                    case BankManager.SQPING_AN_NAME:
+                        registrationBureau.setOperatorName(BankManager.SQPING_AN_OPERATORNAME);
+                        break;
+                    case BankManager.SQJIAO_TONG_NAME:
+                        registrationBureau.setOperatorName(BankManager.SJIAO_TONG_OPERATORNAME);
+                        break;
+                        default:
+                            break;
+                }
+            });
+        }
+    }
+
+
 
     public String handleCreateFlow(String token,SJ_Sjsq sjsq,RegistrationBureau registrationBureau,boolean dealFile){
         Map<String,String> params = new HashMap<String,String>();
         try {
             log.info("进入" + sjsq.getReceiptNumber() + "业务的附件获取功能");
+            ClRegistrationOfficePerson(registrationBureau); //根据银行分享
             //处理附件
             List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
             log.info(" 不动产登记 附件信息获取成功，为：" + JSONArray.toJSONString(fileVoList));

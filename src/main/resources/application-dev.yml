@@ -204,6 +204,9 @@ chenbin:
       url: http://10.13.0.240:9999/z
 penghao:
     transferholdmap: true
+    highestAuthority:      #去一窗受理拉取银行收件人员信息
+        username: admin
+        password: admin
     realEstateRenewal:
         pid: Proc-180824084529-RJ32P320                    #换证登记pid
     supplementaryEvidence:
