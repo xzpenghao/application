@@ -88,7 +88,7 @@ public class ExchangeWithComponyService {
             //调用回写异常信息进Rec(注意此时产生的是All异常)
             Map<String,String> params = new HashMap<>();
             params.put("token","");
-            params.put("transferEntity",JSONObject.toJSONString(sendTransferEntity));
+            params.put("transferEntity",JSONObject.toJSONString(sendTransferEntity.copyThisFailed()));
             backFeign.DealRecieveFromOuter9(
                     reqKey,
                     new SJ_Exception_Record()
