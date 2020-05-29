@@ -5,6 +5,7 @@ import com.springboot.entity.SJHouseSet;
 import com.springboot.vo.Obligee;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author sk
@@ -27,13 +28,9 @@ public interface SjHouseSetService {
      * 描述：税务推送
      * 作者：sk
      * 日期：2020/5/27
-     * 参数：{
-     * @param slbh 受理编号
-     * @param jyfbs 交易方标志 （0 卖方，1买方）
-     * @param SJHouseSetList 套次集合
-     * }
+     * 参数：受理编号 与 套次集合
      * 返回：推送结果
      * 更新记录：更新人：{}，更新日期：{}
      */
-    BaseResponse taxPush(String slbh, String jyfbs, List<SJHouseSet> SJHouseSetList);
+    BaseResponse taxPush(Map<String,String> taxPushMap);
 }

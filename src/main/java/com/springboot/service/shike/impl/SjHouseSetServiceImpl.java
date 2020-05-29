@@ -3,6 +3,7 @@ package com.springboot.service.shike.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpStatus;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.springboot.constant.AdminCommonConstant.BOOLEAN_NUMBER_FALSE;
+import static com.springboot.constant.AdminCommonConstant.BOOLEAN_NUMBER_TRUE;
 
 /**
  * @author sk
@@ -34,6 +36,9 @@ public class SjHouseSetServiceImpl implements SjHouseSetService {
 
     @Value("${HouseSet.Bdc}")
     private String houseSetBdc;
+
+    @Value("${HouseSet.taxPush}")
+    private String taxPushUrl;
 
     /**
      * 描述：根据权利人集合查询房屋套次
@@ -113,26 +118,71 @@ public class SjHouseSetServiceImpl implements SjHouseSetService {
      * 描述：税务推送
      * 作者：sk
      * 日期：2020/5/27
-     * 参数：{
-     * @param slbh 受理编号
-     * @param jyfbs 交易方标志 （0 卖方，1买方）
-     * @param SJHouseSetList 套次集合
-     * }
+     * 参数：受理编号 与 套次集合 map
      * 返回：推送结果
      * 更新记录：更新人：{}，更新日期：{}
      */
     @Override
-    public BaseResponse taxPush(String slbh, String jyfbs, List<SJHouseSet> SJHouseSetList) {
+    public BaseResponse taxPush(Map<String,String> taxPushMap) {
         //1.    参数合法性验证
-        if (StrUtil.isBlank(slbh) || StrUtil.isBlank(jyfbs) || CollUtil.isEmpty(SJHouseSetList)){
+        if (CollUtil.isEmpty(taxPushMap)){
             throw new ZtgeoBizException("参数为空");
         }
         //2.    数据处理与格式化
+        String slbh = taxPushMap.get("slbh");
+        List<SJHouseSet> sjHouseSetList = JSONArray.parseArray(StrUtil.toString(taxPushMap.get("sjHouseSetList")),SJHouseSet.class);
+
+        List<SJHouseSet> qlrfwtc = new ArrayList<>();
+        List<SJHouseSet> ywrfwtc = new ArrayList<>();
+        for (SJHouseSet sjHouseSet:sjHouseSetList) {
+            if (BOOLEAN_NUMBER_FALSE.equals(sjHouseSet.getObligeeType())){
+                // 类型为0 ，为权利人列表
+                qlrfwtc.add(sjHouseSet);
+            }else if (BOOLEAN_NUMBER_TRUE.equals(sjHouseSet.getObligeeType())){
+                ywrfwtc.add(sjHouseSet);
+            }else {
+                log.info("数据无法识别：{}",JSON.toJSONString(sjHouseSet));
+            }
+        }
+        //2.1   按格式生成数据
+        JSONObject taxPushParams = new JSONObject();
+        taxPushParams.put("qlrdata",genJsonData(slbh,qlrfwtc));
+        taxPushParams.put("ywrdata",genJsonData(slbh,ywrfwtc));
+        String result = "";
+        BaseResponse response;
+        //2.2   发送请求 捕获异常
+        try {
+            result = HttpUtil.post(taxPushUrl,taxPushParams);
+            response = JSON.parseObject(result,BaseResponse.class);
+            if (response.getStatus() != HttpStatus.HTTP_OK){
+                throw new ZtgeoBizException(StrUtil.isBlank(response.getMessage())? "不动产套次信息推送税务服务失败" : response.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("税务推送失败,请求参数为:{}",JSON.toJSONString(taxPushParams));
+            throw new ZtgeoBizException("不动产套次信息推送税务服务失败");
+        }
+
+        //3.    数据返回
+        return response;
+    }
+
+
+    /**
+     * 格式化查询参数
+     * @param slbh 受理编号
+     * @param sjHouseSetList 权利人或义务人房屋套次列表
+     * @return 格式化的查询参数
+     */
+    private JSONObject genJsonData(String slbh,List<SJHouseSet> sjHouseSetList){
+        if (CollUtil.isEmpty(sjHouseSetList)){
+            return null;
+        }
         JSONObject ycslxx = new JSONObject();
         ycslxx.put("slbh",slbh);
-        ycslxx.put("Jyfbs",jyfbs);
+        ycslxx.put("Jyfbs",sjHouseSetList.get(0).getObligeeType());
         JSONArray fwtcxx = new JSONArray();
-        for (SJHouseSet sjHouseSet:SJHouseSetList) {
+        for (SJHouseSet sjHouseSet:sjHouseSetList) {
             JSONObject data = new JSONObject();
             // 权证号 -> 不动产证号
             data.put("qzh",sjHouseSet.getRealEstateId());
@@ -180,6 +230,19 @@ public class SjHouseSetServiceImpl implements SjHouseSetService {
                         data.put("fwyt","299");
                 }
             }
+            String string = StrUtil.toString(sjHouseSet.getObligeeInfoVoList());
+            JSONArray qlrArray = JSONArray.parseArray(string);
+            JSONArray qlrxx = new JSONArray();
+            for (Object qlrData:qlrArray) {
+                JSONObject qlr = new JSONObject();
+                Obligee obligee = JSONObject.parseObject(JSON.toJSONString(qlrData),Obligee.class);
+                qlr.put("qzr",obligee.getObligeeName());
+                qlr.put("qzrzjhm",obligee.getObligeeId());
+                qlrxx.add(qlr);
+            }
+            // 反解权利人信息列表
+            data.put("qlrxx",qlrxx);
+
             // 加入集合
             fwtcxx.add(data);
         }
@@ -187,14 +250,7 @@ public class SjHouseSetServiceImpl implements SjHouseSetService {
         JSONObject taxPushData = new JSONObject();
         taxPushData.put("ycslxx",ycslxx);
         taxPushData.put("fwtcxx",fwtcxx);
-
-        JSONObject taxPushParams = new JSONObject();
-        taxPushParams.put("data",taxPushData);
-
-        log.info(JSON.toJSONString(taxPushParams));
-
-        return null;
+        return taxPushData;
     }
-
 
 }

@@ -1,5 +1,6 @@
 package com.springboot.controller;
 
+import com.github.wxiaoqi.security.common.msg.BaseResponse;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.entity.SJHouseSet;
 import com.springboot.service.shike.SjHouseSetService;
@@ -8,12 +9,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author sk
@@ -37,8 +36,8 @@ public class SjHouseSetController {
 
     @RequestMapping(value = "/taxPush", method = RequestMethod.POST)
     @ApiOperation("税务推送")
-    public ObjectRestResponse taxPush(String slbh, String jyfbs,@RequestBody List<SJHouseSet> SJHouseSetList){
-        return new ObjectRestResponse<>().data(sjHouseSetService.taxPush(slbh,jyfbs,SJHouseSetList));
+    public BaseResponse taxPush(@RequestBody Map<String,String> taxPushMap){
+        return sjHouseSetService.taxPush(taxPushMap);
     }
 
     @RequestMapping(value = "/mockTax", method = RequestMethod.POST)
