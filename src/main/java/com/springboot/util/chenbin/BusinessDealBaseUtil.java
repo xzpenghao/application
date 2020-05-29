@@ -10,8 +10,10 @@ import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.constant.penghao.BizOrBizExceptionConstant;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.SJ_Fjinst;
 import com.springboot.entity.chenbin.personnel.OtherEntity.FcIndexAndTdzh;
 import com.springboot.entity.chenbin.personnel.pub_use.*;
+import com.springboot.entity.chenbin.personnel.req.DLFile;
 import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
 import com.springboot.entity.chenbin.personnel.tax.TaxParamBody;
 import com.springboot.entity.chenbin.personnel.tra.TraParamBody;
@@ -28,9 +30,9 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
+import static com.springboot.constant.chenbin.KeywordConstant.*;
 
 /*
     数据处理基本UTIL工具类
@@ -663,5 +665,51 @@ public class BusinessDealBaseUtil {
             }
         }
         return null;
+    }
+
+    public static List<DLFile> dealFjForEle(Sj_Info_Jyhtxx jyhtxx, Map<String , SJ_Fjinst> fjinstMap){
+        List<DLFile> datas = new ArrayList<>();
+        List<SJ_Qlr_Gl> sellers = jyhtxx.getGlHouseSellerVoList();
+        List<SJ_Qlr_Gl> buyers = jyhtxx.getGlHouseBuyerVoList();
+        Set<String> xgrNames = arrangeGuysName(sellers,buyers);
+        SJ_Fjinst fjinst = fjinstMap.get(KEYWORD_OF_ANNEX_IDCARD);
+        if(fjinst!=null){
+            List<SJ_Fjinst> sons = fjinst.getChildren();
+            for(SJ_Fjinst son : sons){
+                String sonName = son.getCname();
+                if(son.getCkind().equals(CKIND_OF_ANNEX_FOLDER) && xgrNames.contains(sonName)){//文件夹并且在相关人范围内
+                    List<SJ_Fjinst> sonsChildren = son.getChildren();
+                    int index_this = 1;
+                    for(SJ_Fjinst sonsChild:sonsChildren){
+                        if(sonsChild.getCkind().equals(CKIND_OF_ANNEX_FILE) && sonsChild.getFile()!=null){
+                            if(!sonsChild.getCname().equals(sonName+CARD_NAME_OF_XCTP) && !sonsChild.getCname().equals(sonName+CARD_NAME_OF_ZJZTP)){
+                                DLFile file_this = new DLFile();
+                                if(sonsChild.getCname().equals(sonName+CARD_NAME_OF_RZDBJG)) {
+                                    file_this.setFileName(sonsChild.getCname() + "." + sonsChild.getFile().getFileExt());
+                                }else {
+                                    file_this.setFileName(sonName + CARD_NAME_OF_ZJZP + index_this + "." + sonsChild.getFile().getFileExt());
+                                    index_this++;
+                                }
+                                file_this.setFileData(sonsChild.getFile().getFileId());
+                                datas.add(file_this);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return datas;
+    }
+
+    public static Set<String> arrangeGuysName(List<SJ_Qlr_Gl>... guysList){
+        Set<String> guysName = new HashSet<>();
+        if(guysList!=null){
+            for (List<SJ_Qlr_Gl> guys:guysList){
+                for(SJ_Qlr_Gl guy:guys){
+                    guysName.add(guy.getObligeeName());
+                }
+            }
+        }
+        return guysName;
     }
 }

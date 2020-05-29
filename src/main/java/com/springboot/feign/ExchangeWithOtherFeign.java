@@ -28,6 +28,14 @@ public interface ExchangeWithOtherFeign {
     @RequestMapping(value = "${Feign.ETicket}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=4i0zZlvo","from_user=1"})
     ObjectRestResponse<String> getETicket(@RequestBody Map<String,Object> receiptNumbers);
 
+    /**
+     * 描述：向电力部门发送数据
+     * 作者：chenb
+     * 日期：2020/5/29/029
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
     @RequestMapping(value = "${Feign.Electric}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=la7dbtxP","from_user=e4f0fbe9ac9449d3bad6edee1be5626e"})
     OtherResponseEntity<DLReturnUnitEntity> sendPowerCompany(Map<String,Object> dlcs);
 }

@@ -1,6 +1,7 @@
 package com.springboot.feign;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.entity.SJ_Fjinst;
 import com.springboot.popj.pub_data.SJ_Exception_Record;
 import com.springboot.popj.pub_data.SJ_Sdqg_Send_Result;
 import com.springboot.popj.pub_data.SJ_Sjsq;
@@ -52,6 +53,12 @@ public interface OuterBackFeign {
 
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter11", method = RequestMethod.POST,consumes = "application/json")
     ObjectRestResponse<String> DealRecieveFromOuter11(@RequestHeader(name = "Authorization") String token, SJ_Sdqg_Send_Result result);
+
+    @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter13", method = RequestMethod.GET)
+    ObjectRestResponse<Map<String , SJ_Fjinst>> DealRecieveFromOuter13(@RequestHeader(name = "Authorization") String token,@RequestParam("taskId") String taskId);
+
+    @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter15", method = RequestMethod.GET)
+    ObjectRestResponse<String> DealRecieveFromOuter15(@RequestHeader(name = "Authorization") String token,@RequestParam("fileId") String fileId);
 
     @RequestMapping(value = "api/test/test",method = RequestMethod.POST)
     ObjectRestResponse<Object> test(@RequestParam("paramsss") String paramsss);

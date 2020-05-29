@@ -19,4 +19,14 @@ public class KeywordConstant {
     public final static String EXC_SDQG_HAPPEN_KEY_ELE = "Ele";
     public final static String EXC_SDQG_HAPPEN_KEY_GAS = "Gas";
     public final static String EXC_SDQG_HAPPEN_KEY_TV = "TV";
+
+    //身份证附件的关键字
+    public final static String KEYWORD_OF_ANNEX_IDCARD = "身份证照片附件";
+
+    public final static String CKIND_OF_ANNEX_FOLDER = "文件夹";
+    public final static String CKIND_OF_ANNEX_FILE = "文件";
+    public final static String CARD_NAME_OF_XCTP = "现场图片";
+    public final static String CARD_NAME_OF_ZJZTP = "身份证图片";
+    public final static String CARD_NAME_OF_ZJZP = "身份证照片";
+    public final static String CARD_NAME_OF_RZDBJG = "人证对比结果";
 }

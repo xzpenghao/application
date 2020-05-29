@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.SJ_Fjinst;
 import com.springboot.entity.chenbin.personnel.OtherEntity.EleWatGasHandle;
+import com.springboot.entity.chenbin.personnel.req.DLFile;
 import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
 import com.springboot.entity.chenbin.personnel.req.ReqSendForWEGEntity;
 import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
@@ -14,6 +16,7 @@ import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.SJ_Exception_Record;
 import com.springboot.popj.pub_data.SJ_Sdqg_Send_Result;
 import com.springboot.popj.pub_data.SJ_Sjsq;
+import com.springboot.service.chenbin.other.ExchangeCommonService;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
@@ -26,10 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,7 +53,7 @@ public class ExchangeWithComponyComponent {
     private ExchangeWithOtherFeign otherFeign;
 
     @Autowired
-    private HttpCallComponent httpCallComponent;
+    private ExchangeCommonService exchangeCommonService;
 
     /**
      * 描述：
@@ -110,9 +110,10 @@ public class ExchangeWithComponyComponent {
         }
 
         //获取附件数据
-
-        //处理附件
-
+        Map<String , SJ_Fjinst> fjinstMap = new HashMap<>();
+        ObjectRestResponse<Map<String , SJ_Fjinst>> fjrv = backFeign.DealRecieveFromOuter13(reqKey,sendTransferEntity.getTaskId());
+        if(fjrv.getStatus()==200)
+            fjinstMap = fjrv.getData();
 
         /**
          * 为处理准备辅助性数据
@@ -166,11 +167,17 @@ public class ExchangeWithComponyComponent {
         /**
          * 执行分发
          */
-        handleExchange(reqKey,sendTransferEntity,handleSign,sjsq);
+        handleExchange(reqKey,sendTransferEntity,handleSign,sjsq,fjinstMap);
 
     }
 
-    public void handleExchange(String reqKey,ReqSendForWEGEntity sendTransferEntity,EleWatGasHandle handleSign,SJ_Sjsq s){
+    public void handleExchange(
+            String reqKey,
+            ReqSendForWEGEntity sendTransferEntity,
+            EleWatGasHandle handleSign,
+            SJ_Sjsq s,
+            Map<String , SJ_Fjinst> fjinstMap
+    ){
         log.info("=================YCSL->SDQG->>->>：分割线（分支线程之后的异常将不会再向主线程抛出）=================");
         ExecutorService executor = Executors.newCachedThreadPool();
         try {
@@ -179,7 +186,7 @@ public class ExchangeWithComponyComponent {
                 public String call() {//建议抛出异常
                     log.info("YCSL->SDQG->>->>ELE：执行电分发线程");
                     //执行发送电部门过户申请
-                    handleExchangeWithEle(reqKey, sendTransferEntity, s);
+                    handleExchangeWithEle(reqKey, sendTransferEntity, s, fjinstMap);
                     return "电分发执行结束";
                 }
             });
@@ -261,7 +268,12 @@ public class ExchangeWithComponyComponent {
         }
     }
 
-    public void handleExchangeWithEle(String reqKey,ReqSendForWEGEntity sendTransferEntity,SJ_Sjsq sjsq){
+    public void handleExchangeWithEle(
+            String reqKey,
+            ReqSendForWEGEntity sendTransferEntity,
+            SJ_Sjsq sjsq,
+            Map<String , SJ_Fjinst> fjinstMap
+    ){
         log.info("YCSL->SDQG->>->>ELE：开始电分发线程,开始时间："+ TimeUtil.getTimeString(new Date()));
 //        try {
 //            Thread.sleep(5000);
@@ -272,6 +284,9 @@ public class ExchangeWithComponyComponent {
         String excMsg = "";
         try {
             DLReqEntity dlcs = BusinessDealBaseUtil.dealParamForEle(sjsq);
+            List<DLFile> datas = BusinessDealBaseUtil.dealFjForEle(sjsq.getTransactionContractInfo(),fjinstMap);
+            datas = getEleNeedFiles(reqKey,datas);
+            dlcs.setData(datas);
             Map<String, Object> dlcsm = new HashMap<>();
             dlcsm.put("sign", "");
             dlcsm.put("data", dlcs);
@@ -504,5 +519,23 @@ public class ExchangeWithComponyComponent {
             }
         }
         return isDealExc;
+    }
+
+    public List<DLFile> getEleNeedFiles(String reqKey,List<DLFile> datas){
+        List<Integer> removeIndexs = new ArrayList<>();
+        for(int i=0;i<datas.size();i++){
+            DLFile data = datas.get(i);
+            log.info("YCSL->SDQG->>->>ELE：执行第"+i+"/"+datas.size()+"个附件拉取任务，当前拉取的附件对象是："+data.getFileName());
+            ObjectRestResponse<String> fileRv = backFeign.DealRecieveFromOuter15(reqKey,data.getFileData());
+            if(fileRv!=null && fileRv.getStatus()==200){
+                data.setFileData(fileRv.getData());
+            }else{
+                removeIndexs.add(i);
+            }
+        }
+        for(Integer index:removeIndexs){
+            datas.remove(datas.get(index));
+        }
+        return datas;
     }
 }
