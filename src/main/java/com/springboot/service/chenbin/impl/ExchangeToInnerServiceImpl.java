@@ -410,7 +410,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
 
     public void  ClRegistrationOfficePerson(RegistrationBureau registrationBureau){
         if (CollectionUtil.isNotEmpty(registrationBureau.getMortgageBizInfo().getMortgageeInfoVoList())){
-            registrationBureau.getMortgageeInfoVoList().stream().forEach(mortgagee->{
+            registrationBureau.getMortgageBizInfo().getMortgageeInfoVoList().stream().forEach(mortgagee->{
                 switch (mortgagee.getMortgageeName()){
                     case BankManager.SQPING_AN_NAME:
                         registrationBureau.setOperatorName(BankManager.SQPING_AN_OPERATORNAME);
