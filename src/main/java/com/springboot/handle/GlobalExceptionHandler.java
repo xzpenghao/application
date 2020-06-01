@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
     public BaseResponse ExceptionHandler(HttpServletResponse response, Exception ex) {
         log.warn("执行出现未捕获的异常，异常全局处理已介入");
         log.error(ex.getMessage(),ex);
-        BaseResponse resp = new BaseResponse(20500, ex.getMessage());
+        BaseResponse resp = new BaseResponse(20400, ex.getMessage());
         log.info("全局异常响应："+ JSONObject.toJSONString(resp));
         return resp;
     }
