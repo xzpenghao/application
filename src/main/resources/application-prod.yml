@@ -4,7 +4,7 @@ server:
   max-http-header-size: 4048576
 spring:
   redis:
-    password: 123456
+    password: ztgeoredis
   autoconfigure:
     exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   application:
@@ -40,19 +40,12 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://192.168.0.108:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://127.0.0.1:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
           druid: #这里可以重写默认值
             initial-size: 6
-#        auth:
-#          url: jdbc:mysql://172.18.0.147:3306/ag-auth?useUnicode=true&characterEncoding=UTF8&useSSL=true
-#          username: consignee
-#          password: ztgeo
-#          driver-class-name: com.mysql.jdbc.Driver
-#          druid:
-#            initial-size: 6
       primary: admin
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -82,7 +75,7 @@ redis:
     maxIdle: 100
     maxWait: 1000
   host: 127.0.0.1
-  port: 6379
+  port: 6378
 #  password: ztgeoredis
   timeout: 2000
   sysName: ace-pubserver
@@ -119,9 +112,9 @@ glHouseBuyer:
   obligeeZwr: 债务人
 httpclient:
   seam: 23335       #杨智昊程序端口
-  ip: 192.168.0.120
+  ip: 10.13.3.239
   #10.3.2.147    #登记平台ip
-  windowAcceptanceIp: localhost   #一窗受理ip
+  windowAcceptanceIp: 10.13.3.239   #一窗受理ip
   windowAcceptanceSeam: 7779      #一窗受理接口
 businessType:
   clfFmortgage: MORTGAGE_OLD_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
@@ -141,15 +134,15 @@ businessType:
 
 
 webplus:
-  ftpAddress: 10.3.0.151    #一窗受理ftp
+  ftpAddress: 10.13.3.249    #一窗受理ftp
   ftpPort: 21
-  ftpUsername: forftp
-  ftpPassword: 123456
+  ftpUsername: ftpsvr
+  ftpPassword: ftpsvr
 
-  ftpAddressBdc: 10.3.0.149    #不动产登记平台
-  ftpPortBdc: 54111
-  ftpUsernameBdc: ftp
-  ftpPasswordBdc: 123456
+  ftpAddressBdc: 10.13.3.249   #不动产登记平台
+  ftpPortBdc: 21
+  ftpUsernameBdc: ftpsvr
+  ftpPasswordBdc: ftpsvr
 
 logging:
   level:
@@ -223,10 +216,10 @@ penghao:
         pid: Proc-171019093148-WLI15DA7  #徐州
          # Proc-180517124205-2WM2423B 宿迁
     transferRegister:           #二手房转移登记
-        pid: Proc-180403153139-46641AJ0
+        pid: Proc-200509090420-08MD84GJ
           #Proc-180403153139-46641AJ0
     transferMortgage:           #转移及抵押二手房
-        pid: Proc-171019095117-0124BU48
+        pid: Proc-200325125812-1TT77108
     contractinformation:        #合同消息获取
         ip: 172.18.0.112
         port: 8088
@@ -244,6 +237,7 @@ sq:
       ip:
       post: 42506
       notice_url: JSRCIS/sq/sqResultNotice.do   #通知宿迁交通银行地址
+      ftpIdentical: true    #银行上传共享平台与一窗受理是否在同一ftp
   gxpt:
       ftpAddress: 172.22.148.129   #共享平台ftp
       ftpPort: 21
@@ -288,17 +282,16 @@ tra:
   bsrypassword: 123456
 
 gxjhpt:
-  url: http://10.13.0.240:8001/
+  url: http://10.13.3.239:8001/
 
 bdccx:
-  url: http://192.168.0.120:23335/
+  url: http://10.13.3.239:23335/
 #  url: http://172.22.226.172:12201/
 ycsl:
-  url: http://localhost:7779/
+  url: http://10.13.3.239:7779/
 
 other:
-  url: http://localhost:7779/
-
+  url: http://10.13.3.239:8001/
 
 PublicInspect:
   BDCZHURL: http://192.168.0.120:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
