@@ -60,6 +60,9 @@ public interface OuterBackFeign {
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter15", method = RequestMethod.GET)
     ObjectRestResponse<String> DealRecieveFromOuter15(@RequestHeader(name = "Authorization") String token,@RequestParam("fileId") String fileId);
 
+    @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter16",method = RequestMethod.GET)
+    public ObjectRestResponse<Boolean> DealRecieveFromOuter16(@RequestHeader(name = "Authorization") String token,@RequestParam("taskId")String taskId);
+
     @RequestMapping(value = "api/test/test",method = RequestMethod.POST)
     ObjectRestResponse<Object> test(@RequestParam("paramsss") String paramsss);
 

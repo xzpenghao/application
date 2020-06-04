@@ -3,7 +3,6 @@ package com.springboot.component.chenbin;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
-import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.SJ_Fjinst;
 import com.springboot.entity.chenbin.personnel.OtherEntity.EleWatGasHandle;
 import com.springboot.entity.chenbin.personnel.req.DLFile;
@@ -16,12 +15,10 @@ import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.SJ_Exception_Record;
 import com.springboot.popj.pub_data.SJ_Sdqg_Send_Result;
 import com.springboot.popj.pub_data.SJ_Sjsq;
-import com.springboot.service.chenbin.other.ExchangeCommonService;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
-import feign.Request;
 import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -52,9 +49,6 @@ public class ExchangeWithComponyComponent {
     @Autowired
     private ExchangeWithOtherFeign otherFeign;
 
-    @Autowired
-    private ExchangeCommonService exchangeCommonService;
-
     /**
      * 描述：
      * 作者：chenb
@@ -66,12 +60,31 @@ public class ExchangeWithComponyComponent {
     public void handleExchange(String reqKey,ReqSendForWEGEntity sendTransferEntity) {
         log.info("YCSL->SDQG->>：token："+reqKey);
         log.info("YCSL->SDQG->>：参数："+ JSONObject.toJSONString(sendTransferEntity));
+        log.info("YCSL->SDQG->>：【"+sendTransferEntity.getTaskId()+"】开始等待登簿步骤完结。。。");
         try {
             //线程执行延后1s，为一窗受理侧准备数据留出充足时间
             Thread.sleep(1*1000);
         } catch (InterruptedException e){
             throw new ZtgeoBizException("分支线程出现等待错误");
         }
+
+        int count=1;
+        while (true){
+            if(count>10){
+                throw new ZtgeoBizException("YCSL->SDQG->>：【"+sendTransferEntity.getTaskId()+"】尝试获知登簿步骤完结状态失败，尝试次数超限，中断执行线程");
+            }
+            ObjectRestResponse<Boolean> taskDone = backFeign.DealRecieveFromOuter16(reqKey,sendTransferEntity.getTaskId());
+            if(
+                    taskDone!=null &&
+                    taskDone.getStatus()==200 &&
+                    taskDone.getData()
+            ) {
+                log.info("YCSL->SDQG->>：【"+sendTransferEntity.getTaskId()+"】已获知登簿步骤完结");
+                break;
+            }
+            count++;
+        }
+
         /**
          * 获取一窗受理侧的办件数据
          */
