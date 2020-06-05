@@ -23,6 +23,7 @@ import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -42,6 +43,11 @@ import static com.springboot.constant.chenbin.KeywordConstant.*;
 @Component
 @Slf4j
 public class ExchangeWithComponyComponent {
+
+    @Value("${chenbin.waitSec}")
+    private int waitSec;
+    @Value("${chenbin.maxConnCount}")
+    private int maxConnCount;
 
     @Autowired
     private OuterBackFeign backFeign;
@@ -63,17 +69,18 @@ public class ExchangeWithComponyComponent {
         log.info("YCSL->SDQG->>：【"+sendTransferEntity.getTaskId()+"】开始等待登簿步骤完结。。。");
         try {
             //线程执行延后1s，为一窗受理侧准备数据留出充足时间
-            Thread.sleep(1*1000);
+            Thread.sleep(waitSec*1000);
         } catch (InterruptedException e){
             throw new ZtgeoBizException("分支线程出现等待错误");
         }
 
         int count=1;
         while (true){
-            if(count>10){
+            if(count>maxConnCount){
                 throw new ZtgeoBizException("YCSL->SDQG->>：【"+sendTransferEntity.getTaskId()+"】尝试获知登簿步骤完结状态失败，尝试次数超限，中断执行线程");
             }
             ObjectRestResponse<Boolean> taskDone = backFeign.DealRecieveFromOuter16(reqKey,sendTransferEntity.getTaskId());
+            log.info("YCSL->SDQG->>：【"+sendTransferEntity.getTaskId()+"】第"+count+"次尝试获知登簿步骤完结状态结果："+JSONObject.toJSONString(taskDone));
             if(
                     taskDone!=null &&
                     taskDone.getStatus()==200 &&
