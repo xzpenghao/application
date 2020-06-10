@@ -58,6 +58,7 @@ public class ExchangeToInnerComponent {
                 }else{
                     bdcqlxgxx.setCertificateType("不动产权证");
                 }
+                bdcqlxgxx.setProvideUnit(getNotNullData(jsonImmov.getString("issuingAuthority"))); //发证机关
                 bdcqlxgxx.setRemarks(getNotNullData(jsonImmov.getString("remark")));                      //备注
                 bdcqlxgxx.setAcceptanceNumber(getNotNullData(jsonImmov.getString("slbh")));//受理编号
                 bdcqlxgxx.setOther(getNotNullData(jsonImmov.getString("other"))); //其他权利状况
