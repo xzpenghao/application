@@ -75,7 +75,6 @@ public class ExchangeToInnerComponent {
                 JSONArray landRightVoList = jsonImmov.getJSONArray("landRightRelatedVoList");//土地权利信息
                 if(landRightVoList!=null && landRightVoList.size()>0){
                     JSONObject landRight = landRightVoList.getJSONObject(0);
-
                     String tdzzrq = getNotNullData(landRight.getString("landRightEndDate"));
                     if(StringUtils.isNotBlank(tdzzrq) ){            //tdzzrq不为空时赋值
                         try {
