@@ -27,6 +27,7 @@ public class KeywordConstant {
     public final static String CKIND_OF_ANNEX_FILE = "文件";
     public final static String CARD_NAME_OF_XCTP = "现场图片";
     public final static String CARD_NAME_OF_ZJZTP = "身份证图片";
-    public final static String CARD_NAME_OF_ZJZP = "身份证照片";
-    public final static String CARD_NAME_OF_RZDBJG = "人证对比结果";
+    public final static String CARD_NAME_OF_YSJG = "衍生结果";
+    public final static String CARD_NAME_OF_RZJG = "人证对比结果";
+    public final static String CARD_NAME_OF_RZJG_RENAME = "人证结果";
 }

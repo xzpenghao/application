@@ -335,6 +335,7 @@ public class ExchangeWithComponyComponent {
                 isDealExc = true;
                 excMsg = "共享交换平台捕获了异常，联系处理";
             }else{
+                log.info("电力返回同步结果："+JSONObject.toJSONString(dlBaskResult));
                 if(!dlBaskResult.getCode().equals("0000")){
                     log.error("YCSL->SDQG->>->>ELE："+dlBaskResult.getMsg());
                     isDealExc = true;

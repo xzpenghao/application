@@ -28,14 +28,14 @@ public class DLReqEntity {
     private String newMobile;               //新用户联系方式
     private String qxno;                    //新不动产权证号
     private String bdcno;                   //不动产单元号
-    private String adress;                  //地址（坐落）
+    private String address;                  //地址（坐落）
     private String contractId;              //一窗收件编号
     private String orgNo;                   //32413
     private List<DLFile> data = new ArrayList<>();  //附件信息
 
     public DLReqEntity getBaseFromBdcql(SJ_Info_Bdcqlxgxx bdcql){
         this.qxno = bdcql.getImmovableCertificateNo();
-        this.adress = bdcql.getImmovableSite();
+        this.address = bdcql.getImmovableSite();
         List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
         String bdcdyhs = "";
         if(bdcgls!=null) {

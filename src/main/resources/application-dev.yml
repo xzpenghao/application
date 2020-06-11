@@ -177,7 +177,7 @@ machine:
   post: 7777
 
 chenbin:
-  waitSec: 1
+  waitSec: 0
   maxConnCount: 10
   isDealFtp: true
   idType: 身份证,1$统一社会信用代码,8$组织机构代码,6

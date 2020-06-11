@@ -675,20 +675,22 @@ public class BusinessDealBaseUtil {
         SJ_Fjinst fjinst = fjinstMap.get(KEYWORD_OF_ANNEX_IDCARD);
         if(fjinst!=null){
             List<SJ_Fjinst> sons = fjinst.getChildren();
+            int index_rzjg = 1;//人证结果序号
             for(SJ_Fjinst son : sons){
                 String sonName = son.getCname();
                 if(son.getCkind().equals(CKIND_OF_ANNEX_FOLDER) && xgrNames.contains(sonName)){//文件夹并且在相关人范围内
                     List<SJ_Fjinst> sonsChildren = son.getChildren();
-                    int index_this = 1;
+                    int index_ysjg = 1;//衍生结果序号
                     for(SJ_Fjinst sonsChild:sonsChildren){
                         if(sonsChild.getCkind().equals(CKIND_OF_ANNEX_FILE) && sonsChild.getFile()!=null){
                             if(!sonsChild.getCname().equals(sonName+CARD_NAME_OF_XCTP) && !sonsChild.getCname().equals(sonName+CARD_NAME_OF_ZJZTP)){
                                 DLFile file_this = new DLFile();
-                                if(sonsChild.getCname().equals(sonName+CARD_NAME_OF_RZDBJG)) {
-                                    file_this.setFileName(sonsChild.getCname() + "." + sonsChild.getFile().getFileExt());
+                                if(sonsChild.getCname().equals(sonName+CARD_NAME_OF_RZJG)) {
+                                    file_this.setFileName(CARD_NAME_OF_RZJG_RENAME + index_rzjg + "." + sonsChild.getFile().getFileExt());
+                                    index_rzjg++;
                                 }else {
-                                    file_this.setFileName(sonName + CARD_NAME_OF_ZJZP + index_this + "." + sonsChild.getFile().getFileExt());
-                                    index_this++;
+                                    file_this.setFileName(CARD_NAME_OF_YSJG + index_rzjg+"-"+ index_ysjg + "." + sonsChild.getFile().getFileExt());
+                                    index_ysjg++;
                                 }
                                 file_this.setFileData(sonsChild.getFile().getFileId());
                                 datas.add(file_this);
