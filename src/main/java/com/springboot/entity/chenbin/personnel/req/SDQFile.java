@@ -1,4 +1,4 @@
-package com.springboot.entity.chenbin.personnel.resp;
+package com.springboot.entity.chenbin.personnel.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DLReturnUnitEntity {
-    private String result;
-    private String message;
+public class SDQFile {
+    private String fileName;
+    private String fileData;
 }

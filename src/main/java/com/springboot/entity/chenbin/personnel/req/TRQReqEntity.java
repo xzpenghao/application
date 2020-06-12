@@ -1,18 +1,14 @@
 package com.springboot.entity.chenbin.personnel.req;
 
 import com.springboot.popj.pub_data.SJ_Info_Sdqgxx;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * @author chenb
  * @version 2020/6/12/012
  * description：
  */
-@Data
-@NoArgsConstructor
-public class DLReqEntity extends SDQReqEntity {
+public class TRQReqEntity extends SDQReqEntity {
     public void assignOrg(SJ_Info_Sdqgxx sdqgxx){
-        this.setOrgNo(sdqgxx.getElecCompony());
+        this.setOrgNo(sdqgxx.getGasCompony());
     }
 }

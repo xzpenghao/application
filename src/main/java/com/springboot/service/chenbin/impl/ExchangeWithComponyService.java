@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.ExchangeWithComponyComponent;
 import com.springboot.config.ZtgeoBizException;
-import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
+import com.springboot.entity.chenbin.personnel.req.SDQReqEntity;
 import com.springboot.entity.chenbin.personnel.req.ReqSendForWEGEntity;
-import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
+import com.springboot.entity.chenbin.personnel.resp.SDQReturnUnitEntity;
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.feign.OuterBackFeign;
@@ -112,7 +112,7 @@ public class ExchangeWithComponyService {
         }
     }
 
-    public OtherResponseEntity<DLReturnUnitEntity> exchangeWithPowerCompany(DLReqEntity dlcs){
+    public OtherResponseEntity<SDQReturnUnitEntity> exchangeWithPowerCompany(SDQReqEntity dlcs){
         Map<String,Object> dlcsm = new HashMap<>();
         dlcsm.put("sign","");
         dlcsm.put("data",dlcs);

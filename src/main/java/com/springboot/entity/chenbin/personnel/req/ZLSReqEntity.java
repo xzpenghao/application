@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class DLReqEntity extends SDQReqEntity {
+public class ZLSReqEntity extends SDQReqEntity {
     public void assignOrg(SJ_Info_Sdqgxx sdqgxx){
-        this.setOrgNo(sdqgxx.getElecCompony());
+        this.setOrgNo(sdqgxx.getWaterCompony());
     }
 }

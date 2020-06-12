@@ -11,10 +11,8 @@ import com.springboot.config.ZtgeoBizException;
 import com.springboot.constant.penghao.BizOrBizExceptionConstant;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.SJ_Fjinst;
-import com.springboot.entity.chenbin.personnel.OtherEntity.FcIndexAndTdzh;
 import com.springboot.entity.chenbin.personnel.pub_use.*;
-import com.springboot.entity.chenbin.personnel.req.DLFile;
-import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
+import com.springboot.entity.chenbin.personnel.req.*;
 import com.springboot.entity.chenbin.personnel.tax.TaxParamBody;
 import com.springboot.entity.chenbin.personnel.tra.TraParamBody;
 import com.springboot.popj.pub_data.*;
@@ -23,11 +21,8 @@ import com.springboot.util.DateUtils;
 import com.springboot.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -634,8 +629,60 @@ public class BusinessDealBaseUtil {
         return fileAddress;
     }
 
+    /**
+     * 描述：处理出电力需要的实体类
+     * 作者：chenb
+     * 日期：2020/6/12/012
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
     public static DLReqEntity dealParamForEle(SJ_Sjsq sjsq){
         DLReqEntity dlcs = new DLReqEntity();
+        dlcs.assignOrg(sjsq.getSdqgxx());
+        dealParamForSDQ(sjsq,dlcs);
+        return dlcs;
+    }
+
+    /**
+     * 描述：处理出水务需要的实体类
+     * 作者：chenb
+     * 日期：2020/6/12/012
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public static ZLSReqEntity dealParamForWat(SJ_Sjsq sjsq){
+        ZLSReqEntity dlcs = new ZLSReqEntity();
+        dlcs.assignOrg(sjsq.getSdqgxx());
+        dealParamForSDQ(sjsq,dlcs);
+        return dlcs;
+    }
+
+    /**
+     * 描述：处理出天然气需要的实体类
+     * 作者：chenb
+     * 日期：2020/6/12/012
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public static TRQReqEntity dealParamForGas(SJ_Sjsq sjsq){
+        TRQReqEntity dlcs = new TRQReqEntity();
+        dlcs.assignOrg(sjsq.getSdqgxx());
+        dealParamForSDQ(sjsq,dlcs);
+        return dlcs;
+    }
+
+    /**
+     * 描述：处理出水电气基础实体类数据
+     * 作者：chenb
+     * 日期：2020/6/12/012
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public static SDQReqEntity dealParamForSDQ(SJ_Sjsq sjsq,SDQReqEntity dlcs){
         List<SJ_Info_Bdcqlxgxx> bdcqls = sjsq.getImmovableRightInfoVoList();
         if(bdcqls!=null && bdcqls.size()>0) {
             SJ_Info_Bdcqlxgxx bdcql_book = null;
@@ -654,7 +701,6 @@ public class BusinessDealBaseUtil {
         }
         Sj_Info_Jyhtxx jyhtxx = sjsq.getTransactionContractInfo();
         dlcs.replenishFromJyxx(sjsq.getReceiptNumber(),sjsq.getNotifiedPersonName(),sjsq.getNotifiedPersonTelephone(),jyhtxx);
-        dlcs.assignOrg(sjsq.getSdqgxx());
         return dlcs;
     }
 
@@ -667,8 +713,8 @@ public class BusinessDealBaseUtil {
         return null;
     }
 
-    public static List<DLFile> dealFjForEle(Sj_Info_Jyhtxx jyhtxx, Map<String , SJ_Fjinst> fjinstMap){
-        List<DLFile> datas = new ArrayList<>();
+    public static List<SDQFile> dealFjForSDQ(Sj_Info_Jyhtxx jyhtxx, Map<String , SJ_Fjinst> fjinstMap){
+        List<SDQFile> datas = new ArrayList<>();
         List<SJ_Qlr_Gl> sellers = jyhtxx.getGlHouseSellerVoList();
         List<SJ_Qlr_Gl> buyers = jyhtxx.getGlHouseBuyerVoList();
         Set<String> xgrNames = arrangeGuysName(sellers,buyers);
@@ -684,7 +730,7 @@ public class BusinessDealBaseUtil {
                     for(SJ_Fjinst sonsChild:sonsChildren){
                         if(sonsChild.getCkind().equals(CKIND_OF_ANNEX_FILE) && sonsChild.getFile()!=null){
                             if(!sonsChild.getCname().equals(sonName+CARD_NAME_OF_XCTP) && !sonsChild.getCname().equals(sonName+CARD_NAME_OF_ZJZTP)){
-                                DLFile file_this = new DLFile();
+                                SDQFile file_this = new SDQFile();
                                 if(sonsChild.getCname().equals(sonName+CARD_NAME_OF_RZJG)) {
                                     file_this.setFileName(CARD_NAME_OF_RZJG_RENAME + index_rzjg + "." + sonsChild.getFile().getFileExt());
                                     index_rzjg++;

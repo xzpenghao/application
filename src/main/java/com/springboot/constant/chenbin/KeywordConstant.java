@@ -30,4 +30,9 @@ public class KeywordConstant {
     public final static String CARD_NAME_OF_YSJG = "衍生结果";
     public final static String CARD_NAME_OF_RZJG = "人证对比结果";
     public final static String CARD_NAME_OF_RZJG_RENAME = "人证结果";
+
+    //自来水公司
+    public final static String WATER_NAME_YK = "YKZLS";
+    public final static String WATER_NAME_SY = "SYZLS";
+    public final static String WATER_NAME_SS = "SSZLS";
 }

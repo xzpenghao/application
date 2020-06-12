@@ -1,13 +1,10 @@
 package com.springboot.rest.chenbin;
 
-import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
-import com.springboot.config.ZtgeoBizException;
-import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
+import com.springboot.entity.chenbin.personnel.req.SDQReqEntity;
 import com.springboot.entity.chenbin.personnel.req.ReqSendForWEGEntity;
-import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
+import com.springboot.entity.chenbin.personnel.resp.SDQReturnUnitEntity;
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import com.springboot.service.chenbin.impl.ExchangeWithComponyService;
-import com.springboot.util.chenbin.ErrorDealUtil;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * @author chenb
@@ -36,7 +31,7 @@ public class ExchangeWithComponyRest {
     private ExchangeWithComponyService exc2Comp;
 
     @RequestMapping(value = "exchange2Ele",method = RequestMethod.POST)
-    public OtherResponseEntity<DLReturnUnitEntity> exchange2Tax(@RequestBody DLReqEntity dlcs){
+    public OtherResponseEntity<SDQReturnUnitEntity> exchange2Tax(@RequestBody SDQReqEntity dlcs){
         return exc2Comp.exchangeWithPowerCompany(dlcs);
     }
 

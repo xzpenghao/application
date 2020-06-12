@@ -1,4 +1,4 @@
-package com.springboot.entity.chenbin.personnel.req;
+package com.springboot.entity.chenbin.personnel.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author chenb
- * @version 2020/4/29/029
+ * @version 2020/6/12/012
  * description：
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DLFile {
-    private String fileName;
-    private String fileData;
+public class BooleanWithMsg {
+    private boolean bol;
+    private String msg;
 }

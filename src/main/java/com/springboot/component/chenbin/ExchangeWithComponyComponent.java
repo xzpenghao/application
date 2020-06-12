@@ -5,16 +5,16 @@ import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjinst;
 import com.springboot.entity.chenbin.personnel.OtherEntity.EleWatGasHandle;
-import com.springboot.entity.chenbin.personnel.req.DLFile;
-import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
-import com.springboot.entity.chenbin.personnel.req.ReqSendForWEGEntity;
-import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
+import com.springboot.entity.chenbin.personnel.req.*;
+import com.springboot.entity.chenbin.personnel.resp.BooleanWithMsg;
+import com.springboot.entity.chenbin.personnel.resp.SDQReturnUnitEntity;
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import com.springboot.feign.ExchangeWithOtherFeign;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.SJ_Exception_Record;
 import com.springboot.popj.pub_data.SJ_Sdqg_Send_Result;
 import com.springboot.popj.pub_data.SJ_Sjsq;
+import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
@@ -48,6 +48,10 @@ public class ExchangeWithComponyComponent {
     private int waitSec;
     @Value("${chenbin.maxConnCount}")
     private int maxConnCount;
+    @Value("${penghao.highestAuthority.username}")
+    private String adminName;
+    @Value("${penghao.highestAuthority.password}")
+    private String adminPass;
 
     @Autowired
     private OuterBackFeign backFeign;
@@ -215,7 +219,7 @@ public class ExchangeWithComponyComponent {
                 public String call() {//建议抛出异常
                     log.info("YCSL->SDQG->>->>WAT：执行水分发线程");
                     //执行发送水部门过户申请
-                    handleExchangeWithWat(reqKey, sendTransferEntity, s);
+                    handleExchangeWithWat(reqKey, sendTransferEntity, s, fjinstMap);
                     return "水分发执行结束";
                 }
             });
@@ -288,6 +292,14 @@ public class ExchangeWithComponyComponent {
         }
     }
 
+    /**
+     * 描述：电力同步
+     * 作者：chenb
+     * 日期：2020/6/12/012
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
     public void handleExchangeWithEle(
             String reqKey,
             ReqSendForWEGEntity sendTransferEntity,
@@ -295,22 +307,18 @@ public class ExchangeWithComponyComponent {
             Map<String , SJ_Fjinst> fjinstMap
     ){
         log.info("YCSL->SDQG->>->>ELE：开始电分发线程,开始时间："+ TimeUtil.getTimeString(new Date()));
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e){
-//            log.error("电分支线程出现等待错误");
-//        }
+
         boolean isDealExc;
         String excMsg = "";
         try {
             DLReqEntity dlcs = BusinessDealBaseUtil.dealParamForEle(sjsq);
-            List<DLFile> datas = BusinessDealBaseUtil.dealFjForEle(sjsq.getTransactionContractInfo(),fjinstMap);
+            List<SDQFile> datas = BusinessDealBaseUtil.dealFjForSDQ(sjsq.getTransactionContractInfo(),fjinstMap);
             datas = getEleNeedFiles(reqKey,datas);
             dlcs.setData(datas);
             Map<String, Object> dlcsm = new HashMap<>();
             dlcsm.put("sign", "");
             dlcsm.put("data", dlcs);
-            OtherResponseEntity<DLReturnUnitEntity> dlBaskResult = null;
+            OtherResponseEntity<SDQReturnUnitEntity> dlBaskResult = null;
             try{
                 dlBaskResult = otherFeign.sendPowerCompany(dlcsm);
             } catch (RetryableException e){ //超时异常
@@ -318,8 +326,8 @@ public class ExchangeWithComponyComponent {
                     log.info("YCSL->SDQG->>->>ELE：访问超时");
                     isDealExc = false;
                     //手动生成电力公司响应
-                    dlBaskResult = new OtherResponseEntity<DLReturnUnitEntity>();
-                    DLReturnUnitEntity dlreturn = new DLReturnUnitEntity();
+                    dlBaskResult = new OtherResponseEntity<SDQReturnUnitEntity>();
+                    SDQReturnUnitEntity dlreturn = new SDQReturnUnitEntity();
                     dlreturn.setResult("1");
                     dlreturn.setMessage("过户数据向电力分发时，请求超时");
                     dlBaskResult.setCode("0000");
@@ -341,7 +349,7 @@ public class ExchangeWithComponyComponent {
                     isDealExc = true;
                     excMsg = dlBaskResult.getMsg();
                 }else{
-                    DLReturnUnitEntity dlrue = dlBaskResult.getData();
+                    SDQReturnUnitEntity dlrue = dlBaskResult.getData();
                     if(dlrue==null){
                         log.error("YCSL->SDQG->>->>ELE：电力过户返回结果的data接收为null，联系电力公司解决");
                         isDealExc = true;
@@ -387,23 +395,75 @@ public class ExchangeWithComponyComponent {
         log.info("YCSL->SDQG->>->>ELE：结束电分发线程,结束时间："+ TimeUtil.getTimeString(new Date()));
     }
 
-    public void handleExchangeWithWat(String reqKey,ReqSendForWEGEntity sendTransferEntity,SJ_Sjsq sjsq){
+    /**
+     * 描述：自来水同步
+     * 作者：chenb
+     * 日期：2020/6/12/012
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public void handleExchangeWithWat(
+            String reqKey,
+            ReqSendForWEGEntity sendTransferEntity,
+            SJ_Sjsq sjsq,
+            Map<String , SJ_Fjinst> fjinstMap
+    ){
         log.info("YCSL->SDQG->>->>WAT：开始水分发线程,开始时间："+ TimeUtil.getTimeString(new Date()));
-//        try {
-//            Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//            log.error("YCSL->SDQG->>->>WAT：水分支线程出现等待错误");
-//        }
+
+        //定义异常描述变量（两个）
         boolean isDealExc;
-        String excMsg = "自来水过户失败了";
+        String excMsg;
+
         try {
-            OtherResponseEntity<DLReturnUnitEntity> dlBaskResult = otherFeign.sendPowerCompany(getTestData(sjsq,"water"));
-            isDealExc = dealTestResult(reqKey,sendTransferEntity,dlBaskResult,"water",EXC_SDQG_HAPPEN_KEY_WAT);
-        } catch (ZtgeoBizException e){
+            //通用数据参数处理，参数来自收件申请数据
+            Map<String,Object> waterBody = new HashMap<>();
+            ZLSReqEntity zlscs = BusinessDealBaseUtil.dealParamForWat(sjsq);
+
+            //声明一个自来水的返回结果对象
+            ObjectRestResponse<SDQReturnUnitEntity> swBaskResult;
+            //获取必要的操作token
+            String backDealToken = backFeign.getToken(new JwtAuthenticationRequest(adminName,adminPass)).getData();
+            //根据对接的自来水单位不同采用不同的同步方法，但必须要求响应报文格式一致
+            switch (zlscs.getOrgNo()){
+                case WATER_NAME_YK:
+                    //处理yk自来水公司需要的附件数据
+                    List<SDQFile> datas_yk = BusinessDealBaseUtil.dealFjForSDQ(sjsq.getTransactionContractInfo(),fjinstMap);
+                    zlscs.setData(datas_yk);
+                    waterBody.put("sign", "");
+                    waterBody.put("data", zlscs);
+                    //请求同步地址，获取响应数据
+                    swBaskResult = backFeign.sendWaterCompany(backDealToken,waterBody);
+                    break;
+                case WATER_NAME_SY:
+                    //处理sy自来水公司需要的附件数据
+                    List<SDQFile> datas_sy = BusinessDealBaseUtil.dealFjForSDQ(sjsq.getTransactionContractInfo(),fjinstMap);
+                    zlscs.setData(datas_sy);
+                    waterBody.put("sign", "");
+                    waterBody.put("data", zlscs);
+                    //请求同步地址，获取响应数据
+                    swBaskResult = backFeign.sendWaterCompany(backDealToken,waterBody);
+                    break;
+                case WATER_NAME_SS:
+                    //处理sy自来水公司需要的附件数据
+                    List<SDQFile> datas_ss = BusinessDealBaseUtil.dealFjForSDQ(sjsq.getTransactionContractInfo(),fjinstMap);
+                    zlscs.setData(datas_ss);
+                    waterBody.put("sign", "");
+                    waterBody.put("data", zlscs);
+                    //请求同步地址，获取响应数据
+                    swBaskResult = backFeign.sendWaterCompany(backDealToken,waterBody);
+                    break;
+                default:
+                    throw new ZtgeoBizException("自来水公司标识超出设置");
+            }
+            BooleanWithMsg bws = dealWaterResult(reqKey,sendTransferEntity,swBaskResult,zlscs.getOrgNo(),EXC_SDQG_HAPPEN_KEY_WAT);
+            isDealExc = bws.isBol();
+            excMsg = bws.getMsg();
+        } catch (ZtgeoBizException e) {
             log.error("YCSL->SDQG->>->>WAT：自来水过户同步失败，出现可以预知的异常："+e.getMessage());
             isDealExc = true;
             excMsg = "自来水过户同步失败，出现可以预知的异常："+e.getMessage();
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("YCSL->SDQG->>->>WAT：自来水过户同步失败，出现未知的异常："+ErrorDealUtil.getErrorInfo(e));
             isDealExc = true;
             excMsg = "自来水过户同步失败，出现未知的异常："+ErrorDealUtil.getErrorInfo(e);
@@ -424,8 +484,10 @@ public class ExchangeWithComponyComponent {
         boolean isDealExc;
         String excMsg = "燃气过户失败了";
         try {
-            OtherResponseEntity<DLReturnUnitEntity> dlBaskResult = otherFeign.sendPowerCompany(getTestData(sjsq,"gas"));
-            isDealExc = dealTestResult(reqKey,sendTransferEntity,dlBaskResult,"gas",EXC_SDQG_HAPPEN_KEY_GAS);
+            OtherResponseEntity<SDQReturnUnitEntity> dlBaskResult = otherFeign.sendPowerCompany(getTestData(sjsq,"gas"));
+            BooleanWithMsg bws = dealTestResult(reqKey,sendTransferEntity,dlBaskResult,"gas",EXC_SDQG_HAPPEN_KEY_GAS);
+            isDealExc = bws.isBol();
+            excMsg = bws.getMsg();
         } catch (ZtgeoBizException e){
             log.error("YCSL->SDQG->>->>GAS：燃气过户同步失败，出现可以预知的异常："+e.getMessage());
             isDealExc = true;
@@ -487,6 +549,73 @@ public class ExchangeWithComponyComponent {
     }
 
     /**
+     * 描述：水同步结果解析与处理
+     * 作者：chenb
+     * 日期：2020/6/12/012
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public BooleanWithMsg dealWaterResult(String reqKey, ReqSendForWEGEntity sendTransferEntity, ObjectRestResponse<SDQReturnUnitEntity> swBaskResult, String compony, String handleKey){
+        log.info("水给出处理结果为："+JSONObject.toJSONString(swBaskResult));
+        BooleanWithMsg isDealExc = new BooleanWithMsg();
+        if(swBaskResult==null){
+            log.error("异常！当前自来水数据发送响应为null");
+            isDealExc.setBol(true);
+            isDealExc.setMsg("异常！当前自来水数据发送响应为null");
+        }else{
+            if(swBaskResult.getStatus()!=200){
+                //逻辑异常的处理
+                log.error(swBaskResult.getMessage());
+                isDealExc.setBol(true);
+                isDealExc.setMsg(swBaskResult.getMessage());
+            }else{
+                //针对水具体的响应结果的处理
+                isDealExc = dealResult(reqKey,sendTransferEntity,handleKey,compony,swBaskResult.getData(),swBaskResult);
+            }
+        }
+        return isDealExc;
+    }
+
+    /**
+     * 描述：针对水电气具体的响应结果的处理
+     * 作者：chenb
+     * 日期：2020/6/12/012
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public BooleanWithMsg dealResult(String reqKey, ReqSendForWEGEntity sendTransferEntity, String handleKey,String compony,SDQReturnUnitEntity sdqrue,Object sourceResult){
+        BooleanWithMsg isDealExc = new BooleanWithMsg();
+        if(sdqrue==null){
+            isDealExc.setBol(true);
+            isDealExc.setMsg(handleKey+"过户返回结果的data接收为null，联系相应公司解决");
+        } else if(StringUtils.isBlank(sdqrue.getResult())){
+            isDealExc.setBol(true);
+            isDealExc.setMsg(handleKey+"过户返回结果的data已接收但未给出过户result，联系相应公司解决");
+        } else {
+            SJ_Sdqg_Send_Result sdqgResult = new SJ_Sdqg_Send_Result().initSuccessFromWEGEntity(sendTransferEntity,handleKey);
+            sdqgResult.setSendCompony(compony);
+            sdqgResult.setResultJson(JSONObject.toJSONString(sourceResult));
+            sdqgResult.setResult(sdqrue.getResult());
+            sdqgResult.setResultStr(sdqrue.getMessage());
+            if ("0".equals(sdqrue.getResult())) {
+                isDealExc.setBol(true);
+                isDealExc.setMsg(handleKey+"过户同步失败，相应公司给出失败原因：" + sdqrue.getMessage());
+            } else {
+                isDealExc.setBol(false);
+                //明确给出处理成功
+                if (sendTransferEntity.isExecAgain() && handleKey.equals(sendTransferEntity.getHandleKey())) {
+                    sendTransferEntity.getExc().setHandleStatus("1");
+                }
+            }
+            //将过户结果回写(有-更新/无-插入)
+            backFeign.DealRecieveFromOuter11(reqKey, sdqgResult);
+        }
+        return isDealExc;
+    }
+
+    /**
      * 以下部分属于测试需要
      * @param sjsq
      * @return
@@ -495,57 +624,34 @@ public class ExchangeWithComponyComponent {
     public Map<String,Object> getTestData(SJ_Sjsq sjsq,String type){
         Map<String, Object> dlcsm = new HashMap<>();
         dlcsm.put("sign", "");
-        DLReqEntity p = BusinessDealBaseUtil.dealParamForEle(sjsq);
+        SDQReqEntity p = BusinessDealBaseUtil.dealParamForGas(sjsq);
         p.setOrgNo(type);
         dlcsm.put("data", p);
         return dlcsm;
     }
 
-    public boolean dealTestResult(String reqKey,ReqSendForWEGEntity sendTransferEntity,OtherResponseEntity<DLReturnUnitEntity> dlBaskResult,String compony,String handleKey){
-        boolean isDealExc;
+    public BooleanWithMsg dealTestResult(String reqKey, ReqSendForWEGEntity sendTransferEntity, OtherResponseEntity<SDQReturnUnitEntity> dlBaskResult, String compony, String handleKey){
+        BooleanWithMsg isDealExc = new BooleanWithMsg();
         if(dlBaskResult==null){
-            log.error("共享交换平台捕获了异常，联系处理");
-            isDealExc = true;
+            log.info("共享交换平台捕获了异常，联系处理");
+            isDealExc.setBol(true);
+            isDealExc.setMsg("共享交换平台捕获了异常，联系处理");
         }else{
             if(!dlBaskResult.getCode().equals("0000")){
                 log.error(dlBaskResult.getMsg());
-                isDealExc = true;
+                isDealExc.setBol(true);
+                isDealExc.setMsg(dlBaskResult.getMsg());
             }else{
-                DLReturnUnitEntity dlrue = dlBaskResult.getData();
-                if(dlrue==null){
-                    log.error(handleKey+"过户返回结果的data接收为null，联系相应公司解决");
-                    isDealExc = true;
-                } else if(StringUtils.isBlank(dlrue.getResult())){
-                    log.error(handleKey+"过户返回结果的data已接收但未给出过户result，联系相应公司解决");
-                    isDealExc = true;
-                } else {
-                    SJ_Sdqg_Send_Result testResult = new SJ_Sdqg_Send_Result().initSuccessFromWEGEntity(sendTransferEntity,handleKey);
-                    testResult.setSendCompony(compony);
-                    testResult.setResultJson(JSONObject.toJSONString(dlBaskResult));
-                    testResult.setResult(dlrue.getResult());
-                    testResult.setResultStr(dlrue.getMessage());
-                    if ("0".equals(dlrue.getResult())) {
-                        log.error(handleKey+"过户同步失败，相应公司给出失败原因：" + dlrue.getMessage());
-                        isDealExc = true;
-                    } else {
-                        isDealExc = false;
-                        //明确给出处理成功
-                        if (sendTransferEntity.isExecAgain() && handleKey.equals(sendTransferEntity.getHandleKey())) {
-                            sendTransferEntity.getExc().setHandleStatus("1");
-                        }
-                    }
-                    //将过户结果回写(有-更新/无-插入)
-                    backFeign.DealRecieveFromOuter11(reqKey, testResult);
-                }
+                isDealExc = dealResult(reqKey,sendTransferEntity,handleKey,compony,dlBaskResult.getData(),dlBaskResult);
             }
         }
         return isDealExc;
     }
 
-    public List<DLFile> getEleNeedFiles(String reqKey,List<DLFile> datas){
+    public List<SDQFile> getEleNeedFiles(String reqKey, List<SDQFile> datas){
         List<Integer> removeIndexs = new ArrayList<>();
         for(int i=0;i<datas.size();i++){
-            DLFile data = datas.get(i);
+            SDQFile data = datas.get(i);
             log.info("YCSL->SDQG->>->>ELE：执行第"+i+"/"+datas.size()+"个附件拉取任务，当前拉取的附件对象是："+data.getFileName());
             ObjectRestResponse<String> fileRv = backFeign.DealRecieveFromOuter15(reqKey,data.getFileData());
             if(fileRv!=null && fileRv.getStatus()==200){

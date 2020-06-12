@@ -1,8 +1,7 @@
 package com.springboot.feign;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
-import com.springboot.entity.chenbin.personnel.req.DLReqEntity;
-import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
+import com.springboot.entity.chenbin.personnel.resp.SDQReturnUnitEntity;
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,5 +36,5 @@ public interface ExchangeWithOtherFeign {
      * 更新记录：更新人：{}，更新日期：{}
     */
     @RequestMapping(value = "${Feign.Electric}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=la7dbtxP","from_user=e4f0fbe9ac9449d3bad6edee1be5626e"})
-    OtherResponseEntity<DLReturnUnitEntity> sendPowerCompany(Map<String,Object> dlcs);
+    OtherResponseEntity<SDQReturnUnitEntity> sendPowerCompany(Map<String,Object> dlcs);
 }

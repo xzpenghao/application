@@ -2,9 +2,9 @@ package com.springboot.feign;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.entity.SJ_Fjinst;
+import com.springboot.entity.chenbin.personnel.resp.SDQReturnUnitEntity;
 import com.springboot.popj.pub_data.SJ_Exception_Record;
 import com.springboot.popj.pub_data.SJ_Sdqg_Send_Result;
-import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.popj.register.JwtAuthenticationRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -61,7 +61,10 @@ public interface OuterBackFeign {
     ObjectRestResponse<String> DealRecieveFromOuter15(@RequestHeader(name = "Authorization") String token,@RequestParam("fileId") String fileId);
 
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter16",method = RequestMethod.GET)
-    public ObjectRestResponse<Boolean> DealRecieveFromOuter16(@RequestHeader(name = "Authorization") String token,@RequestParam("taskId")String taskId);
+    ObjectRestResponse<Boolean> DealRecieveFromOuter16(@RequestHeader(name = "Authorization") String token,@RequestParam("taskId")String taskId);
+
+    @RequestMapping(value = "api/",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8")
+    ObjectRestResponse<SDQReturnUnitEntity> sendWaterCompany(@RequestHeader(name = "Authorization") String token,Map<String,Object> zlscs);
 
     @RequestMapping(value = "api/test/test",method = RequestMethod.POST)
     ObjectRestResponse<Object> test(@RequestParam("paramsss") String paramsss);

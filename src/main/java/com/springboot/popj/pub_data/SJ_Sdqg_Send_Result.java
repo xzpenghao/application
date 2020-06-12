@@ -1,15 +1,10 @@
 package com.springboot.popj.pub_data;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.springboot.entity.chenbin.personnel.req.ReqSendForWEGEntity;
-import com.springboot.entity.chenbin.personnel.resp.DLReturnUnitEntity;
-import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
