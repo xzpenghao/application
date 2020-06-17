@@ -423,7 +423,10 @@ public class ExchangeWithComponyComponent {
             //声明一个自来水的返回结果对象
             ObjectRestResponse<SDQReturnUnitEntity> swBaskResult;
             //获取必要的操作token
-            String backDealToken = backFeign.getToken(new JwtAuthenticationRequest(adminName,adminPass)).getData();
+
+            String backDealToken = reqKey;
+            //管理员token
+//            String backDealToken = backFeign.getToken(new JwtAuthenticationRequest(adminName,adminPass)).getData();
             //根据对接的自来水单位不同采用不同的同步方法，但必须要求响应报文格式一致
             switch (zlscs.getOrgNo()){
                 case WATER_NAME_YK:

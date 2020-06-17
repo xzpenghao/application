@@ -63,7 +63,7 @@ public interface OuterBackFeign {
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter16",method = RequestMethod.GET)
     ObjectRestResponse<Boolean> DealRecieveFromOuter16(@RequestHeader(name = "Authorization") String token,@RequestParam("taskId")String taskId);
 
-    @RequestMapping(value = "api/",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8")
+    @RequestMapping(value = "api/sdqg/registerPushBack",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8")
     ObjectRestResponse<SDQReturnUnitEntity> sendWaterCompany(@RequestHeader(name = "Authorization") String token,Map<String,Object> zlscs);
 
     @RequestMapping(value = "api/test/test",method = RequestMethod.POST)
