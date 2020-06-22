@@ -305,7 +305,7 @@ ETicket:
 
 Feign:
   Tax: dataShareAction.do
-  Tra: sqservice/bdc/getOneAcceptInfo
+  Tra: syhouse/yichuangController/addCwqNetWorkSign
   ETicket: getDzspAction.do
 
 HouseSet:

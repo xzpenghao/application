@@ -68,7 +68,9 @@ public class SjHouseSetServiceImpl implements SjHouseSetService {
         }
         //3     返回结果
         List<SJHouseSet> sjHouseSets = new ArrayList<>();
+        //3.1   义务人查询
         sendBdcHouseSetQuery(obligors,sjHouseSets);
+        //3.1   权利人查询
         sendBdcHouseSetQuery(obligees,sjHouseSets);
         //3.3   为空直接返回
         return sjHouseSets;
