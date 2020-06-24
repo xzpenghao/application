@@ -309,5 +309,5 @@ Feign:
   ETicket: getDzspAction.do
 
 HouseSet:
-  Bdc: http://10.3.0.149:23335/api/services/app/bdcQuery/GetHouseInfoByMember
+  Bdc: http://10.13.3.239:23335/api/services/app/bdcQuery/GetHouseInfoByMember
   taxPush: http://172.22.191.15:9011/dataFwtcSuyAction.do

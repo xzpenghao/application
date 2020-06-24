@@ -94,6 +94,7 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
         log.info("发送交易的数据（处理后）："+JSONObject.toJSONString(traBody));
         try {
             ObjectRestResponse<String> rv = otherFeign.testTra(traBody);
+            log.info("住建返回值：{}", rv );
             if (rv.getStatus() == 200) {
                 result = rv.getData();
             } else {
