@@ -26,6 +26,7 @@ import com.springboot.service.chenbin.ExchangeToTransactionService;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
+import com.springboot.util.chenbin.ErrorDealUtil;
 import com.springboot.util.chenbin.IDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -91,6 +92,7 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
         log.info("发送交易的数据（处理后）："+JSONObject.toJSONString(traBody));
         try {
             ObjectRestResponse<String> rv = otherFeign.testTra(traBody);
+            log.info("交易返回数据："+JSONObject.toJSONString(rv));
             if (rv.getStatus() == 200) {
                 result = rv.getData();
             } else {
@@ -99,7 +101,7 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
             }
             log.info("交易处理返回，结果为:"+JSONObject.toJSONString(rv));
         } catch (Exception e){
-            log.error("交易通知异常，异常产生原因：" + e.getMessage());
+            log.error("交易通知异常，异常产生原因：" + ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("交易通知异常，异常产生原因：" + e.getMessage());
         } finally {
             //成功后由交易人员签收办件
