@@ -41,6 +41,7 @@ spring:
       datasource:
         admin:
           url: jdbc:mysql://192.168.0.108:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+#          url: jdbc:mysql://10.3.0.156:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -122,7 +123,7 @@ httpclient:
   ip: 192.168.0.120
   #10.3.2.147    #登记平台ip
   windowAcceptanceIp: localhost   #一窗受理ip
-  windowAcceptanceSeam: 7779      #一窗受理接口
+  windowAcceptanceSeam: 7780      #一窗受理接口
 businessType:
   clfFmortgage: MORTGAGE_OLD_TRAILER       #存量房预告抵押登记，（组合业务，预告+预告抵押））
   xjfFmortgage: MORTGAGE_NEW_TRAILER       #新建商品房预告抵押登记（组合业务，预告+预告抵押）

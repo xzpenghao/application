@@ -486,7 +486,7 @@ public class BusinessDealBaseUtil {
         SJ_Jyht_Detail htDetail = jyht.getHtDetail();
         HTXX HTXX = new HTXX();
         HTXX.setHTJE(jyht.getContractAmount()!=null? Double.parseDouble(df.format(jyht.getContractAmount())):null);//合同金额
-        HTXX.setFSSS(htDetail.getHouseProperties());//附属设施
+        HTXX.setFSSS(StringUtils.isNotBlank(htDetail.getHouseProperties())?htDetail.getHouseProperties().replaceAll("FJ,",""):htDetail.getHouseProperties());//附属设施
         HTXX.setSFCZ(StringUtils.isNotBlank(htDetail.getIsHire())?Integer.parseInt(htDetail.getIsHire()):null);//是否出租
         HTXX.setCZSM(htDetail.getHireInstructions());//出租说明
         HTXX.setSFBHFS(StringUtils.isNotBlank(htDetail.getDoesIncludeHouseProperties())?Integer.parseInt(htDetail.getDoesIncludeHouseProperties()):null);//是否包含附属设施 1 包含，0 不包含
