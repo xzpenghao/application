@@ -20,6 +20,9 @@ public class SJ_Sjsq  implements Serializable {
     private String notifiedPersonName;                         //通知人名称
     private String notifiedPersonTelephone;                    //通知人电话
     private String notifiedPersonAddress;                      //通知人地址
+    private String ywrNotifiedPersonName;                         //义务通知人名称
+    private String ywrNotifiedPersonTelephone;                    //义务通知人电话
+    private String ywrNotifiedPersonAddress;                      //义务通知人地址
     private String immovableProcessIdentification;             //不动产侧流程标识（pid）
     private String platform;                                   //发起平台
     private String immovableReceivingPerson;                   //不动产侧受理人员标识
@@ -132,6 +135,30 @@ public class SJ_Sjsq  implements Serializable {
 
     public void setNotifiedPersonAddress(String notifiedPersonAddress) {
         this.notifiedPersonAddress = notifiedPersonAddress;
+    }
+
+    public String getYwrNotifiedPersonName() {
+        return ywrNotifiedPersonName;
+    }
+
+    public void setYwrNotifiedPersonName(String ywrNotifiedPersonName) {
+        this.ywrNotifiedPersonName = ywrNotifiedPersonName;
+    }
+
+    public String getYwrNotifiedPersonTelephone() {
+        return ywrNotifiedPersonTelephone;
+    }
+
+    public void setYwrNotifiedPersonTelephone(String ywrNotifiedPersonTelephone) {
+        this.ywrNotifiedPersonTelephone = ywrNotifiedPersonTelephone;
+    }
+
+    public String getYwrNotifiedPersonAddress() {
+        return ywrNotifiedPersonAddress;
+    }
+
+    public void setYwrNotifiedPersonAddress(String ywrNotifiedPersonAddress) {
+        this.ywrNotifiedPersonAddress = ywrNotifiedPersonAddress;
     }
 
     public String getImmovableProcessIdentification() {
