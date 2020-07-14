@@ -450,6 +450,14 @@ public class BusinessDealBaseUtil {
             JYQLRXX.add(jyqlrxx);
         }
         for(SJ_Qlr_Gl sellergl:sellergls){
+            if(StringUtils.isBlank(sellergl.getRelatedPerson().getDh())){
+                if(
+                        StringUtils.isNotBlank(sellergl.getObligeeName())&&
+                                sellergl.getObligeeName().equals(sjsq.getYwrNotifiedPersonName())
+                ){
+                    sellergl.getRelatedPerson().setDh(sjsq.getYwrNotifiedPersonTelephone());
+                }
+            }
             JYQLRXX jyqlrxx = getJyqlr(sellergl);
             jyqlrxx.setQLRBS("0");
             JYQLRXX.add(jyqlrxx);
