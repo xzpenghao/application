@@ -17,10 +17,10 @@ import java.util.Map;
 @FeignClient(name = "exchangeFeign", url = "${gxjhpt.url}")
 public interface ExchangeWithOuterFeign {
 
-    @RequestMapping(value="irsp/openApi/GK_JZCX_RKJCXXCX/v1",method = RequestMethod.POST,produces = "application/json",headers = {"api_id=gaU7XDlY","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
-    JDPersonnelUnitEntity rkkjzxxcx(@RequestParam("request_body") String requset_body); //公安信息
+    @RequestMapping(value="irsp/openApi/GK_JZCX_RKJCXXCX/v1",method = RequestMethod.POST,produces = "application/json",headers = {"api_id=2AR276H3","from_user=1"})
+    JDPersonnelUnitEntity rkkjzxxcx(@RequestParam("request_body") String requset_body); //公安基本核查信息
 
-    @RequestMapping(value="garx",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=XcAtfvwZ","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
+    @RequestMapping(value="garx",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xjIRoAGu","from_user=1"})
     JDPersonnelUnitEntity rkkrxbd(Map<String,Object> params); //人像对比
 
     @RequestMapping(value="share/qyjbxxyz",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
