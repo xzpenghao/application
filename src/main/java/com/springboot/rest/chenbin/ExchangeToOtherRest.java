@@ -125,6 +125,7 @@ public class ExchangeToOtherRest {
     public ObjectRestResponse<String> examineSuccess4(@RequestBody Map<String,String> respMap ){
         System.out.println("进入网签备案结果回推");
         log.info("进入网签备案结果回推");
+        log.debug("网签传入回推数据："+JSONObject.toJSONString(respMap));
         TraRespBody traRespBody = JSONObject.parseObject(respMap.get("data"),TraRespBody.class);
         return exc2Tran.examineSuccess4Tra(traRespBody);
     }
