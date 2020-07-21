@@ -533,7 +533,17 @@ public class BusinessDealBaseUtil {
         TraParamBody traParam = new TraParamBody();
         traParam.setCFZT(taxParam.getCFZT());
         traParam.setDYZT(taxParam.getDYZT());
-        traParam.setHTXX(taxParam.getHTXX());
+        TraHTXX htxx = TraHTXX.init(taxParam.getHTXX());
+        if(htxx.getZFFS()!=null && htxx.getZFFS()==3){
+            Sj_Info_Dyhtxx dyhtxx = sjsq.getMortgageContractInfo();
+            if(dyhtxx!=null){
+                htxx.setDKJE((dyhtxx.getCreditAmount()==null?dyhtxx.getMortgageAmount():dyhtxx.getCreditAmount()).toString());
+                if(dyhtxx.getGlMortgageHolderVoList()!=null && dyhtxx.getGlMortgageHolderVoList().size()>0) {
+                    htxx.setDKYH(dyhtxx.getGlMortgageHolderVoList().get(0).getObligeeName());
+                }
+            }
+        }
+        traParam.setHTXX(htxx);
         traParam.setJYQLRXX(taxParam.getJYQLRXX());
         traParam.setJYDLRXX(taxParam.getJYDLRXX());
         traParam.setQSXX(taxParam.getQSXX());
