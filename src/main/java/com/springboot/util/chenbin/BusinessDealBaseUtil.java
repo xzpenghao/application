@@ -408,9 +408,9 @@ public class BusinessDealBaseUtil {
                     && !bdcql.getCertificateType().equals("土地证")
             ) {
                 String bdczh = bdcql.getImmovableCertificateNo();
-                if(bdczh.contains("-")) {
-                    bdczh = bdczh.substring(0,bdczh.lastIndexOf("_"))+"号";
-                }
+//                if(bdczh.contains("-") && bdczh.contains("_")) {
+//                    bdczh = bdczh.substring(0,bdczh.lastIndexOf("_"))+"号";
+//                }
                 qsxx.setBDCZH(bdczh);
                 qsxx.setJZMJ(bdcql.getArchitecturalArea());
                 qsxx.setTNMJ(bdcql.getHouseArchitecturalArea());
