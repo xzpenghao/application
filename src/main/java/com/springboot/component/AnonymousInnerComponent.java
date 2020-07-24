@@ -23,6 +23,7 @@ import com.springboot.popj.register.HttpRequestMethedEnum;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.util.*;
+import com.springboot.util.chenbin.ErrorDealUtil;
 import com.springboot.util.chenbin.HttpClientUtil;
 import com.springboot.util.chenbin.IDUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -834,12 +835,12 @@ public class AnonymousInnerComponent {
                         return resultJson;
                     }
                     //返回数据到一窗受理平台保存受理编号和登记编号
-                    log.info("BDC->YCSL：开始发送数据向一窗REC");
+                    log.info("BDC->YCSL：开始发送关于【"+getReceiving.getSlbh()+"】办件的数据向一窗REC");
                     String resultJson = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter2");
-                   log.info("BDC->YCSL：收到一窗REC的DealRecieveFromOuter2接口的响应数据：" + resultJson);
+                    log.info("BDC->YCSL：收到一窗REC，DealRecieveFromOuter2接口关于【"+getReceiving.getSlbh()+"】办件的响应数据：" + resultJson);
                     return resultJson;
                 } catch (Exception e) {
-                    log.error("BDC->YCSL：e"+e);
+                    log.error("BDC->YCSL：e" + ErrorDealUtil.getErrorInfo(e));
                     e.printStackTrace();
                     throw new Exception("Callable terminated with Exception!"); // call方法可以抛出异常
                 }
@@ -895,7 +896,6 @@ public class AnonymousInnerComponent {
                     if (StringUtils.isEmpty(respServiceData.getServiceCode())) {
                         respServiceData.setServiceCode(Msgagger.BDCQZSDZF_SERVICE_CODE);
                     }
-                    log.info("DYZMH:"+bdcqlxgxxList.get(0).toString());
                     respServiceData.setServiceDataInfos(bdcqlxgxxList);
                     break;
             }

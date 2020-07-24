@@ -29,10 +29,10 @@ public class ExchangeToInnerComponent {
 
     public List<SJ_Info_Bdcqlxgxx> getBdcQlInfoWithItsRights(ParametricData parametricData){
         List<SJ_Info_Bdcqlxgxx> serviceDataInfos = new ArrayList<SJ_Info_Bdcqlxgxx>();
-        log.info("执行BDC查询前："+ new Date().getTime());
+        log.info("BDC with TXQ --> 执行BDC查询前："+ new Date().getTime());
         List<JSONObject> jsonImmoVoList = immovableFeign.getBdcInfoByZH(parametricData.getBdczh(),parametricData.getQlrmc(),parametricData.getObligeeId());
-        log.info("执行BDC查询后："+ new Date().getTime());
-        log.info("不动产查询数据为："+JSONArray.toJSONString(jsonImmoVoList));
+        log.info("BDC with TXQ --> 执行BDC查询后："+ new Date().getTime());
+        log.info("BDC with TXQ --> 不动产查询数据为："+JSONArray.toJSONString(jsonImmoVoList));
         if(jsonImmoVoList!=null && jsonImmoVoList.size()>0) {
             for (JSONObject jsonImmov:jsonImmoVoList) {
                 SJ_Info_Bdcqlxgxx bdcqlxgxx = new SJ_Info_Bdcqlxgxx();

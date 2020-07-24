@@ -62,12 +62,12 @@ public class ETicketServiceImpl implements ETicketService {
         //1.0请求税务接口
         HashMap<String, Object> paramMap = new HashMap<>();
         paramMap.put("sqbh", receiptNumbers.get(0));
-        ObjectRestResponse<String> result = otherFeign.getETicket(paramMap);
         log.info("查询参数:{}",JSON.toJSONString(paramMap));
+        ObjectRestResponse<String> result = otherFeign.getETicket(paramMap);
+        log.info("查询结果:{}",JSON.toJSONString(result));
         if (null == result){
             throw new ZtgeoBizException("查询无响应");
         }
-        log.info("查询结果:{}",JSON.toJSONString(result));
         //2.0处理税务返回数据
         List<TaxAttachment> taxAttachments;
         if (result.getStatus() != HttpStatus.HTTP_OK){
