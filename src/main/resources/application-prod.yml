@@ -318,3 +318,12 @@ Feign:
   Tra: sqservice/bdc/getOneAcceptInfo
   ETicket: getDzspAction.do
   Electric: share/electric/electric_lmgh_apply_api.action
+  bdc:
+    new_plat:
+      query:
+        djzlcx: http://ip:port/service-core/extQuery/djzl     #登记资料查询
+        cqzscx: http://ip:port/service-core/extQuery/cqzs     #产权证书查询
+        dyzmcx: http://ip:port/service-core/extQuery/dycx     #抵押证明查询
+        dzzzcx: http://ip:port/service-core/extQuery/dzzzcx   #电子证照查询
+        shsjcx: http://ip:port/service-core/extQuery/shsjcx   #审核数据查询
+        dbsjcx: http://ip:port/service-core/extQuery/dzzzcx   #登簿数据查询

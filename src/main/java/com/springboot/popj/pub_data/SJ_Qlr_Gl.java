@@ -15,6 +15,7 @@ public class SJ_Qlr_Gl implements Serializable {
     private String status;                          //状态
 
     private SJ_Qlr_Info relatedPerson;                    //相关人信息
+    private SJ_Qlr_Info dlr;                           //代理人信息
 
     public String getRelationId() {
         return relationId;
@@ -104,20 +105,11 @@ public class SJ_Qlr_Gl implements Serializable {
         this.relatedPerson = relatedPerson;
     }
 
-    @Override
-    public String toString() {
-        return "SJ_Qlr_Gl{" +
-                "relationId='" + relationId + '\'' +
-                ", infoId='" + infoId + '\'' +
-                ", obligeeId='" + obligeeId + '\'' +
-                ", obligeeName='" + obligeeName + '\'' +
-                ", obligeeType='" + obligeeType + '\'' +
-                ", obligeeOrder=" + obligeeOrder +
-                ", sharedMode='" + sharedMode + '\'' +
-                ", sharedValue=" + sharedValue +
-                ", infoTableIdentification='" + infoTableIdentification + '\'' +
-                ", status='" + status + '\'' +
-                ", relatedPerson=" + relatedPerson +
-                '}';
+    public SJ_Qlr_Info getDlr() {
+        return dlr;
+    }
+
+    public void setDlr(SJ_Qlr_Info dlr) {
+        this.dlr = dlr;
     }
 }

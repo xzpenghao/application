@@ -36,7 +36,7 @@ public class SJ_Bdc_Fw_Info implements Serializable {
     private String houseType;                                   //类型
     private String houseNature;                                 //性质
     private String houseStructure;                              //结构
-    private String oldHouseCode;
+    private String oldHouseCode;                                //房屋代码
 
     public String getHouseId() {
         return houseId;

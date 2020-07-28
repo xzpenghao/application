@@ -321,3 +321,12 @@ Feign:
   Tra: api/test/testTra
   ETicket: ETicket/morkData
   Electric: api/test/testElec
+  bdc:
+    new_plat:
+      query:
+        djzlcx: http://ip:port/service-core/extQuery/djzl     #登记资料查询
+        cqzscx: http://ip:port/service-core/extQuery/cqzs     #产权证书查询
+        dyzmcx: http://ip:port/service-core/extQuery/dycx     #抵押证明查询
+        dzzzcx: http://ip:port/service-core/extQuery/dzzzcx   #电子证照查询
+        shsjcx: http://ip:port/service-core/extQuery/shsjcx   #审核数据查询
+        dbsjcx: http://ip:port/service-core/extQuery/dbsjcx   #登簿数据查询

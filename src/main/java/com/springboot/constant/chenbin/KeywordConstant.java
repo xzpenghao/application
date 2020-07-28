@@ -35,4 +35,17 @@ public class KeywordConstant {
     public final static String WATER_NAME_YK = "YKZLS";
     public final static String WATER_NAME_SY = "SYZLS";
     public final static String WATER_NAME_SS = "SSZLS";
+
+    //地区性常量
+    public final static String DATA_SOURCE_DEPART_BDC = "宿迁市不动产登记中心";
+    public final static String DATA_SOURCE_DEPART_ZJJ = "宿迁市住建局";
+    public final static String DATA_SOURCE_DEPART_SWJ = "宿迁市税务局";
+
+    //不动产单元库标识
+    public final static String INFO_TABLE_CODE_BDCQL = "bdcqlxgxx";
+    public final static String INFO_TABLE_CODE_BDCDY = "bdcdyxgxx";
+    public final static String INFO_TABLE_CODE_JYHT = "jyhtxx";
+    public final static String INFO_TABLE_CODE_DYHT = "dyhtxx";
+    public final static String INFO_TABLE_CODE_QWXX = "qsxx";
+
 }

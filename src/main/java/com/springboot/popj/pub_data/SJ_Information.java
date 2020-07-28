@@ -82,4 +82,10 @@ public class SJ_Information implements Serializable {
     public void setInsertTime(Date insertTime) {
         this.insertTime = TimeUtil.getTimeString(insertTime);
     }
+
+    public void initInfoTerm(String dataJson,String dataSourceDepart){
+        this.setDataComeFromMode("接口");
+        this.setDataJson(dataJson);
+        this.setProvideUnit(dataSourceDepart);
+    }
 }

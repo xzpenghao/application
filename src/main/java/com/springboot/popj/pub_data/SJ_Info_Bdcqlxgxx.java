@@ -9,6 +9,7 @@ import java.util.List;
 
 public class SJ_Info_Bdcqlxgxx extends SJ_Information {
     private String acceptanceNumber;            //不动产内网受理编号
+    private String registerType;                     //业务类型
     private String immovableSite;               //不动产坐落（收件单坐落）
     private String immovableCertificateNo;       //不动产权证号
     private String houseCertificateNo;           //房产证号
@@ -25,6 +26,7 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
     private BigDecimal atticArea;                       //阁楼面积
     private BigDecimal garageArea;                       //车库面积
     private BigDecimal storeroomArea;                       //储藏室面积
+    private String fsss;                                //附属设施
     private String houseObtainingWays;                   //房屋取得方式
     private BigDecimal houseObtainingPrice;             //房屋取得价格
     private String housePlanningPurpose;                //房屋规划用途
@@ -85,6 +87,14 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
 
     public void setAcceptanceNumber(String acceptanceNumber) {
         this.acceptanceNumber = acceptanceNumber;
+    }
+
+    public String getRegisterType() {
+        return registerType;
+    }
+
+    public void setRegisterType(String registerType) {
+        this.registerType = registerType;
     }
 
     public String getImmovableSite() {
@@ -173,6 +183,14 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
 
     public void setApportionmentArchitecturalArea(BigDecimal apportionmentArchitecturalArea) {
         this.apportionmentArchitecturalArea = apportionmentArchitecturalArea;
+    }
+
+    public String getFsss() {
+        return fsss;
+    }
+
+    public void setFsss(String fsss) {
+        this.fsss = fsss;
     }
 
     public String getHouseObtainingWays() {

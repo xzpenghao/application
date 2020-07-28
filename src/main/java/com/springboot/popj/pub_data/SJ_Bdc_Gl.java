@@ -1,6 +1,13 @@
 package com.springboot.popj.pub_data;
 
+import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Fwdcxx;
+import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Zddcxx;
+import com.springboot.util.newPlatBizUtil.ResultConvertUtil;
+
 import java.io.Serializable;
+
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.BDC_TYPE_FD;
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.BDC_TYPE_JD;
 
 public class SJ_Bdc_Gl implements Serializable {
     private String relationId;                   //关联id
@@ -76,17 +83,27 @@ public class SJ_Bdc_Gl implements Serializable {
         this.zdInfo = zdInfo;
     }
 
-    @Override
-    public String toString() {
-        return "SJ_Bdc_Gl{" +
-                "relationId='" + relationId + '\'' +
-                ", infoId='" + infoId + '\'' +
-                ", immovableId='" + immovableId + '\'' +
-                ", immovableType='" + immovableType + '\'' +
-                ", infoTableIdentification='" + infoTableIdentification + '\'' +
-                ", status='" + status + '\'' +
-                ", fwInfo=" + fwInfo +
-                ", zdInfo=" + zdInfo +
-                '}';
+    public SJ_Bdc_Gl initFwBdcgl(String tableCode){
+        this.immovableType = BDC_TYPE_FD;
+        this.infoTableIdentification = tableCode;
+        this.fwInfo = new SJ_Bdc_Fw_Info();
+        return this;
+    }
+
+    public SJ_Bdc_Gl initZdBdcgl(String tableCode){
+        this.immovableType = BDC_TYPE_JD;
+        this.infoTableIdentification = tableCode;
+        this.zdInfo = new SJ_Bdc_Zd_Info();
+        return this;
+    }
+
+    public SJ_Bdc_Gl fillFwdcxx(Fwdcxx fwdcxx){
+        ResultConvertUtil.fillFwxx(this.fwInfo,fwdcxx);
+        return this;
+    }
+
+    public SJ_Bdc_Gl fillZddcxx(Zddcxx zddcxx){
+        ResultConvertUtil.fillZdxx(this.zdInfo,zddcxx);
+        return this;
     }
 }
