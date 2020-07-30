@@ -1,6 +1,12 @@
 package com.springboot.popj.pub_data;
 
+import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Dyxx;
+import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
+import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Yyxx;
+
 import java.io.Serializable;
+
+import static com.springboot.constant.chenbin.KeywordConstant.*;
 
 public class SJ_Its_Right implements Serializable {
     private String id;
@@ -110,5 +116,29 @@ public class SJ_Its_Right implements Serializable {
 
     public void setExt3(String ext3) {
         this.ext3 = ext3;
+    }
+
+    public SJ_Its_Right initByDyxx(Dyxx dyxx){
+        this.setRegisterNumber(dyxx.getYwh());
+        this.setImmovableUnitNumber(dyxx.getBdcdyh());
+        this.setItsRightType(BDC_ITS_RIGHT_DY);
+        this.setItsRightStart(dyxx.getDykssj());
+        this.setItsRightEnd(dyxx.getDyjssj());
+        return this;
+    }
+    public SJ_Its_Right initByCfxx(Cfxx cfxx){
+        this.setRegisterNumber(cfxx.getYwh());
+        this.setImmovableUnitNumber(cfxx.getBdcdyh());
+        this.setItsRightType(BDC_ITS_RIGHT_CF);
+        this.setItsRightLimit(cfxx.getCfqx());
+        this.setItsRightStart(cfxx.getCfkssj());
+        this.setItsRightEnd(cfxx.getCfjssj());
+        return this;
+    }
+    public SJ_Its_Right initByYyxx(Yyxx yyxx){
+        this.setRegisterNumber(yyxx.getYwh());
+        this.setImmovableUnitNumber(yyxx.getBdcdyh());
+        this.setItsRightType(BDC_ITS_RIGHT_YY);
+        return this;
     }
 }

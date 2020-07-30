@@ -5,7 +5,7 @@ package com.springboot.emm;
  * @version 2020/7/28/028
  * description：权利人种类
  */
-public enum DIC_QLR_ZL_Enums {
+public enum DIC_RY_ZL_Enums {
     QLR("权利人","1"),
     YWR("义务人","2"),
     DYR("抵押人","3"),
@@ -19,7 +19,7 @@ public enum DIC_QLR_ZL_Enums {
     private String dicName;
     private String dicVal;
 
-    DIC_QLR_ZL_Enums(String dicName,String dicVal){
+    DIC_RY_ZL_Enums(String dicName, String dicVal){
         this.dicName = dicName;
         this.dicVal = dicVal;
     }
@@ -38,4 +38,5 @@ public enum DIC_QLR_ZL_Enums {
 
     public void setDicVal(String dicVal) {
         this.dicVal = dicVal;
-    }}
+    }
+}

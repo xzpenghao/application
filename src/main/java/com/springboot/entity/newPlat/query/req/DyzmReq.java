@@ -1,5 +1,6 @@
 package com.springboot.entity.newPlat.query.req;
 
+import com.springboot.popj.warrant.ParametricData2;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,11 @@ public class DyzmReq {
     private String dyr;
     private String bdcdyh;
     private String xgzh;
+
+    public DyzmReq initByYCParams(ParametricData2 parametricData){
+        this.dyzmh = parametricData.getDyzmh();
+        this.dyr = parametricData.getDyrmc();
+        this.bdcdyh = parametricData.getBdcdyh();
+        return this;
+    }
 }

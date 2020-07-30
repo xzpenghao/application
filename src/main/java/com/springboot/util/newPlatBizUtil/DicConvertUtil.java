@@ -1,6 +1,5 @@
 package com.springboot.util.newPlatBizUtil;
 
-import com.springboot.emm.DIC_QLR_ZL_Enums;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -27,9 +26,5 @@ public class DicConvertUtil {
     }
     public static String getDicValByName(String name,Object... ts) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return getTarget(name,"getDicName","getDicVal",ts);
-    }
-
-    public static void main(String []args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        System.out.println(DicConvertUtil.getDicNameByVal("5",DIC_QLR_ZL_Enums.values()));
     }
 }

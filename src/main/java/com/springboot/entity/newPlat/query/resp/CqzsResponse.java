@@ -5,7 +5,7 @@ import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.*;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
-import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Yyxx;
+import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Yyxx;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -36,14 +36,22 @@ public class CqzsResponse {
     private Ygxx ygxx;         // 预告信息列表
     private List<Qlr> qlrlb; // 权利人列表
     private List<Qlr> ywrlb;  // 义务人列表
-    private List<Qldlr> qldlrlb; // 权利代理人列表
-    private List<Qldlr> ywdlrlb; // 义务代理人列表
+    private List<Cyr> qldlrlb; // 权利代理人列表
+    private List<Cyr> ywdlrlb; // 义务代理人列表
     private List<Fwdcxx> fwdcxxlb; //  房屋调查信息列表
     private List<Zddcxx> zddcxxlb; //  宗地调查信息列表
     private List<Dyxx> dyxxlb;  //  抵押信息列表
     private List<Cfxx> cfxxlb; //  查封信息列表
     private List<Yyxx> yyxxlb; //  异议信息列表
 
+    /**
+     * 描述：返回数据的基础自检方法
+     * 作者：chenb
+     * 日期：2020/7/29/029
+     * 参数：[]
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+     */
     public void checkSelfStandard(){
         //证书类型范围检查
         if(!BDC_CERT_TYPE_FW.equals(this.zslx) && !BDC_CERT_TYPE_TD.equals(this.zslx)){

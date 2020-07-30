@@ -1,11 +1,13 @@
 package com.springboot.entity.newPlat.query.resp;
 
+import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Yyxx;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -54,4 +56,13 @@ public class DjzlResponse {
     private List<Qlr> qlrs;   // 权利人列表
     private List<Dyxx> dyxxs; // 抵押信息列表
     private List<Cfxx> cfxxs; // 查封信息列表
+
+    public void checkSelfStandard(){
+        if (StringUtils.isBlank(this.bdcdyh))
+            throw new ZtgeoBizException("不动产单元号为空");
+        if (StringUtils.isBlank(this.zl))
+            throw new ZtgeoBizException("不动产坐落为空");
+        if (StringUtils.isBlank(this.bdcqzh))
+            throw new ZtgeoBizException("不动产证号为空");
+    }
 }

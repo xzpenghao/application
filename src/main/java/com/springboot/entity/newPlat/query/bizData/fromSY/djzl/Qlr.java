@@ -1,5 +1,6 @@
 package com.springboot.entity.newPlat.query.bizData.fromSY.djzl;
 
+import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Cyr;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,14 +11,12 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class Qlr {
+public class Qlr extends Cyr {
 
-    private String qlrmc; //  产权人
-    private String qlrzjzl; // 产权人证件种类   名称
-    private String qlrzjhm;//  产权证证件号码
-    private String dh;    //  电话
-    private String dz;    //  地址
     private String gyfs; // 共有方式   名称
     private String gyfe; //  共有份额（权利比例）
     private String fbczzh;// 分别持证证号
+    private String dlrmc;   //代理人名称
+    private String dlrzjlx; //代理人证件类型
+    private String dlrzjh;  //代理人证件号码
 }

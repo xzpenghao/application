@@ -4,13 +4,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /***
- *   权利代理人信息
+ *   参与人信息（包含：代理人，委托人，通知人...）
  */
 
 
 @NoArgsConstructor
 @Data
-public class Qldlr {
+public class Cyr {
 
     private String qlrmc;  // 权利人名称
     private String qlrzjzl; //  权利人证件种类  名称

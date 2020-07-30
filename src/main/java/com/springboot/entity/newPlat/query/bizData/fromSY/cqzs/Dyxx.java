@@ -1,5 +1,6 @@
 package com.springboot.entity.newPlat.query.bizData.fromSY.cqzs;
 
+import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -34,6 +35,6 @@ public class Dyxx {
     private String dbfw;   //  担保范围
     private String fj;    //   附记
     private String qt;    //   其它
-    private List<Qldlr> dyqrlb;  //  抵押权人
-    private List<Qldlr> dyrlb;  //   抵押人
+    private List<Qlr> dyqrlb;  //  抵押权人
+    private List<Qlr> dyrlb;  //   抵押人
 }

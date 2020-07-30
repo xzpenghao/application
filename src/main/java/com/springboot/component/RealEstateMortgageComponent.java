@@ -25,6 +25,7 @@ import com.springboot.util.StrUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.HttpClientUtils;
 import com.springboot.util.SysPubDataDealUtil;
+import com.springboot.util.newPlatBizUtil.ResultConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -616,8 +617,8 @@ RealEstateMortgageComponent {
             MortgageBizInfo mortgageBizInfo = new MortgageBizInfo();
             mortgageBizInfo.setMortgageApplyDate(info.getRegistrationDate());//登记日期
             mortgageBizInfo.setMortgageWay(info.getMortgageMode());//抵押方式
-            mortgageBizInfo.setCreditAmount(info.getCreditAmount());//
-            mortgageBizInfo.setEvaluationValue(info.getValuationValue());
+            mortgageBizInfo.setCreditAmount(ResultConvertUtil.getStringFromBigDecimalNotThrowNull(info.getCreditAmount(),"#.00"));//
+            mortgageBizInfo.setEvaluationValue(ResultConvertUtil.getStringFromBigDecimalNotThrowNull(info.getValuationValue(),"#.00"));
             mortgageBizInfo.setMortgageTerm(info.getMortgagePeriod());
             mortgageBizInfo.setMortgageStartDate(info.getMortgageStartingDate());
             mortgageBizInfo.setMortgageEndDate(info.getMortgageEndingDate());

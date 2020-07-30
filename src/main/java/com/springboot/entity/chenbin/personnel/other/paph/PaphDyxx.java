@@ -1,5 +1,9 @@
 package com.springboot.entity.chenbin.personnel.other.paph;
 
+import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx;
+import com.springboot.util.newPlatBizUtil.ResultConvertUtil;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 
 public class PaphDyxx implements Serializable {
@@ -38,5 +42,12 @@ public class PaphDyxx implements Serializable {
 
     public void setDylx(String dylx) {
         this.dylx = dylx;
+    }
+
+    public PaphDyxx initByDjzlDy(Dyxx dyxx){
+        this.zqje = StringUtils.isBlank(dyxx.getZqje())?dyxx.getDyje():dyxx.getZqje();
+        this.dylx = StringUtils.isBlank(dyxx.getDylx())?dyxx.getDyfs():dyxx.getDylx();
+        this.zwlxqx = ResultConvertUtil.creatZwlxqx(dyxx);
+        return this;
     }
 }

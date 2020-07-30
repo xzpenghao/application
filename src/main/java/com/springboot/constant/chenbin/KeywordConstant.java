@@ -48,4 +48,8 @@ public class KeywordConstant {
     public final static String INFO_TABLE_CODE_DYHT = "dyhtxx";
     public final static String INFO_TABLE_CODE_QWXX = "qsxx";
 
+    //它项权
+    public final static String BDC_ITS_RIGHT_DY = "抵押";
+    public final static String BDC_ITS_RIGHT_CF = "查封";
+    public final static String BDC_ITS_RIGHT_YY = "异议";
 }

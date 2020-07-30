@@ -1,5 +1,6 @@
 package com.springboot.entity.newPlat.query.resp;
 
+import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.newPlat.query.bizData.Xgzxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Fwdcxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Zddcxx;
@@ -8,6 +9,7 @@ import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -52,4 +54,9 @@ public class DyzmResponse {
     private List<Fwdcxx> glfwdcxxlb;         //关联房屋调查信息列表
     private List<Zddcxx> zddcxxlb;           //宗地调查信息列表
     private List<Cfxx> cfxxlb;             //查封信息列表
+
+    public void checkSelfStandard(){
+        if(StringUtils.isBlank(this.ywh))
+            throw new ZtgeoBizException("获取不动产抵押信息业务号为空");
+    }
 }

@@ -620,10 +620,10 @@ public class ExchangeInterfaceServiceImpl implements ExchangeInterfaceService {
         bdcdyxgxx.setMortgageCertificateNo("苏(2019)xx市不动产证明第8888888号");
         bdcdyxgxx.setRegistrationDate(new Date());
         bdcdyxgxx.setMortgageMode("预告抵押登记");
-        bdcdyxgxx.setMortgageArea("134");
-        bdcdyxgxx.setCreditAmount("700000.00");
-        bdcdyxgxx.setMortgageAmount("0.00");
-        bdcdyxgxx.setValuationValue("2400339.00");
+        bdcdyxgxx.setMortgageArea(new BigDecimal(134));
+        bdcdyxgxx.setCreditAmount(new BigDecimal(700000.00));
+        bdcdyxgxx.setMortgageAmount(new BigDecimal(0.00));
+        bdcdyxgxx.setValuationValue(new BigDecimal(2400339.00));
         bdcdyxgxx.setRemarks("购买商品房贷款");
         bdcdyxgxx.setDataComeFromMode("接口");
         if(zlType.equals("dy")){

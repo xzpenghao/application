@@ -12,10 +12,10 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
     private String mortgageCertificateNo;           //抵押证明号
     private String registrationDate;                //登记日期
     private String mortgageMode;                    //抵押方式
-    private String mortgageArea;                    //抵押面积
-    private String creditAmount;                    //债权数额
-    private String mortgageAmount;                  //抵押金额
-    private String valuationValue;                  //评估价值
+    private BigDecimal mortgageArea;                    //抵押面积
+    private BigDecimal creditAmount;                    //债权数额
+    private BigDecimal mortgageAmount;                  //抵押金额
+    private BigDecimal valuationValue;                  //评估价值
     private String mortgagePeriod;                  //抵押期限
     private Date mortgageStartingDate;            //抵押期起
     private Date mortgageEndingDate;              //抵押期止
@@ -100,35 +100,35 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
         this.mortgageMode = mortgageMode;
     }
 
-    public String getMortgageArea() {
+    public BigDecimal getMortgageArea() {
         return mortgageArea;
     }
 
-    public void setMortgageArea(String mortgageArea) {
+    public void setMortgageArea(BigDecimal mortgageArea) {
         this.mortgageArea = mortgageArea;
     }
 
-    public String getCreditAmount() {
+    public BigDecimal getCreditAmount() {
         return creditAmount;
     }
 
-    public void setCreditAmount(String creditAmount) {
+    public void setCreditAmount(BigDecimal creditAmount) {
         this.creditAmount = creditAmount;
     }
 
-    public String getMortgageAmount() {
+    public BigDecimal getMortgageAmount() {
         return mortgageAmount;
     }
 
-    public void setMortgageAmount(String mortgageAmount) {
+    public void setMortgageAmount(BigDecimal mortgageAmount) {
         this.mortgageAmount = mortgageAmount;
     }
 
-    public String getValuationValue() {
+    public BigDecimal getValuationValue() {
         return valuationValue;
     }
 
-    public void setValuationValue(String valuationValue) {
+    public void setValuationValue(BigDecimal valuationValue) {
         this.valuationValue = valuationValue;
     }
 

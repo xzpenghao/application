@@ -43,4 +43,5 @@ public class Fwdcxx {
     private String dytdmj; // 独用土地面积
     private String fwjg;  // 房屋结构
     private String fwdm;  // 房屋代码
+    private String sslb;    //设施类别
 }

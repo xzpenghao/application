@@ -43,7 +43,7 @@ public interface BdcQueryFeign {
             produces = "application/json",
             consumes = "application/json;charset=UTF-8"
     )   //抵押证明查询
-    OtherResponseEntity<List<DjzlResponse>> dyzmcx(DyzmReq dyzmReq);
+    OtherResponseEntity<List<DyzmResponse>> dyzmcx(DyzmReq dyzmReq);
 
     @RequestMapping(
             value = "${Feign.bdc.new_plat.query.dzzzcx}",

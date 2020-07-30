@@ -15,6 +15,7 @@ public class SJ_Bdc_Gl implements Serializable {
     private String immovableId;                  //关联不动产id
     private String immovableType;                //不动产类型，用于描述不动产是净地还是房地
     private String infoTableIdentification;      //info关联表标识（标识提供数据的表）
+    private String sslb;                         //设施类别
     private String status;                       //状态（是否废弃或挂起当前收件业务）
     private SJ_Bdc_Fw_Info fwInfo;               //房地权属信息
     private SJ_Bdc_Zd_Info zdInfo;               //净地权属信息
@@ -59,6 +60,14 @@ public class SJ_Bdc_Gl implements Serializable {
         this.infoTableIdentification = infoTableIdentification;
     }
 
+    public String getSslb() {
+        return sslb;
+    }
+
+    public void setSslb(String sslb) {
+        this.sslb = sslb;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -83,21 +92,20 @@ public class SJ_Bdc_Gl implements Serializable {
         this.zdInfo = zdInfo;
     }
 
-    public SJ_Bdc_Gl initFwBdcgl(String tableCode){
+    public SJ_Bdc_Gl initFwBdcgl(){
         this.immovableType = BDC_TYPE_FD;
-        this.infoTableIdentification = tableCode;
         this.fwInfo = new SJ_Bdc_Fw_Info();
         return this;
     }
 
-    public SJ_Bdc_Gl initZdBdcgl(String tableCode){
+    public SJ_Bdc_Gl initZdBdcgl(){
         this.immovableType = BDC_TYPE_JD;
-        this.infoTableIdentification = tableCode;
         this.zdInfo = new SJ_Bdc_Zd_Info();
         return this;
     }
 
     public SJ_Bdc_Gl fillFwdcxx(Fwdcxx fwdcxx){
+        this.sslb = fwdcxx.getSslb();
         ResultConvertUtil.fillFwxx(this.fwInfo,fwdcxx);
         return this;
     }

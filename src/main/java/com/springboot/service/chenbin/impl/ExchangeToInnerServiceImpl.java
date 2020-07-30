@@ -35,6 +35,7 @@ import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
+import com.springboot.util.newPlatBizUtil.ResultConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -236,10 +237,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
                 JSONArray mortArray = obj.getJSONArray("mortgageInfoVoList");
                 if(mortArray!=null && mortArray.size()>0){
                     List<PaphDyxx> dyxxs = getAfterDyxxs(mortArray,paph);
-                    if(dyxxs!=null && dyxxs.size()>0){
-                        paphEntity.setSfqtdy("是");
-                        paphEntity.setDyxxs(dyxxs);
-                    }
+                    ResultConvertUtil.setPaphQtdy(dyxxs,paphEntity);
                 }
                 JSONArray attachArray = obj.getJSONArray("attachInfoVoList");
                 if (attachArray!=null && attachArray.size()>0){

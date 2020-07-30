@@ -1,5 +1,10 @@
 package com.springboot.popj.pub_data;
 
+import com.springboot.config.ZtgeoBizException;
+import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Cyr;
+import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 
 public class SJ_Qlr_Gl implements Serializable {
@@ -111,5 +116,35 @@ public class SJ_Qlr_Gl implements Serializable {
 
     public void setDlr(SJ_Qlr_Info dlr) {
         this.dlr = dlr;
+    }
+
+    /**
+     * 描述：权利人一窗规范产生
+     *      共有份额的初步处理和数字判断
+     * 作者：chenb
+     * 日期：2020/7/29/029
+     * 参数：[qlrzl, sort, qlr]
+     * 返回：SJ_Qlr_Gl
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public SJ_Qlr_Gl initByDjqlr(String qlrzl,Integer sort,Qlr qlr){
+        initByDjcyr(qlrzl,sort,qlr);
+        this.setSharedMode(qlr.getGyfs());
+        this.setSharedValue(StringUtils.isNotBlank(qlr.getGyfe())?qlr.getGyfe().replaceAll("%",""):null);
+        if(StringUtils.isNotBlank(this.sharedValue)) {
+            try {
+                Float.parseFloat(this.sharedValue);
+            }catch (NumberFormatException e){
+                throw new ZtgeoBizException("权利人共有份额未通过数字检查");
+            }
+        }
+        return this;
+    }
+
+    public SJ_Qlr_Gl initByDjcyr(String cyrzl, Integer sort, Cyr cyr){
+        this.setObligeeName(cyr.getQlrmc());
+        this.setObligeeType(cyrzl);
+        this.setObligeeOrder(sort);
+        return this;
     }
 }
