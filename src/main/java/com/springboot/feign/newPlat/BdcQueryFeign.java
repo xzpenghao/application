@@ -22,7 +22,7 @@ import java.util.List;
 public interface BdcQueryFeign {
 
     @RequestMapping(
-            value = "${Feign.bdc.new_plat.query.djzlcx}",
+            value = "${Feign.bdc.newPlat.query.djzlcx}",
             method = RequestMethod.POST,
             produces = "application/json",
             consumes = "application/json;charset=UTF-8"
@@ -30,7 +30,7 @@ public interface BdcQueryFeign {
     OtherResponseEntity<List<DjzlResponse>> djzlcx(DjzlReq djzlReq);
 
     @RequestMapping(
-            value = "${Feign.bdc.new_plat.query.cqzscx}",
+            value = "${Feign.bdc.newPlat.query.cqzscx}",
             method = RequestMethod.POST,
             produces = "application/json",
             consumes = "application/json;charset=UTF-8"
@@ -38,7 +38,7 @@ public interface BdcQueryFeign {
     OtherResponseEntity<List<CqzsResponse>> cqzscx(CqzsReq cqzsReq);
 
     @RequestMapping(
-            value = "${Feign.bdc.new_plat.query.dyzmcx}",
+            value = "${Feign.bdc.newPlat.query.dyzmcx}",
             method = RequestMethod.POST,
             produces = "application/json",
             consumes = "application/json;charset=UTF-8"
@@ -46,7 +46,7 @@ public interface BdcQueryFeign {
     OtherResponseEntity<List<DyzmResponse>> dyzmcx(DyzmReq dyzmReq);
 
     @RequestMapping(
-            value = "${Feign.bdc.new_plat.query.dzzzcx}",
+            value = "${Feign.bdc.newPlat.query.dzzzcx}",
             method = RequestMethod.POST,
             produces = "application/json",
             consumes = "application/json;charset=UTF-8"
@@ -54,14 +54,14 @@ public interface BdcQueryFeign {
     OtherResponseEntity<List<Dzzzxx>> dzzzcx(DzzzReq dzzzReq);
 
     @RequestMapping(
-            value = "${Feign.bdc.new_plat.query.shsjcx}",
+            value = "${Feign.bdc.newPlat.query.shsjcx}",
             method = RequestMethod.GET,
             produces = "application/json"
     )   //审核数据查询
     OtherResponseEntity<Djshxx> shsjcx(@RequestParam("ywh")String ywh);
 
     @RequestMapping(
-            value = "${Feign.bdc.new_plat.query.dbsjcx}",
+            value = "${Feign.bdc.newPlat.query.dbsjcx}",
             method = RequestMethod.GET,
             produces = "application/json"
     )   //登簿数据查询

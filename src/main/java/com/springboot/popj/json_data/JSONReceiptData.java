@@ -34,6 +34,7 @@ public class JSONReceiptData implements Serializable {
 
     private String serviceDatas;                                //服务数据
     private String userExtVoList;                               //设定系统对接扩展用户映射
+    private String bdcMappingVoList;                            //不动产业务映射表
 
     public String getThirdApplyId() {
         return thirdApplyId;
@@ -241,5 +242,13 @@ public class JSONReceiptData implements Serializable {
 
     public void setUserExtVoList(String userExtVoList) {
         this.userExtVoList = userExtVoList;
+    }
+
+    public String getBdcMappingVoList() {
+        return bdcMappingVoList;
+    }
+
+    public void setBdcMappingVoList(String bdcMappingVoList) {
+        this.bdcMappingVoList = bdcMappingVoList;
     }
 }

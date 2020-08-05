@@ -13,8 +13,11 @@ public class JSONGLQlr implements Serializable {
     private String sharedValue;                     //共有份额
     private String infoTableIdentification;         //关联info表标识
     private String status;                          //状态
+    private String sfcz;                            //是否持证
+    private String sczh;                            //所持证号
 
     private String relatedPerson;                    //相关人信息(JSON)
+    private String relatedAgent;                    //代理人信息（JSON）
 
     public String getRelationId() {
         return relationId;
@@ -102,5 +105,29 @@ public class JSONGLQlr implements Serializable {
 
     public void setRelatedPerson(String relatedPerson) {
         this.relatedPerson = relatedPerson;
+    }
+
+    public String getSfcz() {
+        return sfcz;
+    }
+
+    public void setSfcz(String sfcz) {
+        this.sfcz = sfcz;
+    }
+
+    public String getSczh() {
+        return sczh;
+    }
+
+    public void setSczh(String sczh) {
+        this.sczh = sczh;
+    }
+
+    public String getRelatedAgent() {
+        return relatedAgent;
+    }
+
+    public void setRelatedAgent(String relatedAgent) {
+        this.relatedAgent = relatedAgent;
     }
 }

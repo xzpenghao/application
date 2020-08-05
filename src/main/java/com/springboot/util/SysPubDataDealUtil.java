@@ -32,8 +32,10 @@ public class SysPubDataDealUtil {
         String sdt_temp = serviceDataTo;
         String JSON_serviceDatas = sjsq_JSON_str.getServiceDatas();
         String JSON_userExtVoList = sjsq_JSON_str.getUserExtVoList();
+        String JSON_bdcMappingVoList = sjsq_JSON_str.getBdcMappingVoList();
         sjsq_JSON_str.setServiceDatas(null);
         sjsq_JSON_str.setUserExtVoList(null);
+        sjsq_JSON_str.setBdcMappingVoList(null);
         SJ_Sjsq sjsq = copyJSONReceiptDataToSjsq(sjsq_JSON_str);//信息拷贝至收件申请对象中
 //        System.out.println("2:"+JSONObject.toJSONString(sjsq));
         if (sjsq == null) {
@@ -57,6 +59,19 @@ public class SysPubDataDealUtil {
                 }
             }
             sjsq.setUserExtVoList(userExts);
+        }
+        if(StringUtils.isNotBlank(JSON_bdcMappingVoList)){//不动产业务挂接数据
+            List<Sj_Sjsq_Bdc_Mapping> bdcMappingVoList = JSONArray.parseArray(JSON_bdcMappingVoList,Sj_Sjsq_Bdc_Mapping.class);
+            if(bdcMappingVoList!=null){
+                for(Sj_Sjsq_Bdc_Mapping bdcMapping:bdcMappingVoList){
+                    if(StringUtils.isBlank(bdcMapping.getSqbh())){
+                        bdcMapping.setSqbh(sjsq.getReceiptNumber());
+                    } else if(!bdcMapping.getSqbh().equals(sjsq.getReceiptNumber())){
+                        throw new ZtgeoBizException("不动产映射字段非法注入");
+                    }
+                }
+            }
+            sjsq.setBdcMappingVoList(bdcMappingVoList);
         }
         if (JSON_serviceDatas != null && JSON_serviceDatas.length() > 0) {
             List<JSONServiceData> serviceDatas = JSONArray.parseArray(JSON_serviceDatas, JSONServiceData.class);
@@ -463,15 +478,27 @@ public class SysPubDataDealUtil {
             for (JSONGLQlr qlrgl : qlrgls) {
                 SJ_Qlr_Gl sj_qlr_gl = null;
                 qlrgl.setInfoTableIdentification(dataFrom);
+
+                //关联的权利人
                 String relatedPerson = qlrgl.getRelatedPerson();
                 SJ_Qlr_Info sj_qlr_info = null;
                 if (StringUtils.isNotBlank(relatedPerson)) {
                     sj_qlr_info = JSON.parseObject(relatedPerson, SJ_Qlr_Info.class);
                 }
                 qlrgl.setRelatedPerson(null);
+
+                //关联的代理人
+                String dlrxx = qlrgl.getRelatedAgent();
+                SJ_Qlr_Info sj_dlr_info = null;
+                if (StringUtils.isNotBlank(dlrxx)) {
+                    sj_dlr_info = JSON.parseObject(dlrxx, SJ_Qlr_Info.class);
+                }
+                qlrgl.setRelatedAgent(null);
+
                 sj_qlr_gl = JSON.parseObject(JSON.toJSONString(qlrgl), SJ_Qlr_Gl.class);
                 sj_qlr_gl.setObligeeType(qlrlx);
                 sj_qlr_gl.setRelatedPerson(sj_qlr_info);
+                sj_qlr_gl.setRelatedAgent(sj_dlr_info);
                 sj_qlrgls.add(sj_qlr_gl);
             }
         }

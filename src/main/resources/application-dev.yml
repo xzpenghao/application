@@ -40,7 +40,7 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://192.168.0.108:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://localhost:3306/ag-admin-suqian?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -322,11 +322,11 @@ Feign:
   ETicket: ETicket/morkData
   Electric: api/test/testElec
   bdc:
-    new_plat:
+    newPlat:
       query:
-        djzlcx: http://ip:port/service-core/extQuery/djzl     #登记资料查询
-        cqzscx: http://ip:port/service-core/extQuery/cqzs     #产权证书查询
-        dyzmcx: http://ip:port/service-core/extQuery/dycx     #抵押证明查询
-        dzzzcx: http://ip:port/service-core/extQuery/dzzzcx   #电子证照查询
-        shsjcx: http://ip:port/service-core/extQuery/shsjcx   #审核数据查询
-        dbsjcx: http://ip:port/service-core/extQuery/dbsjcx   #登簿数据查询
+        djzlcx: service-core/extQuery/djzl     #登记资料查询
+        cqzscx: service-core/extQuery/cqzs     #产权证书查询
+        dyzmcx: service-core/extQuery/dycx     #抵押证明查询
+        dzzzcx: service-core/extQuery/dzzzcx   #电子证照查询
+        shsjcx: service-core/extQuery/shsjcx   #审核数据查询
+        dbsjcx: service-core/extQuery/dbsjcx   #登簿数据查询

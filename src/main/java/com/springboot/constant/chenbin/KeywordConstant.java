@@ -52,4 +52,39 @@ public class KeywordConstant {
     public final static String BDC_ITS_RIGHT_DY = "抵押";
     public final static String BDC_ITS_RIGHT_CF = "查封";
     public final static String BDC_ITS_RIGHT_YY = "异议";
+
+    //节点类型
+    public final static String BDC_NOTICE_JD_SL = "acceptNotice";
+    public final static String BDC_NOTICE_JD_SH = "verifyNotice";
+    public final static String BDC_NOTICE_JD_DB = "resultNotice";
+
+    //handle结果标识
+    public final static String YCSL_HANDLE_RESULT_PASS = "审核通过";
+    public final static String YCSL_HANDLE_RESULT_NO_PASS = "审核不通过";
+    public final static String YCSL_HANDLE_RESULT_SUCCESS = "成功";
+    public final static String YCSL_HANDLE_RESULT_UNSUCCESS = "不成功";
+    public final static String BDC_DB_JG_SUCCESS = "登簿成功";
+
+    //规范化登记类型
+    public final static String BDC_YWLX_NAME_QS = "权属";
+    public final static String BDC_YWLX_NAME_QSZX = "权属注销";
+    public final static String BDC_YWLX_NAME_DY = "抵押";
+    public final static String BDC_YWLX_NAME_DYZX = "抵押注销";
+    public final static String BDC_YWLX_NAME_CF = "查封";
+    public final static String BDC_YWLX_NAME_CFZX = "查封注销";
+    public final static String BDC_YWLX_NAME_YG = "预告";
+    public final static String BDC_YWLX_NAME_YGZX = "预告注销";
+    public final static String BDC_YWLX_NAME_YY = "异议";
+    public final static String BDC_YWLX_NAME_YYZX = "异议注销";
+
+    //处理服务设置
+    public final static String YCSL_SERVICE_CODE_BDCSHCLJG = "ImmovableHandleResultService";
+    public final static String YCSL_SERVICE_CODE_BDCDBCLJG = "ImmovableBookingResultService";
+    public final static String YCSL_SERVICE_CODE_BDCYGJG = "ForecastElectronicCertificationService";
+    public final static String YCSL_SERVICE_CODE_BDCQZJG = "ImmovableElectronicCertificate";
+    public final static String YCSL_SERVICE_CODE_BDCDYJG = "MortgageElectronicCertificate";
+    public final static String YCSL_SERVICE_CODE_BDCYGZXJG = "ForecastElectronicCertCancellation";
+    public final static String YCSL_SERVICE_CODE_BDCQZZXJG = "ImmovableElectronicCertCancellation";
+    public final static String YCSL_SERVICE_CODE_BDCDYZXJG = "MortgageElectronicCertCancellation";
+
 }

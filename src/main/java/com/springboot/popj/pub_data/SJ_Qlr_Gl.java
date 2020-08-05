@@ -19,8 +19,11 @@ public class SJ_Qlr_Gl implements Serializable {
     private String infoTableIdentification;         //关联info表标识
     private String status;                          //状态
 
+    private String sfcz;                            //是否持证
+    private String sczh;                            //所持证号
+
     private SJ_Qlr_Info relatedPerson;                    //相关人信息
-    private SJ_Qlr_Info dlr;                           //代理人信息
+    private SJ_Qlr_Info relatedAgent;                     //代理人信息
 
     public String getRelationId() {
         return relationId;
@@ -110,12 +113,28 @@ public class SJ_Qlr_Gl implements Serializable {
         this.relatedPerson = relatedPerson;
     }
 
-    public SJ_Qlr_Info getDlr() {
-        return dlr;
+    public String getSfcz() {
+        return sfcz;
     }
 
-    public void setDlr(SJ_Qlr_Info dlr) {
-        this.dlr = dlr;
+    public void setSfcz(String sfcz) {
+        this.sfcz = sfcz;
+    }
+
+    public String getSczh() {
+        return sczh;
+    }
+
+    public void setSczh(String sczh) {
+        this.sczh = sczh;
+    }
+
+    public SJ_Qlr_Info getRelatedAgent() {
+        return relatedAgent;
+    }
+
+    public void setRelatedAgent(SJ_Qlr_Info relatedAgent) {
+        this.relatedAgent = relatedAgent;
     }
 
     /**

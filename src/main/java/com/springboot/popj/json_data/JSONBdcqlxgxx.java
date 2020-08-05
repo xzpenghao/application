@@ -10,6 +10,7 @@ import java.util.Date;
 public class JSONBdcqlxgxx implements Serializable {
     private String infoId;                          //主键
     private String receiptNumber;                   //收件编号-sj_sjsq表主键
+    private String registerType;                //登记类型
     private String acceptanceNumber;            //不动产内网受理编号
     private String immovableSite;               //不动产坐落（收件单坐落）
     private String immovableCertificateNo;       //不动产权证号
@@ -27,6 +28,7 @@ public class JSONBdcqlxgxx implements Serializable {
     private BigDecimal atticArea;                       //阁楼面积
     private BigDecimal garageArea;                       //车库面积
     private BigDecimal storeroomArea;                       //储藏室面积
+    private String fsss;                                    //附属设施描述
     private String houseObtainingWays;                   //房屋取得方式
     private BigDecimal houseObtainingPrice;             //房屋取得价格
     private String housePlanningPurpose;                //房屋规划用途
@@ -525,5 +527,21 @@ public class JSONBdcqlxgxx implements Serializable {
 
     public void setBookPics(String bookPics) {
         this.bookPics = bookPics;
+    }
+
+    public String getRegisterType() {
+        return registerType;
+    }
+
+    public void setRegisterType(String registerType) {
+        this.registerType = registerType;
+    }
+
+    public String getFsss() {
+        return fsss;
+    }
+
+    public void setFsss(String fsss) {
+        this.fsss = fsss;
     }
 }

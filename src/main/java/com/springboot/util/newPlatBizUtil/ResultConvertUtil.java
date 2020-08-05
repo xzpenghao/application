@@ -2,16 +2,20 @@ package com.springboot.util.newPlatBizUtil;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphCfxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphDyxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
+import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
+import com.springboot.entity.newPlat.query.bizData.Shxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.*;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Yyxx;
 import com.springboot.entity.newPlat.query.resp.CqzsResponse;
+import com.springboot.entity.newPlat.query.resp.Djshxx;
 import com.springboot.entity.newPlat.query.resp.DjzlResponse;
 import com.springboot.entity.newPlat.query.resp.DyzmResponse;
 import com.springboot.popj.pub_data.*;
@@ -621,6 +625,33 @@ public class ResultConvertUtil {
     */
     public static boolean isIntegerValue(BigDecimal decimalVal) {
         return decimalVal.scale() <= 0 || decimalVal.stripTrailingZeros().scale() <= 0;
+    }
+
+    public static void checkQueryResult(String intfDescribe,OtherResponseEntity cxjg){
+        if(BDC_INTF_HANDLE_RETURN_CODE_UNSUCCESS.equals(cxjg.getCode()))
+            throw new ZtgeoBizException(cxjg.getMsg());
+        if(!BDC_INTF_HANDLE_RETURN_CODE_SUCCESS.equals(cxjg.getCode()))
+            throw new ZtgeoBizException(intfDescribe+"响应CODE不符合规范，取值范围是[0,1],当前响应：【"+cxjg.getCode()+"】");
+    }
+    public static void checkYcResult(ObjectRestResponse yczxjg){
+        if(yczxjg.getStatus()!=200){
+            throw new ZtgeoBizException(yczxjg.getMessage());
+        }
+    }
+
+    public static String initBdcShjgByInterfceGet(String ywh,Djshxx djshxx){
+        if(djshxx==null){
+            throw new ZtgeoBizException(ywh+"号不动产办件返回的审批信息为null");
+        }
+        if(djshxx.getShxxlb()==null || djshxx.getShxxlb().size()<1){
+            throw new ZtgeoBizException(ywh+"号不动产办件未返回有效审批信息，审批详情列表为空");
+        }
+        String remark = ywh+"号不动产业务（"+djshxx.getShxxlb().get(0).getDjxl()+"）办件,各节点审批详情：";
+        for(Shxx shxx:djshxx.getShxxlb()){
+            remark += shxx.getJdsm()+"节点审核意见--"+shxx.getSpyj()+";";
+        }
+        remark = remark.substring(0,remark.lastIndexOf(";"))+"。";
+        return remark;
     }
 
     public static void main(String[] args){

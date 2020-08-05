@@ -46,6 +46,7 @@ public class SJ_Sjsq  implements Serializable {
     private List<RespServiceData> serviceDatas; //封装返回值数据
     private List<SJ_Execute_depart> executeDeparts; //指定执行部门
     private List<SJ_Sjsq_User_Ext> userExtVoList;//设定系统对接扩展用户映射
+    private List<Sj_Sjsq_Bdc_Mapping> bdcMappingVoList;//不动产业务映射表
 
     public String getThirdApplyId() {
         return thirdApplyId;
@@ -317,5 +318,13 @@ public class SJ_Sjsq  implements Serializable {
 
     public void setUserExtVoList(List<SJ_Sjsq_User_Ext> userExtVoList) {
         this.userExtVoList = userExtVoList;
+    }
+
+    public List<Sj_Sjsq_Bdc_Mapping> getBdcMappingVoList() {
+        return bdcMappingVoList;
+    }
+
+    public void setBdcMappingVoList(List<Sj_Sjsq_Bdc_Mapping> bdcMappingVoList) {
+        this.bdcMappingVoList = bdcMappingVoList;
     }
 }
