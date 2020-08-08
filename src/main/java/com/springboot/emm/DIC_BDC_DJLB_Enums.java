@@ -2,20 +2,17 @@ package com.springboot.emm;
 
 /**
  * @author chenb
- * @version 2020/7/29/029
- * description：人员共有方式
+ * @version 2020/8/7
+ * description：转内网登记类别
  */
-public enum DIC_RY_GYFS_Enums {
-    DDSY("单独所有","0"),
-    GTGY("共同共有","1"),
-    AFGY("按份共有","2"),
-    QTGY("其它共有","3"),
-    WZD("未指定","4");
+public enum DIC_BDC_DJLB_Enums {
+    DBYW("单笔业务","0"),
+    ZHYW("组合业务","1");
 
     private String dicName;
     private String dicVal;
 
-    DIC_RY_GYFS_Enums(String dicName, String dicVal){
+    DIC_BDC_DJLB_Enums(String dicName,String dicVal){
         this.dicName = dicName;
         this.dicVal = dicVal;
     }

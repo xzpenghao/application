@@ -19,6 +19,6 @@ public class Yyxx {
     private String djsj; //  登记时间 yyyy-MM-dd HH:mm:ss
     private String qsztmc;// 权属状态 1 现势 放名称
     private String fj; // 附记
-    private String yysqr; // 异议申请人
+    private String yysqrmc; // 异议申请人
     private String yysqrzjh; // 申请人证件号码
 }

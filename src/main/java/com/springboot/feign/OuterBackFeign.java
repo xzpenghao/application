@@ -5,6 +5,7 @@ import com.springboot.entity.SJ_Fjinst;
 import com.springboot.entity.chenbin.personnel.resp.SDQReturnUnitEntity;
 import com.springboot.popj.pub_data.SJ_Exception_Record;
 import com.springboot.popj.pub_data.SJ_Sdqg_Send_Result;
+import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.popj.pub_data.Sj_Sjsq_Bdc_Mapping;
 import com.springboot.popj.register.JwtAuthenticationRequest;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -64,11 +65,18 @@ public interface OuterBackFeign {
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter16",method = RequestMethod.GET)
     ObjectRestResponse<Boolean> DealRecieveFromOuter16(@RequestHeader(name = "Authorization") String token,@RequestParam("taskId")String taskId);
 
-    @RequestMapping(value = "/DealRecieveFromOuter17",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8")
-    public ObjectRestResponse<Sj_Sjsq_Bdc_Mapping> DealRecieveFromOuter17(@RequestHeader(name = "Authorization") String token,Sj_Sjsq_Bdc_Mapping bdcMapping);
+    @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter17",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8")
+    ObjectRestResponse<Sj_Sjsq_Bdc_Mapping> DealRecieveFromOuter17(@RequestHeader(name = "Authorization") String token,Sj_Sjsq_Bdc_Mapping bdcMapping);
 
     @RequestMapping(value = "api/sdqg/registerPushBack",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8")
     ObjectRestResponse<SDQReturnUnitEntity> sendWaterCompany(@RequestHeader(name = "Authorization") String token,Map<String,Object> zlscs);
+
+    //获取服务数据
+    @RequestMapping(value = "api/biz/RecDataBusi/getReceiptData",method = RequestMethod.GET)
+    ObjectRestResponse<SJ_Sjsq> getReceiptData(@RequestParam("sqbh") String sqbh,
+                                                      @RequestParam(name = "taskId",required = false) String taskId,
+                                                      @RequestParam(name = "serviceCode",required = false)String serviceCode,
+                                                      @RequestParam(name = "serviceDataTo",required = false)String serviceDataTo);
 
     @RequestMapping(value = "api/test/test",method = RequestMethod.POST)
     ObjectRestResponse<Object> test(@RequestParam("paramsss") String paramsss);

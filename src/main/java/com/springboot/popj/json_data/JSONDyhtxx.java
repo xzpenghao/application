@@ -34,6 +34,8 @@ public class JSONDyhtxx implements Serializable {
     private String ext2;                                    //扩展字段2
     private String ext3;                                    //扩展字段3
 
+    private String contractSignTime;                   //合同签订时间
+
     private String glImmovableVoList;          //关联的不动产数据
     private String glMortgagorVoList;            //关联的抵押人数据
     private String glMortgageHolderVoList;            //关联的抵押权人数据
@@ -299,5 +301,13 @@ public class JSONDyhtxx implements Serializable {
 
     public void setGlMortgageeAgentInfoVoList(String glMortgageeAgentInfoVoList) {
         this.glMortgageeAgentInfoVoList = glMortgageeAgentInfoVoList;
+    }
+
+    public String getContractSignTime() {
+        return contractSignTime;
+    }
+
+    public void setContractSignTime(String contractSignTime) {
+        this.contractSignTime = contractSignTime;
     }
 }

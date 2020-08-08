@@ -8,6 +8,7 @@ public class JSONGLBdc implements Serializable {
     private String immovableId;                  //关联不动产id
     private String immovableType;                //不动产类型，用于描述不动产是净地还是房地
     private String infoTableIdentification;      //info关联表标识（标识提供数据的表）
+    private String sslb;                         //设施类别（Z/Z1/F）
     private String status;                       //状态（是否废弃或挂起当前收件业务）
     private String fwInfo;               //房地权属信息(JSON)
     private String zdInfo;               //净地权属信息(JSON)
@@ -74,5 +75,13 @@ public class JSONGLBdc implements Serializable {
 
     public void setZdInfo(String zdInfo) {
         this.zdInfo = zdInfo;
+    }
+
+    public String getSslb() {
+        return sslb;
+    }
+
+    public void setSslb(String sslb) {
+        this.sslb = sslb;
     }
 }

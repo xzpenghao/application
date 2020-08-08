@@ -1,5 +1,8 @@
 package com.springboot.util.newPlatBizUtil;
 
+import com.springboot.config.ZtgeoBizException;
+import com.springboot.util.chenbin.ErrorDealUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -9,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
  * @version 2020/7/28/028
  * description：新平台字典操作工具类
  */
+@Slf4j
 public class DicConvertUtil {
 
     /**
@@ -39,8 +43,19 @@ public class DicConvertUtil {
      * 返回：字典值取字典名称
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public static String getDicNameByVal(String val,Object... ts) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return getTarget(val,"getDicVal","getDicName",ts);
+    public static String getDicNameByVal(String val,Object... ts){
+        try {
+            return getTarget(val,"getDicVal","getDicName",ts);
+        } catch (NoSuchMethodException e) {
+            log.error("枚举转换时未找到对应方法，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换时未找到对应方法");
+        } catch (InvocationTargetException e) {
+            log.error("枚举转换时未找到目标枚举标识，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换时未找到目标枚举标识");
+        } catch (IllegalAccessException e) {
+            log.error("枚举转换不合法的使用方式，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换不合法的使用方式");
+        }
     }
 
     /**
@@ -51,8 +66,19 @@ public class DicConvertUtil {
      * 返回：字典名称取字典值
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public static String getDicValByName(String name,Object... ts) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return getTarget(name,"getDicName","getDicVal",ts);
+    public static String getDicValByName(String name,Object... ts){
+        try{
+            return getTarget(name,"getDicName","getDicVal",ts);
+        } catch (NoSuchMethodException e) {
+            log.error("枚举转换时未找到对应方法，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换时未找到对应方法");
+        } catch (InvocationTargetException e) {
+            log.error("枚举转换时未找到目标枚举标识，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换时未找到目标枚举标识");
+        } catch (IllegalAccessException e) {
+            log.error("枚举转换不合法的使用方式，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换不合法的使用方式");
+        }
     }
 
     /**
@@ -63,8 +89,19 @@ public class DicConvertUtil {
      * 返回：关键字标识取关键字名称
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public static String getKeyWordByCode(String code,Object... ts) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return getTarget(code,"getKeyCode","getKeyWord",ts);
+    public static String getKeyWordByCode(String code,Object... ts){
+        try {
+            return getTarget(code, "getKeyCode", "getKeyWord", ts);
+        } catch (NoSuchMethodException e) {
+            log.error("枚举转换时未找到对应方法，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换时未找到对应方法");
+        } catch (InvocationTargetException e) {
+            log.error("枚举转换时未找到目标枚举标识，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换时未找到目标枚举标识");
+        } catch (IllegalAccessException e) {
+            log.error("枚举转换不合法的使用方式，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换不合法的使用方式");
+        }
     }
 
     /**
@@ -75,7 +112,18 @@ public class DicConvertUtil {
      * 返回：关键字名称取键字标识
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public static String getKeyCodeByWord(String word,Object... ts) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return getTarget(word,"getKeyWord","getKeyCode",ts);
+    public static String getKeyCodeByWord(String word,Object... ts){
+        try {
+            return getTarget(word, "getKeyWord", "getKeyCode", ts);
+        } catch (NoSuchMethodException e) {
+            log.error("枚举转换时未找到对应方法，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换时未找到对应方法");
+        } catch (InvocationTargetException e) {
+            log.error("枚举转换时未找到目标枚举标识，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换时未找到目标枚举标识");
+        } catch (IllegalAccessException e) {
+            log.error("枚举转换不合法的使用方式，异常详情："+ ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("枚举转换不合法的使用方式");
+        }
     }
 }

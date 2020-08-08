@@ -11,6 +11,7 @@ public class SJ_Sjsq_User_Ext implements Serializable {
     private String userName;                        //用户名
     private String dataInitMethod;                  //数据产生方式
     private String bizCode;                         //业务标识
+    private String bizName;                         //不动产标准业务名称
 
     public String getId() {
         return id;
@@ -66,5 +67,13 @@ public class SJ_Sjsq_User_Ext implements Serializable {
 
     public void setBizCode(String bizCode) {
         this.bizCode = bizCode;
+    }
+
+    public String getBizName() {
+        return bizName;
+    }
+
+    public void setBizName(String bizName) {
+        this.bizName = bizName;
     }
 }

@@ -23,6 +23,7 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
     private String ext1;                                    //扩展字段1
     private String ext2;                                    //扩展字段2
     private String ext3;                                    //扩展字段3
+    private String contractSignTime;                   //合同签订时间
 
     private List<SJ_Bdc_Gl> glImmovableVoList;          //关联的不动产数据
     private List<SJ_Qlr_Gl> glMortgagorVoList;            //关联的抵押人数据
@@ -230,5 +231,13 @@ public class Sj_Info_Dyhtxx extends SJ_Information {
 
     public void setRegistrationReason(String registrationReason) {
         this.registrationReason = registrationReason;
+    }
+
+    public String getContractSignTime() {
+        return contractSignTime;
+    }
+
+    public void setContractSignTime(String contractSignTime) {
+        this.contractSignTime = contractSignTime;
     }
 }

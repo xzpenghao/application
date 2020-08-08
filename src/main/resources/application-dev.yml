@@ -330,3 +330,33 @@ Feign:
         dzzzcx: service-core/extQuery/dzzzcx   #电子证照查询
         shsjcx: service-core/extQuery/shsjcx   #审核数据查询
         dbsjcx: service-core/extQuery/dbsjcx   #登簿数据查询
+      interact:
+        wsjgjc: service-core/extQuery/wsjgjc   #网申结果检查
+        wsbjcj: service-core/extQuery/wsbjcj   #网申办件创建
+newplat:
+  turnInners:                              #转内网保险机制，配置默认执行配置（当转内网时下述项未传入时使用）
+  - key: esfzy                                #二手房转移
+    sid: 1
+    sname: 不动产转移登记
+    jsrid: zhangshoudong
+    jsrmc: 张守东
+  - key: esfzydy                              #二手房转移及抵押
+    sid: 1,2
+    sname: 不动产转移登记,不动产抵押登记
+    jsrid: zhangshoudong
+    jsrmc: 张守东
+  - key: bdcdy                              #不动产抵押
+    sid: 2
+    sname: 不动产抵押登记
+    jsrid: testbank
+    jsrmc: 测试银行
+  - key: ygyd                               #预告预抵
+    sid: 3,4
+    sname: 预告登记,预告抵押登记
+    jsrid: testbank
+    jsrmc: 测试银行
+  - key: dyzx                                #抵押注销登记
+    sid: 5
+    sname: 抵押注销登记
+    jsrid: testbank
+    jsrmc: 测试银行

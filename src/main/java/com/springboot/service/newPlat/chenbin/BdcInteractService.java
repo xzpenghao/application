@@ -1,30 +1,52 @@
 package com.springboot.service.newPlat.chenbin;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.chenbin.OtherComponent;
 import com.springboot.component.newPlat.BdcInteractComponent;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
+import com.springboot.entity.newPlat.settingTerm.NewPlatSettings;
 import com.springboot.entity.newPlat.transInner.req.BdcNoticeReq;
+import com.springboot.entity.newPlat.transInner.req.NewBdcFlowCheckReq;
+import com.springboot.entity.newPlat.transInner.req.fromZY.NewBdcFlowRequest;
+import com.springboot.entity.newPlat.transInner.req.fromZY.domain.Dyxx;
+import com.springboot.entity.newPlat.transInner.req.fromZY.domain.Fjxx;
+import com.springboot.entity.newPlat.transInner.req.fromZY.domain.NewBdcFlowRespData;
+import com.springboot.entity.newPlat.transInner.req.fromZY.domain.Sqrxx;
 import com.springboot.feign.OuterBackFeign;
-import com.springboot.popj.pub_data.SJ_Exception_Record;
+import com.springboot.feign.newPlat.BdcInteractFeign;
+import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.JwtAuthenticationRequest;
+import com.springboot.util.SysPubDataDealUtil;
+import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
+import com.springboot.util.newPlatBizUtil.ParamConvertUtil;
+import com.springboot.util.newPlatBizUtil.ResultConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
+import static com.springboot.constant.AdminCommonConstant.BOOLEAN_NUMBER_TRUE;
+import static com.springboot.constant.chenbin.BusinessConstant.*;
 import static com.springboot.constant.chenbin.KeywordConstant.EXC_DIRECTION_OUTER;
 
 /**
@@ -45,7 +67,16 @@ public class BdcInteractService {
     private OuterBackFeign backFeign;
 
     @Autowired
+    private BdcInteractFeign bdcInteractFeign;
+
+    @Autowired
+    private OtherComponent otherComponent;
+
+    @Autowired
     private BdcInteractComponent bdcInteractComponent;
+
+    @Autowired
+    private NewPlatSettings newPlatSettings;
 
     /**
      * 描述：通知的异步处理模块
@@ -107,6 +138,302 @@ public class BdcInteractService {
             } finally {
                 executor.shutdown();
             }
+        }
+    }
+
+    public String commonCreatNewPlatProc(String commonInterfaceAttributer,String checkAlready,String flowKey)throws ParseException {
+        //声明返回结果
+        String back = "不动产同步创建成功";
+        //获取一窗受理操作token
+        String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
+        //处理数据
+        SJ_Sjsq sjsq = SysPubDataDealUtil.parseReceiptData(
+                commonInterfaceAttributer, null, null, null);
+        //创建签收Map
+        Map<String,String> params = new HashMap<>();
+        //执行创建
+        try {
+            //debug留痕
+            log.debug("【"+sjsq.getReceiptNumber()+"】("+flowKey+")转JSON前：" + commonInterfaceAttributer);
+            log.debug("【"+sjsq.getReceiptNumber()+"】("+flowKey+")转JSON后：" + JSONObject.toJSONString(sjsq));
+            //预检查是否已经创建成功
+            if(BOOLEAN_NUMBER_TRUE.equals(checkAlready)) {
+                if(preCheckWsjSucc(sjsq,params))
+                    return back;
+            }
+            NewBdcFlowRequest newBdcFlowRequest = null;
+            switch (flowKey) {
+                case "二手房转移登记":
+                    newBdcFlowRequest = prepareNewBdcFlowRequestForESFZY(sjsq);
+                    break;
+                case "二手房转移及抵押登记":
+                    newBdcFlowRequest = prepareNewBdcFlowRequestForESFZYJDY(sjsq);
+                    break;
+            }
+            creatNewplatFlow(newBdcFlowRequest,sjsq.getBdcMappingVoList(),params);
+            return back;
+        } catch (ZtgeoBizException e){
+            throw e;
+        } catch (Exception e){
+            log.error("二手房转内网办件出现异常，异常详情信息："+ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("二手房转内网办件出现异常,联系管理员");
+        }finally {
+            //签收办件
+            otherComponent.signPro(token,bsryname,bsrypassword,sjsq.getReceiptNumber(),params);
+        }
+    }
+
+    /**
+     * 描述：二手房转移登记转内网逻辑
+     * 作者：chenb
+     * 日期：2020/8/6
+     * 参数：[commonInterfaceAttributer, checkAlready]
+     * 返回：String
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public NewBdcFlowRequest prepareNewBdcFlowRequestForESFZY(SJ_Sjsq sjsq) throws ParseException {
+        //基本数据生成
+        NewBdcFlowRequest newBdcFlowRequest = ParamConvertUtil.getBaseFromSjsq(
+                sjsq,                               //收件申请
+                newPlatSettings,                    //新平台配置
+                NEWPLAT_TURNINNERS_ESFZY,           //新平台业务类型
+                BDC_DJLB_DBYW,                      //登记类别
+                LZDZ_LDKQ                           //领证地址
+        );
+        //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
+        ParamConvertUtil.fillMainHouseToReq(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
+        //补全申请人信息
+        newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
+        //补全附件列表信息
+        newBdcFlowRequest.setFjxx(transFjxxWithin2Sys());
+
+        return newBdcFlowRequest;
+    }
+
+    /**
+     * 描述：二手房转移及抵押登记转内网逻辑
+     * 作者：chenb
+     * 日期：2020/8/6
+     * 参数：[commonInterfaceAttributer, checkAlready]
+     * 返回：String
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public NewBdcFlowRequest prepareNewBdcFlowRequestForESFZYJDY(SJ_Sjsq sjsq) throws ParseException {
+        //基本数据生成
+        NewBdcFlowRequest newBdcFlowRequest = ParamConvertUtil.getBaseFromSjsq(
+                sjsq,                               //收件申请
+                newPlatSettings,                    //新平台配置
+                NEWPLAT_TURNINNERS_ESFZYDY,           //新平台业务类型
+                BDC_DJLB_ZHYW,                      //登记类别
+                LZDZ_LDKQ                           //领证地址
+        );
+        //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
+        ParamConvertUtil.fillMainHouseToReq(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
+        //补全申请人信息
+        newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
+        //补全附件列表信息
+        newBdcFlowRequest.setFjxx(transFjxxWithin2Sys());
+        //补全抵押信息
+        newBdcFlowRequest.setDyxx(initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo()));
+        return newBdcFlowRequest;
+    }
+
+    /**
+     * 描述：转内网的执行代码
+     * 作者：chenb
+     * 日期：2020/8/8
+     * 参数：[newBdcFlowRequest, bdcMappingVoList, params]
+     * 返回：void
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public void creatNewplatFlow(NewBdcFlowRequest newBdcFlowRequest,List<Sj_Sjsq_Bdc_Mapping> bdcMappingVoList,Map<String,String> params){
+        if(newBdcFlowRequest==null){
+            throw new ZtgeoBizException("转内网主体对象生成失败");
+        }
+        OtherResponseEntity<List<NewBdcFlowRespData>> creResp = bdcInteractFeign.wsbjcj(newBdcFlowRequest);
+        creResp.checkSelfIfBdc("不动产流程转内网创建接口");
+        dealBdcCreatResult(creResp.getData(),bdcMappingVoList,params);
+        if ("success".equals(params.get("isSuccess"))) {
+            params.remove("isSuccess","success");
+        } else {
+            params.remove("isSuccess");
+            throw new ZtgeoBizException(creResp.getMsg());
+        }
+    }
+
+    /**
+     * 描述：将出卖和购买人转换为申请人
+     * 作者：chenb
+     * 日期：2020/8/8
+     * 参数：[jyhtxx]
+     * 返回：List<Sqrxx>
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public List<Sqrxx> transSellersAndBuyersToSqr(Sj_Info_Jyhtxx jyhtxx){
+        if(jyhtxx==null)
+            throw new ZtgeoBizException("交易合同信息缺失，涉及房屋买卖的登记时，这是不允许的！");
+        List<SJ_Qlr_Gl> glQlrs = jyhtxx.getGlHouseBuyerVoList();
+        List<SJ_Qlr_Gl> glSellers = jyhtxx.getGlHouseSellerVoList();
+
+        List<SJ_Qlr_Gl> glQlrDlrs = jyhtxx.getGlAgentVoList();
+        List<SJ_Qlr_Gl> glYwrDlrs = jyhtxx.getGlAgentSellerVoList();
+
+        //预处理代理人(针对权利人中未给出代理人信息，但代理人集合有值)
+        preCheckQlrAndDlr(glQlrs,glQlrDlrs);
+        preCheckQlrAndDlr(glSellers,glYwrDlrs);
+        //合并集合
+        glQlrs.addAll(glSellers);
+        //处理申请人
+        return ParamConvertUtil.getSqrsByQlrs(glQlrs,BDC_NEW_PLAT_YW_KEY_QL);
+    }
+
+    /**
+     * 描述：将抵押与抵押权人转换为申请人
+     * 作者：chenb
+     * 日期：2020/8/8
+     * 参数：[jyhtxx]
+     * 返回：List<Sqrxx>
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public List<Sqrxx> mortDyrsAndDyqrsToSqr(Sj_Info_Dyhtxx dyhtxx){
+        //获取抵押/抵押权人
+        List<SJ_Qlr_Gl> glQlrs = dyhtxx.getGlMortgagorVoList();
+        List<SJ_Qlr_Gl> gldyqrs = dyhtxx.getGlMortgageHolderVoList();
+
+        List<SJ_Qlr_Gl> glQlrDlrs = dyhtxx.getGlMortgagorAgentInfoVoList();
+        List<SJ_Qlr_Gl> glDyqrDlrs = dyhtxx.getGlMortgageeAgentInfoVoList();
+
+        //预处理代理人(针对权利人中未给出代理人信息，但代理人集合有值)
+        preCheckQlrAndDlr(glQlrs,glQlrDlrs);
+        preCheckQlrAndDlr(gldyqrs,glDyqrDlrs);
+
+        //合并集合
+        glQlrs.addAll(gldyqrs);
+        //处理申请人
+        return ParamConvertUtil.getSqrsByQlrs(glQlrs,BDC_NEW_PLAT_YW_KEY_DY);
+    }
+
+    public void preCheckQlrAndDlr(List<SJ_Qlr_Gl> glQlrs,List<SJ_Qlr_Gl> glDlrs){
+        if(glDlrs!=null && glDlrs.size()>0) { //条件1.代理人集合不为空
+            if (!glQlrs.stream().anyMatch(glQlr -> glQlr.getRelatedAgent() != null)) { //条件2. 权利中未发现存在代理人信息
+                if(glDlrs.size()==1){   //代理人集合长度为1
+                    glQlrs.stream().forEach(glQlr -> glQlr.setRelatedAgent(
+                            JSONObject.parseObject(JSONObject.toJSONString(glDlrs.get(0).getRelatedPerson()),SJ_Qlr_Info.class)));
+                }else{    //代理人集合长度大于1
+                    if(glQlrs.size()==glDlrs.size()){   //权利人和代理人集合长度一致
+                        for (int i=0;i<glQlrs.size();i++){
+                            glQlrs.get(i).setRelatedAgent(glDlrs.get(i).getRelatedPerson());
+                        }
+                    }else{
+                        //合并 代理人信息
+                        SJ_Qlr_Info hbdlrxx = ParamConvertUtil.getOneQlrByList(glDlrs);
+                        String hbdlrxxJSON = JSONObject.toJSONString(hbdlrxx);
+                        for(SJ_Qlr_Gl glQlr:glQlrs){
+                            glQlr.setRelatedAgent(JSONObject.parseObject(hbdlrxxJSON,SJ_Qlr_Info.class));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public List<Fjxx> transFjxxWithin2Sys(){
+
+        return null;
+    }
+
+    public List<Dyxx> initDyxx(String yywh,Sj_Info_Dyhtxx dyhtxx) throws ParseException {
+        List<Dyxx> dyxxes = null;
+        if(dyhtxx!=null){
+            dyxxes = new ArrayList<>();
+            Dyxx dyxx = new Dyxx();
+            dyxx.setBdbzzqse(
+                    ResultConvertUtil.getBigDecimalNotThrowNull(
+                        "转内网-被担保主债权数额",
+                        ResultConvertUtil.getStringFromBigDecimalNotThrowNull(
+                            dyhtxx.getCreditAmount().divide(new BigDecimal("10000")),
+                            "#.00"
+                        )
+                    )
+            );
+            dyxx.setDbfw("详见合同");
+            dyxx.setDyfs(dyhtxx.getMortgageMode());
+            dyxx.setDyyy(dyhtxx.getMortgageReason());
+            dyxx.setZwlxqssj(TimeUtil.getTimeString(TimeUtil.getTimeFromString(dyhtxx.getMortgageStartingDate())));
+            dyxx.setZwlxjssj(TimeUtil.getTimeString(TimeUtil.getTimeFromString(dyhtxx.getMortgageEndingDate())));
+            dyxx.setDyhtqdrq(TimeUtil.getTimeString(TimeUtil.getTimeFromString(dyhtxx.getContractSignTime())));
+            dyxx.setBdcjz(null);
+            dyxx.setDysx(null);
+            dyxx.setYywh(yywh);
+            SJ_Qlr_Info zwr = ParamConvertUtil.getOneQlrByList(dyhtxx.getGlObligorInfoVoList());
+            if(zwr!=null && StringUtils.isNotBlank(zwr.getObligeeName())) {
+                dyxx.setZwr(zwr.getObligeeName());
+                dyxx.setZwrzjlx(zwr.getObligeeDocumentType());
+                dyxx.setZwrzjhm(zwr.getObligeeDocumentNumber());
+            }
+            dyxx.setSqrxx(mortDyrsAndDyqrsToSqr(dyhtxx));
+            dyxx.setFjxx(transFjxxWithin2Sys());
+        }
+        return dyxxes;
+    }
+    /**
+     * 描述：外网申请编号不动产创建成功预检查功能
+     * 作者：chenb
+     * 日期：2020/8/7
+     * 参数：String sqbh
+     * 返回：Map
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public boolean preCheckWsjSucc(SJ_Sjsq sjsq,Map<String,String> params){
+        dealCheckWsjSucc(sjsq.getReceiptNumber(),sjsq.getBdcMappingVoList(),params);
+        if ("success".equals(params.get("isSuccess"))) {
+            params.remove("isSuccess","success");
+            return true;
+        } else {
+            params.remove("isSuccess");
+        }
+        return false;
+    }
+
+    /**
+     * 描述：执行外网申请编号不动产创建成功检查接口
+     * 作者：chenb
+     * 日期：2020/8/7
+     * 参数：String sqbh
+     * 返回：Map
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public void dealCheckWsjSucc(String sqbh, List<Sj_Sjsq_Bdc_Mapping> bdcMappingVoList, Map<String,String> params){
+        params.put("receiptNumber", sqbh);
+        NewBdcFlowCheckReq wwywh = new NewBdcFlowCheckReq(sqbh);
+        OtherResponseEntity<List<NewBdcFlowRespData>> checkResult = bdcInteractFeign.wsjgjc(wwywh);
+        checkResult.checkSelfIfBdc("不动产业务创建检查接口");
+        dealBdcCreatResult(checkResult.getData(),bdcMappingVoList,params);
+    }
+
+    /**
+     * 描述：处理不动产业务转内网创建返回结果
+     * 作者：chenb
+     * 日期：2020/8/7
+     * 参数：List<NewBdcFlowRespData> bdcCreatResult,Map<String,String> params
+     * 返回：void
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public void dealBdcCreatResult(List<NewBdcFlowRespData> bdcCreatResult, List<Sj_Sjsq_Bdc_Mapping> bdcMappingVoList, Map<String,String> params){
+        if(bdcCreatResult==null||bdcCreatResult.size()<1){
+            params.put("isSuccess","unsuccess");
+        }else{
+            params.put("isSuccess","success");
+            for(Sj_Sjsq_Bdc_Mapping bdcMapping : bdcMappingVoList){
+                for(NewBdcFlowRespData bdcCreatRes:bdcCreatResult){
+                    if(bdcMapping.equals(bdcCreatRes.getSid())){
+                        bdcMapping.setBdcywh(bdcCreatRes.getYwh());
+                        bdcMapping.setBdcywlx(bdcCreatRes.getYwlx());
+                        break;
+                    }
+                }
+            }
+            params.put("bdcMappingVoList", JSONArray.toJSONString(bdcMappingVoList));
         }
     }
 }

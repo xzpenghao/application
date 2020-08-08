@@ -1,5 +1,8 @@
 package com.springboot.popj.pub_data;
 
+import com.springboot.emm.DIC_RY_ZJZL_Enums;
+import com.springboot.util.newPlatBizUtil.DicConvertUtil;
+
 import java.io.Serializable;
 
 public class SJ_Qlr_Info implements Serializable {
@@ -92,5 +95,9 @@ public class SJ_Qlr_Info implements Serializable {
 
     public void setDz(String dz) {
         this.dz = dz;
+    }
+
+    public String gainTransObligeeDocumentType(){
+        return DicConvertUtil.getDicValByName(this.obligeeDocumentType, DIC_RY_ZJZL_Enums.values());
     }
 }

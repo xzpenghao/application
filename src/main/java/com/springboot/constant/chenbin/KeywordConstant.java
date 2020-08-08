@@ -87,4 +87,6 @@ public class KeywordConstant {
     public final static String YCSL_SERVICE_CODE_BDCQZZXJG = "ImmovableElectronicCertCancellation";
     public final static String YCSL_SERVICE_CODE_BDCDYZXJG = "MortgageElectronicCertCancellation";
 
+    public final static String YCSL_SERVICE_CODE_BDCDYSJ = "MortgageCertificateService";
+    public final static String YCSL_SERVICE_CODE_BDCQLSJ = "OwnershipCertificateServiceWithItsRight";
 }

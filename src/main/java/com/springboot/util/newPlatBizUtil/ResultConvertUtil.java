@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.emm.DIC_RY_ZJZL_Enums;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphCfxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphDyxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
+import com.springboot.entity.newPlat.query.bizData.Dbjgxx;
 import com.springboot.entity.newPlat.query.bizData.Shxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.*;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
@@ -18,11 +20,13 @@ import com.springboot.entity.newPlat.query.resp.CqzsResponse;
 import com.springboot.entity.newPlat.query.resp.Djshxx;
 import com.springboot.entity.newPlat.query.resp.DjzlResponse;
 import com.springboot.entity.newPlat.query.resp.DyzmResponse;
+import com.springboot.entity.newPlat.transInner.req.fromZY.domain.NewBdcFlowRespData;
 import com.springboot.popj.pub_data.*;
 import com.springboot.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -261,6 +265,9 @@ public class ResultConvertUtil {
     public static void initBdcdcxxByCqzs(SJ_Info_Bdcqlxgxx bdcqlxx,CqzsResponse cqzs){
         List<Fwdcxx> fwdcxxlb = cqzs.getFwdcxxlb();
         List<Zddcxx> zddcxxlb = cqzs.getZddcxxlb();
+        if(fwdcxxlb!=null && fwdcxxlb.size()>0){
+            zddcxxlb = null;
+        }
         bdcqlxx.setGlImmovableVoList(getBdcdcxxByDcxx(fwdcxxlb,zddcxxlb));
     }
 
@@ -275,6 +282,9 @@ public class ResultConvertUtil {
     public static void initBdcdcxxByDyzm(Sj_Info_Bdcdyxgxx bdcdyxx,DyzmResponse dyzm){
         List<Fwdcxx> fwdcxxlb = dyzm.getGlfwdcxxlb();
         List<Zddcxx> zddcxxlb = dyzm.getZddcxxlb();
+        if(fwdcxxlb!=null && fwdcxxlb.size()>0){
+            zddcxxlb = null;
+        }
         bdcdyxx.setGlImmovableVoList(getBdcdcxxByDcxx(fwdcxxlb,zddcxxlb));
     }
 
@@ -388,7 +398,7 @@ public class ResultConvertUtil {
     public static SJ_Qlr_Info getQlrxxByCyr(Cyr cyr){
         SJ_Qlr_Info qlrInfo = new SJ_Qlr_Info();
         qlrInfo.setObligeeName(cyr.getQlrmc());
-        qlrInfo.setObligeeDocumentType(cyr.getQlrzjzl());
+        qlrInfo.setObligeeDocumentType(DicConvertUtil.getDicNameByVal(cyr.getQlrzjzl(), DIC_RY_ZJZL_Enums.values()));
         qlrInfo.setObligeeDocumentNumber(cyr.getQlrzjhm());
         qlrInfo.setDh(cyr.getDh());
         qlrInfo.setDz(cyr.getDz());
@@ -627,18 +637,47 @@ public class ResultConvertUtil {
         return decimalVal.scale() <= 0 || decimalVal.stripTrailingZeros().scale() <= 0;
     }
 
-    public static void checkQueryResult(String intfDescribe,OtherResponseEntity cxjg){
-        if(BDC_INTF_HANDLE_RETURN_CODE_UNSUCCESS.equals(cxjg.getCode()))
-            throw new ZtgeoBizException(cxjg.getMsg());
-        if(!BDC_INTF_HANDLE_RETURN_CODE_SUCCESS.equals(cxjg.getCode()))
-            throw new ZtgeoBizException(intfDescribe+"响应CODE不符合规范，取值范围是[0,1],当前响应：【"+cxjg.getCode()+"】");
-    }
     public static void checkYcResult(ObjectRestResponse yczxjg){
         if(yczxjg.getStatus()!=200){
             throw new ZtgeoBizException(yczxjg.getMessage());
         }
     }
 
+    /**
+     * 描述：登簿结果的非空检查
+     * 作者：chenb
+     * 日期：2020/8/6
+     * 参数：[dbjglb]
+     * 返回：void
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public static void checkDbjgNonNull(String ywh,List<Dbjgxx> dbjglb){
+        if(dbjglb==null || dbjglb.size()<1)
+            throw new ZtgeoBizException("非注销类不动产业务登簿结果为空，但此时不应为空，产生异常的业务号：【"+ywh+"】");
+        if(dbjglb.stream().anyMatch(dbjg -> StringUtils.isBlank(dbjg.getBdczh())))
+            throw new ZtgeoBizException("非注销类不动产业务登簿结果返回“不动产证号”为空，但此时不应为空，产生异常的业务号：【"+ywh+"】");
+    }
+
+    /**
+     * 描述：注销类登登簿结果检查
+     * 作者：chenb
+     * 日期：2020/8/6
+     * 参数：[dbjglb]
+     * 返回：void
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public static void checkZxldbjg(List<Dbjgxx> dbjglb){
+
+    }
+
+    /**
+     * 描述：通过接口取得数据结果初始化不动产审核结果信息（产生remark字符串）
+     * 作者：chenb
+     * 日期：2020/8/6
+     * 参数：[ywh, djshxx]
+     * 返回：String
+     * 更新记录：更新人：{}，更新日期：{}
+     */
     public static String initBdcShjgByInterfceGet(String ywh,Djshxx djshxx){
         if(djshxx==null){
             throw new ZtgeoBizException(ywh+"号不动产办件返回的审批信息为null");

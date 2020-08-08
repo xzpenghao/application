@@ -7,6 +7,8 @@ import com.springboot.component.chenbin.file.FromFTPDownloadComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.newPlat.settingTerm.NewPlatSettings;
+import com.springboot.entity.newPlat.settingTerm.TurnInnerSettingsTerm;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.service.chenbin.other.ExchangeInterfaceService;
@@ -37,6 +39,8 @@ public class TestRest {
     private HttpCallComponent httpCallComponent;
     @Autowired
     private OuterBackFeign outerBackFeign;
+    @Autowired
+    private NewPlatSettings newPlatSettings;
 
     @RequestMapping(value = "/getFileList", method = RequestMethod.POST)
     public ObjectRestResponse<List<ImmovableFile>> getFileList(@RequestParam("receiptNumber") String receiptNumber, @RequestParam("token") String token) {
@@ -86,5 +90,10 @@ public class TestRest {
             log.info(e.getCause().getMessage());
         }
         return null;
+    }
+
+    @RequestMapping(value = "testSetting",method = RequestMethod.GET)
+    public ObjectRestResponse<TurnInnerSettingsTerm> testSetting(){
+        return new ObjectRestResponse<TurnInnerSettingsTerm>().data(newPlatSettings.gainTermByKey("esfzy"));
     }
 }

@@ -2,18 +2,17 @@ package com.springboot.emm;
 
 /**
  * @author chenb
- * @version 2020/7/28/028
- * description：通知类型关键字
+ * @version 2020/8/7
+ * description：不动产类型
  */
-public enum KEY_NOTICE_CODE {
-    SLJD("受理通知","acceptNotice"),
-    SHJD("审核通知","verifyNotice"),
-    DBJD("登簿通知","resultNotice");
+public enum KEY_BDC_TYPE_Enums {
+    FD("房地","FW"),
+    ZD("宗地","ZD");
 
     private String keyWord;
     private String keyCode;
 
-    KEY_NOTICE_CODE(String keyWord, String keyCode){
+    KEY_BDC_TYPE_Enums(String keyWord, String keyCode){
         this.keyWord = keyWord;
         this.keyCode = keyCode;
     }

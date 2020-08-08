@@ -19,7 +19,7 @@ public class SJ_Qlr_Gl implements Serializable {
     private String infoTableIdentification;         //关联info表标识
     private String status;                          //状态
 
-    private String sfcz;                            //是否持证
+    private String sfcz;                            //是否持证()
     private String sczh;                            //所持证号
 
     private SJ_Qlr_Info relatedPerson;                    //相关人信息

@@ -15,11 +15,16 @@ import java.util.List;
 @Data
 public class DjzlResponse {
 
+    private String id;  //
+    private String ywh;
     private String djlx; // 登记类型   100  首次登记
+    private String djlxmc; // 登记类型名称
     private String bdcdyh; //不动产单元号
     private String fwdm; // 房屋代码
+    private String zddm; // 宗地代码
     private String bdcqzh; // 产权证号
     private String fwlxmc; // 房屋类型
+    private String fwlx;
 
     private String ytmc; // 房屋用途
     private String zl; // 坐落
@@ -27,7 +32,7 @@ public class DjzlResponse {
     private String fwjgmc; //房屋结构
     private Integer szc; // 所在层(实际层)
     private Integer zcs; // 总层数
-    private String  fwxzlxmc; // 房屋性质类型
+    private String  fwxzlx; // 房屋性质类型
 
     private String myc; // 名义层
     private String zh; // 自然幢号
@@ -44,7 +49,7 @@ public class DjzlResponse {
     private String qlqssj; // 权利起始时间  yyyy-MM-dd
     private String qljssj; //权利结束时间   yyyy-MM-dd
     private String qlxzmc; //权利性质
-    private String  tdytmc; // 土地用途
+    private String tdytmc; // 土地用途
     private String fj; // 附记
 
     private String  tdsyqmj; //土地使用权面积 平方米
@@ -53,11 +58,11 @@ public class DjzlResponse {
 
 
     private List<Yyxx> yyxxs;  // 异议信息列表
-    private List<Qlr> qlrs;   // 权利人列表
+    private List<Qlr> qlrVos;   // 权利人列表  // todo qlrs
     private List<Dyxx> dyxxs; // 抵押信息列表
     private List<Cfxx> cfxxs; // 查封信息列表
-
-    public void checkSelfStandard(){
+	
+	public void checkSelfStandard(){
         if (StringUtils.isBlank(this.bdcdyh))
             throw new ZtgeoBizException("不动产单元号为空");
         if (StringUtils.isBlank(this.zl))

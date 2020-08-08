@@ -160,11 +160,12 @@ public class BusinessDealBaseUtil {
         for(SJ_Info_Bdcqlxgxx immovableRightInfo:immovableRightInfoVoList){
             if(StringUtils.isNotBlank(immovableRightInfo.getDataType())
                     && "主设施".equals(immovableRightInfo.getDataType())
-                    && !immovableRightInfo.getCertificateType().equals("土地证")
+                    && !"土地证".equals(immovableRightInfo.getCertificateType())
+                    && !"土地不动产权证".equals(immovableRightInfo.getCertificateType())
             ){
                 immovableRightInfo_bdcqz = immovableRightInfo;
             }
-            if(immovableRightInfo.getCertificateType().equals("土地证")){
+            if("土地证".equals(immovableRightInfo.getCertificateType())){
                 immovableRightInfo_td = immovableRightInfo;
             }
         }
@@ -405,10 +406,11 @@ public class BusinessDealBaseUtil {
             if (
                     StringUtils.isNotBlank(bdcql.getDataType())
                     && "主设施".equals(bdcql.getDataType())
-                    && !bdcql.getCertificateType().equals("土地证")
+                    && !"土地证".equals(bdcql.getCertificateType())
+                    && !"土地不动产权证".equals(bdcql.getCertificateType())
             ) {
                 String bdczh = bdcql.getImmovableCertificateNo();
-                if(bdczh.contains("-")) {
+                if(bdczh.contains("_")) {
                     bdczh = bdczh.substring(0,bdczh.lastIndexOf("_"))+"号";
                 }
                 qsxx.setBDCZH(bdczh);
@@ -426,7 +428,10 @@ public class BusinessDealBaseUtil {
                         }
                     }
                 }
-            } else if(!bdcql.getCertificateType().equals("土地证")){//添加附属设施到FWXX
+            } else if(
+                    !"土地证".equals(bdcql.getCertificateType())
+                    && !"土地不动产权证".equals(bdcql.getCertificateType())
+            ){//添加附属设施到FWXX
                 List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
                 if (bdcgls != null) {
                     for (SJ_Bdc_Gl bdcgl : bdcgls) {

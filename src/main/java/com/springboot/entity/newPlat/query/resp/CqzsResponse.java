@@ -66,6 +66,7 @@ public class CqzsResponse {
         }else{
             if(this.fwdcxxlb==null || this.fwdcxxlb.size()<1)
                 throw new ZtgeoBizException("【产权证书-信息核验】不动产类型设置为<FW>时，房屋调查信息未给出");
+            this.bdclx = BDC_TYPE_FD;
         }
         //权利信息的基本核验
         if(this.tdxgqlxx==null){
