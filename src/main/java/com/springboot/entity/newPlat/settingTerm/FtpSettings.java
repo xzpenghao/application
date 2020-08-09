@@ -9,12 +9,12 @@ import java.util.List;
 
 /**
  * @author chenb
- * @version 2020/8/6
- * description：配置的装载类
+ * @version 2020/8/9
+ * description：ftp配置
  */
 @Data
 @Component
-@ConfigurationProperties(prefix = "newplat")
-public class NewPlatSettings extends BaseSettings<TurnInnerSettingsTerm> {
-
+@ConfigurationProperties(prefix = "ftp")
+public class FtpSettings extends BaseSettings<FtpSettingTerm> {
+    private FtpDealSetting isDealFtp;
 }

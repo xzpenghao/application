@@ -65,6 +65,7 @@ public interface OuterBackFeign {
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter16",method = RequestMethod.GET)
     ObjectRestResponse<Boolean> DealRecieveFromOuter16(@RequestHeader(name = "Authorization") String token,@RequestParam("taskId")String taskId);
 
+    //获取新平台不动产业务映射信息
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter17",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8")
     ObjectRestResponse<Sj_Sjsq_Bdc_Mapping> DealRecieveFromOuter17(@RequestHeader(name = "Authorization") String token,Sj_Sjsq_Bdc_Mapping bdcMapping);
 

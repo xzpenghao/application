@@ -1,5 +1,6 @@
 package com.springboot.entity.newPlat.settingTerm;
 
+import com.springboot.entity.newPlat.settingTerm.base.BaseTerm;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,8 +11,7 @@ import org.springframework.stereotype.Component;
  * description：转内网的保障型设置
  */
 @Data
-public class TurnInnerSettingsTerm {
-    private String key;
+public class TurnInnerSettingsTerm extends BaseTerm {
     private String sid;
     private String sname;
     private String jsrid;

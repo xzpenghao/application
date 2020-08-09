@@ -3,6 +3,8 @@ package com.springboot.component.chenbin.file;
 import com.github.pagehelper.util.StringUtil;
 import com.google.common.collect.Maps;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.entity.newPlat.settingTerm.FtpSettingTerm;
+import com.springboot.entity.newPlat.settingTerm.FtpSettings;
 import com.springboot.util.DateUtils;
 import com.springboot.util.StrUtil;
 import com.springboot.util.TimeUtil;
@@ -13,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,25 +29,8 @@ import java.util.UUID;
 @Component("toFTPUploadComponent")
 @Slf4j
 public class ToFTPUploadComponent {
-
-    @Value("${webplus.ftpAddressBdc}")
-    private String ftpAddress;
-    @Value("${webplus.ftpPortBdc}")
-    private String ftpPort;
-    @Value("${webplus.ftpUsernameBdc}")
-    private String ftpUsername;
-    @Value("${webplus.ftpPasswordBdc}")
-    private String ftpPassword;
-
-
-    @Value("${webplus.ftpAddress}")
-    private String yftpAddress;
-    @Value("${webplus.ftpPort}")
-    private String yftpPort;
-    @Value("${webplus.ftpUsername}")
-    private String yftpUsername;
-    @Value("${webplus.ftpPassword}")
-    private String yftpPassword;
+    @Autowired
+    private FtpSettings ftpSettings;
 
 
     private static String LOCAL_CHARSET = "GBK";
@@ -62,9 +48,10 @@ public class ToFTPUploadComponent {
             log.info("进入附件处理");
             int reply;
             log.info("连接ftp服务器");
-            ftpClient.connect(yftpAddress, Integer.parseInt(yftpPort));// 连接FTP服务器
+            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("ycsl");
+            ftpClient.connect(ftpSettingTerm.getFtpAddress(), Integer.parseInt(ftpSettingTerm.getFtpPort()));// 连接FTP服务器
             log.info("登录ftp用户");
-            ftpClient.login(yftpUsername, yftpPassword);// 登录
+            ftpClient.login(ftpSettingTerm.getFtpUsername(), ftpSettingTerm.getFtpPassword());// 登录
             ftpClient.enterLocalPassiveMode();
             //如果没有需求上传图片的话还ok，
             /**
@@ -140,8 +127,9 @@ public class ToFTPUploadComponent {
         ftp.setControlEncoding("GBK");
         try {
             int reply;
-            ftp.connect(ftpAddress, Integer.parseInt(ftpPort));// 连接FTP服务器
-            ftp.login(ftpUsername, ftpPassword);// 登录
+            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("bdc");
+            ftp.connect(ftpSettingTerm.getFtpAddress(), Integer.parseInt(ftpSettingTerm.getFtpPort()));// 连接FTP服务器
+            ftp.login(ftpSettingTerm.getFtpUsername(), ftpSettingTerm.getFtpPassword());// 登录
             ftp.enterLocalPassiveMode();      //被动模式
             reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
@@ -198,15 +186,17 @@ public class ToFTPUploadComponent {
     }
 
     public String ycslUpload(byte[] bytes, String path, String fileName, String from_){
-        String address = yftpAddress;
-        String port = yftpPort;
-        String username = yftpUsername;
-        String password = yftpPassword;
+        FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey("ycsl");
+        String address = ftpSettingTermy.getFtpAddress();
+        String port = ftpSettingTermy.getFtpPort();
+        String username = ftpSettingTermy.getFtpUsername();
+        String password = ftpSettingTermy.getFtpPassword();
         if(from_!=null && "bdc".equals(from_)){
-            address = ftpAddress;
-            port = ftpPort;
-            username = ftpUsername;
-            password = ftpPassword;
+            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("bdc");
+            address = ftpSettingTerm.getFtpAddress();
+            port = ftpSettingTerm.getFtpPort();
+            username = ftpSettingTerm.getFtpUsername();
+            password = ftpSettingTerm.getFtpPassword();
         }
         Object r = ycslUpload(
                 bytes,fileName,fileName.contains(".")?fileName.substring(fileName.lastIndexOf(".")):"",path,
@@ -343,8 +333,9 @@ public class ToFTPUploadComponent {
 //            }
             //路径年/月/日/entryId名称
             String mulu = pathFold;
-            ftp.connect(yftpAddress, Integer.valueOf(yftpPort));
-            ftp.login(yftpUsername, yftpPassword);
+            FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey("ycsl");
+            ftp.connect(ftpSettingTermy.getFtpAddress(), Integer.valueOf(ftpSettingTermy.getFtpPort()));
+            ftp.login(ftpSettingTermy.getFtpUsername(), ftpSettingTermy.getFtpPassword());
             ftp.enterLocalPassiveMode();
             int reply = ftp.getReplyCode();
             log.info("FTP连接返回：" + reply);

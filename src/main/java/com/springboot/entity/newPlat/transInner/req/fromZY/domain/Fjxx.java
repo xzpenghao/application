@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Fjxx {
 
-    private String fj;
-    private String fjdz;
-    private String sxh;
-    private String wjjmc;
-    private String wjlx;
-    private String wjmc;
+    private String fj;          //附件
+    private String fjdz;        //附件地址
+    private String sxh;         //顺序号
+    private String wjjmc;       //文件夹名称
+    private String wjlx;        //文件类型（后缀名）
+    private String wjmc;        //文件名称
 
 }

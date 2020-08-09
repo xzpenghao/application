@@ -139,18 +139,6 @@ businessType:
   dealPerson: zhujun              #ADMIN
   bankPerson: ADMIN
 
-
-webplus:
-  ftpAddress: 10.3.0.151    #一窗受理ftp
-  ftpPort: 21
-  ftpUsername: forftp
-  ftpPassword: 123456
-
-  ftpAddressBdc: 10.3.0.149    #不动产登记平台
-  ftpPortBdc: 54111
-  ftpUsernameBdc: ftp
-  ftpPasswordBdc: 123456
-
 logging:
   level:
     com.ztgeo.general: info
@@ -179,7 +167,6 @@ machine:
 chenbin:
   waitSec: 0
   maxConnCount: 10
-  isDealFtp: true
   idType: 身份证,1$统一社会信用代码,8$组织机构代码,6
   registrationBureau:           #登记局
     username: tsdjj             #用户名
@@ -250,11 +237,6 @@ sq:
       post: 42506
       notice_url: JSRCIS/sq/sqResultNotice.do   #通知宿迁交通银行地址
       ftpIdentical: true    #银行上传共享平台与一窗受理是否在同一ftp
-  gxpt:
-      ftpAddress: 172.22.148.129   #共享平台ftp
-      ftpPort: 21
-      ftpUsername: ftpadmin
-      ftpPassword: 123qwe!@#
 
   jyht:     #商品房权利人信息
     api_id: 3Rkt5FPx    #二手房
@@ -334,7 +316,7 @@ Feign:
         wsjgjc: service-core/extQuery/wsjgjc   #网申结果检查
         wsbjcj: service-core/extQuery/wsbjcj   #网申办件创建
 newplat:
-  turnInners:                              #转内网保险机制，配置默认执行配置（当转内网时下述项未传入时使用）
+  settings:                              #转内网保险机制，配置默认执行配置（当转内网时下述项未传入时使用）
   - key: esfzy                                #二手房转移
     sid: 1
     sname: 不动产转移登记
@@ -360,3 +342,24 @@ newplat:
     sname: 抵押注销登记
     jsrid: testbank
     jsrmc: 测试银行
+
+ftp:
+  isDealFtp:
+    bdc: false
+    jhpt: false
+  settings:
+  - key: ycsl
+    ftpAddress: 10.3.0.151    #一窗受理ftp
+    ftpPort: 21
+    ftpUsername: forftp
+    ftpPassword: 123456
+  - key: bdc
+    ftpAddress: 10.3.0.149    #不动产登记平台
+    ftpPort: 54111
+    ftpUsername: ftp
+    ftpPassword: 123456
+  - key: jhpt
+    ftpAddress: 172.22.148.129   #共享交换平台
+    ftpPort: 21
+    ftpUsername: ftpadmin
+    ftpPassword: 123qwe!@#

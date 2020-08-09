@@ -20,6 +20,7 @@ public class SJ_Fjfile implements Serializable {
     private String ezt3;                      //扩展字段3
 
     private String logicPath;                  //逻辑路径
+    private String xh;                          //序号
 
     public String getFileId() {
         return fileId;
@@ -131,5 +132,13 @@ public class SJ_Fjfile implements Serializable {
 
     public void setSaveType(String saveType) {
         this.saveType = saveType;
+    }
+
+    public String getXh() {
+        return xh;
+    }
+
+    public void setXh(String xh) {
+        this.xh = xh;
     }
 }

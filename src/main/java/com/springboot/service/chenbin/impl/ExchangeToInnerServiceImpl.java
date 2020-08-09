@@ -24,6 +24,7 @@ import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
 import com.springboot.entity.chenbin.personnel.resp.BDCInterfaceResp;
+import com.springboot.entity.newPlat.settingTerm.FtpSettings;
 import com.springboot.feign.ForImmovableFeign;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.*;
@@ -73,6 +74,8 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private FileHandleComponent fileHandleComponent;
     @Autowired
     private OuterBackFeign backFeign;
+    @Autowired
+    private FtpSettings ftpSettings;
 
     @Value("${chenbin.idType}")
     private String idType;
@@ -106,8 +109,6 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
     private String registrationOfTransfer;
     @Value("${businessType.transferAndMortgage}")
     private String transferAndMortgage;
-    @Value("${chenbin.isDealFtp}")
-    private boolean isDealFtp;
 
 //    @Autowired
 //    private AnonymousInnerComponent anonymousInnerComponent;
@@ -137,7 +138,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         ClRegistrationOfficePerson(registrationBureau);
         log.info("将传入不动产数据（未处理附件）：" + JSONObject.toJSONString(registrationBureau));
         String token = httpCallComponent.getToken(username, password);
-        return handleCreateFlow(token,sjsq,registrationBureau,isDealFtp);
+        return handleCreateFlow(token,sjsq,registrationBureau,ftpSettings.getIsDealFtp().getBdc());
     }
 
     @Override
@@ -149,7 +150,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjsq, transferRegisterPid, true, registrationOfTransfer, dealPerson, areaNo);
         TransferBizInfo transferBizInfo = BusinessDealBaseUtil.getTransferBizInfoByJyhtAndBdcqls(sjsq,idType);
         registrationBureau.setTransferBizInfo(transferBizInfo);
-        return handleCreateFlow(token,sjsq,registrationBureau,isDealFtp);
+        return handleCreateFlow(token,sjsq,registrationBureau,ftpSettings.getIsDealFtp().getBdc());
     }
 
     @Override
@@ -170,7 +171,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         }
         registrationBureau.setTransferBizInfo(transferBizInfo);
         registrationBureau.setMortgageBizInfo(mortgageBizInfo);
-        return handleCreateFlow(token,sjsq,registrationBureau,isDealFtp);
+        return handleCreateFlow(token,sjsq,registrationBureau,ftpSettings.getIsDealFtp().getBdc());
     }
 
     @Override
@@ -317,7 +318,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         List<SynNewEcertInfoEntity> elecLicenseInfoList_ = new ArrayList<SynNewEcertInfoEntity>();
         for(SynNewEcertInfoEntity elecLicenseInfo:elecLicenseInfoList){
             elecLicenseInfo.setCertificateType(getCertificateTypeMapper(elecLicenseInfo.getCertificateType()));
-            if(isDealFtp){//使用不同FTP
+            if(ftpSettings.getIsDealFtp().getBdc()){//使用不同FTP
                 byte[] bytes = fromFTPDownloadComponent.downloadFile(elecLicenseInfo.getFtpPath(),"bdc");
                 if(bytes!=null){
                     String date = TimeUtil.getDateString(new Date());

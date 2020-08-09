@@ -3,10 +3,15 @@ package com.springboot.service.newPlat.chenbin;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.component.chenbin.OtherComponent;
+import com.springboot.component.fileMapping.FileNameConfigService;
 import com.springboot.component.newPlat.BdcInteractComponent;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
+import com.springboot.entity.newPlat.jsonMap.FileNameMapping;
+import com.springboot.entity.newPlat.settingTerm.FtpSettings;
 import com.springboot.entity.newPlat.settingTerm.NewPlatSettings;
 import com.springboot.entity.newPlat.transInner.req.BdcNoticeReq;
 import com.springboot.entity.newPlat.transInner.req.NewBdcFlowCheckReq;
@@ -58,8 +63,10 @@ import static com.springboot.constant.chenbin.KeywordConstant.EXC_DIRECTION_OUTE
 @Service
 public class BdcInteractService {
 
+    //办事人员name
     @Value("${djj.bsryname}")
     private String bsryname;
+    //办事人员登录使用密码
     @Value("${djj.bsrypassword}")
     private String bsrypassword;
 
@@ -73,10 +80,19 @@ public class BdcInteractService {
     private OtherComponent otherComponent;
 
     @Autowired
+    private HttpCallComponent httpCallComponent;
+
+    @Autowired
     private BdcInteractComponent bdcInteractComponent;
 
     @Autowired
+    private FtpSettings ftpSettings;
+
+    @Autowired
     private NewPlatSettings newPlatSettings;
+
+    @Autowired
+    private FileNameConfigService fileNameConfigService;
 
     /**
      * 描述：通知的异步处理模块
@@ -161,15 +177,20 @@ public class BdcInteractService {
                 if(preCheckWsjSucc(sjsq,params))
                     return back;
             }
+            //拉取并做附件映射
+            //处理附件
+            List<SJ_Fjfile> fileVoList = httpCallComponent.getFileVoList(sjsq.getReceiptNumber(), token);
+            //准备数据
             NewBdcFlowRequest newBdcFlowRequest = null;
             switch (flowKey) {
                 case "二手房转移登记":
-                    newBdcFlowRequest = prepareNewBdcFlowRequestForESFZY(sjsq);
+                    newBdcFlowRequest = prepareNewBdcFlowRequestForESFZY(sjsq,fileVoList);
                     break;
                 case "二手房转移及抵押登记":
-                    newBdcFlowRequest = prepareNewBdcFlowRequestForESFZYJDY(sjsq);
+                    newBdcFlowRequest = prepareNewBdcFlowRequestForESFZYJDY(sjsq,fileVoList);
                     break;
             }
+            //执行创建
             creatNewplatFlow(newBdcFlowRequest,sjsq.getBdcMappingVoList(),params);
             return back;
         } catch (ZtgeoBizException e){
@@ -191,7 +212,7 @@ public class BdcInteractService {
      * 返回：String
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public NewBdcFlowRequest prepareNewBdcFlowRequestForESFZY(SJ_Sjsq sjsq) throws ParseException {
+    public NewBdcFlowRequest prepareNewBdcFlowRequestForESFZY(SJ_Sjsq sjsq,List<SJ_Fjfile> fileVoList) throws ParseException {
         //基本数据生成
         NewBdcFlowRequest newBdcFlowRequest = ParamConvertUtil.getBaseFromSjsq(
                 sjsq,                               //收件申请
@@ -205,7 +226,7 @@ public class BdcInteractService {
         //补全申请人信息
         newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
         //补全附件列表信息
-        newBdcFlowRequest.setFjxx(transFjxxWithin2Sys());
+        newBdcFlowRequest.setFjxx(transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_ZY));
 
         return newBdcFlowRequest;
     }
@@ -218,7 +239,7 @@ public class BdcInteractService {
      * 返回：String
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public NewBdcFlowRequest prepareNewBdcFlowRequestForESFZYJDY(SJ_Sjsq sjsq) throws ParseException {
+    public NewBdcFlowRequest prepareNewBdcFlowRequestForESFZYJDY(SJ_Sjsq sjsq,List<SJ_Fjfile> fileVoList) throws ParseException {
         //基本数据生成
         NewBdcFlowRequest newBdcFlowRequest = ParamConvertUtil.getBaseFromSjsq(
                 sjsq,                               //收件申请
@@ -232,9 +253,9 @@ public class BdcInteractService {
         //补全申请人信息
         newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
         //补全附件列表信息
-        newBdcFlowRequest.setFjxx(transFjxxWithin2Sys());
+        newBdcFlowRequest.setFjxx(transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_ZY));
         //补全抵押信息
-        newBdcFlowRequest.setDyxx(initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo()));
+        newBdcFlowRequest.setDyxx(initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
         return newBdcFlowRequest;
     }
 
@@ -337,12 +358,39 @@ public class BdcInteractService {
         }
     }
 
-    public List<Fjxx> transFjxxWithin2Sys(){
-
+    public List<Fjxx> transFjxxWithin2Sys(List<SJ_Fjfile> fileVoList,String lkey){
+        FileNameMapping fileNameMapping = fileNameConfigService.gainFileMapByKey(lkey);
+        if(fileNameMapping!=null){
+            List<String> fileStandards = fileNameMapping.getMappingName();
+            List<Fjxx> fjxxes = new ArrayList<>();
+            int i=1;
+            for(SJ_Fjfile file:fileVoList){
+                if(fileStandards.contains(file.getLogicPath())){
+                    Fjxx fjxx = new Fjxx();
+                    //文件名称
+                    if(file.getFileName().lastIndexOf(".")>0) {
+                        fjxx.setWjmc(file.getFileName().substring(0,file.getFileName().lastIndexOf(".")));
+                    }else{
+                        fjxx.setWjmc(file.getFileName());
+                    }
+                    //文件扩展名
+                    fjxx.setWjlx(file.getFileExt());
+                    //文件夹名称
+                    fjxx.setWjjmc(file.getLogicPath());
+                    //设置文件序号
+                    fjxx.setSxh(Integer.toString(i));
+                    CommonSetBdcFjdz(fjxx,file);
+                    fjxxes.add(fjxx);
+                    i++;
+                }
+            }
+            if(fjxxes.size()>0)
+                return fjxxes;
+        }
         return null;
     }
 
-    public List<Dyxx> initDyxx(String yywh,Sj_Info_Dyhtxx dyhtxx) throws ParseException {
+    public List<Dyxx> initDyxx(String yywh,Sj_Info_Dyhtxx dyhtxx,List<SJ_Fjfile> fileVoList) throws ParseException {
         List<Dyxx> dyxxes = null;
         if(dyhtxx!=null){
             dyxxes = new ArrayList<>();
@@ -372,10 +420,27 @@ public class BdcInteractService {
                 dyxx.setZwrzjhm(zwr.getObligeeDocumentNumber());
             }
             dyxx.setSqrxx(mortDyrsAndDyqrsToSqr(dyhtxx));
-            dyxx.setFjxx(transFjxxWithin2Sys());
+            dyxx.setFjxx(transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_DY));
         }
         return dyxxes;
     }
+
+    /**
+     * 描述：通用不动产附件地址转内网转换处理
+     * 作者：chenb
+     * 日期：2020/8/9
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public void CommonSetBdcFjdz(Fjxx fjxx,SJ_Fjfile file){
+        if(ftpSettings.getIsDealFtp().getBdc()){//需要操作附件上传
+
+        }else{
+            fjxx.setFjdz(file.getFtpPath().replaceAll("\\\\","/"));
+        }
+    }
+
     /**
      * 描述：外网申请编号不动产创建成功预检查功能
      * 作者：chenb

@@ -3,6 +3,8 @@ package com.springboot.component.chenbin.file;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.component.BdcFTPDownloadComponent;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.newPlat.settingTerm.FtpSettingTerm;
+import com.springboot.entity.newPlat.settingTerm.FtpSettings;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.net.ftp.FTPClient;
@@ -16,37 +18,25 @@ import java.io.InputStream;
 
 @Component("fromFTPDownloadComponent")
 public class FromFTPDownloadComponent {
-    @Value("${webplus.ftpAddress}")
-    private String ftpAddress;
-    @Value("${webplus.ftpPort}")
-    private String ftpPort;
-    @Value("${webplus.ftpUsername}")
-    private String ftpUsername;
-    @Value("${webplus.ftpPassword}")
-    private String ftpPassword;
 
-    @Value("${webplus.ftpAddressBdc}")
-    private String ftpAddressBdc;
-    @Value("${webplus.ftpPortBdc}")
-    private String ftpPortBdc;
-    @Value("${webplus.ftpUsernameBdc}")
-    private String ftpUsernameBdc;
-    @Value("${webplus.ftpPasswordBdc}")
-    private String ftpPasswordBdc;
+    @Autowired
+    private FtpSettings ftpSettings;
 
     @Autowired
     private BdcFTPDownloadComponent bdcFTPDownloadComponent;
 
     public byte[] downloadFile(String ftpPath,String from_){
-        String address = ftpAddress;
-        String port = ftpPort;
-        String username = ftpUsername;
-        String password = ftpPassword;
+        FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey("ycsl");
+        String address = ftpSettingTermy.getFtpAddress();
+        String port = ftpSettingTermy.getFtpPort();
+        String username = ftpSettingTermy.getFtpUsername();
+        String password = ftpSettingTermy.getFtpPassword();
         if(from_!=null && "bdc".equals(from_)){
-            address = ftpAddressBdc;
-            port = ftpPortBdc;
-            username = ftpUsernameBdc;
-            password = ftpPasswordBdc;
+            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("bdc");
+            address = ftpSettingTerm.getFtpAddress();
+            port = ftpSettingTerm.getFtpPort();
+            username = ftpSettingTerm.getFtpUsername();
+            password = ftpSettingTerm.getFtpPassword();
         }
         String path = "";
         String fileName = "";
@@ -70,9 +60,10 @@ public class FromFTPDownloadComponent {
         FTPClient ftp = new FTPClient();
         try {
             int reply;
-            ftp.connect(ftpAddress, Integer.parseInt(ftpPort));
+            FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey("ycsl");
+            ftp.connect(ftpSettingTermy.getFtpAddress(), Integer.parseInt(ftpSettingTermy.getFtpPort()));
             // 如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
-            ftp.login(ftpUsername, ftpPassword);// 登录
+            ftp.login(ftpSettingTermy.getFtpUsername(), ftpSettingTermy.getFtpPassword());// 登录
             ftp.enterLocalPassiveMode();      //被动模式
             reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {

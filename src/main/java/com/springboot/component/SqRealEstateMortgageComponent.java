@@ -13,6 +13,8 @@ import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.Mort
 import com.springboot.entity.chenbin.personnel.other.bank.business.mortgage.domain.*;
 import com.springboot.entity.chenbin.personnel.other.bank.business.revok.RevokeRegistrationReqVo;
 import com.springboot.entity.chenbin.personnel.other.bank.business.revok.RevokeRegistrationRespVo;
+import com.springboot.entity.newPlat.settingTerm.FtpSettingTerm;
+import com.springboot.entity.newPlat.settingTerm.FtpSettings;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.FwInfo;
 import com.springboot.popj.GlImmovable;
@@ -89,16 +91,6 @@ public class SqRealEstateMortgageComponent {
     private String ygdy;
     @Value("${sq.dyzxdj}")
     private String dyzxdj;
-    @Value("${sq.gxpt.ftpAddress}")
-    private String ftpAddress;
-    @Value("${sq.gxpt.ftpPort}")
-    private String ftpPort;
-    @Value("${sq.gxpt.ftpUsername}")
-    private String ftpUsername;
-    @Value("${sq.gxpt.ftpPassword}")
-    private String ftpPassword;
-    @Value("${sq.bank.jt.ftpIdentical}")
-    private boolean ftpIdentical;
     @Value("${sq.bank.jt.username}")
     private String bankBsryname;
     @Value("${sq.bank.jt.password}")
@@ -115,6 +107,8 @@ public class SqRealEstateMortgageComponent {
     private NetSignUtils netSignUtils;
     @Autowired
     private OuterBackFeign outerBackFeign;
+    @Autowired
+    private FtpSettings ftpSettings;
 
 
     public void sqJgdyzx(RevokeRegistrationReqVo revokeRegistrationRespVo, OutputStream outputStream) {
@@ -126,7 +120,15 @@ public class SqRealEstateMortgageComponent {
                 try {
                     if (null != revokeRegistrationRespVo.getFileInfoVoList() && revokeRegistrationRespVo.getFileInfoVoList().size() != 0) {
                         String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(revokeRegistrationRespVo.getFileInfoVoList().get(0).getFileAdress()));
-                        anonymousInnerComponent.getProcessingAnnex(null, mapParmeter, revokeRegistrationRespVo.getFileInfoVoList(), ftpAddress, ftpPort, ftpUsername, ftpPassword, path);
+                        FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("jhpt");
+                        anonymousInnerComponent.getProcessingAnnex(
+                                null, mapParmeter, revokeRegistrationRespVo.getFileInfoVoList(),
+                                ftpSettingTerm.getFtpAddress(),
+                                ftpSettingTerm.getFtpPort(),
+                                ftpSettingTerm.getFtpUsername(),
+                                ftpSettingTerm.getFtpPassword(),
+                                path
+                        );
                     }
                 } catch (Exception e) {
                     log.info("e" + e);
@@ -183,7 +185,7 @@ public class SqRealEstateMortgageComponent {
                 for (FileInfoVo fileInfoVo : revokeRegistrationRespVo.getFileInfoVoList()) {
                     SJ_File sj_file = new SJ_File();
                     String adress = "";
-                    if (ftpIdentical) {
+                    if (ftpSettings.getIsDealFtp().getJhpt()) {
                         adress = StrUtil.getFTPAdress(fileInfoVo.getFileAdress());
                     } else {
                         //替换地址为设定的路径(不同ftp时)
@@ -311,7 +313,15 @@ public class SqRealEstateMortgageComponent {
                 try {
                     if (null != mortgageRegistrationReqVo.getFileInfoVoList() && mortgageRegistrationReqVo.getFileInfoVoList().size() != 0) {
                         String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(mortgageRegistrationReqVo.getFileInfoVoList().get(0).getFileAdress()));
-                        anonymousInnerComponent.getProcessingAnnex(null, mapParmeter, mortgageRegistrationReqVo.getFileInfoVoList(), ftpAddress, ftpPort, ftpUsername, ftpPassword, path);
+                        FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("jhpt");
+                        anonymousInnerComponent.getProcessingAnnex(
+                                null, mapParmeter, mortgageRegistrationReqVo.getFileInfoVoList(),
+                                ftpSettingTerm.getFtpAddress(),
+                                ftpSettingTerm.getFtpPort(),
+                                ftpSettingTerm.getFtpUsername(),
+                                ftpSettingTerm.getFtpPassword(),
+                                path
+                        );
                     }
                 } catch (Exception e) {
                     log.info("e" + e);

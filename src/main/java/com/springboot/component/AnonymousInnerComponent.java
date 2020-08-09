@@ -16,6 +16,8 @@ import com.springboot.entity.chenbin.personnel.other.bank.notice.result.ResultNo
 import com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.MortgageeInfoVo;
 import com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.MortgagorInfoVo;
 import com.springboot.entity.chenbin.personnel.other.bank.notice.result.domain.RealEstateInfoVo;
+import com.springboot.entity.newPlat.settingTerm.FtpSettingTerm;
+import com.springboot.entity.newPlat.settingTerm.FtpSettings;
 import com.springboot.mapper.ExceptionRecordMapper;
 import com.springboot.popj.*;
 import com.springboot.popj.pub_data.*;
@@ -44,7 +46,8 @@ import java.util.concurrent.*;
 @Slf4j
 public class AnonymousInnerComponent {
 
-
+    @Autowired
+    private FtpSettings ftpSettings;
     @Autowired
     private HttpCallComponent httpCallComponent;
     @Autowired
@@ -67,14 +70,6 @@ public class AnonymousInnerComponent {
     private String machineIp;
     @Value("${machine.post}")
     private String machinePost;
-    @Value("${webplus.ftpAddressBdc}")
-    private String ftpAddress;
-    @Value("${webplus.ftpPortBdc}")
-    private String ftpPort;
-    @Value("${webplus.ftpUsernameBdc}")
-    private String ftpUsername;
-    @Value("${webplus.ftpPasswordBdc}")
-    private String ftpPassword;
     @Value("${djj.bsryname}")
     private String bsryname;
     @Value("${djj.bsrypassword}")
@@ -84,24 +79,6 @@ public class AnonymousInnerComponent {
     @Value("${djj.tsrypaaword}")
     private String tsrypaaword;
 
-
-    @Value("${sq.gxpt.ftpAddress}")
-    private String gxftpAddress;
-    @Value("${sq.gxpt.ftpPort}")
-    private String gxftpPort;
-    @Value("${sq.gxpt.ftpUsername}")
-    private String gxftpUsername;
-    @Value("${sq.gxpt.ftpPassword}")
-    private String gxftpPassword;
-    @Value("${webplus.ftpAddress}")
-    private String yftpAddress;
-    @Value("${webplus.ftpPort}")
-    private String yftpPort;
-    @Value("${webplus.ftpUsername}")
-    private String yftpUsername;
-    @Value("${webplus.ftpPassword}")
-    private String yftpPassword;
-
     @Value("${sq.bank.jt.ip}")
     private String jtIp;
     @Value("${sq.bank.jt.post}")
@@ -110,8 +87,6 @@ public class AnonymousInnerComponent {
     private String noticeUrl;
     @Value("${penghao.transferholdmap}")
     private boolean transferHoldmap;
-    @Value("${sq.bank.jt.ftpIdentical}")
-    private boolean ftpIdentical;
 
     @Autowired
     private ExceptionRecordMapper exceptionRecordMapper;
@@ -157,7 +132,15 @@ public class AnonymousInnerComponent {
             log.info("sjsq"+mapParmeter.get("SJ_Sjsq"));
             log.info("modelId"+mapParmeter.get("modelId"));
             String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
-            getProcessingAnnex(zyxxObject,mapParmeter,null,ftpAddress,ftpPort,ftpUsername,ftpPassword,path);//附件上传
+            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("bdc");
+            getProcessingAnnex(
+                    zyxxObject,mapParmeter,null,
+                    ftpSettingTerm.getFtpAddress(),
+                    ftpSettingTerm.getFtpPort(),
+                    ftpSettingTerm.getFtpUsername(),
+                    ftpSettingTerm.getFtpPassword(),
+                    path
+            );//附件上传
             log.info("fileInfoList"+mapParmeter.get("fileInfoList"));
             //发送一窗受理进行启动流程
             String json = preservationRegistryData(mapParmeter, token, "/api/biz/RecService/DealRecieveFromOuter5");
@@ -292,7 +275,15 @@ public class AnonymousInnerComponent {
                 //权属信息
                 List<SJ_Info_Bdcqlxgxx> bdcqlxgxxList=exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
                 log.info("获得权属信息为："+ com.alibaba.fastjson.JSONArray.toJSONString(bdcqlxgxxList));
-                HandleAttachementDiagram(bdcqlxgxxList,jsonObject,registerNumber,ftpAddress,ftpPort,ftpUsername,ftpPassword,path);//附件上传
+                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("bdc");
+                HandleAttachementDiagram(
+                        bdcqlxgxxList,jsonObject,registerNumber,
+                        ftpSettingTerm.getFtpAddress(),
+                        ftpSettingTerm.getFtpPort(),
+                        ftpSettingTerm.getFtpUsername(),
+                        ftpSettingTerm.getFtpPassword(),
+                        path
+                );//附件上传
                 log.info("处理权属信息为："+ com.alibaba.fastjson.JSONArray.toJSONString(bdcqlxgxxList));
                 respServiceData.setServiceDataInfos(bdcqlxgxxList);
                 serviceDatas.add(respServiceData);
@@ -404,8 +395,21 @@ public class AnonymousInnerComponent {
                 com.alibaba.fastjson.JSONObject fileObject = jsonArray.getJSONObject(i);
                 String fileAddress = fileObject.getString("fileAddress");
                 String fileType = fileObject.getString("fileType");
-                byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
-                uploadObject = toFTPUploadComponent.ycslUpload(bytes,DateUtils.getNowYear() + DateUtils.getNowMonth() + DateUtils.getNowDay() + IDUtil.getUUId()+"."+fileType, fileType, path,gxftpAddress,gxftpPort,gxftpUsername,gxftpPassword);//获取上传路径和名称
+                byte[] bytes = bdcFTPDownloadComponent.downFile(
+                        StrUtil.getFTPRemotePathByFTPPath(fileAddress),
+                        StrUtil.getFTPFileNameByFTPPath(fileAddress),
+                        null, address, port, username, password
+                );//连接一窗受理平台ftp
+                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("jhpt");
+                uploadObject = toFTPUploadComponent.ycslUpload(
+                        bytes,
+                        DateUtils.getNowYear() + DateUtils.getNowMonth() + DateUtils.getNowDay() + IDUtil.getUUId()+"."+fileType,
+                        fileType, path,
+                        ftpSettingTerm.getFtpAddress(),
+                        ftpSettingTerm.getFtpPort(),
+                        ftpSettingTerm.getFtpUsername(),
+                        ftpSettingTerm.getFtpPassword()
+                );//获取上传路径和名称
                 if (uploadObject == null) {
                     log.error(Msgagger.FILE_FAIL);
                     throw new ZtgeoBizException(Msgagger.FILE_FAIL);
@@ -443,8 +447,18 @@ public class AnonymousInnerComponent {
                         com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
                         String fileAddress = fileObject.getString("fileAddress");
                         String fileType = fileObject.getString("fileType");
-                        byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
-                        uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType, path, yftpAddress, yftpPort, yftpUsername, yftpPassword);//获取上传路径和名称
+                        byte[] bytes = bdcFTPDownloadComponent.downFile(
+                                StrUtil.getFTPRemotePathByFTPPath(fileAddress),
+                                StrUtil.getFTPFileNameByFTPPath(fileAddress),
+                                null, address, port, username, password);//连接一窗受理平台ftp
+                        FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("ycsl");
+                        uploadObject = toFTPUploadComponent.ycslUpload(
+                                bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType, path,
+                                ftpSettingTerm.getFtpAddress(),
+                                ftpSettingTerm.getFtpPort(),
+                                ftpSettingTerm.getFtpUsername(),
+                                ftpSettingTerm.getFtpPassword()
+                        );//获取上传路径和名称
                         if (uploadObject == null) {
                             log.error(Msgagger.FILE_FAIL);
                             throw new ZtgeoBizException(Msgagger.FILE_FAIL);
@@ -473,8 +487,19 @@ public class AnonymousInnerComponent {
                 com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
                 String fileAddress = fileObject.getString("fileAddress");
                 String fileType = fileObject.getString("fileType");
-                byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
-                uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType, path, yftpAddress, yftpPort, yftpUsername, yftpPassword);//获取上传路径和名称
+                byte[] bytes = bdcFTPDownloadComponent.downFile(
+                        StrUtil.getFTPRemotePathByFTPPath(fileAddress),
+                        StrUtil.getFTPFileNameByFTPPath(fileAddress),
+                        null, address, port, username, password
+                );//连接一窗受理平台ftp
+                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("ycsl");
+                uploadObject = toFTPUploadComponent.ycslUpload(
+                        bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType, path,
+                        ftpSettingTerm.getFtpAddress(),
+                        ftpSettingTerm.getFtpPort(),
+                        ftpSettingTerm.getFtpUsername(),
+                        ftpSettingTerm.getFtpPassword()
+                );//获取上传路径和名称
                 if (uploadObject == null) {
                     log.error(Msgagger.FILE_FAIL);
                     throw new ZtgeoBizException(Msgagger.FILE_FAIL);
@@ -529,8 +554,19 @@ public class AnonymousInnerComponent {
                 log.info("fileAdress:" + fileObject.getString("fileAddress"));
                 log.info("fileType:" + fileObject.getString("fileType"));
                 String fileType = fileObject.getString("fileType");
-                byte[] bytes = bdcFTPDownloadComponent.downFile(StrUtil.getFTPRemotePathByFTPPath(fileAddress), StrUtil.getFTPFileNameByFTPPath(fileAddress), null, address, port, username, password);//连接一窗受理平台ftp
-                uploadObject = toFTPUploadComponent.ycslUpload(bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,yftpAddress,yftpPort,yftpUsername,yftpPassword);//获取上传路径和名称
+                byte[] bytes = bdcFTPDownloadComponent.downFile(
+                        StrUtil.getFTPRemotePathByFTPPath(fileAddress),
+                        StrUtil.getFTPFileNameByFTPPath(fileAddress),
+                        null, address, port, username, password
+                );//连接一窗受理平台ftp
+                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("ycsl");
+                uploadObject = toFTPUploadComponent.ycslUpload(
+                        bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,
+                        ftpSettingTerm.getFtpAddress(),
+                        ftpSettingTerm.getFtpPort(),
+                        ftpSettingTerm.getFtpUsername(),
+                        ftpSettingTerm.getFtpPassword()
+                );//获取上传路径和名称
                 if (uploadObject == null) {
                     log.error(Msgagger.FILE_FAIL);
                     throw new ZtgeoBizException(Msgagger.FILE_FAIL);
@@ -549,7 +585,7 @@ public class AnonymousInnerComponent {
             }
         }else {
             fileArray = com.alibaba.fastjson.JSONArray.parseArray(com.alibaba.fastjson.JSONObject.toJSONString(fileInfoVoList));
-            if (!ftpIdentical){
+            if (!ftpSettings.getIsDealFtp().getJhpt()){
                     for (int i = 0; i < fileArray.size(); i++) {
                         com.alibaba.fastjson.JSONObject fileObject = fileArray.getJSONObject(i);
                         String fileAddress = "";

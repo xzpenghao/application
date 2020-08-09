@@ -5,8 +5,11 @@ import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.component.chenbin.file.FromFTPDownloadComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
+import com.springboot.component.fileMapping.FileNameConfigService;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
+import com.springboot.entity.newPlat.jsonMap.FileNameMapping;
+import com.springboot.entity.newPlat.settingTerm.FtpSettings;
 import com.springboot.entity.newPlat.settingTerm.NewPlatSettings;
 import com.springboot.entity.newPlat.settingTerm.TurnInnerSettingsTerm;
 import com.springboot.feign.OuterBackFeign;
@@ -41,6 +44,10 @@ public class TestRest {
     private OuterBackFeign outerBackFeign;
     @Autowired
     private NewPlatSettings newPlatSettings;
+    @Autowired
+    private FtpSettings ftpSettings;
+    @Autowired
+    private FileNameConfigService fileNameConfigService;
 
     @RequestMapping(value = "/getFileList", method = RequestMethod.POST)
     public ObjectRestResponse<List<ImmovableFile>> getFileList(@RequestParam("receiptNumber") String receiptNumber, @RequestParam("token") String token) {
@@ -93,7 +100,9 @@ public class TestRest {
     }
 
     @RequestMapping(value = "testSetting",method = RequestMethod.GET)
-    public ObjectRestResponse<TurnInnerSettingsTerm> testSetting(){
-        return new ObjectRestResponse<TurnInnerSettingsTerm>().data(newPlatSettings.gainTermByKey("esfzy"));
+    public ObjectRestResponse<FileNameMapping> testSetting(){
+        log.info("转内网配置："+JSONObject.toJSONString(newPlatSettings));
+        log.info("FTP配置："+JSONObject.toJSONString(ftpSettings));
+        return new ObjectRestResponse<FileNameMapping>().data(fileNameConfigService.getFileMapConfigInfo().get(3));
     }
 }
