@@ -108,53 +108,7 @@ public class BdcInteractRest {
         return rv;
     }
 
-    /**
-     * 描述：不动产抵押登记转内网接口
-     * 作者：chenb
-     * 日期：2020/8/6
-     * 参数：[String]
-     * 返回：String
-     * 更新记录：更新人：{}，更新日期：{}
-     */
-    @RequestMapping(value = "creatProcMort2Bdc",method = RequestMethod.GET)
-    public ObjectRestResponse<String> creatProcMort2Bdc(
-            @RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer,
-            @RequestParam(name = "checkAlready",required = false) String checkAlready
-    ){
-        return new ObjectRestResponse<>();
-    }
 
-    /**
-     * 描述：预告及预告抵押登记转内网接口
-     * 作者：chenb
-     * 日期：2020/8/6
-     * 参数：[String]
-     * 返回：String
-     * 更新记录：更新人：{}，更新日期：{}
-     */
-    @RequestMapping(value = "creatProcDoubleYG2Bdc",method = RequestMethod.GET)
-    public ObjectRestResponse<String> creatProcDoubleYG2Bdc(
-            @RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer,
-            @RequestParam(name = "checkAlready",required = false) String checkAlready
-    ){
-        return new ObjectRestResponse<>();
-    }
-
-    /**
-     * 描述：抵押注销登记转内网接口
-     * 作者：chenb
-     * 日期：2020/8/6
-     * 参数：[String]
-     * 返回：String
-     * 更新记录：更新人：{}，更新日期：{}
-     */
-    @RequestMapping(value = "creatProcMortCancel2Bdc",method = RequestMethod.GET)
-    public ObjectRestResponse<String> creatProcMortCancel2Bdc(
-            @RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer,
-            @RequestParam(name = "checkAlready",required = false) String checkAlready
-    ){
-        return new ObjectRestResponse<>();
-    }
 
     /**
      * 描述：一窗流程创建通用接口

@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -60,6 +61,7 @@ import static com.springboot.constant.chenbin.KeywordConstant.EXC_DIRECTION_OUTE
  * description：不动产交互服务
  */
 @Slf4j
+@Scope("prototype")
 @Service
 public class BdcInteractService {
 
@@ -189,6 +191,9 @@ public class BdcInteractService {
                 case "二手房转移及抵押登记":
                     newBdcFlowRequest = prepareNewBdcFlowRequestForESFZYJDY(sjsq,fileVoList);
                     break;
+                case "抵押登记(含两证)":
+                    newBdcFlowRequest = prepareNewBdcFlowRequestForBDCDYDJ(sjsq,fileVoList);
+                    break;
             }
             //debug留痕
             log.debug("【"+sjsq.getReceiptNumber()+"】最终传入不动产数据为："+JSONObject.toJSONString(newBdcFlowRequest));
@@ -260,6 +265,36 @@ public class BdcInteractService {
         newBdcFlowRequest.setDyxx(initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
         return newBdcFlowRequest;
     }
+
+
+    /**
+     *
+     * @param sjsq
+     * @param fileVoList
+     * @return
+     * @throws ParseException
+     */
+    public NewBdcFlowRequest prepareNewBdcFlowRequestForBDCDYDJ(SJ_Sjsq sjsq,List<SJ_Fjfile> fileVoList) throws ParseException {
+        //基本数据生成
+        NewBdcFlowRequest newBdcFlowRequest = ParamConvertUtil.getBaseFromSjsq(
+                sjsq,                               //收件申请
+                newPlatSettings,                    //新平台配置
+                NEWPLAT_TURNINNERS_BDCDY,           //新平台业务类型
+                BDC_DJLB_DBYW,                      //登记类别
+                LZDZ_LDKQ                           //领证地址
+        );
+        //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
+        ParamConvertUtil.fillMainHouseToReq(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
+        //补全抵押信息
+        newBdcFlowRequest.setDyxx(initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
+        return  newBdcFlowRequest;
+    }
+
+
+
+
+
+
 
     /**
      * 描述：转内网的执行代码

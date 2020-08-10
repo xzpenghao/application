@@ -415,6 +415,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
                         registrationBureau.setOperatorName(BankManager.SQPING_AN_OPERATORNAME);
                         break;
                     case BankManager.SQJIAO_TONG_NAME:
+                      //  registrationBureau.setOperatorName("zhujun");
                         registrationBureau.setOperatorName(BankManager.SJIAO_TONG_OPERATORNAME);
                         break;
                         default:

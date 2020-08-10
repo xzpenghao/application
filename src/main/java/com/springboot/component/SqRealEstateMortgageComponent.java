@@ -308,6 +308,7 @@ public class SqRealEstateMortgageComponent {
         Map<String, String> mapParmeter = new HashMap<>();
         JSONObject reObject = new JSONObject();
         Map<String, Object> map = new HashMap<>();
+        //new Callble 可以单独写个类出来
         FutureTask<String> future = new FutureTask<String>(new Callable<String>() {
             public String call() throws Exception {
                 try {

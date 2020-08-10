@@ -21,6 +21,7 @@ public class ReMortgageRegistrationVo {
 
     private String apiName;
     private String charst;
+
     private String orgId;
     private String version;
     private String reqUniqueNo;
