@@ -42,10 +42,10 @@ public class BdcTransToInterRest {
     ){
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
-            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,"抵押登记(含两证)"));
+            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,"不动产抵押登记"));
         } catch (ParseException e) {
-            log.error("二手房(及抵押办件)转内网办件传入数据异常，原始数据为："+commonInterfaceAttributer);
-            throw new ZtgeoBizException("二手房转内网办件传入数据异常");
+            log.error("不动产抵押登记传入数据异常，原始数据为："+commonInterfaceAttributer);
+            throw new ZtgeoBizException("不动产抵押登记内网办件传入数据异常");
         }
         return rv;
     }
@@ -63,7 +63,14 @@ public class BdcTransToInterRest {
             @RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer,
             @RequestParam(name = "checkAlready",required = false) String checkAlready
     ){
-        return new ObjectRestResponse<>();
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        try {
+            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,"预告及预告抵押"));
+        } catch (ParseException e) {
+            log.error("不动产抵押登记传入数据异常，原始数据为："+commonInterfaceAttributer);
+            throw new ZtgeoBizException("不动产抵押登记内网办件传入数据异常");
+        }
+        return rv;
     }
 
     /**

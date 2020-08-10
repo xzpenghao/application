@@ -24,6 +24,7 @@ import com.springboot.feign.OuterBackFeign;
 import com.springboot.feign.newPlat.BdcInteractFeign;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.JwtAuthenticationRequest;
+import com.springboot.service.newPlat.penghao.BdcTransToInterService;
 import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
@@ -86,6 +87,9 @@ public class BdcInteractService {
 
     @Autowired
     private BdcInteractComponent bdcInteractComponent;
+
+    @Autowired
+    private BdcTransToInterService bdcTransToInterService;
 
     @Autowired
     private FtpSettings ftpSettings;
@@ -191,8 +195,11 @@ public class BdcInteractService {
                 case "二手房转移及抵押登记":
                     newBdcFlowRequest = prepareNewBdcFlowRequestForESFZYJDY(sjsq,fileVoList);
                     break;
-                case "抵押登记(含两证)":
-                    newBdcFlowRequest = prepareNewBdcFlowRequestForBDCDYDJ(sjsq,fileVoList);
+                case "不动产抵押登记":
+                    newBdcFlowRequest = bdcTransToInterService.prepareNewBdcFlowRequestForBDCDYDJ(sjsq,fileVoList);
+                    break;
+                case "预告及预告抵押":
+                    newBdcFlowRequest = bdcTransToInterService.prepareNewBdcFlowRequestForYGJYGDYDJ(sjsq,fileVoList);
                     break;
             }
             //debug留痕
@@ -265,31 +272,6 @@ public class BdcInteractService {
         newBdcFlowRequest.setDyxx(initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
         return newBdcFlowRequest;
     }
-
-
-    /**
-     *
-     * @param sjsq
-     * @param fileVoList
-     * @return
-     * @throws ParseException
-     */
-    public NewBdcFlowRequest prepareNewBdcFlowRequestForBDCDYDJ(SJ_Sjsq sjsq,List<SJ_Fjfile> fileVoList) throws ParseException {
-        //基本数据生成
-        NewBdcFlowRequest newBdcFlowRequest = ParamConvertUtil.getBaseFromSjsq(
-                sjsq,                               //收件申请
-                newPlatSettings,                    //新平台配置
-                NEWPLAT_TURNINNERS_BDCDY,           //新平台业务类型
-                BDC_DJLB_DBYW,                      //登记类别
-                LZDZ_LDKQ                           //领证地址
-        );
-        //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
-        ParamConvertUtil.fillMainHouseToReq(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
-        //补全抵押信息
-        newBdcFlowRequest.setDyxx(initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
-        return  newBdcFlowRequest;
-    }
-
 
 
 
