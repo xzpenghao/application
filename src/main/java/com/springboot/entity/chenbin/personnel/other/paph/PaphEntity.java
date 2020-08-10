@@ -12,6 +12,9 @@ public class PaphEntity implements Serializable {
     private List<PaphDyxx> dyxxs;
     private String sfcf;
     private List<PaphCfxx> cfxxs;
+    private String sfdj;
+    private List<PaphDjxx> djxxs;
+    private String qtxz;
 
     public String getBdczh() {
         return bdczh;
@@ -75,5 +78,29 @@ public class PaphEntity implements Serializable {
 
     public void setCfxxs(List<PaphCfxx> cfxxs) {
         this.cfxxs = cfxxs;
+    }
+
+    public String getSfdj() {
+        return sfdj;
+    }
+
+    public void setSfdj(String sfdj) {
+        this.sfdj = sfdj;
+    }
+
+    public List<PaphDjxx> getDjxxs() {
+        return djxxs;
+    }
+
+    public void setDjxxs(List<PaphDjxx> djxxs) {
+        this.djxxs = djxxs;
+    }
+
+    public String getQtxz() {
+        return qtxz;
+    }
+
+    public void setQtxz(String qtxz) {
+        this.qtxz = qtxz;
     }
 }

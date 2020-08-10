@@ -51,6 +51,7 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
 
     private String remarks;                      //备注附记
     private String other;                        //其他权利状况
+    private String qtxz;                        //其它限制信息
     private String dataType;                     //数据类型（主房产/附属房产）
     private String ext1;                         //扩展字段1
     private String ext2;                         //扩展字段2
@@ -487,5 +488,13 @@ public class SJ_Info_Bdcqlxgxx extends SJ_Information {
 
     public void setBookPics(List<SJ_Book_Pic_ext> bookPics) {
         this.bookPics = bookPics;
+    }
+
+    public String getQtxz() {
+        return qtxz;
+    }
+
+    public void setQtxz(String qtxz) {
+        this.qtxz = qtxz;
     }
 }

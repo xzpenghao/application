@@ -190,6 +190,8 @@ public class BdcInteractService {
                     newBdcFlowRequest = prepareNewBdcFlowRequestForESFZYJDY(sjsq,fileVoList);
                     break;
             }
+            //debug留痕
+            log.debug("【"+sjsq.getReceiptNumber()+"】最终传入不动产数据为："+JSONObject.toJSONString(newBdcFlowRequest));
             //执行创建
             creatNewplatFlow(newBdcFlowRequest,sjsq.getBdcMappingVoList(),params);
             return back;
@@ -365,23 +367,25 @@ public class BdcInteractService {
             List<Fjxx> fjxxes = new ArrayList<>();
             int i=1;
             for(SJ_Fjfile file:fileVoList){
-                if(fileStandards.contains(file.getLogicPath())){
-                    Fjxx fjxx = new Fjxx();
-                    //文件名称
-                    if(file.getFileName().lastIndexOf(".")>0) {
-                        fjxx.setWjmc(file.getFileName().substring(0,file.getFileName().lastIndexOf(".")));
-                    }else{
-                        fjxx.setWjmc(file.getFileName());
+                if(fileStandards.contains(file.getLogicPath())) {
+                    if ("1".equals(file.getSaveType())) {       //后续会将本地文件上传至FTP后将路径赋值
+                        Fjxx fjxx = new Fjxx();
+                        //文件名称
+                        if (file.getFileName().lastIndexOf(".") > 0) {
+                            fjxx.setWjmc(file.getFileName().substring(0, file.getFileName().lastIndexOf(".")));
+                        } else {
+                            fjxx.setWjmc(file.getFileName());
+                        }
+                        //文件扩展名
+                        fjxx.setWjlx(file.getFileExt());
+                        //文件夹名称
+                        fjxx.setWjjmc(file.getLogicPath());
+                        //设置文件序号
+                        fjxx.setSxh(Integer.toString(i));
+                        CommonSetBdcFjdz(fjxx, file);
+                        fjxxes.add(fjxx);
+                        i++;
                     }
-                    //文件扩展名
-                    fjxx.setWjlx(file.getFileExt());
-                    //文件夹名称
-                    fjxx.setWjjmc(file.getLogicPath());
-                    //设置文件序号
-                    fjxx.setSxh(Integer.toString(i));
-                    CommonSetBdcFjdz(fjxx,file);
-                    fjxxes.add(fjxx);
-                    i++;
                 }
             }
             if(fjxxes.size()>0)

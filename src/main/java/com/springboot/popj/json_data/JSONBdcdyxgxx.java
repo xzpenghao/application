@@ -27,6 +27,7 @@ public class JSONBdcdyxgxx implements Serializable {
     private String mortgageReason;                  //抵押原因
     private String remarks;                         //备注附记
     private String other;                           //其他权利状况
+    private String qtxz;                        //其它限制信息
     private String electronicProofPath;             //电子证明存放路径
     private byte[] electronicProofByte;             //电子证明
     private String serviceCode;                     //服务code
@@ -298,5 +299,13 @@ public class JSONBdcdyxgxx implements Serializable {
 
     public void setGlMortgageHolderVoList(String glMortgageHolderVoList) {
         this.glMortgageHolderVoList = glMortgageHolderVoList;
+    }
+
+    public String getQtxz() {
+        return qtxz;
+    }
+
+    public void setQtxz(String qtxz) {
+        this.qtxz = qtxz;
     }
 }

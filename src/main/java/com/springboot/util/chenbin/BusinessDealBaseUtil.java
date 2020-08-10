@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.util.*;
 
 import static com.springboot.constant.chenbin.KeywordConstant.*;
+import static com.springboot.constant.penghao.BizOrBizExceptionConstant.*;
 
 /*
     数据处理基本UTIL工具类
@@ -159,7 +160,7 @@ public class BusinessDealBaseUtil {
         SJ_Info_Bdcqlxgxx immovableRightInfo_td = null;
         for(SJ_Info_Bdcqlxgxx immovableRightInfo:immovableRightInfoVoList){
             if(StringUtils.isNotBlank(immovableRightInfo.getDataType())
-                    && "主设施".equals(immovableRightInfo.getDataType())
+                    && "主要权证".equals(immovableRightInfo.getDataType())
                     && !"土地证".equals(immovableRightInfo.getCertificateType())
                     && !"土地不动产权证".equals(immovableRightInfo.getCertificateType())
             ){
@@ -323,13 +324,13 @@ public class BusinessDealBaseUtil {
         for (SJ_Bdc_Gl bdc_gl : bdc_gls) {
             RealEstateUnitInfo realEstateUnitInfo = new RealEstateUnitInfo();
             switch (bdc_gl.getImmovableType()) {
-                case "房地":
+                case IMMOVABLE_TYPE_OF_FD:
                     SJ_Bdc_Fw_Info fw = bdc_gl.getFwInfo();
                     realEstateUnitInfo.setHouseholdId(fw.getHouseholdId());
                     realEstateUnitInfo.setRealEstateUnitId(fw.getImmovableUnitNumber());
                     realEstateUnitInfo.setSit(fw.getHouseLocation());
                     break;
-                case "宗地":
+                case IMMOVABLE_TYPE_OF_JD:
                     SJ_Bdc_Zd_Info zd = bdc_gl.getZdInfo();
                     realEstateUnitInfo.setHouseholdId(zd.getParcelUnicode());
                     realEstateUnitInfo.setSit(zd.getParcelLocation());
@@ -384,8 +385,11 @@ public class BusinessDealBaseUtil {
         String DYZT = "0";
         //权属信息
         QSXX qsxx = new QSXX();
+        //房屋信息
         List<FWXX> FWXX = new ArrayList<FWXX>();
+        //处理权属信息和房屋信息
         for(SJ_Info_Bdcqlxgxx bdcql:bdcqls) {
+            //限制信息获取与处理
             List<SJ_Its_Right> itsRightVoList = bdcql.getItsRightVoList();
             if (itsRightVoList != null) {
                 for (SJ_Its_Right itsRight : itsRightVoList) {
@@ -399,16 +403,24 @@ public class BusinessDealBaseUtil {
                         case "异议":
                             YYZT = "1";
                             break;
+                        case "冻结":
+                            CFZT = "1";
+                            break;
                     }
                 }
             }
-
+            //证书类型未赋值
+            if(StringUtils.isBlank(bdcql.getCertificateType()))
+                bdcql.setCertificateType(CERTIFICATE_TYPE_OF_FC);
+            //集合长度为1时的主要房产默认设置
+            if(StringUtils.isBlank(bdcql.getDataType()) && bdcqls.size()==1)
+                bdcql.setDataType("主要权证");
+            //主房产权属设置及附属不动产添加
             if (
-                    StringUtils.isNotBlank(bdcql.getDataType())
-                    && "主设施".equals(bdcql.getDataType())
-                    && !"土地证".equals(bdcql.getCertificateType())
-                    && !"土地不动产权证".equals(bdcql.getCertificateType())
+                    "主要权证".equals(bdcql.getDataType())
+                    && CERTIFICATE_TYPE_OF_FC.equals(bdcql.getCertificateType())
             ) {
+                //权利信息预处理与设置
                 String bdczh = bdcql.getImmovableCertificateNo();
                 if(bdczh.contains("_")) {
                     bdczh = bdczh.substring(0,bdczh.lastIndexOf("_"))+"号";
@@ -423,19 +435,18 @@ public class BusinessDealBaseUtil {
                 List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
                 if (bdcgls != null) {
                     for (SJ_Bdc_Gl bdcgl : bdcgls) {
-                        if (bdcgl.getImmovableType().equals("房地")) {
+                        if (IMMOVABLE_TYPE_OF_FD.equals(bdcgl.getImmovableType())) {
                             FWXX.add(getFwxx(bdcql,bdcgl.getFwInfo()));
                         }
                     }
                 }
-            } else if(
-                    !"土地证".equals(bdcql.getCertificateType())
-                    && !"土地不动产权证".equals(bdcql.getCertificateType())
-            ){//添加附属设施到FWXX
+            } else if(  //添加其它不动产到FWXX
+                    CERTIFICATE_TYPE_OF_FC.equals(bdcql.getCertificateType())
+            ){
                 List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
                 if (bdcgls != null) {
                     for (SJ_Bdc_Gl bdcgl : bdcgls) {
-                        if (bdcgl.getImmovableType().equals("房地")) {
+                        if (IMMOVABLE_TYPE_OF_FD.equals(bdcgl.getImmovableType())) {
                             SJ_Bdc_Fw_Info fw = bdcgl.getFwInfo();
                             FWXX.add(getFwxx(bdcql,fw));
                         }

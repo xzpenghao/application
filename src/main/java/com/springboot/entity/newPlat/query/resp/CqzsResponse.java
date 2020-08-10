@@ -4,6 +4,7 @@ package com.springboot.entity.newPlat.query.resp;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.*;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
+import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Djxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Yyxx;
 import lombok.Data;
@@ -31,6 +32,8 @@ public class CqzsResponse {
     private String zl; // 坐落
     private String fj; // 附记
     private String qtzk; //  其他状况
+    private String  qtxz;   //登记其它限制（其它限制,内部限制/其它限制/内部限制/无或返回空值）
+
     private Fwxgqlxx fwxgqlxx; //  房屋相关权利信息
     private Tdxgqlxx tdxgqlxx; //  土地相关权利信息
     private Ygxx ygxx;         // 预告信息列表
@@ -43,6 +46,7 @@ public class CqzsResponse {
     private List<Dyxx> dyxxlb;  //  抵押信息列表
     private List<Cfxx> cfxxlb; //  查封信息列表
     private List<Yyxx> yyxxlb; //  异议信息列表
+    private List<Djxx> djxxlb;              //冻结信息列表
 
     /**
      * 描述：返回数据的基础自检方法

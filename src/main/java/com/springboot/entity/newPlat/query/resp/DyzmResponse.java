@@ -5,6 +5,7 @@ import com.springboot.entity.newPlat.query.bizData.Xgzxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Fwdcxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Zddcxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
+import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Djxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,12 +49,15 @@ public class DyzmResponse {
     private String zt;                  //状态
     private String fj;                  //附记
     private String qtzk;                //其它状况
+    private String  qtxz;               //登记其它限制（其它限制,内部限制/其它限制/内部限制/无或返回空值）
+
     private List<Qlr> dyrlb;              //抵押人列表
     private List<Qlr> dyqrlb;             //抵押权人列表
     private List<Xgzxx> xgzlb;          //相关证列表
     private List<Fwdcxx> glfwdcxxlb;         //关联房屋调查信息列表
     private List<Zddcxx> zddcxxlb;           //宗地调查信息列表
     private List<Cfxx> cfxxlb;             //查封信息列表
+    private List<Djxx> djxxlb;              //冻结信息列表
 
     public void checkSelfStandard(){
         if(StringUtils.isBlank(this.ywh))

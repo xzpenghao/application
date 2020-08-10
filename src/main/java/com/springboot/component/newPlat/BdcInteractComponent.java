@@ -67,6 +67,10 @@ public class BdcInteractComponent {
             case BDC_NOTICE_JD_DB:
                 handleNoticeResult(token,noticeBody.getWsywh(),noticeBody.getYwhlb());
                 break;
+            //废弃(预想的逻辑实现是，调用主程序发websocket通知和站内信)
+            case BDC_NOTICE_JD_FQ:
+
+                break;
             default:
                 throw new ZtgeoBizException("Unexpected value【节点标识】: " + noticeBody.getJdbs());
         }

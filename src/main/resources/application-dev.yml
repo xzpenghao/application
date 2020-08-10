@@ -141,7 +141,7 @@ businessType:
 
 logging:
   level:
-    com.ztgeo.general: info
+    com.springboot: debug
 
 service:
   bdcbljgtjfw: ImmovableHandleResultService  #不动产办理结果提交服务

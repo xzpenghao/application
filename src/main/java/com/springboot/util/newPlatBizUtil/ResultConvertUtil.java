@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.emm.DIC_BDC_TYPE_Enums;
 import com.springboot.emm.DIC_RY_ZJZL_Enums;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphCfxx;
+import com.springboot.entity.chenbin.personnel.other.paph.PaphDjxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphDyxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
@@ -14,6 +16,7 @@ import com.springboot.entity.newPlat.query.bizData.Dbjgxx;
 import com.springboot.entity.newPlat.query.bizData.Shxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.*;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
+import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Djxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Yyxx;
 import com.springboot.entity.newPlat.query.resp.CqzsResponse;
@@ -35,6 +38,7 @@ import java.util.List;
 
 import static com.springboot.constant.chenbin.KeywordConstant.*;
 import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.*;
+import static com.springboot.constant.penghao.BizOrBizExceptionConstant.CERTIFICATE_TYPE_OF_FC;
 
 /**
  * @author chenb
@@ -122,6 +126,12 @@ public class ResultConvertUtil {
                 paphEntity.setSfcf("是");
                 paphEntity.setCfxxs(getPaphCfsByDjzlCf(cfxxs));
             }
+            //解析冻结信息
+            List<Djxx> djxxs = djzl.getDjxxlb();
+            if(djxxs!=null && djxxs.size()>0){
+                paphEntity.setSfdj("是");
+                paphEntity.setDjxxs(getPaphDjsByDjzlDj(djxxs));
+            }
             //解析抵押数据，区分贷前和贷后
             List<com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx> dyxxs = djzl.getDyxxs();
             if(dyxxs!=null && dyxxs.size()>0){
@@ -152,7 +162,9 @@ public class ResultConvertUtil {
             bdcqlxx.setAcceptanceNumber(cqzs.getYwh());
             bdcqlxx.setRegisterType(cqzs.getDjlx());
             bdcqlxx.setImmovableCertificateNo(cqzs.getBdczh());
-            bdcqlxx.setCertificateType(cqzs.getZslx());
+            bdcqlxx.setCertificateType(
+                    StringUtils.isBlank(cqzs.getZslx())?CERTIFICATE_TYPE_OF_FC:DicConvertUtil.getDicNameByVal(cqzs.getZslx(), DIC_BDC_TYPE_Enums.values())
+            );
             bdcqlxx.setRegistrationDate(TimeUtil.getTimeFromString(cqzs.getDjrq()));
             bdcqlxx.setImmovableSite(cqzs.getZl());
             bdcqlxx.setRemarks(cqzs.getFj());
@@ -209,6 +221,7 @@ public class ResultConvertUtil {
             paphEntity.setBdczh(djzl.getBdcqzh());
             paphEntity.setBdczl(djzl.getZl());
             paphEntity.setBdcdyh(djzl.getBdcdyh());
+            paphEntity.setQtxz(StringUtils.isBlank(djzl.getQtxz())?"无":djzl.getQtxz());
         }
         return paphEntity;
     }
@@ -301,6 +314,7 @@ public class ResultConvertUtil {
         List<Dyxx> dyxxlb = cqzs.getDyxxlb();
         List<Cfxx> cfxxlb = cqzs.getCfxxlb();
         List<Yyxx> yyxxlb = cqzs.getYyxxlb();
+        List<Djxx> djxxlb = cqzs.getDjxxlb();
 
         if(cfxxlb!=null && cfxxlb.size()>0){
             for(Cfxx cfxx:cfxxlb){
@@ -315,6 +329,11 @@ public class ResultConvertUtil {
         if(yyxxlb!=null && yyxxlb.size()>0){
             for(Yyxx yyxx:yyxxlb){
                 itsRightVoList.add(new SJ_Its_Right().initByYyxx(yyxx));
+            }
+        }
+        if(djxxlb!=null && djxxlb.size()>0){
+            for(Djxx djxx:djxxlb){
+                itsRightVoList.add(new SJ_Its_Right().initByDjxx(djxx));
             }
         }
         bdcqlxx.setItsRightVoList(itsRightVoList);
@@ -479,6 +498,26 @@ public class ResultConvertUtil {
             pcfxxs.add(pcfxx);
         }
         return pcfxxs;
+    }
+
+    /**
+     * 描述：从登记资料的冻结信息
+     *          解析金融机构需要的冻结信息
+     * 作者：chenb
+     * 日期：2020/7/30/030
+     * 参数：[djxxs]
+     * 返回：【PaphDjxx】
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public static List<PaphDjxx> getPaphDjsByDjzlDj(List<Djxx> djxxs){
+        List<PaphDjxx> pdjxxs = new ArrayList<>();
+        for(Djxx djxx:djxxs){
+            PaphDjxx pdjxx = new PaphDjxx();
+            pdjxx.setDjqxq(djxx.getDjkssj());
+            pdjxx.setDjqxz(djxx.getDjjssj());
+            pdjxxs.add(pdjxx);
+        }
+        return pdjxxs;
     }
 
     /**

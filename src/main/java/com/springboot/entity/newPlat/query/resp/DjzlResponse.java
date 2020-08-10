@@ -1,10 +1,7 @@
 package com.springboot.entity.newPlat.query.resp;
 
 import com.springboot.config.ZtgeoBizException;
-import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
-import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx;
-import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
-import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Yyxx;
+import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -52,15 +49,16 @@ public class DjzlResponse {
     private String tdytmc; // 土地用途
     private String fj; // 附记
 
-    private String  tdsyqmj; //土地使用权面积 平方米
-    private String  fttdmj; //分摊土地面积  平方米
-    private String  dytdmj; //独用土地面积  平方米
-
+    private String  tdsyqmj;   //土地使用权面积 平方米
+    private String  fttdmj;    //分摊土地面积  平方米
+    private String  dytdmj;    //独用土地面积  平方米
+    private String  qtxz;       //登记其它限制（其它限制,内部限制/其它限制/内部限制/无或返回空值）
 
     private List<Yyxx> yyxxs;  // 异议信息列表
     private List<Qlr> qlrVos;   // 权利人列表  // todo qlrs
     private List<Dyxx> dyxxs; // 抵押信息列表
     private List<Cfxx> cfxxs; // 查封信息列表
+    private List<Djxx> djxxlb;              //冻结信息列表
 	
 	public void checkSelfStandard(){
         if (StringUtils.isBlank(this.bdcdyh))

@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BdcNoticeReq {
-    private String jdbs;            //节点标识（受理通知acceptNotice & 审核通知verifyNotice & 登簿通知resultNotice）
+    private String jdbs;            //节点标识（受理通知acceptNotice & 审核通知verifyNotice & 登簿通知resultNotice & 废弃通知 ）
     private List<String> ywhlb;     //业务列表
     private String wsywh;           //网申业务号（这里是一窗的收件申请编号）
 

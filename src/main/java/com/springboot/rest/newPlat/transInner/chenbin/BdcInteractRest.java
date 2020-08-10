@@ -5,6 +5,7 @@ import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.emm.KEY_NOTICE_CODE_Enums;
 import com.springboot.entity.newPlat.transInner.req.BdcNoticeReq;
+import com.springboot.popj.pub_data.SJ_Sjsq;
 import com.springboot.service.newPlat.chenbin.BdcInteractService;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import com.springboot.util.newPlatBizUtil.DicConvertUtil;
@@ -140,7 +141,7 @@ public class BdcInteractRest {
     }
 
     /**
-     * 描述：预告及预告抵押登记转内网接口
+     * 描述：抵押注销登记转内网接口
      * 作者：chenb
      * 日期：2020/8/6
      * 参数：[String]
@@ -155,11 +156,27 @@ public class BdcInteractRest {
         return new ObjectRestResponse<>();
     }
 
+    /**
+     * 描述：一窗流程创建通用接口
+     * 作者：chenb
+     * 日期：2020/8/10
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
     @RequestMapping(value = "creatOneAcceptProcCommon",method = RequestMethod.POST)
     public ObjectRestResponse<String> creatOneAcceptProc(@RequestBody BdcNoticeReq noticeBody){
         return new ObjectRestResponse<>();
     }
 
+    /**
+     * 描述：通过
+     * 作者：chenb
+     * 日期：2020/8/10
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
     @RequestMapping(value = "creatOneAcceptProcByHistoryWord",method = RequestMethod.POST)
     public ObjectRestResponse<String> creatOneAcceptProcByHistoryWord(@RequestBody BdcNoticeReq noticeBody){
         return new ObjectRestResponse<>();

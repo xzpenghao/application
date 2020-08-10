@@ -3,6 +3,7 @@ package com.springboot.popj.pub_data;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Dyxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Yyxx;
+import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Djxx;
 
 import java.io.Serializable;
 
@@ -139,6 +140,15 @@ public class SJ_Its_Right implements Serializable {
         this.setRegisterNumber(yyxx.getYwh());
         this.setImmovableUnitNumber(yyxx.getBdcdyh());
         this.setItsRightType(BDC_ITS_RIGHT_YY);
+        return this;
+    }
+    public SJ_Its_Right initByDjxx(Djxx djxx){
+        this.setRegisterNumber(djxx.getYwh());
+        this.setImmovableUnitNumber(djxx.getBdcdyh());
+        this.setItsRightType(BDC_ITS_RIGHT_DJ);
+        this.setItsRightLimit(djxx.getDjqx());
+        this.setItsRightStart(djxx.getDjkssj());
+        this.setItsRightEnd(djxx.getDjjssj());
         return this;
     }
 }

@@ -219,14 +219,14 @@ public class ParamConvertUtil {
         if(qlxxVoList.size()>1) {
             for (SJ_Info_Bdcqlxgxx qlxx : qlxxVoList) {
                 String dataType = qlxx.getDataType();       //权属主体标识
-                if ("主设施".equals(dataType)) {
+                if ("主要权证".equals(dataType)) {
                     if (qlxxzt != null)
-                        throw new ZtgeoBizException("主设施权属信息只能存在一个");
+                        throw new ZtgeoBizException("主要权证信息只能存在一个");
                     qlxxzt = qlxx;
                 }
             }
             if (qlxxzt == null)
-                throw new ZtgeoBizException("多权属不动产登记业务，主要权属设施未设定");
+                throw new ZtgeoBizException("多权属不动产登记业务，主要权证未设定");
         }else{
             qlxxzt = qlxxVoList.get(0);
         }

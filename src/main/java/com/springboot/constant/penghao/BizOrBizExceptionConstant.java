@@ -23,8 +23,8 @@ public class BizOrBizExceptionConstant {
     public final static String IMMOVABLE_TYPE_OF_FD = "房地";
     //之前净地改成宗地
     public final static String IMMOVABLE_TYPE_OF_JD = "宗地";
-    public final static String CERTIFICATE_TYPE_OF_BDC = "不动产权证";
-    public final static String CERTIFICATE_TYPE_OF_FCTD = "房产土地证";
+    public final static String CERTIFICATE_TYPE_OF_FC = "房屋不动产证";
+    public final static String CERTIFICATE_TYPE_OF_TD = "土地不动产证";
     public final static String POWER_LEVEL_WRITE = "Write";
     public final static String POWER_LEVEL_READ = "ReadOnly";
     public final static String POWER_LEVEL_NULL_WRITE = "WriteIfNull";

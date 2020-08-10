@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.springboot.constant.penghao.BizOrBizExceptionConstant.IMMOVABLE_TYPE_OF_FD;
+
 /**
  * 电力的分发请求实体
  * @author chenb
@@ -39,7 +41,7 @@ public class SDQReqEntity {
         String bdcdyhs = "";
         if(bdcgls!=null) {
             for (SJ_Bdc_Gl bdcgl : bdcgls) {
-                if("房地".equals(bdcgl.getImmovableType())) {
+                if(IMMOVABLE_TYPE_OF_FD.equals(bdcgl.getImmovableType())) {
                     bdcdyhs = bdcdyhs + "," + bdcgl.getFwInfo().getImmovableUnitNumber();
                 }
             }

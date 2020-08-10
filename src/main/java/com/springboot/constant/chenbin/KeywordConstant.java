@@ -52,11 +52,13 @@ public class KeywordConstant {
     public final static String BDC_ITS_RIGHT_DY = "抵押";
     public final static String BDC_ITS_RIGHT_CF = "查封";
     public final static String BDC_ITS_RIGHT_YY = "异议";
+    public final static String BDC_ITS_RIGHT_DJ = "冻结";
 
     //节点类型
     public final static String BDC_NOTICE_JD_SL = "acceptNotice";
     public final static String BDC_NOTICE_JD_SH = "verifyNotice";
     public final static String BDC_NOTICE_JD_DB = "resultNotice";
+    public final static String BDC_NOTICE_JD_FQ = "discardNotice";
 
     //handle结果标识
     public final static String YCSL_HANDLE_RESULT_PASS = "审核通过";
@@ -77,7 +79,7 @@ public class KeywordConstant {
     public final static String BDC_YWLX_NAME_YY = "异议";
     public final static String BDC_YWLX_NAME_YYZX = "异议注销";
 
-    //处理服务设置
+    //处理服务设置(回写)
     public final static String YCSL_SERVICE_CODE_BDCSHCLJG = "ImmovableHandleResultService";
     public final static String YCSL_SERVICE_CODE_BDCDBCLJG = "ImmovableBookingResultService";
     public final static String YCSL_SERVICE_CODE_BDCYGJG = "ForecastElectronicCertificationService";
@@ -86,7 +88,7 @@ public class KeywordConstant {
     public final static String YCSL_SERVICE_CODE_BDCYGZXJG = "ForecastElectronicCertCancellation";
     public final static String YCSL_SERVICE_CODE_BDCQZZXJG = "ImmovableElectronicCertCancellation";
     public final static String YCSL_SERVICE_CODE_BDCDYZXJG = "MortgageElectronicCertCancellation";
-
+    //处理服务设置(查询)
     public final static String YCSL_SERVICE_CODE_BDCDYSJ = "MortgageCertificateService";
     public final static String YCSL_SERVICE_CODE_BDCQLSJ = "OwnershipCertificateServiceWithItsRight";
 }

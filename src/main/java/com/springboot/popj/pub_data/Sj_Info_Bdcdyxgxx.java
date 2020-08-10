@@ -22,6 +22,7 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
     private String mortgageReason;                  //抵押原因
     private String remarks;                         //备注附记
     private String other;                           //其他权利状况
+    private String qtxz;                        //其它限制信息
     private String electronicProofPath;             //电子证明存放路径
     private byte[] electronicProofByte;             //电子证明
     private String dataType;                        //数据类型（存量/新增）
@@ -245,4 +246,11 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
         this.glMortgageHolderVoList = glMortgageHolderVoList;
     }
 
+    public String getQtxz() {
+        return qtxz;
+    }
+
+    public void setQtxz(String qtxz) {
+        this.qtxz = qtxz;
+    }
 }

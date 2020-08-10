@@ -52,6 +52,7 @@ public class JSONBdcqlxgxx implements Serializable {
     private BigDecimal buildingParcelArea;                  //建筑宗地面积
 
     private String remarks;                      //备注附记
+    private String qtxz;                        //其它限制信息
     private String serviceCode;                  //服务code
     private String dataJson;                     //原始数据json
     private String dataType;                     //数据类型（存量/新增）
@@ -543,5 +544,13 @@ public class JSONBdcqlxgxx implements Serializable {
 
     public void setFsss(String fsss) {
         this.fsss = fsss;
+    }
+
+    public String getQtxz() {
+        return qtxz;
+    }
+
+    public void setQtxz(String qtxz) {
+        this.qtxz = qtxz;
     }
 }
