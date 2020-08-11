@@ -237,7 +237,7 @@ public class BdcInteractService {
                 LZDZ_LDKQ                           //领证地址
         );
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
-        ParamConvertUtil.fillMainHouseToReq(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
+        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
         //补全申请人信息
         newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
         //补全附件列表信息
@@ -264,7 +264,7 @@ public class BdcInteractService {
                 LZDZ_LDKQ                           //领证地址
         );
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
-        ParamConvertUtil.fillMainHouseToReq(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
+        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
         //补全申请人信息
         newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
         //补全附件列表信息

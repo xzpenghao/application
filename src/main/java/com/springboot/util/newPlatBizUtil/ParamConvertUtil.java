@@ -117,18 +117,61 @@ public class ParamConvertUtil {
      * 返回：void
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public static void fillMainHouseToReq(NewBdcFlowRequest newBdcFlowRequest,List<SJ_Info_Bdcqlxgxx> qlxxVoList) throws ParseException {
-        //声明房屋主体
-        Fwxx fwxx = new Fwxx();
+    public static void fillMainHouseToReqByQlxx(NewBdcFlowRequest newBdcFlowRequest,List<SJ_Info_Bdcqlxgxx> qlxxVoList) throws ParseException {
+
         //获取主要不动产权属
         SJ_Info_Bdcqlxgxx qlxxzt = getMainHouseQlxx(qlxxVoList);
+        //获取主体房产信息
+        SJ_Bdc_Gl bdc = getMainHouse(qlxxzt.getGlImmovableVoList());
+        //获取基础房屋信息
+        Fwxx fwxx = getBaseFwxx(bdc);
+
         //设置权利相关项
         fwxx.setQllx(getNullStrIfk(qlxxzt.getLandRightType()));
         fwxx.setQlxz(getNullStrIfk(qlxxzt.getHouseRightNature()));
         fwxx.setQlqssj(TimeUtil.getTimeString(TimeUtil.getTimeFromString(qlxxzt.getLandUseRightStartingDate())));
         fwxx.setQljssj(TimeUtil.getTimeString(TimeUtil.getTimeFromString(qlxxzt.getLandUseRightEndingDate())));
+        //土地相关设置
+        fwxx.setTddymj(qlxxzt.getSingleLandArea());
+        fwxx.setTdftmj(qlxxzt.getShareLandArea());
+        fwxx.setTdsyqmj(qlxxzt.getCommonLandArea());
+        fwxx.setTdyt(getNullStrIfk(qlxxzt.getLandPurpose()));
 
-        SJ_Bdc_Gl bdc = getMainHouse(qlxxzt.getGlImmovableVoList());
+        //设置原业务号和房屋信息
+        newBdcFlowRequest.setYywh(getNullStrIfk(qlxxzt.getAcceptanceNumber()));
+        newBdcFlowRequest.setFwxx(fwxx);
+    }
+
+    /**
+     * 描述：从现势抵押信息中整理转内网必要的FWXX
+     * 作者：chenb
+     * 日期：2020/8/8
+     * 参数：[newBdcFlowRequest, qlxxVoList]
+     * 返回：void
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public static void fillMainHouseToReqByDyxx(NewBdcFlowRequest newBdcFlowRequest,List<Sj_Info_Bdcdyxgxx> dyxxVoList) throws ParseException {
+        //抵押信息判断
+        if(dyxxVoList==null || dyxxVoList.size()<1){
+            throw new ZtgeoBizException("收件不动产抵押信息为空");
+        }
+        if(dyxxVoList.size()>1){
+            throw new ZtgeoBizException("收件存在多条不动产抵押信息，这在现在是不被允许的");
+        }
+        //获取主体抵押信息
+        Sj_Info_Bdcdyxgxx ztdyxx = dyxxVoList.get(0);
+        //获取房屋主体信息
+        SJ_Bdc_Gl bdc = getMainHouse(ztdyxx.getGlImmovableVoList());
+        Fwxx fwxx = getBaseFwxx(bdc);
+
+        //设置原业务号和房屋信息
+        newBdcFlowRequest.setYywh(getNullStrIfk(ztdyxx.getAcceptanceNumber()));
+        newBdcFlowRequest.setFwxx(fwxx);
+    }
+
+    public static Fwxx getBaseFwxx(SJ_Bdc_Gl bdc){
+        //声明房屋主体
+        Fwxx fwxx = new Fwxx();
         SJ_Bdc_Fw_Info fwInfo = bdc.getFwInfo();
         if(fwInfo==null){
             throw new ZtgeoBizException("不动产不是房屋,这暂时在一窗受理的转内网业务上是不允许的");
@@ -150,15 +193,8 @@ public class ParamConvertUtil {
         fwxx.setTnjzmj(fwInfo.getHouseArchitecturalArea());
         fwxx.setFtjzmj(fwInfo.getApportionmentArchitecturalArea());
         fwxx.setFzwdm(null);
-        //土地相关设置
-        fwxx.setTddymj(qlxxzt.getSingleLandArea());
-        fwxx.setTdftmj(qlxxzt.getShareLandArea());
-        fwxx.setTdsyqmj(qlxxzt.getCommonLandArea());
-        fwxx.setTdyt(getNullStrIfk(qlxxzt.getLandPurpose()));
 
-        //设置原业务号和房屋信息
-        newBdcFlowRequest.setYywh(getNullStrIfk(qlxxzt.getAcceptanceNumber()));
-        newBdcFlowRequest.setFwxx(fwxx);
+        return fwxx;
     }
 
     /**
