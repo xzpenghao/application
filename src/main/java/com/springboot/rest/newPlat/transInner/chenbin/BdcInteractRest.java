@@ -2,6 +2,7 @@ package com.springboot.rest.newPlat.transInner.chenbin;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.emm.KEY_NOTICE_CODE_Enums;
 import com.springboot.entity.newPlat.transInner.req.BdcNoticeReq;
@@ -77,7 +78,7 @@ public class BdcInteractRest {
     ) {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
-            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,"二手房转移登记"));
+            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,Msgagger.ESFZYDJ));
         } catch (ParseException e) {
             log.error("二手房转内网办件传入数据异常，原始数据为："+commonInterfaceAttributer);
             throw new ZtgeoBizException("二手房转内网办件传入数据异常");
@@ -100,7 +101,7 @@ public class BdcInteractRest {
     ){
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
-            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,"二手房转移及抵押登记"));
+            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready, Msgagger.ESFZYJDYDJ));
         } catch (ParseException e) {
             log.error("二手房(及抵押办件)转内网办件传入数据异常，原始数据为："+commonInterfaceAttributer);
             throw new ZtgeoBizException("二手房转内网办件传入数据异常");

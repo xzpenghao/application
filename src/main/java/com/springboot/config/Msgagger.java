@@ -7,7 +7,7 @@ public class Msgagger {
     public final static String ZONGDI = "宗地";
     public final static String TDZ = "土地证";
     public final static String FCZ = "房产证";
-    public final static String DYZXDJ = "抵押权注销登记";
+    public final static String DYQZXDJ = "抵押权注销登记";
     public final static String AUTOINTECECG = "保存自动接口执行成功";
     public final static String XJSPFYGDYDJ = "新建商品房预告抵押登记";
     public final static String CLFYGDHDJ = "存量房预告抵押登记";
@@ -19,6 +19,13 @@ public class Msgagger {
     public final static String FTP_BAD="权属信息获取不到或ftp路径不对";
     public final static String ZDT="宗地图";
     public final static String FCFHT="分层分户图";
+
+    public final static String  YGJYGDY ="预告及预告抵押";
+    public final static String   DYZXDJ="抵押注销登记";
+    public final static String   BDCDYDJ="不动产抵押登记";
+    public final static String   ESFZYJDYDJ="二手房转移及抵押登记";
+    public final static String   ESFZYDJ="二手房转移登记";
+
 
     public final static String AUTOINTECEBAD = "保存自动接口执行失败";
     public final static String ACCPETNOTICE = "acceptNotice";//受理通知

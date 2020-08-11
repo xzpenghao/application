@@ -40,8 +40,6 @@ public class BdcTransToInterService {
     @Value("${djj.bsrypassword}")
     private String bsrypassword;
 
-
-
     @Autowired
     private BdcInteractService bdcInteractService;
 
@@ -52,14 +50,14 @@ public class BdcTransToInterService {
     private FileNameConfigService fileNameConfigService;
 
 
-
-    /**
-     *
-     * @param sjsq
-     * @param fileVoList
-     * @return
-     * @throws ParseException
-     */
+   /**
+    * 功能描述: 不动产抵押登记转内网 <br>
+    * 〈〉
+    * @Param: [sjsq, fileVoList]
+    * @Return: com.springboot.entity.newPlat.transInner.req.fromZY.NewBdcFlowRequest
+    * @Author:  Peng Hao
+    * @Date: 2020/8/11 8:56
+    */
     public  NewBdcFlowRequest  prepareNewBdcFlowRequestForBDCDYDJ(SJ_Sjsq sjsq, List<SJ_Fjfile> fileVoList) throws ParseException {
         //基本数据生成
         NewBdcFlowRequest newBdcFlowRequest = ParamConvertUtil.getBaseFromSjsq(
@@ -69,20 +67,23 @@ public class BdcTransToInterService {
                 BDC_DJLB_ZHYW,                      //登记类别
                 LZDZ_LDKQ                           //领证地址
         );
+        //设置抵押登记申请人
+        newBdcFlowRequest.setSqrxx(bdcInteractService.mortDyrsAndDyqrsToSqr(sjsq.getMortgageContractInfo()));
+        //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
+        ParamConvertUtil.fillMainHouseToReq(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
         //补全抵押信息
         newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
-        //合同信息
-
         return  newBdcFlowRequest;
     }
 
 
     /**
-     *
-     * @param sjsq
-     * @param fileVoList
-     * @return
-     * @throws ParseException
+     * 功能描述:  不动产预抵押转内网<br>
+     * 〈〉
+     * @Param: [sjsq, fileVoList]
+     * @Return: com.springboot.entity.newPlat.transInner.req.fromZY.NewBdcFlowRequest
+     * @Author: Peng Hao
+     * @Date: 2020/8/11 8:56
      */
     public  NewBdcFlowRequest  prepareNewBdcFlowRequestForYGJYGDYDJ(SJ_Sjsq sjsq, List<SJ_Fjfile> fileVoList) throws ParseException {
         //基本数据生成
@@ -93,11 +94,41 @@ public class BdcTransToInterService {
                 BDC_DJLB_DBYW,                      //登记类别
                 LZDZ_LDKQ                           //领证地址
         );
-        //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
-        ParamConvertUtil.fillMainHouseToReq(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
+        newBdcFlowRequest.setHtxx(bdcInteractService.initJyhtxx(sjsq.getTransactionContractInfo()));
+        //最外层申请人信息为买卖双方
+        newBdcFlowRequest.setSqrxx(bdcInteractService.mortDyrsAndDyqrsToSqr(sjsq.getMortgageContractInfo()));
+        //补全附件列表信息
+        newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_YD));
         //补全抵押信息
         newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
-        return  newBdcFlowRequest;
+        return newBdcFlowRequest;
+    }
+
+
+
+    /**
+     * 功能描述:不动产抵押注销转内网 <br>
+     * 〈〉
+     * @Param: [sjsq, fileVoList]
+     * @Return: com.springboot.entity.newPlat.transInner.req.fromZY.NewBdcFlowRequest
+     * @Author: Peng Hao
+     * @Date: 2020/8/11 14:47
+     */
+    public  NewBdcFlowRequest  prepareNewBdcFlowRequestForDYZXDJ(SJ_Sjsq sjsq, List<SJ_Fjfile> fileVoList) throws ParseException {
+        //基本数据生成
+        NewBdcFlowRequest newBdcFlowRequest = ParamConvertUtil.getBaseFromSjsq(
+                sjsq,                               //收件申请
+                newPlatSettings,                    //新平台配置
+                NEWPLAT_TURNINNERS_YGYD,           //新平台业务类型
+                BDC_DJLB_DBYW,                      //登记类别
+                LZDZ_LDKQ                           //领证地址
+        );
+        //最外层申请人信息为买卖双方
+        newBdcFlowRequest.setSqrxx(bdcInteractService.mortDyrsAndDyqrsToSqr(sjsq.getMortgageContractInfo()));
+        //补全附件列表信息
+        newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_DYZX));
+        //附件信息
+        return newBdcFlowRequest;
     }
 
 

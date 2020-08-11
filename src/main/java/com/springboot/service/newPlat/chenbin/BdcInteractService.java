@@ -7,6 +7,7 @@ import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.component.chenbin.OtherComponent;
 import com.springboot.component.fileMapping.FileNameConfigService;
 import com.springboot.component.newPlat.BdcInteractComponent;
+import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
@@ -16,10 +17,7 @@ import com.springboot.entity.newPlat.settingTerm.NewPlatSettings;
 import com.springboot.entity.newPlat.transInner.req.BdcNoticeReq;
 import com.springboot.entity.newPlat.transInner.req.NewBdcFlowCheckReq;
 import com.springboot.entity.newPlat.transInner.req.fromZY.NewBdcFlowRequest;
-import com.springboot.entity.newPlat.transInner.req.fromZY.domain.Dyxx;
-import com.springboot.entity.newPlat.transInner.req.fromZY.domain.Fjxx;
-import com.springboot.entity.newPlat.transInner.req.fromZY.domain.NewBdcFlowRespData;
-import com.springboot.entity.newPlat.transInner.req.fromZY.domain.Sqrxx;
+import com.springboot.entity.newPlat.transInner.req.fromZY.domain.*;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.feign.newPlat.BdcInteractFeign;
 import com.springboot.popj.pub_data.*;
@@ -189,17 +187,20 @@ public class BdcInteractService {
             //准备数据
             NewBdcFlowRequest newBdcFlowRequest = null;
             switch (flowKey) {
-                case "二手房转移登记":
+                case Msgagger.ESFZYDJ:
                     newBdcFlowRequest = prepareNewBdcFlowRequestForESFZY(sjsq,fileVoList);
                     break;
-                case "二手房转移及抵押登记":
+                case Msgagger.ESFZYJDYDJ:
                     newBdcFlowRequest = prepareNewBdcFlowRequestForESFZYJDY(sjsq,fileVoList);
                     break;
-                case "不动产抵押登记":
+                case Msgagger.BDCDYDJ:
                     newBdcFlowRequest = bdcTransToInterService.prepareNewBdcFlowRequestForBDCDYDJ(sjsq,fileVoList);
                     break;
-                case "预告及预告抵押":
+                case Msgagger.YGJYGDY:
                     newBdcFlowRequest = bdcTransToInterService.prepareNewBdcFlowRequestForYGJYGDYDJ(sjsq,fileVoList);
+                    break;
+                case Msgagger.DYZXDJ:
+                    newBdcFlowRequest = bdcTransToInterService.prepareNewBdcFlowRequestForDYZXDJ(sjsq,fileVoList);
                     break;
             }
             //debug留痕
@@ -209,9 +210,9 @@ public class BdcInteractService {
             return back;
         } catch (ZtgeoBizException e){
             throw e;
-        } catch (Exception e){
-            log.error("二手房转内网办件出现异常，异常详情信息："+ErrorDealUtil.getErrorInfo(e));
-            throw new ZtgeoBizException("二手房转内网办件出现异常,联系管理员");
+        }catch (Exception e){
+            log.error("内网办件出现异常，异常详情信息："+ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("转内网办件出现异常,联系管理员");
         }finally {
             //签收办件
             otherComponent.signPro(token,bsryname,bsrypassword,sjsq.getReceiptNumber(),params);
@@ -341,6 +342,7 @@ public class BdcInteractService {
         List<SJ_Qlr_Gl> gldyqrs = dyhtxx.getGlMortgageHolderVoList();
 
         List<SJ_Qlr_Gl> glQlrDlrs = dyhtxx.getGlMortgagorAgentInfoVoList();
+
         List<SJ_Qlr_Gl> glDyqrDlrs = dyhtxx.getGlMortgageeAgentInfoVoList();
 
         //预处理代理人(针对权利人中未给出代理人信息，但代理人集合有值)
@@ -364,7 +366,7 @@ public class BdcInteractService {
                         for (int i=0;i<glQlrs.size();i++){
                             glQlrs.get(i).setRelatedAgent(glDlrs.get(i).getRelatedPerson());
                         }
-                    }else{
+                    }else{  //针对于多个代理人进行处理
                         //合并 代理人信息
                         SJ_Qlr_Info hbdlrxx = ParamConvertUtil.getOneQlrByList(glDlrs);
                         String hbdlrxxJSON = JSONObject.toJSONString(hbdlrxx);
@@ -410,6 +412,31 @@ public class BdcInteractService {
         }
         return null;
     }
+
+    /**
+     * 功能描述: 处理交易合同信息<br>
+     * 〈〉
+     * @Param: [jyhtxx]
+     * @Return: com.springboot.entity.newPlat.transInner.req.fromZY.domain.Htxx
+     * @Author: Administrator
+     * @Date: 2020/8/11 11:49
+     */
+    public Htxx initJyhtxx(Sj_Info_Jyhtxx jyhtxx){
+        Htxx htxx = new Htxx();
+         if (null != jyhtxx){
+            htxx.setHtbah(jyhtxx.getContractNumber());//合同备案号
+            htxx.setHtbh(jyhtxx.getContractNumber());//合同编号
+            htxx.setHtqdrq(jyhtxx.getContractSignTime());//签订时间
+            htxx.setHtbarq(jyhtxx.getContractRecordTime());//备案时间
+            htxx.setHtje(Double.parseDouble(jyhtxx.getContractAmount().toString()));//合同金额
+            htxx.setHtzt(jyhtxx.getIsReal());//合同状态
+         }
+        return htxx;
+    }
+
+
+
+
 
     public List<Dyxx> initDyxx(String yywh,Sj_Info_Dyhtxx dyhtxx,List<SJ_Fjfile> fileVoList) throws ParseException {
         List<Dyxx> dyxxes = null;

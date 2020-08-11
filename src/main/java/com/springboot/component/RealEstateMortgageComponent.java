@@ -20,11 +20,8 @@ import com.springboot.popj.warrant.RealPropertyCertificate;
 import com.springboot.popj.warrant.ZdInfo;
 import com.springboot.service.chenbin.impl.ExchangeToInnerServiceImpl;
 
-import com.springboot.util.DateUtils;
-import com.springboot.util.StrUtil;
+import com.springboot.util.*;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
-import com.springboot.util.HttpClientUtils;
-import com.springboot.util.SysPubDataDealUtil;
 import com.springboot.util.newPlatBizUtil.ResultConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +33,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -886,23 +884,28 @@ RealEstateMortgageComponent {
         SJ_Sjsq sjSjsq = SysPubDataDealUtil.parseReceiptData(commonInterfaceAttributer, null, null, null);
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, registrationPid, true, grMortgageRegistration, bankPerson, areaNo);
         registrationBureau = ClAutoRealPropertyCertificate(sjSjsq, registrationBureau);
-        String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
+        String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname, bsrypassword)).getData();
         //做ftp操作
-        if (sjSjsq.getExt1().equals("0")){
-            exchangeToInnerService.ClRegistrationOfficePerson(registrationBureau);
-            return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+        if (StringUtils.isNotEmpty(sjSjsq.getExt1())) {
+            if ("0".equals(sjSjsq.getExt1())) {
+                exchangeToInnerService.ClRegistrationOfficePerson(registrationBureau);
+                return exchangeToInnerService.handleCreateFlow(token, sjSjsq, registrationBureau, true);
+            } else if ("1".equals(sjSjsq.getExt1())) {
+                exchangeToInnerService.ClRegistrationOfficePerson(registrationBureau);
+                String strMap = exchangeToInnerService.handleCreateFlow(token, sjSjsq, registrationBureau, true);
+                Map<String, String> stringToMap = StrUtil.mapStringToMap(strMap);//转换map
+                return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"), stringToMap.get(" receiptNumber"));
+            }
         }
-            exchangeToInnerService.ClRegistrationOfficePerson(registrationBureau);
-            String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
-            Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
-            return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
+        exchangeToInnerService.ClRegistrationOfficePerson(registrationBureau);
+        return exchangeToInnerService.handleCreateFlow(token, sjSjsq, registrationBureau, true);
     }
 
     private RegistrationBureau ClAutoRealPropertyCertificate(SJ_Sjsq sj_sjsq, RegistrationBureau registrationBureau) {
         Sj_Info_Dyhtxx mortgageContractInfo = sj_sjsq.getMortgageContractInfo();
         //抵押业务信息
         MortgageBizInfo mortgageBizInfo = new MortgageBizInfo();
-        mortgageBizInfo.setMortgageApplyDate(mortgageContractInfo.getApplyTime());
+        mortgageBizInfo.setMortgageApplyDate(TimeUtil.getTimeString(new Date()));
         if (StringUtils.isNotBlank(mortgageContractInfo.getRegistrationSubclass())){
             mortgageBizInfo.setRegisterSubType(mortgageContractInfo.getRegistrationSubclass());
         }else{

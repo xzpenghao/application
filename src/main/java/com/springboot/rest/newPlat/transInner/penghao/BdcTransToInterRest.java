@@ -1,8 +1,10 @@
 package com.springboot.rest.newPlat.transInner.penghao;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.service.newPlat.chenbin.BdcInteractService;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -19,30 +21,32 @@ import java.text.ParseException;
  * @Version 1.0
  */
 @RestController
+@RequestMapping("api/bdc/bank/interact")
 @Scope("prototype")
 @Slf4j
+@Api(tags = "不动产(新平台)交互银行接口")
 public class BdcTransToInterRest {
 
     @Autowired
     private BdcInteractService bdcInteractService;
 
 
-    /**
-     * 描述：不动产抵押登记转内网接口
-     * 作者：chenb
-     * 日期：2020/8/6
-     * 参数：[String]
-     * 返回：String
-     * 更新记录：更新人：{}，更新日期：{}
-     */
-    @RequestMapping(value = "creatProcMort2Bdc",method = RequestMethod.GET)
-    public ObjectRestResponse<String> creatProcMort2Bdc(
+  /**
+   * 功能描述: 不动产抵押登记转内网接口<br>
+   * 〈〉
+   * @Param: [commonInterfaceAttributer, checkAlready]
+   * @Return: com.github.wxiaoqi.security.common.msg.ObjectRestResponse<java.lang.String>
+   * @Author: Peng Hao
+   * @Date: 2020/8/11 15:03
+   */
+    @RequestMapping(value = "creatProcMortDyDjBdc",method = RequestMethod.GET)
+    public ObjectRestResponse<String> creatProcMortDyDjBdc(
             @RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer,
             @RequestParam(name = "checkAlready",required = false) String checkAlready
     ){
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
-            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,"不动产抵押登记"));
+            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,Msgagger.BDCDYDJ));
         } catch (ParseException e) {
             log.error("不动产抵押登记传入数据异常，原始数据为："+commonInterfaceAttributer);
             throw new ZtgeoBizException("不动产抵押登记内网办件传入数据异常");
@@ -51,21 +55,21 @@ public class BdcTransToInterRest {
     }
 
     /**
-     * 描述：预告及预告抵押登记转内网接口
-     * 作者：chenb
-     * 日期：2020/8/6
-     * 参数：[String]
-     * 返回：String
-     * 更新记录：更新人：{}，更新日期：{}
+     * 功能描述: 预告及预告抵押登记转内网接口<br>
+     * 〈〉
+     * @Param: [commonInterfaceAttributer, checkAlready]
+     * @Return: com.github.wxiaoqi.security.common.msg.ObjectRestResponse<java.lang.String>
+     * @Author: Peng Hao
+     * @Date: 2020/8/11 15:03
      */
-    @RequestMapping(value = "creatProcDoubleYG2Bdc",method = RequestMethod.GET)
-    public ObjectRestResponse<String> creatProcDoubleYG2Bdc(
+    @RequestMapping(value = "creatProcYgDyBdc",method = RequestMethod.GET)
+    public ObjectRestResponse<String> creatProcYgDyBdc(
             @RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer,
             @RequestParam(name = "checkAlready",required = false) String checkAlready
     ){
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
-            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,"预告及预告抵押"));
+            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,Msgagger.YGJYGDY));
         } catch (ParseException e) {
             log.error("不动产抵押登记传入数据异常，原始数据为："+commonInterfaceAttributer);
             throw new ZtgeoBizException("不动产抵押登记内网办件传入数据异常");
@@ -74,19 +78,26 @@ public class BdcTransToInterRest {
     }
 
     /**
-     * 描述：抵押注销登记转内网接口
-     * 作者：chenb
-     * 日期：2020/8/6
-     * 参数：[String]
-     * 返回：String
-     * 更新记录：更新人：{}，更新日期：{}
+     * 功能描述:抵押注销登记转内网接口
+     * 〈〉
+     * @Param: [commonInterfaceAttributer, checkAlready]
+     * @Return: com.github.wxiaoqi.security.common.msg.ObjectRestResponse<java.lang.String>
+     * @Author: Peng Hao
+     * @Date: 2020/8/11 15:03
      */
-    @RequestMapping(value = "creatProcMortCancel2Bdc",method = RequestMethod.GET)
-    public ObjectRestResponse<String> creatProcMortCancel2Bdc(
+    @RequestMapping(value = "creatProcMortZxBdc",method = RequestMethod.GET)
+    public ObjectRestResponse<String> creatProcMortZxBdc(
             @RequestParam("commonInterfaceAttributer") String commonInterfaceAttributer,
             @RequestParam(name = "checkAlready",required = false) String checkAlready
     ){
-        return new ObjectRestResponse<>();
+        ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
+        try {
+            rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,Msgagger.DYZXDJ));
+        } catch (ParseException e) {
+            log.error("不动产抵押注销传入数据异常，原始数据为："+commonInterfaceAttributer);
+            throw new ZtgeoBizException("不动产抵押注销内网办件传入数据异常");
+        }
+        return rv;
     }
 
 }
