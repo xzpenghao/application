@@ -64,13 +64,11 @@ public class BdcTransToInterService {
                 sjsq,                               //收件申请
                 newPlatSettings,                    //新平台配置
                 NEWPLAT_TURNINNERS_BDCDY,           //新平台业务类型
-                BDC_DJLB_ZHYW,                      //登记类别
+                BDC_DJLB_DBYW,                      //登记类别
                 LZDZ_LDKQ                           //领证地址
         );
-        //设置抵押登记申请人
-        newBdcFlowRequest.setSqrxx(bdcInteractService.mortDyrsAndDyqrsToSqr(sjsq.getMortgageContractInfo()));
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
-        ParamConvertUtil.fillMainHouseToReq(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
+        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
         //补全抵押信息
         newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
         return  newBdcFlowRequest;
@@ -91,14 +89,17 @@ public class BdcTransToInterService {
                 sjsq,                               //收件申请
                 newPlatSettings,                    //新平台配置
                 NEWPLAT_TURNINNERS_YGYD,           //新平台业务类型
-                BDC_DJLB_DBYW,                      //登记类别
+                BDC_DJLB_ZHYW,                      //登记类别
                 LZDZ_LDKQ                           //领证地址
         );
-        newBdcFlowRequest.setHtxx(bdcInteractService.initJyhtxx(sjsq.getTransactionContractInfo()));
-        //最外层申请人信息为买卖双方
-        newBdcFlowRequest.setSqrxx(bdcInteractService.mortDyrsAndDyqrsToSqr(sjsq.getMortgageContractInfo()));
+        //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
+       // ParamConvertUtil.fillMainHouseToReqByDyxx(newBdcFlowRequest,sjsq.getImmovableCurrentMortgageInfoVoList());
+        //暂定 新平台获取
+//        newBdcFlowRequest.setHtxx(bdcInteractService.initJyhtxx(sjsq.getTransactionContractInfo()));
+        //最外层申请人为买卖双方
+        newBdcFlowRequest.setSqrxx(bdcInteractService.transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
         //补全附件列表信息
-        newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_YD));
+        newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_YG));
         //补全抵押信息
         newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
         return newBdcFlowRequest;
@@ -119,12 +120,15 @@ public class BdcTransToInterService {
         NewBdcFlowRequest newBdcFlowRequest = ParamConvertUtil.getBaseFromSjsq(
                 sjsq,                               //收件申请
                 newPlatSettings,                    //新平台配置
-                NEWPLAT_TURNINNERS_YGYD,           //新平台业务类型
+                NEWPLAT_TURNINNERS_DYZX,           //新平台业务类型
                 BDC_DJLB_DBYW,                      //登记类别
                 LZDZ_LDKQ                           //领证地址
         );
-        //最外层申请人信息为买卖双方
-        newBdcFlowRequest.setSqrxx(bdcInteractService.mortDyrsAndDyqrsToSqr(sjsq.getMortgageContractInfo()));
+        //房屋信息
+        //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
+        ParamConvertUtil.fillMainHouseToReqByDyxx(newBdcFlowRequest,sjsq.getImmovableCurrentMortgageInfoVoList());
+        //最外层申请为抵押权人
+//        newBdcFlowRequest.setSqrxx(bdcInteractService.mortDyrsAndDyqrsToSqr(sjsq.getMortgageContractInfo()));
         //补全附件列表信息
         newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_DYZX));
         //附件信息
