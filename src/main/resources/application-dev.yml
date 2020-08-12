@@ -83,7 +83,7 @@ redis:
     maxIdle: 100
     maxWait: 1000
   host: 127.0.0.1
-  port: 6379
+  port: 6389
 #  password: ztgeoredis
   timeout: 2000
   sysName: ace-pubserver
@@ -120,7 +120,7 @@ glHouseBuyer:
   obligeeZwr: 债务人
 httpclient:
   seam: 23335       #杨智昊程序端口
-  ip: 192.168.0.120
+  ip: 10.13.0.231
   #10.3.2.147    #登记平台ip
   windowAcceptanceIp: localhost   #一窗受理ip
   windowAcceptanceSeam: 7780      #一窗受理接口
@@ -221,7 +221,7 @@ penghao:
         pid: Proc-191106165449-7075280W
           #Proc-180517124140-3MN26M71
     mortgageRegistration:       #抵押登记pid
-        pid: Proc-171019093148-WLI15DA7  #徐州
+        pid: Proc-191106165520-XJ123752  #徐州
          # Proc-180517124205-2WM2423B 宿迁
     transferRegister:           #二手房转移登记
         pid: Proc-180403153139-46641AJ0
@@ -293,7 +293,7 @@ gxjhpt:
   url: http://127.0.0.1:7780/
 
 bdccx:
-  url: http://10.3.0.149:23335/
+  url: http://10.13.0.231:23335/
 #  url: http://172.22.226.172:12201/
 ycsl:
   url: http://localhost:7780/
@@ -303,9 +303,9 @@ other:
 
 
 PublicInspect:
-  BDCZHURL: http://192.168.0.120:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
-  DYZMHURL: http://192.168.0.120:23335/api/services/app/BdcQuery/GetBdcInfoByDYZMH?DYZMH=%s
-  YGZMHURL: http://192.168.0.120:23335/api/services/app/BdcQuery/GetBdcInfoByYGZMH?YGZMH=%s
+  BDCZHURL: http://10.13.0.231:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
+  DYZMHURL: http://10.13.0.231:23335/api/services/app/BdcQuery/GetBdcInfoByDYZMH?DYZMH=%s
+  YGZMHURL: http://10.13.0.231:23335/api/services/app/BdcQuery/GetBdcInfoByYGZMH?YGZMH=%s
 
 
 ETicket:
@@ -319,5 +319,5 @@ Feign:
   Electric: api/test/testElec
 
 HouseSet:
-  Bdc: http://10.3.0.149:23335/api/services/app/bdcQuery/GetHouseInfoByMember
+  Bdc: http://10.13.0.231:23335/api/services/app/bdcQuery/GetHouseInfoByMember
   taxPush: http://localhost:7777/sjHouseSet/mockTax
