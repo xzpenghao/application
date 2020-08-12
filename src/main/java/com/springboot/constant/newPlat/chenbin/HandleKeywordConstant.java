@@ -38,4 +38,15 @@ public class HandleKeywordConstant {
     public final static String BDC_RYLX_DLR_YGYW="预告义务代理人";
     public final static String BDC_RYLX_DLR_YGDY="预告抵押代理人";
     public final static String BDC_RYLX_DLR_YGDYQ="预告抵押权代理人";
+
+    //是否预测
+    public final static String BDC_DATA_TYPE_YC = "1";
+    public final static String BDC_DATA_TYPE_SC = "0";
+
+    //附件默认处理路径
+    public final static String FILE_DEFAULT_MAPPING_FOLDER_NAME = "其他";
+
+    //ftp模式
+    public final static String FTP_USE_MODE_ACTIVE = "active";
+    public final static String FTP_USE_MODE_PASSIVE = "passive";
 }

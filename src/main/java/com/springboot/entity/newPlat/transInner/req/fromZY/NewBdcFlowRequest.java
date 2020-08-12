@@ -23,6 +23,7 @@ public class NewBdcFlowRequest {
     private String wwdjlxmc;                        //sname..
     private String wwywh;                           //网申业务号..
     private String yywh;                            //原业务号
+    private String yqllx;                           //原权利类型
     private String djlb;                            //登记类别..
     private String jsrid;                           //接收人ID..
     private String jsrmc;                           //接收人名称..

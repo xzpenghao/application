@@ -29,6 +29,7 @@ public class DyzmResponse {
     private String zl;                  //坐落
     private String djlx;                //登记类型
     private String djrq;                //登记日期
+    private String qllx;                //权利类型
     private String dyfs;                //抵押方式
     private String dyyy;                //抵押原因
     private String dylx;                //抵押类型

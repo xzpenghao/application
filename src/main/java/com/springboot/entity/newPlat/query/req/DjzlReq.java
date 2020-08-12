@@ -19,9 +19,16 @@ public class DjzlReq {
     private String qlrzjh; // 权利人证件号
     private String zl; // 坐落
 
-    public DjzlReq initByPaph(PaphReqEntity paph){
-        this.qlrmc = paph.getQlrmc();
-        this.qlrzjh = paph.getQlrzjh();
+    public DjzlReq initByPaph(PaphReqEntity paph,String key){
+        if("before".equals(key)) {
+            this.qlrmc = paph.getQlrmc();
+            this.qlrzjh = paph.getQlrzjh();
+        }else if("after".equals(key)){
+            this.qlrmc = paph.getDyrmc();
+            this.qlrzjh = paph.getDyrzjh();
+        }else{
+            throw new ZtgeoBizException("暂不支持的查询key，目前风险查询仅支持贷前/贷后");
+        }
         if(StringUtils.isNotBlank(paph.getBdczl())){
             this.zl = paph.getBdczl().replaceAll("\\$","%");
             if(StringUtils.isBlank(this.zl.replaceAll("%","")))

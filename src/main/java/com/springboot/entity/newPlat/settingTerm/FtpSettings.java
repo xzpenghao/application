@@ -17,4 +17,6 @@ import java.util.List;
 @ConfigurationProperties(prefix = "ftp")
 public class FtpSettings extends BaseSettings<FtpSettingTerm> {
     private FtpDealSetting isDealFtp;
+    private String ycSaveSetting;
+    private String ifLocalBasePath;
 }

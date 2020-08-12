@@ -15,6 +15,7 @@ public class JSONBdcdyxgxx implements Serializable {
     private String acceptanceNumber;            //不动产内网受理编号
     private String immovableSite;               //不动产坐落（收件单坐落）
     private String mortgageCertificateNo;           //抵押证明号
+    private String qllx;                        //抵押权利类型
     private Date registrationDate;                //登记日期
     private String mortgageMode;                    //抵押方式
     private BigDecimal mortgageArea;                    //抵押面积
@@ -307,5 +308,13 @@ public class JSONBdcdyxgxx implements Serializable {
 
     public void setQtxz(String qtxz) {
         this.qtxz = qtxz;
+    }
+
+    public String getQllx() {
+        return qllx;
+    }
+
+    public void setQllx(String qllx) {
+        this.qllx = qllx;
     }
 }

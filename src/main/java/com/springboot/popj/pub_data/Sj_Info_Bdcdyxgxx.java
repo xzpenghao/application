@@ -8,6 +8,7 @@ import java.util.List;
 
 public class Sj_Info_Bdcdyxgxx extends SJ_Information{
     private String acceptanceNumber;            //不动产内网受理编号
+    private String qllx;                        //抵押权利类型
     private String immovableSite;               //不动产坐落（收件单坐落）
     private String mortgageCertificateNo;           //抵押证明号
     private String registrationDate;                //登记日期
@@ -252,5 +253,13 @@ public class Sj_Info_Bdcdyxgxx extends SJ_Information{
 
     public void setQtxz(String qtxz) {
         this.qtxz = qtxz;
+    }
+
+    public String getQllx() {
+        return qllx;
+    }
+
+    public void setQllx(String qllx) {
+        this.qllx = qllx;
     }
 }

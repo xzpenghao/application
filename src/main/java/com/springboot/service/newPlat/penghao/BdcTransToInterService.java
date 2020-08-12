@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.util.List;
 
 import static com.springboot.constant.chenbin.BusinessConstant.*;
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.BDC_DATA_TYPE_SC;
 
 /**
  * @Author Peng Hao
@@ -68,9 +69,13 @@ public class BdcTransToInterService {
                 LZDZ_LDKQ                           //领证地址
         );
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
-        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList());
+        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList(),BDC_DATA_TYPE_SC);
         //补全抵押信息
-        newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
+        newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(
+                newBdcFlowRequest.getYywh(),
+                newBdcFlowRequest.getYqllx(),
+                sjsq.getMortgageContractInfo(),fileVoList)
+        );
         return  newBdcFlowRequest;
     }
 
@@ -101,7 +106,12 @@ public class BdcTransToInterService {
         //补全附件列表信息
         newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_YG));
         //补全抵押信息
-        newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(newBdcFlowRequest.getYywh(),sjsq.getMortgageContractInfo(),fileVoList));
+        newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(
+                newBdcFlowRequest.getYywh(),
+                null,
+                sjsq.getMortgageContractInfo(),
+                fileVoList)
+        );
         return newBdcFlowRequest;
     }
 
@@ -126,7 +136,7 @@ public class BdcTransToInterService {
         );
         //房屋信息
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
-        ParamConvertUtil.fillMainHouseToReqByDyxx(newBdcFlowRequest,sjsq.getImmovableCurrentMortgageInfoVoList());
+        ParamConvertUtil.fillMainHouseToReqByDyxx(newBdcFlowRequest,sjsq.getImmovableCurrentMortgageInfoVoList(),BDC_DATA_TYPE_SC);
         //最外层申请为抵押权人
 //        newBdcFlowRequest.setSqrxx(bdcInteractService.mortDyrsAndDyqrsToSqr(sjsq.getMortgageContractInfo()));
         //补全附件列表信息

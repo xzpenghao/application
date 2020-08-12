@@ -137,7 +137,7 @@ public class BdcQueryService {
         //1. 定义返回结果集
         List<PaphEntity> paphEntitys = new ArrayList<>();
         //2. 初始化查询条件
-        DjzlReq djzlReq = new DjzlReq().initByPaph(paph);
+        DjzlReq djzlReq = new DjzlReq().initByPaph(paph,key);
         //3. 执行查询操作
         OtherResponseEntity<List<DjzlResponse>> cxjg = bdcQueryFeign.djzlcx(djzlReq);
         //4. 解析查询的结果数据

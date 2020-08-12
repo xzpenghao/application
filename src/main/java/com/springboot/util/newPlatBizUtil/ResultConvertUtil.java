@@ -202,6 +202,7 @@ public class ResultConvertUtil {
             bdcdyxx.setRemarks(dyzm.getFj());
             bdcdyxx.setOther(dyzm.getQtzk());
             bdcdyxx.initInfoTerm("",DATA_SOURCE_DEPART_BDC);
+            bdcdyxx.setQllx(StringUtils.isBlank(dyzm.getQllx())?"抵押权":dyzm.getQllx());
         }
         return bdcdyxx;
     }

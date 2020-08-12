@@ -26,6 +26,7 @@ public class Dyxx {
     private String bdcjz;                   //不动产价值
     private String dysx;                    //抵押顺序
     private String yywh;                    //原业务号
+    private String yqllx;                   //原权利类型
     private String zwr;                     //债务人
     private String zwrzjhm;                 //债务人证件号码
     private String zwrzjlx;                 //债务人证件类型

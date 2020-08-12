@@ -1,10 +1,13 @@
 package com.springboot.entity.chenbin.personnel.other.paph;
 
+import com.springboot.emm.DIC_BDC_DYFS_Enums;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx;
+import com.springboot.util.newPlatBizUtil.DicConvertUtil;
 import com.springboot.util.newPlatBizUtil.ResultConvertUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class PaphDyxx implements Serializable {
     private String dyqr;
@@ -46,7 +49,14 @@ public class PaphDyxx implements Serializable {
 
     public PaphDyxx initByDjzlDy(Dyxx dyxx){
         this.zqje = StringUtils.isBlank(dyxx.getZqje())?dyxx.getDyje():dyxx.getZqje();
+        if(StringUtils.isNotBlank(this.zqje))
+            this.zqje = ResultConvertUtil.getStringFromBigDecimalNotThrowNull(
+                    new BigDecimal(Double.parseDouble(this.zqje)*10000),
+                    "#.00"
+            );
         this.dylx = StringUtils.isBlank(dyxx.getDylx())?dyxx.getDyfs():dyxx.getDylx();
+        if(StringUtils.isNotBlank(this.dylx))
+            this.dylx = DicConvertUtil.getDicNameByVal(this.dylx , DIC_BDC_DYFS_Enums.values());
         this.zwlxqx = ResultConvertUtil.creatZwlxqx(dyxx);
         return this;
     }

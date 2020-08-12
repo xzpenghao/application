@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -117,17 +118,16 @@ public class ParamConvertUtil {
      * 返回：void
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public static void fillMainHouseToReqByQlxx(NewBdcFlowRequest newBdcFlowRequest,List<SJ_Info_Bdcqlxgxx> qlxxVoList) throws ParseException {
+    public static void fillMainHouseToReqByQlxx(NewBdcFlowRequest newBdcFlowRequest,List<SJ_Info_Bdcqlxgxx> qlxxVoList,String sfyc) throws ParseException {
 
         //获取主要不动产权属
         SJ_Info_Bdcqlxgxx qlxxzt = getMainHouseQlxx(qlxxVoList);
         //获取主体房产信息
         SJ_Bdc_Gl bdc = getMainHouse(qlxxzt.getGlImmovableVoList());
         //获取基础房屋信息
-        Fwxx fwxx = getBaseFwxx(bdc);
-
+        Fwxx fwxx = getBaseFwxx(bdc,sfyc);
         //设置权利相关项
-        fwxx.setQllx(getNullStrIfk(qlxxzt.getLandRightType()));
+        fwxx.setQllx(getNullStrIfk(qlxxzt.getHouseRightType()));
         fwxx.setQlxz(getNullStrIfk(qlxxzt.getHouseRightNature()));
         fwxx.setQlqssj(TimeUtil.getTimeString(TimeUtil.getTimeFromString(qlxxzt.getLandUseRightStartingDate())));
         fwxx.setQljssj(TimeUtil.getTimeString(TimeUtil.getTimeFromString(qlxxzt.getLandUseRightEndingDate())));
@@ -138,7 +138,8 @@ public class ParamConvertUtil {
         fwxx.setTdyt(getNullStrIfk(qlxxzt.getLandPurpose()));
 
         //设置原业务号和房屋信息
-        newBdcFlowRequest.setYywh(getNullStrIfk(qlxxzt.getAcceptanceNumber()));
+        newBdcFlowRequest.setYywh(getNullStrIfk(qlxxzt.getAcceptanceNumber()));//原业务号
+        newBdcFlowRequest.setYqllx(getNullStrIfk(qlxxzt.getHouseRightType()));//原权利类型
         newBdcFlowRequest.setFwxx(fwxx);
     }
 
@@ -150,7 +151,7 @@ public class ParamConvertUtil {
      * 返回：void
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public static void fillMainHouseToReqByDyxx(NewBdcFlowRequest newBdcFlowRequest,List<Sj_Info_Bdcdyxgxx> dyxxVoList) throws ParseException {
+    public static void fillMainHouseToReqByDyxx(NewBdcFlowRequest newBdcFlowRequest,List<Sj_Info_Bdcdyxgxx> dyxxVoList,String sfyc) throws ParseException {
         //抵押信息判断
         if(dyxxVoList==null || dyxxVoList.size()<1){
             throw new ZtgeoBizException("收件不动产抵押信息为空");
@@ -162,14 +163,14 @@ public class ParamConvertUtil {
         Sj_Info_Bdcdyxgxx ztdyxx = dyxxVoList.get(0);
         //获取房屋主体信息
         SJ_Bdc_Gl bdc = getMainHouse(ztdyxx.getGlImmovableVoList());
-        Fwxx fwxx = getBaseFwxx(bdc);
-
+        Fwxx fwxx = getBaseFwxx(bdc,sfyc);
         //设置原业务号和房屋信息
         newBdcFlowRequest.setYywh(getNullStrIfk(ztdyxx.getAcceptanceNumber()));
+        newBdcFlowRequest.setYqllx(ztdyxx.getQllx());
         newBdcFlowRequest.setFwxx(fwxx);
     }
 
-    public static Fwxx getBaseFwxx(SJ_Bdc_Gl bdc){
+    public static Fwxx getBaseFwxx(SJ_Bdc_Gl bdc,String sfyc){
         //声明房屋主体
         Fwxx fwxx = new Fwxx();
         SJ_Bdc_Fw_Info fwInfo = bdc.getFwInfo();
@@ -194,6 +195,8 @@ public class ParamConvertUtil {
         fwxx.setFtjzmj(fwInfo.getApportionmentArchitecturalArea());
         fwxx.setFzwdm(null);
 
+        //是否预测设置
+        fwxx.setSfyc(sfyc);
         return fwxx;
     }
 
@@ -377,6 +380,13 @@ public class ParamConvertUtil {
         if(StringUtils.isBlank(sqrzl))
             throw new ZtgeoBizException("人员种类映射失败，【"+ywKsy+"】类业务【"+qlrlx+"】未查找到匹配的申请人种类");
         return sqrzl;
+    }
+
+    public static String initNeedFtpPath(String platName,String firstKey,String fileName){
+        return "/"+platName.toUpperCase()
+                +"/"+firstKey.toUpperCase()
+                +"/"+TimeUtil.getDateString(new Date()).replaceAll("-","")
+                +"/"+fileName;
     }
 
     /**

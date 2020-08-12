@@ -42,4 +42,5 @@ public class Fwxx {
     private BigDecimal tdsyqmj;             //土地使用权面积
     private String tdyt;                //土地用途
 
+    private String sfyc;                //是否预测0-实测/1-预测
 }
