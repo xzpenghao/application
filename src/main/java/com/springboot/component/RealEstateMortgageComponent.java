@@ -913,6 +913,7 @@ RealEstateMortgageComponent {
         }
         mortgageBizInfo.setMortgageWay(BusinessDealBaseUtil.getModeBySub(mortgageBizInfo.getRegisterSubType()));
         mortgageBizInfo.setMortgageTerm(mortgageContractInfo.getMortgagePeriod());
+        mortgageBizInfo.setEvaluationValue(mortgageContractInfo.getValuationValue().toString());
         if ( null != mortgageContractInfo.getMaximumClaimAmount() ) {
             mortgageBizInfo.setHighestClaimAmount(mortgageContractInfo.getMaximumClaimAmount().toString());
         }
@@ -923,7 +924,10 @@ RealEstateMortgageComponent {
         );
         mortgageBizInfo.setMortgageStartDate(DateUtils.strToDate(mortgageContractInfo.getMortgageStartingDate()));
         mortgageBizInfo.setMortgageEndDate(DateUtils.strToDate(mortgageContractInfo.getMortgageEndingDate()));
-        if (null != mortgageContractInfo.getCreditAmount()) {
+        //债权数据为空的话取抵押金额
+        if (null == mortgageContractInfo.getCreditAmount()){
+            mortgageBizInfo.setCreditAmount(mortgageContractInfo.getMortgageAmount().toString());
+        }else {
             mortgageBizInfo.setCreditAmount(mortgageContractInfo.getCreditAmount().toString());
         }
         //抵押人
