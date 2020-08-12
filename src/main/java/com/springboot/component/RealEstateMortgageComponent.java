@@ -1,8 +1,10 @@
 package com.springboot.component;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.util.StringUtil;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.HttpCallComponent;
 import com.springboot.config.DJJUser;
@@ -715,7 +717,7 @@ RealEstateMortgageComponent {
         realPropertyCertificate.setOther(jsonObject.getString("other"));//其他权利状况
         realPropertyCertificate.setRegistrationDate(jsonObject.getString("registerDate"));
         JSONArray glImmovablejsonArray = (JSONArray) jsonObject.get("realEstateUnitInfoVoList");//房屋信息
-        if (null != glImmovablejsonArray) {
+        if (CollectionUtil.isNotEmpty(glImmovablejsonArray)) {
             for (int z = 0; z < glImmovablejsonArray.size(); z++) {
                 //房屋信息
                 JSONObject glImmovableObject = glImmovablejsonArray.getJSONObject(z);
@@ -766,7 +768,7 @@ RealEstateMortgageComponent {
         JSONArray ygInfojsonArray = (JSONArray) jsonObject.get("advanceInfoVoList");
         if (null != ygInfojsonArray) {
             String[] kung = new String[ygInfojsonArray.size()];
-            if (null != ygInfojsonArray) {
+            if (CollectionUtil.isNotEmpty(ygInfojsonArray)) {
                 for (int j = 0; j < ygInfojsonArray.size(); j++) {
                     JSONObject ygObject = ygInfojsonArray.getJSONObject(j);
                     kung[j] = ygObject.getString("vormerkungId");
@@ -866,13 +868,18 @@ RealEstateMortgageComponent {
         RegistrationBureau registrationBureau = BusinessDealBaseUtil.dealBaseInfo(sjSjsq, registrationPid, true, grMortgageRegistration, bankPerson, areaNo);
         registrationBureau = ClAutoRealPropertyCertificate(sjSjsq, registrationBureau);
         String token = backFeign.getToken(new JwtAuthenticationRequest(bsryname,bsrypassword)).getData();
-        if (sjSjsq.getExt1().equals("0")){
-            //做ftp操作
-            return exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
+        if (StringUtils.isNotEmpty(sjSjsq.getExt1())) {
+            if (sjSjsq.getExt1().equals("0")) {
+                //做ftp操作
+                return exchangeToInnerService.handleCreateFlow(token, sjSjsq, registrationBureau, true);
+            }else if (sjSjsq.getExt1().equals("1")){
+            String strMap = exchangeToInnerService.handleCreateFlow(token, sjSjsq, registrationBureau, true);
+            Map<String, String> stringToMap = StrUtil.mapStringToMap(strMap);//转换map
+            return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"), stringToMap.get(" receiptNumber"));
+            }
         }
-            String strMap= exchangeToInnerService.handleCreateFlow(token,sjSjsq,registrationBureau,true);
-            Map<String,String> stringToMap= StrUtil.mapStringToMap(strMap);//转换map
-            return exchangeToInnerService.handleAcceptance(stringToMap.get("registerNumber"),stringToMap.get(" receiptNumber"));
+        //说明没有选择受理提交,登记平台到受理节点
+        return exchangeToInnerService.handleCreateFlow(token, sjSjsq, registrationBureau, true);
     }
 
     private RegistrationBureau ClAutoRealPropertyCertificate(SJ_Sjsq sj_sjsq, RegistrationBureau registrationBureau) {
@@ -887,6 +894,7 @@ RealEstateMortgageComponent {
         }
         mortgageBizInfo.setMortgageWay(BusinessDealBaseUtil.getModeBySub(mortgageBizInfo.getRegisterSubType()));
         mortgageBizInfo.setMortgageTerm(mortgageContractInfo.getMortgagePeriod());
+        mortgageBizInfo.setEvaluationValue(mortgageContractInfo.getValuationValue().toString());
         if ( null != mortgageContractInfo.getMaximumClaimAmount() ) {
             mortgageBizInfo.setHighestClaimAmount(mortgageContractInfo.getMaximumClaimAmount().toString());
         }
@@ -897,7 +905,10 @@ RealEstateMortgageComponent {
         );
         mortgageBizInfo.setMortgageStartDate(DateUtils.strToDate(mortgageContractInfo.getMortgageStartingDate()));
         mortgageBizInfo.setMortgageEndDate(DateUtils.strToDate(mortgageContractInfo.getMortgageEndingDate()));
-        if (null != mortgageContractInfo.getCreditAmount()) {
+        //债权数据为空的话取抵押金额
+        if (null == mortgageContractInfo.getCreditAmount()){
+            mortgageBizInfo.setCreditAmount(mortgageContractInfo.getMortgageAmount().toString());
+        }else{
             mortgageBizInfo.setCreditAmount(mortgageContractInfo.getCreditAmount().toString());
         }
         //抵押人
