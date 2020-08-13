@@ -72,34 +72,40 @@ public class SysPubDataDealUtil {
                     serviceDataTo = serviceDataTo_temp;
                 }
                 String JSON_serviceDataInfos = serviceData.getServiceDataInfos();
-                switch (serviceDataTo) {
-                    //使用操作表作为判断条件
-                    case BizOrBizExceptionConstant.IMMOVABLE_RIGHT_RECEIPT_SERVICE:
-                        dealBdcqlxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    case BizOrBizExceptionConstant.IMMOVABLE_MORTGAGE_RECEIPT_SERVICE:
-                        dealBdcdyxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    case BizOrBizExceptionConstant.TRANSACTION_CONTRACT_RECEIPT_SERVICE:
-                        dealJyhtxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    case BizOrBizExceptionConstant.MORTGAGE_CONTRACT_RECEIPT_SERVICE:
-                        dealDyhtxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    case BizOrBizExceptionConstant.TAXATION_RECEIPT_SERVICE:
-                        dealQsxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    case BizOrBizExceptionConstant.HANDLE_RESULT_SERVICE:
-                        dealHandleResults(JSON_serviceDataInfos, sjsq, serviceCode);
-                        break;
-                    default:
-                        log.error("入库表标识为：" + serviceDataTo + "的表标识常量未定义");
-                        throw new ZtgeoBizException(BizOrBizExceptionConstant.DATA_TABLE_ERROR_MSG);
+
+                if (!BizOrBizExceptionConstant.IMMOVEABLE_BUILDING_SERVICE.equals(serviceDataTo)) {
+                    switch (serviceDataTo) {
+                        //使用操作表作为判断条件
+                        case BizOrBizExceptionConstant.IMMOVABLE_RIGHT_RECEIPT_SERVICE:
+                            dealBdcqlxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
+                            break;
+                        case BizOrBizExceptionConstant.IMMOVABLE_MORTGAGE_RECEIPT_SERVICE:
+                            dealBdcdyxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
+                            break;
+                        case BizOrBizExceptionConstant.TRANSACTION_CONTRACT_RECEIPT_SERVICE:
+                            dealJyhtxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
+                            break;
+                        case BizOrBizExceptionConstant.MORTGAGE_CONTRACT_RECEIPT_SERVICE:
+                            dealDyhtxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
+                            break;
+                        case BizOrBizExceptionConstant.TAXATION_RECEIPT_SERVICE:
+                            dealQsxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
+                            break;
+                        case BizOrBizExceptionConstant.HANDLE_RESULT_SERVICE:
+                            dealHandleResults(JSON_serviceDataInfos, sjsq, serviceCode);
+                            break;
+                        default:
+                            log.error("入库表标识为：" + serviceDataTo + "的表标识常量未定义");
+                            throw new ZtgeoBizException(BizOrBizExceptionConstant.DATA_TABLE_ERROR_MSG);
+                    }
                 }
             }
         }
         return sjsq;
     }
+
+
+
 
     //处理权利信息
     public static void dealBdcqlxxInfos(String JSON_serviceDataInfos, SJ_Sjsq sjsq, String serviceCode) {

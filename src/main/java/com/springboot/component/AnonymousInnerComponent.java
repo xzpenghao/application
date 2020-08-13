@@ -1,5 +1,6 @@
 package com.springboot.component;
 
+import com.github.pagehelper.util.StringUtil;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.google.common.collect.Maps;
 import com.springboot.component.chenbin.ExchangeToInnerComponent;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -633,8 +635,23 @@ public class AnonymousInnerComponent {
                             handleResult.setHandleResult(verfyInfoObject.getString("registerSubType") + Msgagger.ADOPT);
                             handleResult.setProvideUnit(Msgagger.REGISTRATION);
                             handleResult.setDataComeFromMode(Msgagger.SUCCESSFUL_INTERFACE);
-                            handleResultVoList.add(handleResult);
+                            if (StringUtil.isNotEmpty(verfyInfoObject.getString("registerSubType"))){
+                                handleResultVoList.add(handleResult);
+                            }
                         }
+//                        RespServiceData respServiceData = new RespServiceData();
+//                        //为了组合业务合并审核结果
+//                        if (null !=  handleResultVoList && handleResultVoList.size()>1) {
+//                            SJ_Info_Handle_Result handleResult = new SJ_Info_Handle_Result();
+//                            handleResult.setProvideUnit(Msgagger.REGISTRATION);
+//                            handleResult.setDataComeFromMode(Msgagger.SUCCESSFUL_INTERFACE);
+//                            handleResult.setHandleResult(handleResultVoList.stream().map(n -> n.getHandleResult()).collect(Collectors.joining("_")));
+//                            handleResult.setHandleText(handleResultVoList.stream().map(n -> n.getHandleText()).collect(Collectors.joining("_")));
+//                            ResultVoList.add(handleResult);
+//                            respServiceData.setServiceDataInfos(ResultVoList);
+//                        }else {
+//                            respServiceData.setServiceDataInfos(ResultVoList);
+//                        }
                         RespServiceData respServiceData = new RespServiceData();
                         respServiceData.setServiceCode(immovableHandleResultService);
                         respServiceData.setServiceDataInfos(handleResultVoList);
@@ -696,10 +713,8 @@ public class AnonymousInnerComponent {
                         respServiceData.setServiceDataInfos(handleResultVoList);
                         log.info("resultServiceData2:\n"+respServiceData.getServiceDataInfos());
                         if (StringUtils.isNotEmpty(name)){
-                            String yhOrgId="";
                                 //如果多家银行介入进来需要判断抵押权人信息
                                 log.info("抵押注销通知进来了");
-                                String url="";
                                 List<MortgageService> mortgageServiceList = resultServiceData.getServiceDataInfos();
                                 ResultNoticeReqVo resultNoticeReqVo = new ResultNoticeReqVo();
                                 resultNoticeReqVo.setBusinessId(getReceiving.getSlbh());
@@ -708,17 +723,15 @@ public class AnonymousInnerComponent {
                                 if (null != resultNoticeReqVo.getMortgageeInfoVoList() && resultNoticeReqVo.getMortgageeInfoVoList().size()>0){
                                     List<MortgageeInfoVo> mortgageeInfoVoList =resultNoticeReqVo.getMortgageeInfoVoList();
                                     for (MortgageeInfoVo mortgagee: mortgageeInfoVoList) {
-                                        if (mortgagee.getMortgageeName().contains("交通银行")){
-                                            yhOrgId= Msgagger.SQ_JT_ORGID; //orgId
-                                            url=noticeUrl; //通知url针对的是宿迁交通银行
-                                        }
+//                                        if (mortgagee.getMortgageeName().contains("交通银行")){
+//                                            resultNoticeReqVo.setOrgId(Msgagger.SQ_JT_ORGID);
+//                                            JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
+//                                            log.info("bankObject"+bankObject.toString());
+//                                            String resultJson= BankNotification(bankObject,noticeUrl);
+//                                            log.info("银行返回json"+resultJson);
+//                                        }
                                     }
-                                    resultNoticeReqVo.setOrgId(yhOrgId);
                                 }
-                                JSONObject bankObject=JSONObject.fromObject(resultNoticeReqVo);
-                                log.info("bankObject"+bankObject.toString());
-                               String resultJson= BankNotification(bankObject,url);
-                                log.info("银行返回json"+resultJson);
                         }
                         respServiceDataList.add(respServiceData);
                         JSONArray jsonArray = JSONArray.fromObject(respServiceDataList);

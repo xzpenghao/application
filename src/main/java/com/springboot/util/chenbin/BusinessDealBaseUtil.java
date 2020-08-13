@@ -93,7 +93,7 @@ public class BusinessDealBaseUtil {
         mortgageBizInfo.setMortgageApplyDate(StringUtils.isNotBlank(dyht.getApplyTime()) ? dyht.getApplyTime() : TimeUtil.getTimeString(new Date()));
         mortgageBizInfo.setRegisterSubType(StringUtils.isBlank(dyht.getRegistrationSubclass())?"一般抵押权":dyht.getRegistrationSubclass());
         mortgageBizInfo.setMortgageWay(StringUtils.isBlank(dyht.getMortgageMode())?getModeBySub(dyht.getRegistrationSubclass()):dyht.getMortgageMode());
-        mortgageBizInfo.setCreditAmount(dyht.getCreditAmount() == null ? null : dyht.getCreditAmount().toString());
+        mortgageBizInfo.setCreditAmount(dyht.getCreditAmount() == null ? dyht.getMortgageAmount().toString() : dyht.getCreditAmount().toString());
         mortgageBizInfo.setEvaluationValue(dyht.getValuationValue() == null ? null : dyht.getValuationValue().toString());
         mortgageBizInfo.setMortgageTerm(dyht.getMortgagePeriod());
         mortgageBizInfo.setMortgageStartDate(DateUtils.strToDate(dyht.getMortgageStartingDate()));
@@ -355,7 +355,6 @@ public class BusinessDealBaseUtil {
             String[] id_ = idType.split(",");
             String idTypeName = id_[0];
             if (idType.contains(idName)) {
-                System.out.println("为：" + id_[1]);
                 idd = id_[1];
             }
         }

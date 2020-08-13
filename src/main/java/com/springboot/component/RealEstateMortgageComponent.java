@@ -697,20 +697,22 @@ RealEstateMortgageComponent {
     private RealPropertyCertificate getRealProperty(JSONObject jsonObject, JSONObject obj1) {
         RealPropertyCertificate realPropertyCertificate = new RealPropertyCertificate();
         if (StringUtils.isEmpty(jsonObject.getString("realEstateId"))) {
-            realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("vormerkungId"));
-            realPropertyCertificate.setForecastCertificateNos(jsonObject.getString("vormerkungId").split(","));
+            if (StringUtil.isNotEmpty(jsonObject.getString("vormerkungId"))) {
+                realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("vormerkungId"));
+                realPropertyCertificate.setForecastCertificateNos(jsonObject.getString("vormerkungId").split(","));
+            }
         } else {
             realPropertyCertificate.setImmovableCertificateNo(jsonObject.getString("realEstateId"));
         }
-        if (StringUtils.isEmpty(jsonObject.getString("certificateType"))) {
-            realPropertyCertificate.setCertificateType("不动产权证");
-        } else {
+        if (StringUtils.isNotEmpty(jsonObject.getString("certificateType"))){
             if (jsonObject.getString("certificateType").equals("房屋不动产证")) {
                 realPropertyCertificate.setCertificateType("不动产权证");
             } else if (jsonObject.getString("certificateType").equals("房产证")) {
                 realPropertyCertificate.setCertificateType("房产证");
             } else if (jsonObject.getString("certificateType").equals("土地证")) {
                 realPropertyCertificate.setCertificateType("土地证");
+            }else {
+                realPropertyCertificate.setCertificateType("不动产权证");
             }
         }
         realPropertyCertificate.setRemarks(jsonObject.getString("remark"));//备注附记
@@ -853,9 +855,14 @@ RealEstateMortgageComponent {
     public List<RealPropertyCertificate> getRealPropertySj(String json, String ygCancellcation) {
         List<RealPropertyCertificate> realPropertyCertificateList = new ArrayList<>();
         //不动产证号和不动产单元号 (返回list)
-        JSONArray jsonArray = JSONArray.parseArray(json);
-        for (int i = 0; i < jsonArray.size(); i++) {
-            realPropertyCertificateList.add(getRealProperty(jsonArray.getJSONObject(i), null));
+        if (StringUtil.isNotEmpty(ygCancellcation)) {
+            JSONArray jsonArray = JSONArray.parseArray(json);
+            for (int i = 0; i < jsonArray.size(); i++) {
+                realPropertyCertificateList.add(getRealProperty(jsonArray.getJSONObject(i), null));
+            }
+        }else {
+            JSONObject jsonObject = JSON.parseObject(json);
+            realPropertyCertificateList.add(getRealProperty(jsonObject, null));
         }
         return realPropertyCertificateList;
     }
@@ -1055,14 +1062,15 @@ RealEstateMortgageComponent {
     public ObjectRestResponse getRealPropertyCertificate(ParametricData parametricData) throws Exception {
         String json = "";
         if (StringUtils.isNotEmpty(parametricData.getBdcdyh()) && StringUtils.isNotEmpty(parametricData.getQlrmc())){
-            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH"+"?BDCDYH"+parametricData.getBdcdyh()+"&obligeeName"+parametricData.getQlrmc());
+            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH"+"?BDCDYH="+parametricData.getBdcdyh()+"&obligeeName"+parametricData.getQlrmc());
         }else if (StringUtils.isNotEmpty(parametricData.getBdcdyh())){
-            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH"+"?BDCDYH"+parametricData.getBdcdyh());
+            json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCDYH"+"?BDCDYH="+parametricData.getBdcdyh());
         } else if (StringUtils.isNotEmpty(parametricData.getBdczh()) && StringUtils.isNotEmpty(parametricData.getQlrmc())){
             json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh()+"&obligeeName="+parametricData.getQlrmc());
         }else if (StringUtils.isNotEmpty(parametricData.getBdczh())){
             json = httpClientUtils.paramGet("http://" + ip + ":" + seam + "/api/services/app/BdcQuery/GetBdcInfoByBDCZH"+ "?BDCZH=" + parametricData.getBdczh());
         }
+        System.out.println("json信息:"+json);
         ObjectRestResponse resultRV = new ObjectRestResponse();
         return resultRV.data(getRealPropertySj(json, null));
     }
