@@ -35,17 +35,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,7 +49,6 @@ import java.util.concurrent.FutureTask;
 
 import static com.springboot.constant.AdminCommonConstant.BOOLEAN_NUMBER_TRUE;
 import static com.springboot.constant.chenbin.BusinessConstant.*;
-import static com.springboot.constant.chenbin.KeywordConstant.EXC_DIRECTION_OUTER;
 import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.BDC_DATA_TYPE_SC;
 import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FILE_DEFAULT_MAPPING_FOLDER_NAME;
 
@@ -215,6 +210,7 @@ public class BdcInteractService {
             }
             //debug留痕
             log.debug("【"+sjsq.getReceiptNumber()+"】最终传入不动产数据为："+JSONObject.toJSONString(newBdcFlowRequest));
+            log.info("开始转内网，时间："+new Date().getTime());
             //执行创建
             creatNewplatFlow(newBdcFlowRequest,sjsq.getBdcMappingVoList(),params);
             return back;
@@ -238,6 +234,7 @@ public class BdcInteractService {
      * 更新记录：更新人：{}，更新日期：{}
      */
     public NewBdcFlowRequest prepareNewBdcFlowRequestForESFZY(SJ_Sjsq sjsq,List<SJ_Fjfile> fileVoList) throws ParseException {
+        log.info("进入二手房转移登记数据处理，申请编号："+sjsq.getReceiptNumber());
         //基本数据生成
         NewBdcFlowRequest newBdcFlowRequest = ParamConvertUtil.getBaseFromSjsq(
                 sjsq,                               //收件申请
@@ -251,7 +248,7 @@ public class BdcInteractService {
         //补全申请人信息
         newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
         //补全附件列表信息
-        newBdcFlowRequest.setFjxx(transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_ZY));
+        newBdcFlowRequest.setFjxx(transFjxxFromYcToBdc(fileVoList,BDC_NEW_PLAT_FLOW_KEY_ZY,sjsq.getReceiptNumber()));
 
         return newBdcFlowRequest;
     }
@@ -278,9 +275,10 @@ public class BdcInteractService {
         //补全申请人信息
         newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
         //补全附件列表信息
-        newBdcFlowRequest.setFjxx(transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_ZY));
+        newBdcFlowRequest.setFjxx(transFjxxFromYcToBdc(fileVoList,BDC_NEW_PLAT_FLOW_KEY_ZY,sjsq.getReceiptNumber()));
         //补全抵押信息
         newBdcFlowRequest.setDyxx(initDyxx(
+                sjsq.getReceiptNumber(),
                 newBdcFlowRequest.getYywh(),
                 newBdcFlowRequest.getYqllx(),
                 sjsq.getMortgageContractInfo(),fileVoList)
@@ -306,6 +304,7 @@ public class BdcInteractService {
             throw new ZtgeoBizException("转内网主体对象生成失败");
         }
         OtherResponseEntity<List<NewBdcFlowRespData>> creResp = bdcInteractFeign.wsbjcj(newBdcFlowRequest);
+        log.info("不动产创建流程返回："+JSONObject.toJSONString(creResp));
         creResp.checkSelfIfBdc("不动产流程转内网创建接口");
         dealBdcCreatResult(creResp.getData(),bdcMappingVoList,params);
         if ("success".equals(params.get("isSuccess"))) {
@@ -401,12 +400,13 @@ public class BdcInteractService {
      * 返回：
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public List<Fjxx> transFjxxWithin2Sys(List<SJ_Fjfile> fileVoList,String lkey){
+    public List<Fjxx> transFjxxFromYcToBdc(List<SJ_Fjfile> fileVoList,String lkey,String sqbh){
+        log.info("进入【"+lkey+"】的附件处理");
         FileNameMapping fileNameMapping = fileNameConfigService.gainFileMapByKey(lkey);
         if(fileNameMapping!=null){
             List<String> fileStandards = fileNameMapping.getMappingName();
             List<Fjxx> fjxxes = new ArrayList<>();
-            List<TwoFjxx> willAsynFiles = new ArrayList<>();
+            List<TwoOrNFjxx> willAsynFiles = new ArrayList<>();
             int i=1;
             for(SJ_Fjfile file:fileVoList){
                 String logicName = FILE_DEFAULT_MAPPING_FOLDER_NAME;
@@ -428,18 +428,25 @@ public class BdcInteractService {
                 //设置文件序号
                 fjxx.setSxh(Integer.toString(i));
                 //通用路径生成
-                if(CommonSetBdcFjdz(fjxx, file,file.getSaveType(),lkey)){
+                if(CommonSetBdcFjdz(fjxx, file,file.getSaveType(),lkey,fileNameMapping.getSid(),sqbh)){
                     //设置原路径、去向路径
-                    TwoFjxx twoFjxx = new TwoFjxx(file.getFtpPath(),fjxx.getFjdz());
+                    TwoOrNFjxx twoFjxx = new TwoOrNFjxx().initByTwo(
+                            file.getSaveType(),         //源文件存储方式（0-硬盘/1-ftp）
+                            "ycsl",         //源文件来源
+                            file.getFtpPath(),              //源文件存放地址
+                            "1",                //将生成的目标文件存储方式（0-硬盘/1-ftp）
+                            "bdc",              //将生成的目标文件key
+                            fjxx.getFjdz()                      //将生成的目标文件存放地址
+                    );
                     willAsynFiles.add(twoFjxx);
                 }
-                if ("1".equals(file.getSaveType())) {       //后续会将本地文件上传至FTP后将路径赋值
+//                if ("1".equals(file.getSaveType())) {       //后续会将本地文件上传至FTP后将路径赋值
                     fjxxes.add(fjxx);
                     i++;
-                }
+//                }
             }
             if(willAsynFiles.size()>0){ //启动异步传输
-//                fileInteractComponent.ybcl();
+                fileInteractComponent.AsynchTrans(willAsynFiles);
             }
             if(fjxxes.size()>0)
                 return fjxxes;
@@ -468,11 +475,15 @@ public class BdcInteractService {
         return htxx;
     }
 
-
-
-
-
-    public List<Dyxx> initDyxx(String yywh,String yqllx,Sj_Info_Dyhtxx dyhtxx,List<SJ_Fjfile> fileVoList) throws ParseException {
+    /**
+     * 描述：产生抵押信息
+     * 作者：chenb
+     * 日期：2020/8/13
+     * 参数：[sqbh, yywh, yqllx, dyhtxx, fileVoList]
+     * 返回：List<Dyxx>
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public List<Dyxx> initDyxx(String sqbh,String yywh,String yqllx,Sj_Info_Dyhtxx dyhtxx,List<SJ_Fjfile> fileVoList) throws ParseException {
         List<Dyxx> dyxxes = null;
         if(dyhtxx!=null){
             dyxxes = new ArrayList<>();
@@ -503,7 +514,8 @@ public class BdcInteractService {
                 dyxx.setZwrzjhm(zwr.getObligeeDocumentNumber());
             }
             dyxx.setSqrxx(mortDyrsAndDyqrsToSqr(dyhtxx));
-            dyxx.setFjxx(transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_DY));
+            dyxx.setFjxx(transFjxxFromYcToBdc(fileVoList,BDC_NEW_PLAT_FLOW_KEY_DY,sqbh));
+            dyxxes.add(dyxx);
         }
         return dyxxes;
     }
@@ -516,7 +528,7 @@ public class BdcInteractService {
      * 返回：
      * 更新记录：更新人：{}，更新日期：{}
     */
-    public boolean CommonSetBdcFjdz(Fjxx fjxx,SJ_Fjfile file,String saveType,String lKey){
+    public boolean CommonSetBdcFjdz(Fjxx fjxx,SJ_Fjfile file,String saveType,String lKey,String sid,String wwywh){
         //声明是否使用异步上传附件标识
         boolean isUseAsyn = false;
         //声明并预处理完整FTP路径
@@ -526,13 +538,13 @@ public class BdcInteractService {
         if("0".equals(saveType)){ //文件保存在本地,需要加载本地文件并上传至不动产的FTP
             isUseAsyn = true;
             //设置路径到不动产附件对象中
-            String logicFtpPath = ParamConvertUtil.initNeedFtpPath("BDC",lKey,fileName);
+            String logicFtpPath = ParamConvertUtil.initNeedFtpPath("BDC",lKey,fileName,sid,wwywh);
             fjxx.setFjdz(logicFtpPath);
         }else{      //FTP保存
             if(ftpSettings.getIsDealFtp().getBdc()){//需要操作附件上传，从一窗受理FTP下载并上传至不动产的FTP
                 isUseAsyn = true;
                 //设置路径到不动产附件对象中
-                String logicFtpPath = ParamConvertUtil.initNeedFtpPath("BDC",lKey,fileName);
+                String logicFtpPath = ParamConvertUtil.initNeedFtpPath("BDC",lKey,fileName,sid,wwywh);
                 fjxx.setFjdz(logicFtpPath);
                 //重定义标准文件FTP或本地路径
                 file.setFtpPath(remotePath);
@@ -594,7 +606,7 @@ public class BdcInteractService {
             params.put("isSuccess","success");
             for(Sj_Sjsq_Bdc_Mapping bdcMapping : bdcMappingVoList){
                 for(NewBdcFlowRespData bdcCreatRes:bdcCreatResult){
-                    if(bdcMapping.equals(bdcCreatRes.getSid())){
+                    if(bdcMapping.getSid().equals(bdcCreatRes.getSid())){
                         bdcMapping.setBdcywh(bdcCreatRes.getYwh());
                         bdcMapping.setBdcywlx(bdcCreatRes.getYwlx());
                         break;

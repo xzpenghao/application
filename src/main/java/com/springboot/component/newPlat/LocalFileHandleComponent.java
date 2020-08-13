@@ -26,26 +26,19 @@ public class LocalFileHandleComponent {
     @Autowired
     private FtpSettings ftpSettings;
 
-    public String uploadFileLocal(MultipartFile file, String processId){
-        String basePath = ftpSettings.getIfLocalBasePath();
-        basePath = basePath + TimeUtil.getDateString(new Date()) + "/" +processId;
-        File fileDir = new File(basePath);
+    //上传附件
+    public String uploadFileLocal(InputStream file_is,String path,String fileName, int length){
+        File fileDir = new File(path);
         if  (!fileDir.exists()  || !fileDir.isDirectory()){
             //创建文件夹
             fileDir.mkdir();
         }
-        String fileName = file.getOriginalFilename();
-        fileName = fileName.substring(0, fileName.lastIndexOf("."))
-                + "-" + UUID.randomUUID().toString().substring(0,10)
-                +fileName.substring(fileName.lastIndexOf("."));
         String filePath = fileDir+"/"+fileName;
         //以获取到的文件名命名文件，生成文件对象
         File destFile = new File(filePath);
         //文件对象读获取到的字节数组
-        InputStream file_is = null;
         try {
-            file_is = file.getInputStream();
-            byte[] fileData = new byte[(int) file.getSize()];
+            byte[] fileData = new byte[length];
             file_is.read(fileData);
             //使用aphache工具处理文件
             FileUtils.writeByteArrayToFile(destFile,fileData);
@@ -66,6 +59,7 @@ public class LocalFileHandleComponent {
         return filePath;
     }
 
+    //下载附件
     public byte[] downloadFileLocal(String fjlj){
         File file = new File(fjlj);
         if(file.exists()&&file.isFile()){

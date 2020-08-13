@@ -72,6 +72,7 @@ public class BdcTransToInterService {
         ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList(),BDC_DATA_TYPE_SC);
         //补全抵押信息
         newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(
+                sjsq.getReceiptNumber(),
                 newBdcFlowRequest.getYywh(),
                 newBdcFlowRequest.getYqllx(),
                 sjsq.getMortgageContractInfo(),fileVoList)
@@ -104,9 +105,10 @@ public class BdcTransToInterService {
         //最外层申请人为买卖双方
         newBdcFlowRequest.setSqrxx(bdcInteractService.transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
         //补全附件列表信息
-        newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_YG));
+        newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxFromYcToBdc(fileVoList,BDC_NEW_PLAT_FLOW_KEY_YG,sjsq.getReceiptNumber()));
         //补全抵押信息
         newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(
+                sjsq.getReceiptNumber(),
                 newBdcFlowRequest.getYywh(),
                 null,
                 sjsq.getMortgageContractInfo(),
@@ -140,7 +142,7 @@ public class BdcTransToInterService {
         //最外层申请为抵押权人
 //        newBdcFlowRequest.setSqrxx(bdcInteractService.mortDyrsAndDyqrsToSqr(sjsq.getMortgageContractInfo()));
         //补全附件列表信息
-        newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxWithin2Sys(fileVoList,BDC_NEW_PLAT_FLOW_KEY_DYZX));
+        newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxFromYcToBdc(fileVoList,BDC_NEW_PLAT_FLOW_KEY_DYZX,sjsq.getReceiptNumber()));
         //附件信息
         return newBdcFlowRequest;
     }

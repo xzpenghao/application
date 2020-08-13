@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "immovableFeign", url = "${bdccx.url}")
+@FeignClient(name = "immovableFeign", url = "${bdc.old.url}")
 public interface ForImmovableFeign {
 
     @RequestMapping(value="api/services/app/BdcQuery/GetBdcInfoByZL",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")

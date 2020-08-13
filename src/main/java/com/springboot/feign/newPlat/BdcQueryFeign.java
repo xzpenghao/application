@@ -18,7 +18,7 @@ import java.util.List;
  * @version 2020/7/27/027
  * description：不动产查询feign
  */
-@FeignClient(name = "bdcQueryFeign", url = "${bdccx.url}")
+@FeignClient(name = "bdcQueryFeign", url = "${bdc.cx.url}")
 public interface BdcQueryFeign {
 
     @RequestMapping(

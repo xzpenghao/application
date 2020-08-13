@@ -382,10 +382,12 @@ public class ParamConvertUtil {
         return sqrzl;
     }
 
-    public static String initNeedFtpPath(String platName,String firstKey,String fileName){
+    public static String initNeedFtpPath(String platName,String firstKey,String fileName,String sid,String wwywh){
         return "/"+platName.toUpperCase()
                 +"/"+firstKey.toUpperCase()
                 +"/"+TimeUtil.getDateString(new Date()).replaceAll("-","")
+                +"/"+sid
+                +"/"+wwywh
                 +"/"+fileName;
     }
 

@@ -78,6 +78,7 @@ public class BdcInteractRest {
     ) {
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
+            log.info("进入二手房转移登记【转内网】");
             rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready,Msgagger.ESFZYDJ));
         } catch (ParseException e) {
             log.error("二手房转内网办件传入数据异常，原始数据为："+commonInterfaceAttributer);
@@ -101,6 +102,7 @@ public class BdcInteractRest {
     ){
         ObjectRestResponse<String> rv = new ObjectRestResponse<String>();
         try {
+            log.info("进入二手房转移及抵押登记【转内网】");
             rv.data(bdcInteractService.commonCreatNewPlatProc(commonInterfaceAttributer,checkAlready, Msgagger.ESFZYJDYDJ));
         } catch (ParseException e) {
             log.error("二手房(及抵押办件)转内网办件传入数据异常，原始数据为："+commonInterfaceAttributer);

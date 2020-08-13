@@ -18,7 +18,7 @@ import java.util.List;
  * @version 2020/8/7
  * description：不动产交互feign
  */
-@FeignClient(name = "bdcInteractFeign", url = "${bdccx.url}")
+@FeignClient(name = "bdcInteractFeign", url = "${bdc.jh.url}")
 public interface BdcInteractFeign {
     @RequestMapping(
             value = "${Feign.bdc.newPlat.interact.wsjgjc}",

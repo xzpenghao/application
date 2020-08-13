@@ -16,4 +16,5 @@ public class FtpSettingTerm extends BaseTerm {
     private String ftpPassword;
 
     private String ftpTransMode;            //主被动模式，passive-被动/active-主动
+    private String env;
 }

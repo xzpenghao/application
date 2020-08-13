@@ -1,8 +1,10 @@
 package com.springboot.popj.pub_data;
 
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.emm.DIC_RY_GYFS_Enums;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Cyr;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
+import com.springboot.util.newPlatBizUtil.DicConvertUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -148,7 +150,7 @@ public class SJ_Qlr_Gl implements Serializable {
      */
     public SJ_Qlr_Gl initByDjqlr(String qlrzl,Integer sort,Qlr qlr){
         initByDjcyr(qlrzl,sort,qlr);
-        this.setSharedMode(qlr.getGyfs());
+        this.setSharedMode(DicConvertUtil.getDicNameByVal(qlr.getGyfs(), DIC_RY_GYFS_Enums.values()));
         this.setSharedValue(StringUtils.isNotBlank(qlr.getGyfe())?qlr.getGyfe().replaceAll("%",""):null);
         if(StringUtils.isNotBlank(this.sharedValue)) {
             try {

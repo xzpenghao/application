@@ -49,4 +49,6 @@ public class HandleKeywordConstant {
     //ftp模式
     public final static String FTP_USE_MODE_ACTIVE = "active";
     public final static String FTP_USE_MODE_PASSIVE = "passive";
+    public final static String FTP_USE_ENV_WIN = "Win";
+    public final static String FTP_USE_ENV_UNIX = "Unix";
 }
