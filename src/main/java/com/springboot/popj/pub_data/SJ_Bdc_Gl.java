@@ -5,6 +5,7 @@ import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Fwdcxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Zddcxx;
 import com.springboot.util.newPlatBizUtil.DicConvertUtil;
 import com.springboot.util.newPlatBizUtil.ResultConvertUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -107,9 +108,11 @@ public class SJ_Bdc_Gl implements Serializable {
         return this;
     }
 
-    public SJ_Bdc_Gl fillFwdcxx(Fwdcxx fwdcxx){
+    public SJ_Bdc_Gl fillFwdcxx(Fwdcxx fwdcxx,String qlxz){
         this.sslb = fwdcxx.getSslb();
         ResultConvertUtil.fillFwxx(this.fwInfo,fwdcxx);
+        if(StringUtils.isBlank(this.fwInfo.getHouseNature()))
+            this.fwInfo.setHouseNature(qlxz);
         return this;
     }
 

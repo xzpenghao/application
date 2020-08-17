@@ -368,6 +368,23 @@ public class BdcInteractService {
         return ParamConvertUtil.getSqrsByQlrs(glQlrs,BDC_NEW_PLAT_YW_KEY_DY);
     }
 
+    public List<Sqrxx> bdcMortDyqrToSqr(List<Sj_Info_Bdcdyxgxx> immovableCurrentMortgageInfoVoList){
+        if(immovableCurrentMortgageInfoVoList==null || immovableCurrentMortgageInfoVoList.size()<1){
+            throw new ZtgeoBizException("【数据检查未通过】不动产抵押信息为空");
+        }
+        Sj_Info_Bdcdyxgxx bdcdyxgxx = immovableCurrentMortgageInfoVoList.get(0);
+        List<SJ_Qlr_Gl> gldyqrs = bdcdyxgxx.getGlMortgageHolderVoList();
+        return ParamConvertUtil.getSqrsByQlrs(gldyqrs,BDC_NEW_PLAT_YW_KEY_DY);
+    }
+
+    /**
+     * 描述：代理人预检查
+     * 作者：chenb
+     * 日期：2020/8/14
+     * 参数：[glQlrs, glDlrs]
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+     */
     public void preCheckQlrAndDlr(List<SJ_Qlr_Gl> glQlrs,List<SJ_Qlr_Gl> glDlrs){
         if(glDlrs!=null && glDlrs.size()>0) { //条件1.代理人集合不为空
             if (!glQlrs.stream().anyMatch(glQlr -> glQlr.getRelatedAgent() != null)) { //条件2. 权利中未发现存在代理人信息
@@ -535,8 +552,8 @@ public class BdcInteractService {
         String remotePath = file.getFtpPath().replaceAll("\\\\","/");
         //截取文件名
         String fileName = remotePath.substring(remotePath.lastIndexOf("/") + 1);
-        if("0".equals(saveType)){ //文件保存在本地,需要加载本地文件并上传至不动产的FTP
-            isUseAsyn = true;
+        if("0".equals(saveType)){ //文件保存在本地,赋值逻辑路径/设置不动产附件操作标识
+            isUseAsyn = ftpSettings.getIsDealFtp().getBdc();
             //设置路径到不动产附件对象中
             String logicFtpPath = ParamConvertUtil.initNeedFtpPath("BDC",lKey,fileName,sid,wwywh);
             fjxx.setFjdz(logicFtpPath);

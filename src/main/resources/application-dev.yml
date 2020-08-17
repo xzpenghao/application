@@ -278,11 +278,16 @@ tra:
 gxjhpt:
   url: http://10.13.0.240:8001/
 
-bdccx:
-  url: http://10.3.0.149:23335/
-#  url: http://172.22.226.172:12201/
 ycsl:
   url: http://localhost:7780/
+
+bdc:
+  old:
+    url: http://10.3.0.149:23335/
+  cx: #查询
+    url: http://172.22.226.12:8099/
+  jh: #交互
+    url: http://172.22.220.10:8099/
 
 other:
   url: http://localhost:7780/
@@ -306,15 +311,15 @@ Feign:
   bdc:
     newPlat:
       query:
-        djzlcx: service-core/extQuery/djzl     #登记资料查询
-        cqzscx: service-core/extQuery/cqzs     #产权证书查询
-        dyzmcx: service-core/extQuery/dycx     #抵押证明查询
-        dzzzcx: service-core/extQuery/dzzzcx   #电子证照查询
-        shsjcx: service-core/extQuery/shsjcx   #审核数据查询
-        dbsjcx: service-core/extQuery/dbsjcx   #登簿数据查询
+        djzlcx: out/sqapi/djzl     #登记资料查询
+        cqzscx: out/sqapi/cqzs     #产权证书查询
+        dyzmcx: out/sqapi/dycx     #抵押证明查询
+        dzzzcx: out/sqapi/dzzzcx   #电子证照查询
+        shsjcx: out/sqapi/shsj   #审核数据查询
+        dbsjcx: out/sqapi/bdcdb   #登簿数据查询
       interact:
-        wsjgjc: service-core/extQuery/wsjgjc   #网申结果检查
-        wsbjcj: service-core/extQuery/wsbjcj   #网申办件创建
+        wsjgjc: net/net/getAutoProcessStatus   #网申结果检查
+        wsbjcj: net/net/AutoCreate   #网申办件创建
 newplat:
   settings:                              #转内网保险机制，配置默认执行配置（当转内网时下述项未传入时使用）
   - key: esfzy                                #二手房转移
@@ -344,22 +349,30 @@ newplat:
     jsrmc: 测试银行
 
 ftp:
+  ycSaveSetting: 1        #一窗使用本地或Ftp存储附件（1-FTP/0-本地）
+  ifLocalBasePath: D:\ycsl\process\file\    #如果本地存储使用的基础路径，供本地存储模式下，外部向一窗受理发送附件使用
   isDealFtp:
     bdc: false
     jhpt: false
   settings:
   - key: ycsl
-    ftpAddress: 10.3.0.151    #一窗受理ftp
+    ftpAddress: 127.0.0.1    #一窗受理ftp
     ftpPort: 21
-    ftpUsername: forftp
-    ftpPassword: 123456
+    ftpUsername: test
+    ftpPassword: test
+    ftpTransMode: passive   #主被动模式，passive-被动/active-主动
+    env: Win                #FTP环境，Win-Windows/Unix-Unix
   - key: bdc
-    ftpAddress: 10.3.0.149    #不动产登记平台
-    ftpPort: 54111
-    ftpUsername: ftp
-    ftpPassword: 123456
-  - key: jhpt
-    ftpAddress: 172.22.148.129   #共享交换平台
+    ftpAddress: 127.0.0.1    #不动产登记平台
     ftpPort: 21
-    ftpUsername: ftpadmin
-    ftpPassword: 123qwe!@#
+    ftpUsername: test
+    ftpPassword: test
+    ftpTransMode: passive   #主被动模式，passive-被动/active-主动
+    env: Win                #FTP环境，Win-Windows/Unix-Unix
+  - key: jhpt
+    ftpAddress: 127.0.0.1   #共享交换平台
+    ftpPort: 21
+    ftpUsername: test
+    ftpPassword: test
+    ftpTransMode: passive   #主被动模式，passive-被动/active-主动
+    env: Win                #FTP环境，Win-Windows/Unix-Unix

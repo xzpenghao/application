@@ -9,6 +9,10 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.springboot.config.Msgagger;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.constant.penghao.BizOrBizExceptionConstant;
+import com.springboot.emm.DIC_BDC_FW_GHYT_Enums;
+import com.springboot.emm.DIC_BDC_FW_JG_Enums;
+import com.springboot.emm.DIC_BDC_FW_LX_Enums;
+import com.springboot.emm.DIC_BDC_FW_XZ_Enums;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.SJ_Fjinst;
 import com.springboot.entity.chenbin.personnel.pub_use.*;
@@ -19,6 +23,7 @@ import com.springboot.popj.pub_data.*;
 import com.springboot.popj.registration.*;
 import com.springboot.util.DateUtils;
 import com.springboot.util.TimeUtil;
+import com.springboot.util.newPlatBizUtil.DicConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -428,7 +433,7 @@ public class BusinessDealBaseUtil {
                 qsxx.setBDCZH(bdczh);
                 qsxx.setJZMJ(bdcql.getArchitecturalArea());
                 qsxx.setTNMJ(bdcql.getHouseArchitecturalArea());
-                qsxx.setYT(bdcql.getHousePlanningPurpose());
+                qsxx.setYT(DicConvertUtil.getDicNameByVal(bdcql.getHousePlanningPurpose(), DIC_BDC_FW_GHYT_Enums.values()));
                 qsxx.setZL(bdcql.getImmovableSite());
                 qsxx.setTDSYQR(bdcql.getLandUseRightOwner());
                 qsxx.setTDHQFS(bdcql.getLandObtainWay());
@@ -576,15 +581,17 @@ public class BusinessDealBaseUtil {
         fwxx.setFTMJ(fw.getApportionmentArchitecturalArea());
         fwxx.setFWDY(fw.getUnitMark());
         fwxx.setFWFH(fw.getRoomMark());
-        fwxx.setFWJG(fw.getHouseStructure());
-        fwxx.setFWLX(StringUtils.isBlank(fw.getHouseType()) ? bdcql.getHouseType() : fw.getHouseType());
-        fwxx.setFWXZ(StringUtils.isBlank(fw.getHouseNature()) ? bdcql.getHouseNature() : fw.getHouseNature());
+        fwxx.setFWJG(DicConvertUtil.getDicNameByVal(fw.getHouseStructure(), DIC_BDC_FW_JG_Enums.values()));
+        fwxx.setFWLX(DicConvertUtil.getDicNameByVal(
+                StringUtils.isBlank(fw.getHouseType()) ? bdcql.getHouseType() : fw.getHouseType(), DIC_BDC_FW_LX_Enums.values()));
+        fwxx.setFWXZ(DicConvertUtil.getDicNameByVal(
+                StringUtils.isBlank(fw.getHouseNature()) ? bdcql.getHouseNature() : fw.getHouseNature(), DIC_BDC_FW_XZ_Enums.values()));
         fwxx.setFWZL(fw.getHouseLocation());
         fwxx.setJZMJ(fw.getArchitecturalArea());
         fwxx.setTNMJ(fw.getHouseArchitecturalArea());
         fwxx.setXMMC(fw.getProjectName());
         fwxx.setYFCBH(fw.getOldHouseCode());
-        fwxx.setYT(fw.getImmovablePlanningUse());
+        fwxx.setYT(DicConvertUtil.getDicNameByVal(fw.getImmovablePlanningUse(), DIC_BDC_FW_GHYT_Enums.values()));
         fwxx.setZL(fw.getHouseLocation());
         fwxx.setZCS(fw.getTotalStorey());
         fwxx.setSZC(fw.getLocationStorey());

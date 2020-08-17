@@ -21,7 +21,7 @@ import java.text.ParseException;
  * @Version 1.0
  */
 @RestController
-@RequestMapping("api/bdc/bank/interact")
+@RequestMapping("api/bdc/interact")
 @Scope("prototype")
 @Slf4j
 @Api(tags = "不动产(新平台)交互银行接口")

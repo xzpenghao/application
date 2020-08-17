@@ -140,7 +140,7 @@ public class BdcTransToInterService {
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
         ParamConvertUtil.fillMainHouseToReqByDyxx(newBdcFlowRequest,sjsq.getImmovableCurrentMortgageInfoVoList(),BDC_DATA_TYPE_SC);
         //最外层申请为抵押权人
-//        newBdcFlowRequest.setSqrxx(bdcInteractService.mortDyrsAndDyqrsToSqr(sjsq.getMortgageContractInfo()));
+        newBdcFlowRequest.setSqrxx(bdcInteractService.bdcMortDyqrToSqr(sjsq.getImmovableCurrentMortgageInfoVoList()));
         //补全附件列表信息
         newBdcFlowRequest.setFjxx(bdcInteractService.transFjxxFromYcToBdc(fileVoList,BDC_NEW_PLAT_FLOW_KEY_DYZX,sjsq.getReceiptNumber()));
         //附件信息

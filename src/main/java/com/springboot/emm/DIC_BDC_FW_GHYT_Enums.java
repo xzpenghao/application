@@ -45,7 +45,9 @@ public enum DIC_BDC_FW_GHYT_Enums {
     ZJ("宗教","82"),
     JIANY("监狱","83"),
     WGYF("物管用房","84"),
-    GJPT("公建配套","8401");
+    GJPT("公建配套","8401"),
+    CKW("车库位","85"),
+    JYXCKW("人防车库位","86");
 
     private String dicName;
     private String dicVal;

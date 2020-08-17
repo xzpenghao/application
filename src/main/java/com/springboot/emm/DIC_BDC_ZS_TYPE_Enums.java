@@ -5,14 +5,14 @@ package com.springboot.emm;
  * @version 2020/7/28/028
  * description：证书类型
  */
-public enum DIC_BDC_TYPE_Enums {
+public enum DIC_BDC_ZS_TYPE_Enums {
     FWBDCQZ("房屋不动产证","1"),
     TDBDCQZ("土地不动产证","2");
 
     private String dicName;
     private String dicVal;
 
-    DIC_BDC_TYPE_Enums(String dicName,String dicVal){
+    DIC_BDC_ZS_TYPE_Enums(String dicName, String dicVal){
         this.dicName = dicName;
         this.dicVal = dicVal;
     }

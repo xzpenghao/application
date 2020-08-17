@@ -1,17 +1,14 @@
 package com.springboot.util.newPlatBizUtil;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
-import com.springboot.emm.DIC_BDC_TYPE_Enums;
+import com.springboot.emm.DIC_BDC_ZS_TYPE_Enums;
 import com.springboot.emm.DIC_RY_ZJZL_Enums;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphCfxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphDjxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphDyxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
-import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import com.springboot.entity.newPlat.query.bizData.Dbjgxx;
 import com.springboot.entity.newPlat.query.bizData.Shxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.*;
@@ -23,13 +20,11 @@ import com.springboot.entity.newPlat.query.resp.CqzsResponse;
 import com.springboot.entity.newPlat.query.resp.Djshxx;
 import com.springboot.entity.newPlat.query.resp.DjzlResponse;
 import com.springboot.entity.newPlat.query.resp.DyzmResponse;
-import com.springboot.entity.newPlat.transInner.req.fromZY.domain.NewBdcFlowRespData;
 import com.springboot.popj.pub_data.*;
 import com.springboot.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -163,7 +158,7 @@ public class ResultConvertUtil {
             bdcqlxx.setRegisterType(cqzs.getDjlx());
             bdcqlxx.setImmovableCertificateNo(cqzs.getBdczh());
             bdcqlxx.setCertificateType(
-                    StringUtils.isBlank(cqzs.getZslx())?CERTIFICATE_TYPE_OF_FC:DicConvertUtil.getDicNameByVal(cqzs.getZslx(), DIC_BDC_TYPE_Enums.values())
+                    StringUtils.isBlank(cqzs.getZslx())?CERTIFICATE_TYPE_OF_FC:DicConvertUtil.getDicNameByVal(cqzs.getZslx(), DIC_BDC_ZS_TYPE_Enums.values())
             );
             bdcqlxx.setRegistrationDate(TimeUtil.getTimeFromString(cqzs.getDjrq()));
             bdcqlxx.setImmovableSite(cqzs.getZl());
@@ -282,7 +277,7 @@ public class ResultConvertUtil {
         if(fwdcxxlb!=null && fwdcxxlb.size()>0){
             zddcxxlb = null;
         }
-        bdcqlxx.setGlImmovableVoList(getBdcdcxxByDcxx(fwdcxxlb,zddcxxlb));
+        bdcqlxx.setGlImmovableVoList(getBdcdcxxByDcxx(fwdcxxlb,zddcxxlb,bdcqlxx.getHouseRightNature()));
     }
 
     /**
@@ -299,7 +294,7 @@ public class ResultConvertUtil {
         if(fwdcxxlb!=null && fwdcxxlb.size()>0){
             zddcxxlb = null;
         }
-        bdcdyxx.setGlImmovableVoList(getBdcdcxxByDcxx(fwdcxxlb,zddcxxlb));
+        bdcdyxx.setGlImmovableVoList(getBdcdcxxByDcxx(fwdcxxlb,zddcxxlb,null));
     }
 
     /**
@@ -392,11 +387,11 @@ public class ResultConvertUtil {
      * 返回：List<SJ_Bdc_Gl>
      * 更新记录：更新人：{}，更新日期：{}
     */
-    public static List<SJ_Bdc_Gl> getBdcdcxxByDcxx(List<Fwdcxx> fwdcxxlb, List<Zddcxx> zddcxxlb){
+    public static List<SJ_Bdc_Gl> getBdcdcxxByDcxx(List<Fwdcxx> fwdcxxlb, List<Zddcxx> zddcxxlb,String qlxz){
         List<SJ_Bdc_Gl> glImmovableVoList = new ArrayList<>();
         if(fwdcxxlb!=null){
             for(Fwdcxx fwdcxx:fwdcxxlb){
-                glImmovableVoList.add(new SJ_Bdc_Gl().initFwBdcgl().fillFwdcxx(fwdcxx));
+                glImmovableVoList.add(new SJ_Bdc_Gl().initFwBdcgl().fillFwdcxx(fwdcxx,qlxz));
             }
         }
         if(zddcxxlb!=null){
