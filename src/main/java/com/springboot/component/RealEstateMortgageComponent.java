@@ -711,9 +711,9 @@ RealEstateMortgageComponent {
                 realPropertyCertificate.setCertificateType("房产证");
             } else if (jsonObject.getString("certificateType").equals("土地证")) {
                 realPropertyCertificate.setCertificateType("土地证");
-            }else {
-                realPropertyCertificate.setCertificateType("不动产权证");
             }
+        }else {
+            realPropertyCertificate.setCertificateType("不动产权证");
         }
         realPropertyCertificate.setRemarks(jsonObject.getString("remark"));//备注附记
         realPropertyCertificate.setOther(jsonObject.getString("other"));//其他权利状况
