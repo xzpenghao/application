@@ -1,10 +1,7 @@
 package com.springboot.feign.newPlat;
 
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
-import com.springboot.entity.newPlat.query.req.CqzsReq;
-import com.springboot.entity.newPlat.query.req.DjzlReq;
-import com.springboot.entity.newPlat.query.req.DyzmReq;
-import com.springboot.entity.newPlat.query.req.DzzzReq;
+import com.springboot.entity.newPlat.query.req.*;
 import com.springboot.entity.newPlat.query.resp.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +41,14 @@ public interface BdcQueryFeign {
             consumes = "application/json;charset=UTF-8"
     )   //抵押证明查询
     OtherResponseEntity<List<DyzmResponse>> dyzmcx(DyzmReq dyzmReq);
+
+    @RequestMapping(
+            value = "${Feign.bdc.newPlat.query.bdcdycx}",
+            method = RequestMethod.POST,
+            produces = "application/json",
+            consumes = "application/json;charset=UTF-8"
+    )   //抵押证明查询
+    OtherResponseEntity<BdcdyResponse> bdcdycx(BdcdyReq bdcdyReq);
 
     @RequestMapping(
             value = "${Feign.bdc.newPlat.query.dzzzcx}",

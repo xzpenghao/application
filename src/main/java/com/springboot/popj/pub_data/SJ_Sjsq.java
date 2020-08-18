@@ -42,6 +42,7 @@ public class SJ_Sjsq  implements Serializable {
     private List<Sj_Info_Qsxx> taxInfoVoList;                  //涉税信息
     private List<SJ_Info_Handle_Result> handleResultVoList;
     private SJ_Info_Sdqgxx sdqgxx;
+    private SJ_Info_Immovable immovableSelf;
 
     private List<RespServiceData> serviceDatas; //封装返回值数据
     private List<SJ_Execute_depart> executeDeparts; //指定执行部门
@@ -326,5 +327,13 @@ public class SJ_Sjsq  implements Serializable {
 
     public void setBdcMappingVoList(List<Sj_Sjsq_Bdc_Mapping> bdcMappingVoList) {
         this.bdcMappingVoList = bdcMappingVoList;
+    }
+
+    public SJ_Info_Immovable getImmovableSelf() {
+        return immovableSelf;
+    }
+
+    public void setImmovableSelf(SJ_Info_Immovable immovableSelf) {
+        this.immovableSelf = immovableSelf;
     }
 }

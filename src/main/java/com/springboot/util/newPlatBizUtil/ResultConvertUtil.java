@@ -11,15 +11,13 @@ import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
 import com.springboot.entity.newPlat.query.bizData.Dbjgxx;
 import com.springboot.entity.newPlat.query.bizData.Shxx;
+import com.springboot.entity.newPlat.query.bizData.fromSY.bdcdy.Bdcdyxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.*;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Cfxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Djxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Yyxx;
-import com.springboot.entity.newPlat.query.resp.CqzsResponse;
-import com.springboot.entity.newPlat.query.resp.Djshxx;
-import com.springboot.entity.newPlat.query.resp.DjzlResponse;
-import com.springboot.entity.newPlat.query.resp.DyzmResponse;
+import com.springboot.entity.newPlat.query.resp.*;
 import com.springboot.popj.pub_data.*;
 import com.springboot.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -99,6 +97,17 @@ public class ResultConvertUtil {
             bdcdyxx.setGlMortgageHolderVoList(initXgrxx(BDC_RYZL_DYQR, dyzm.getDyqrlb()));
         }
         return bdcdyxx;
+    }
+
+    public static SJ_Info_Immovable getImmovInfoByDysj(BdcdyResponse bdcdyResponse){
+        bdcdyResponse.checkSelfStandard();
+        SJ_Info_Immovable serviceDataInfo = new SJ_Info_Immovable();
+        serviceDataInfo.setSfczyc(bdcdyResponse.getSfczyc());
+        if(bdcdyResponse.getBdcdyxxlb()!=null && bdcdyResponse.getBdcdyxxlb().size()>0){
+            //初始化不动产调查信息
+            initBdcdcxxByBdcdyxx(serviceDataInfo,bdcdyResponse.getBdcdyxxlb());
+        }
+        return serviceDataInfo;
     }
 
     /**
@@ -295,6 +304,18 @@ public class ResultConvertUtil {
             zddcxxlb = null;
         }
         bdcdyxx.setGlImmovableVoList(getBdcdcxxByDcxx(fwdcxxlb,zddcxxlb,null));
+    }
+
+    public static void initBdcdcxxByBdcdyxx(SJ_Info_Immovable serviceDataInfo,List<Bdcdyxx> bdcdyxxlb) {
+        List<SJ_Bdc_Gl> glImmovableVoList = new ArrayList<>();
+        for(Bdcdyxx bdcdyxx:bdcdyxxlb) {
+            if(StringUtils.isBlank(serviceDataInfo.getSfyc())){
+                serviceDataInfo.setSfyc(bdcdyxx.getSfyc());
+            }
+            SJ_Bdc_Gl bdcGl = new SJ_Bdc_Gl();
+            bdcGl.setImmovableType(BDC_TYPE_FD);
+
+        }
     }
 
     /**

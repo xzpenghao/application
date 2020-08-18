@@ -16,6 +16,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.springboot.constant.penghao.BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR;
+
 
 @Slf4j
 public class SysPubDataDealUtil {
@@ -107,6 +109,9 @@ public class SysPubDataDealUtil {
                     case BizOrBizExceptionConstant.HANDLE_RESULT_SERVICE:
                         dealHandleResults(JSON_serviceDataInfos, sjsq, serviceCode);
                         break;
+                    case BizOrBizExceptionConstant.IMMOVEABLE_BUILDING_SERVICE:
+                        dealBuildings(JSON_serviceDataInfos, sjsq, serviceCode);
+                        break;
                     case BizOrBizExceptionConstant.SDQG_SERVICE:
                         dealSDQGxx(JSON_serviceDataInfos, sjsq, serviceCode);
                         break;
@@ -162,7 +167,7 @@ public class SysPubDataDealUtil {
             /*
              *  不动产权利人关联信息处理
              */
-            List<SJ_Qlr_Gl> sj_qlrgls = copyJSONQlrToSJQlr(JSON_glObligeeVoList, BizOrBizExceptionConstant.IMMOVABLE_RIGHT_RECEIPT_SERVICE, BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR);
+            List<SJ_Qlr_Gl> sj_qlrgls = copyJSONQlrToSJQlr(JSON_glObligeeVoList, BizOrBizExceptionConstant.IMMOVABLE_RIGHT_RECEIPT_SERVICE, OBLIGEE_TYPE_OF_QLR);
 
             /*
              *  不动产义务人关联信息处理
@@ -392,6 +397,39 @@ public class SysPubDataDealUtil {
             sj_handleResults.add(sj_handleResult);
         }
         sjsq.setHandleResultVoList(sj_handleResults);
+    }
+
+    //处理楼盘信息
+    public static void dealBuildings(String JSON_serviceDataInfos, SJ_Sjsq sjsq, String serviceCode){
+        List<JSONImmovable> json_bdcs = JSONArray.parseArray(JSON_serviceDataInfos,JSONImmovable.class);
+        List<SJ_Info_Immovable> sj_bdcs = new ArrayList<SJ_Info_Immovable>();
+        for(JSONImmovable json_bdc:json_bdcs){
+            String JSON_glImmovableVoList = json_bdc.getGlImmovableVoList();
+            json_bdc.setGlImmovableVoList(null);
+            String JSON_glObligeeVoList = json_bdc.getGlObligeeVoList();
+            json_bdc.setGlObligeeVoList(null);
+            String JSON_glAgentVoList = json_bdc.getGlAgentVoList();
+            json_bdc.setGlAgentVoList(null);
+            //反转出不动产信息服务数据
+            SJ_Info_Immovable sj_bdc = JSON.parseObject(JSON.toJSONString(json_bdc), SJ_Info_Immovable.class);
+            baseSetting(sj_bdc,serviceCode,sjsq.getReceiptNumber());
+            //不动产关联信息处理
+            List<SJ_Bdc_Gl> sj_bdcgls = copyJSONBdcToSJBdc(JSON_glImmovableVoList,BizOrBizExceptionConstant.IMMOVEABLE_BUILDING_SERVICE,sj_bdc,sjsq);
+            sj_bdc.setGlImmovableVoList(sj_bdcgls);
+            List<SJ_Qlr_Gl> sj_qlrgls = copyJSONQlrToSJQlr(JSON_glObligeeVoList,BizOrBizExceptionConstant.IMMOVEABLE_BUILDING_SERVICE, OBLIGEE_TYPE_OF_QLR);
+            sj_bdc.setGlObligeeVoList(sj_qlrgls);
+            List<SJ_Qlr_Gl> sj_dlrgl = copyJSONQlrToSJQlr(JSON_glAgentVoList,BizOrBizExceptionConstant.IMMOVEABLE_BUILDING_SERVICE,BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR_DLR);
+            sj_bdc.setGlAgentVoList(sj_dlrgl);
+            sj_bdcs.add(sj_bdc);
+        }
+        //应该只有一个合同
+        if(sj_bdcs!=null && sj_bdcs.size()>1){
+            log.error("不动产楼盘数目异常");
+            throw new ZtgeoBizException(BizOrBizExceptionConstant.IMMOVABLE_COUNT_ERROR);
+        }
+        if(sj_bdcs!=null && sj_bdcs.size()==1) {
+            sjsq.setImmovableSelf(sj_bdcs.get(0));
+        }
     }
 
     //处理水电气广过户信息

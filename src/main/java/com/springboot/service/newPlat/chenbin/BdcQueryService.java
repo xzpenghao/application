@@ -5,14 +5,17 @@ import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
 import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
+import com.springboot.entity.newPlat.query.req.BdcdyReq;
 import com.springboot.entity.newPlat.query.req.CqzsReq;
 import com.springboot.entity.newPlat.query.req.DjzlReq;
 import com.springboot.entity.newPlat.query.req.DyzmReq;
+import com.springboot.entity.newPlat.query.resp.BdcdyResponse;
 import com.springboot.entity.newPlat.query.resp.CqzsResponse;
 import com.springboot.entity.newPlat.query.resp.DjzlResponse;
 import com.springboot.entity.newPlat.query.resp.DyzmResponse;
 import com.springboot.feign.newPlat.BdcQueryFeign;
 import com.springboot.popj.pub_data.SJ_Info_Bdcqlxgxx;
+import com.springboot.popj.pub_data.SJ_Info_Immovable;
 import com.springboot.popj.pub_data.Sj_Info_Bdcdyxgxx;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.popj.warrant.ParametricData2;
@@ -121,6 +124,27 @@ public class BdcQueryService {
             log.warn("【抵押证明查询】--> 不动产抵押证明查询，返回了null值，这在设计上是超出规范的，请知悉");
         }
         //5. 返回结果集
+        return serviceDataInfos;
+    }
+
+    public List<SJ_Info_Immovable> queryBdcdyxxByDyh(String bdcdyh){
+        //1. 定义返回结果集
+        List<SJ_Info_Immovable> serviceDataInfos = new ArrayList<>();
+        //2. 初始化查询条件
+        BdcdyReq bdcdyReq = new BdcdyReq().initDyReq("123",bdcdyh);
+        //3. 执行查询操作
+        OtherResponseEntity<BdcdyResponse> cxjg = bdcQueryFeign.bdcdycx(bdcdyReq);
+        //4. 解析查询的结果数据
+        if(cxjg!=null) {
+            cxjg.checkSelfIfBdc("不动产单元信息查询接口");
+            BdcdyResponse bdcdyResponse = cxjg.getData();
+            if(bdcdyResponse!=null){
+                SJ_Info_Immovable serviceDataInfo = ResultConvertUtil.getImmovInfoByDysj(bdcdyResponse);
+                serviceDataInfos.add(serviceDataInfo);
+            }
+        } else {
+            log.warn("【不动产单元查询】--> 不动产单元信息查询，返回了null值，这在设计上是超出规范的，请知悉");
+        }
         return serviceDataInfos;
     }
 

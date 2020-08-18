@@ -314,6 +314,7 @@ Feign:
         djzlcx: out/sqapi/djzl     #登记资料查询
         cqzscx: out/sqapi/cqzs     #产权证书查询
         dyzmcx: out/sqapi/dycx     #抵押证明查询
+        bdcdycx: out/sqapi/cxBdcdyInfo    #不动产单元查询
         dzzzcx: out/sqapi/dzzzcx   #电子证照查询
         shsjcx: out/sqapi/shsj   #审核数据查询
         dbsjcx: out/sqapi/bdcdb   #登簿数据查询

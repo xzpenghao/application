@@ -19,6 +19,7 @@ public class BizOrBizExceptionConstant {
     public final static String MORTGAGE_CONTRACT_RECEIPT_SERVICE = "dyhtxx";
     public final static String TAXATION_RECEIPT_SERVICE = "qsxx";
     public final static String HANDLE_RESULT_SERVICE = "handleResult";
+    public final static String IMMOVEABLE_BUILDING_SERVICE = "lpfwb";
     public final static String SDQG_SERVICE = "sdqgxx";
     public final static String IMMOVABLE_TYPE_OF_FD = "房地";
     //之前净地改成宗地
@@ -63,6 +64,7 @@ public class BizOrBizExceptionConstant {
     public final static String GET_IMMOVABLE_TYPE_NOT_CLEAR = "不明确的不动产类型";
     public final static String RECEIPT_INFO_NULL_ERROR = "保存的收件基础信息不可为空";
     public final static String RECEIPT_NUMBER_NULL_ERROR = "保存的收件编号不可为空";
+    public final static String IMMOVABLE_COUNT_ERROR = "不动产服务只能为一条，这里选择了多个";
     public final static String RECEIPT_TRANSACTION_CONTRACT_COUNT_ERROR = "交易合同只能选择一个，这里选择了多个";
     public final static String RECEIPT_MORTGAGE_CONTRACT_COUNT_ERROR = "抵押合同只能选择一个，这里选择了多个";
     public final static String SDQG_COUNT_ERROR = "水电气广服务数据只能选择一个，这里选择了多个";
