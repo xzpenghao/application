@@ -2,19 +2,28 @@ package com.springboot.service.chenbin.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.chenbin.ExchangeToInnerComponent;
 import com.springboot.component.chenbin.file.ToFTPUploadComponent;
+import com.springboot.component.newPlat.FileInteractComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.constant.penghao.BizOrBizExceptionConstant;
+import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.chenbin.personnel.other.web.*;
+import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
+import com.springboot.entity.newPlat.settingTerm.FtpSettings;
+import com.springboot.entity.newPlat.settingTerm.NewPlatSettings;
+import com.springboot.entity.newPlat.transInner.req.fromZY.domain.TwoOrNFjxx;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.pub_data.*;
 import com.springboot.popj.register.JwtAuthenticationRequest;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.service.chenbin.ExchangeToWebService;
+import com.springboot.service.newPlat.chenbin.BdcQueryService;
 import com.springboot.util.DateUtils;
 import com.springboot.util.TimeUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
+import com.springboot.util.newPlatBizUtil.ParamConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +38,9 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
 
+import static com.springboot.constant.chenbin.BusinessConstant.BDC_NEW_PLAT_FLOW_KEY_ZY;
+import static com.springboot.constant.chenbin.BusinessConstant.NEWPLAT_TURNINNERS_ESFZY;
+
 @Slf4j
 @Service("exc2Web")
 public class ExchangeToWebServiceImpl implements ExchangeToWebService {
@@ -37,25 +49,54 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
     private String username;
     @Value("${djj.bsrypassword}")
     private String password;
-    @Value("${chenbin.registrationBureau.secRec.transfer.wholeMoney.mid}")
-    private String mouldId;
+    @Autowired
+    private NewPlatSettings newPlatSettings;
+    @Autowired
+    private FtpSettings ftpSettings;
 
     @Autowired
     private OuterBackFeign outerBackFeign;
 
     @Autowired
-    private ExchangeToInnerComponent exchangeToInnerComponent;
+    private BdcQueryService bdcQueryService;
 
     @Autowired
-    private ToFTPUploadComponent toFTPUploadComponent;
+    private FileInteractComponent fileInteractComponent;
+
 
     @Override
     public Object initWebSecReg(RequestParamBody paramBody) {
+        try {
+            return dealYcslCreateProcess(initData(paramBody));
+        } catch (ParseException e) {
+            log.error("JSON转译异常，原始异常信息："+ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("JSON转译异常");
+        }
+    }
+
+    @Override
+    public Object initWebSecRegForNewPlat(RequestParamBody paramBody) {
+        try {
+            return dealYcslCreateProcess(initData(paramBody));
+        } catch (ParseException e) {
+            log.error("JSON转译异常，原始异常信息："+ErrorDealUtil.getErrorInfo(e));
+            throw new ZtgeoBizException("JSON转译异常");
+        }
+    }
+
+    public Map<String,String> initData(RequestParamBody paramBody) throws ParseException {
         log.info("接收互联网加申请");
+        //数据自检
+        paramBody.checkSelfStandard();
+        //声明交互map
         Map<String,String> mapParmeter= new HashMap<>();
+        //取关键数据
         String returnSlbh = paramBody.getReturnSlbh();
         RequestParamSjsq sjsq_req = paramBody.getRecEntity();
-        System.out.println(JSONObject.toJSONString(sjsq_req));
+        //关键数据自检
+        sjsq_req.checkSelfStandard();
+
+        System.out.println("申请收件信息详情："+JSONObject.toJSONString(sjsq_req));
         List<ImmovableFile> fileVoList = paramBody.getFileVoList();
 
         SJ_Sjsq sjsq = getSjsqFromBaseParams(sjsq_req);
@@ -63,14 +104,18 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
         log.info("本次办件使用的权证号为："+JSONArray.toJSONString(bdcDatas));
 
         List<RespServiceData> serviceDatas = new ArrayList<RespServiceData>();
-        //不动产权属服务数据
+
+        /**
+         * 不动产权属服务数据
+         */
         RespServiceData serviceData1 = new RespServiceData();
         List<SJ_Info_Bdcqlxgxx> bdcqls_final = new ArrayList<SJ_Info_Bdcqlxgxx>();
         if(bdcDatas!=null && bdcDatas.size()>0){
             for(String bdcData:bdcDatas){
                 ParametricData parametricData = new ParametricData();
                 parametricData.setBdczh(bdcData);
-                List<SJ_Info_Bdcqlxgxx> bdcqls_temp = exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
+                //使用新的权属数据获取
+                List<SJ_Info_Bdcqlxgxx> bdcqls_temp = bdcQueryService.queryQzxxWithItsRights(parametricData);
                 for(SJ_Info_Bdcqlxgxx bdcql_temp : bdcqls_temp){
                     bdcqls_final.add(bdcql_temp);
                 }
@@ -88,7 +133,10 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
         if(StringUtils.isBlank(sjsq.getImmovableSite())){
             sjsq.setImmovableSite(bdcqls_final.get(0).getImmovableSite());
         }
-        //交易服务数据组织
+
+        /**
+         * 交易服务数据组织
+         */
         RespServiceData serviceData2 = new RespServiceData();
         RequestParamJyht htdata = sjsq_req.getHtdata();
         List<Sj_Info_Jyhtxx> jyhtxxes = new ArrayList<Sj_Info_Jyhtxx>();
@@ -162,50 +210,45 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
         serviceDatas.add(serviceData2);
         sjsq.setServiceDatas(serviceDatas);
 
-        mapParmeter.put("returnSlbh",returnSlbh);
-        if(fileVoList!=null) {
-            List<com.springboot.popj.registration.ImmovableFile> files = new ArrayList<com.springboot.popj.registration.ImmovableFile>();
-            for(ImmovableFile f:fileVoList){
-                com.springboot.popj.registration.ImmovableFile file = new com.springboot.popj.registration.ImmovableFile();
-                if(f.getFileType().contains(".")){
-                    f.setFileType(f.getFileType().replaceAll(".",""));
-                }
-                file.setFileName(f.getFileName().contains(f.getFileType())?f.getFileName():(f.getFileName()+'.'+f.getFileType()));
-                file.setFileSequence(f.getFileSequence());
-                file.setFileSize(f.getFileSize());
-                file.setFileType(f.getFileType());
-                file.setpName(f.getPName());
-                BASE64Decoder base64Decoder = new BASE64Decoder();
-                String pathFold = File.separator
-                        + DateUtils.getNowYear()
-                        + File.separator
-                        + DateUtils.getNowMonth()
-                        + File.separator + DateUtils.getNowDay();
-                try {
-//                    log.info("巴涩："+f.getFileBase64());
-                    String fileName_ftp = UUID.randomUUID().toString()+"."+f.getFileType();
-                    if(toFTPUploadComponent.uploadFileBDC(pathFold,f.getFileName(),f.getFileType(),fileName_ftp,new ByteArrayInputStream(base64Decoder.decodeBuffer(f.getFileBase64())))){
-                        file.setFileAdress(pathFold + File.separator  + fileName_ftp);
-                        file.setFileAddress(pathFold + File.separator  + fileName_ftp);
-                    }
-                } catch (IOException e) {
-                    log.warn("附件base64解析异常"+ ErrorDealUtil.getErrorInfo(e));
-                    e.printStackTrace();
-                    throw new ZtgeoBizException("附件base64解析异常");
-                } catch (RuntimeException er){
-                    log.warn("文件上传出现其它运行时异常--"+ ErrorDealUtil.getErrorInfo(er));
-                    er.printStackTrace();
-                    throw new ZtgeoBizException("文件上传出现其它运行时异常--"+er.getMessage());
-                }
-                files.add(file);
-            }
-            mapParmeter.put("fileVoList", JSONArray.toJSONString(files));
+        /**
+         * 处理收件人
+         */
+        if(StringUtils.isNotBlank(sjsq_req.getReceiverId())) {
+            List<SJ_Sjsq_User_Ext> userExtVoList = new ArrayList<>();
+            SJ_Sjsq_User_Ext userExt = new SJ_Sjsq_User_Ext();
+            userExt.setAdaptSys("01");
+            userExt.setDataInitMethod("字典");
+            userExt.setUserCode(sjsq_req.getReceiverId());
+            userExt.setUserName(sjsq_req.getReceiverName());
+            userExtVoList.add(userExt);
+            sjsq.setUserExtVoList(userExtVoList);
         }
-        mapParmeter.put("modelId",mouldId);
-        mapParmeter.put("subControl","0");//0是提交，1是不提交
+
+        /**
+         * 异步附件处理
+         */
+        if(fileVoList!=null) {
+            List<SJ_Fjfile> files = dealAsynchFile(fileVoList);
+            mapParmeter.put("fileVoList",JSONArray.toJSONString(files));
+        }
+
+        /**
+         * 收尾数据
+         */
+        mapParmeter.put("returnSlbh",returnSlbh);
+        mapParmeter.put("modelId",newPlatSettings.gainTermByKey(NEWPLAT_TURNINNERS_ESFZY).getMid());
+        mapParmeter.put("subControl","0");//0是提交，1是不提交,2是仅创建办件不保存数据
         mapParmeter.put("SJ_Sjsq", JSONObject.toJSONString(sjsq));
+        return mapParmeter;
+    }
+
+    public Object dealYcslCreateProcess(Map<String,String> mapParmeter){
         String token = outerBackFeign.getToken(new JwtAuthenticationRequest(username, password)).getData();
-        return outerBackFeign.DealRecieveFromOuter5(token,mapParmeter).getData();
+        ObjectRestResponse<Object> ourv = outerBackFeign.DealRecieveFromOuter5(token,mapParmeter);
+        if(ourv.getStatus()!=200){
+            throw new ZtgeoBizException("转一窗生成办件失败，返回失败原因："+ourv.getMessage());
+        }
+        return ourv.getData();
     }
 
     private SJ_Sjsq getSjsqFromBaseParams(RequestParamSjsq sjsq_req){
@@ -258,5 +301,79 @@ public class ExchangeToWebServiceImpl implements ExchangeToWebService {
             }
         }
         return sellergls;
+    }
+
+    private List<SJ_Fjfile> dealAsynchFile(List<ImmovableFile> fileVoList){
+        List<SJ_Fjfile> files = new ArrayList<>();
+        List<TwoOrNFjxx> willAsynFiles = new ArrayList<>();
+        for(ImmovableFile f:fileVoList){
+            SJ_Fjfile file = new SJ_Fjfile();
+            if(f.getFileType().contains(".")){
+                f.setFileType(f.getFileType().replaceAll(".",""));
+            }
+            file.setFileName(f.getFileName().contains(f.getFileType())?f.getFileName():(f.getFileName()+'.'+f.getFileType()));
+            file.setFileExt(f.getFileType());
+            file.setFileSize(f.getFileSize());
+            file.setXh(f.getFileSequence());
+            file.setLogicPath(f.getPName());
+            file.setSaveType(ftpSettings.getYcSaveSetting());
+
+            String actualFileName = UUID.randomUUID().toString().replaceAll("-","").toUpperCase()
+                    +"."+f.getFileType();
+
+            if(CommonSetYcBdcFjdz(file,actualFileName)){
+                //设置原路径、去向路径
+                TwoOrNFjxx treeFjxx = new TwoOrNFjxx()
+                        .initYcAndBdcByBase64(f.getFileBase64(),ftpSettings.getYcSaveSetting(),"1",file);
+                willAsynFiles.add(treeFjxx);
+            }else{
+                //设置原路径、去向路径
+                TwoOrNFjxx treeFjxx = new TwoOrNFjxx()
+                        .initYcAndBdcByBase64(f.getFileBase64(),ftpSettings.getYcSaveSetting(),null,file);
+                willAsynFiles.add(treeFjxx);
+            }
+            files.add(file);
+        }
+        if(willAsynFiles.size()>0) { //启动异步传输
+            log.info("web+办件附件三方异步处理开始！");
+            fileInteractComponent.AsynchTrans(willAsynFiles);
+        }
+        return files;
+    }
+
+    /**
+     * 描述：通用一窗和不动产附件地址处理
+     * 作者：chenb
+     * 日期：2020/8/19
+     * 参数：[file, actualFileName]
+     * 返回：需要不动产异步上传时返回true；仅上传一窗返回false
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public boolean CommonSetYcBdcFjdz(SJ_Fjfile file,String actualFileName){
+        //声明是否使用异步上传附件标识
+        boolean isUseAsyn4Bdc = ftpSettings.getIsDealFtp().getBdc();
+        //设置不操作不动产ftp但yc使用本地存储，仍然设置异步上传不动产FTP
+        if(!isUseAsyn4Bdc){
+            isUseAsyn4Bdc = "0".equals(ftpSettings.getYcSaveSetting());
+        }
+        //一窗FTP路径生成
+        String ycPath = ParamConvertUtil.initYcslFtpPath(ftpSettings,actualFileName);
+        //不动产FTP路径生成
+        String bdcMappingPath = "";
+        if(isUseAsyn4Bdc) {
+            bdcMappingPath = ParamConvertUtil.initNeedFtpPath(
+                    "BDC",
+                    BDC_NEW_PLAT_FLOW_KEY_ZY,
+                    actualFileName,
+                    "999",
+                    "YCSL-HLW-" + TimeUtil.getDateString(new Date()).replaceAll("-", "")
+            );
+        }else{
+            bdcMappingPath = ycPath;
+        }
+        file.setFtpPath(ycPath);
+        file.setBdcMappingPath(bdcMappingPath);
+
+        return isUseAsyn4Bdc;
     }
 }

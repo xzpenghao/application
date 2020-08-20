@@ -13,7 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransFjxx {
-    private String saveType;
+    private String saveType;        //0-本地；1-ftp；-1-base64
     private String ifFtpKey;
     private String path;
+    private String fileBase64;
 }

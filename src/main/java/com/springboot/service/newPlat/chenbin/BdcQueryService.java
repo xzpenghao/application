@@ -127,6 +127,14 @@ public class BdcQueryService {
         return serviceDataInfos;
     }
 
+    /**
+     * 描述：不动产单元信息生成楼盘服务数据
+     * 作者：chenb
+     * 日期：2020/8/18
+     * 参数：[bdcdyh]
+     * 返回：List<SJ_Info_Immovable>
+     * 更新记录：更新人：{}，更新日期：{}
+     */
     public List<SJ_Info_Immovable> queryBdcdyxxByDyh(String bdcdyh){
         //1. 定义返回结果集
         List<SJ_Info_Immovable> serviceDataInfos = new ArrayList<>();
@@ -134,6 +142,8 @@ public class BdcQueryService {
         BdcdyReq bdcdyReq = new BdcdyReq().initDyReq("123",bdcdyh);
         //3. 执行查询操作
         OtherResponseEntity<BdcdyResponse> cxjg = bdcQueryFeign.bdcdycx(bdcdyReq);
+        //查询结果留痕
+        log.debug(JSONObject.toJSONString(cxjg));
         //4. 解析查询的结果数据
         if(cxjg!=null) {
             cxjg.checkSelfIfBdc("不动产单元信息查询接口");

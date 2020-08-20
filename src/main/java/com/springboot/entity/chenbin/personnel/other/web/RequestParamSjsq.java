@@ -1,5 +1,8 @@
 package com.springboot.entity.chenbin.personnel.other.web;
 
+import com.springboot.config.ZtgeoBizException;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,8 +17,10 @@ public class RequestParamSjsq implements Serializable {
     private String notifiedPersonTelephone;                     //通知人电话
     private String notifiedPersonAddress;                       //通知人地址
     private String platform;                                    //发起平台(填web+)
+    private String receiverId;                                  //收件人ID
+    private String receiverName;                                //收件人NAME
     private String districtCode;                                //区县代码
-    private List<String> bdcDatas;                                  //证号集合
+    private List<String> bdcDatas;                              //证号集合
     private RequestParamJyht htdata;                            //合同数据
 
     public String getBusinessType() {
@@ -98,6 +103,22 @@ public class RequestParamSjsq implements Serializable {
         this.platform = platform;
     }
 
+    public String getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(String receiverId) {
+        this.receiverId = receiverId;
+    }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
+    }
+
     public String getDistrictCode() {
         return districtCode;
     }
@@ -120,5 +141,17 @@ public class RequestParamSjsq implements Serializable {
 
     public void setHtdata(RequestParamJyht htdata) {
         this.htdata = htdata;
+    }
+
+    public void checkSelfStandard() {
+        if(StringUtils.isBlank(this.receiverId)||StringUtils.isBlank(this.receiverName)) {
+            throw new ZtgeoBizException("收件人数据【receiver】未传入");
+        }
+        if(this.bdcDatas==null||this.bdcDatas.size()<1) {
+            throw new ZtgeoBizException("不动产权证数据【bdcDatas】未传入！");
+        }
+        if(this.htdata == null) {
+            throw new ZtgeoBizException("交易合同数据【htdata】未传入！");
+        }
     }
 }

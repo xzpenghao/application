@@ -141,6 +141,9 @@ public class BdcInteractComponent {
         Map<String, String> sjsqMap = new HashMap<>();
         //写入申请编号
         sjsqMap.put("receiptNumber",wsywh);
+        //不动产一窗挂接数组
+//        boolean isUpdateBdcMap = false;
+//        List<Sj_Sjsq_Bdc_Mapping> bdcMappings = new ArrayList<>();
         //创建服务数据集合
         List<RespServiceData> serviceDatas = new ArrayList<>();
         //写入固定成功处理服务数据
@@ -191,6 +194,9 @@ public class BdcInteractComponent {
             }
         }
         sjsqMap.put("serviceDatas", JSONArray.toJSONString(serviceDatas));
+//        if(isUpdateBdcMap) {
+//            sjsqMap.put("bdcMappingVoList", JSONArray.toJSONString(bdcMappings));
+//        }
         //调用rec程序保存对应登簿结果服务数据并提交对应流程
         backFeign.DealRecieveFromOuter2(token,sjsqMap);
     }

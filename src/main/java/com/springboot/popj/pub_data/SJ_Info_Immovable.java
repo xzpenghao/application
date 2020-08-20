@@ -14,7 +14,9 @@ public class SJ_Info_Immovable extends SJ_Information implements Serializable {
     private String ext2;                            //扩展字段2
     private String ext3;                            //扩展字段3
     private String sfyc;                            //是否预测
-    private String sfczyc;          //是否存在异常
+    private String sfczyc;                          //是否存在异常
+    private String yywh;                            //原业务号
+    private String yqllx;                           //原权利类型
     private List<SJ_Bdc_Gl> glImmovableVoList;          //关联的不动产数据
     private List<SJ_Qlr_Gl> glObligeeVoList;            //关联权利人列表
     private List<SJ_Qlr_Gl> glAgentVoList;              //代理人
@@ -129,5 +131,21 @@ public class SJ_Info_Immovable extends SJ_Information implements Serializable {
 
     public void setSfczyc(String sfczyc) {
         this.sfczyc = sfczyc;
+    }
+
+    public String getYywh() {
+        return yywh;
+    }
+
+    public void setYywh(String yywh) {
+        this.yywh = yywh;
+    }
+
+    public String getYqllx() {
+        return yqllx;
+    }
+
+    public void setYqllx(String yqllx) {
+        this.yqllx = yqllx;
     }
 }

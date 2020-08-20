@@ -246,7 +246,7 @@ public class BdcInteractService {
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
         ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList(),BDC_DATA_TYPE_SC);
         //补全申请人信息
-        newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
+        newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo(),BDC_NEW_PLAT_YW_KEY_QL));
         //补全附件列表信息
         newBdcFlowRequest.setFjxx(transFjxxFromYcToBdc(fileVoList,BDC_NEW_PLAT_FLOW_KEY_ZY,sjsq.getReceiptNumber()));
 
@@ -273,7 +273,7 @@ public class BdcInteractService {
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
         ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList(),BDC_DATA_TYPE_SC);
         //补全申请人信息
-        newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo()));
+        newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo(),BDC_NEW_PLAT_YW_KEY_QL));
         //补全附件列表信息
         newBdcFlowRequest.setFjxx(transFjxxFromYcToBdc(fileVoList,BDC_NEW_PLAT_FLOW_KEY_ZY,sjsq.getReceiptNumber()));
         //补全抵押信息
@@ -281,7 +281,10 @@ public class BdcInteractService {
                 sjsq.getReceiptNumber(),
                 newBdcFlowRequest.getYywh(),
                 newBdcFlowRequest.getYqllx(),
-                sjsq.getMortgageContractInfo(),fileVoList)
+                sjsq.getMortgageContractInfo(),
+                fileVoList,
+                BDC_NEW_PLAT_YW_KEY_DY
+                )
         );
         return newBdcFlowRequest;
     }
@@ -323,7 +326,7 @@ public class BdcInteractService {
      * 返回：List<Sqrxx>
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public List<Sqrxx> transSellersAndBuyersToSqr(Sj_Info_Jyhtxx jyhtxx){
+    public List<Sqrxx> transSellersAndBuyersToSqr(Sj_Info_Jyhtxx jyhtxx,String yw_key){
         if(jyhtxx==null)
             throw new ZtgeoBizException("交易合同信息缺失，涉及房屋买卖的登记时，这是不允许的！");
         List<SJ_Qlr_Gl> glQlrs = jyhtxx.getGlHouseBuyerVoList();
@@ -338,7 +341,7 @@ public class BdcInteractService {
         //合并集合
         glQlrs.addAll(glSellers);
         //处理申请人
-        return ParamConvertUtil.getSqrsByQlrs(glQlrs,BDC_NEW_PLAT_YW_KEY_QL);
+        return ParamConvertUtil.getSqrsByQlrs(glQlrs,yw_key);
     }
 
     /**
@@ -349,7 +352,7 @@ public class BdcInteractService {
      * 返回：List<Sqrxx>
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public List<Sqrxx> mortDyrsAndDyqrsToSqr(Sj_Info_Dyhtxx dyhtxx){
+    public List<Sqrxx> mortDyrsAndDyqrsToSqr(Sj_Info_Dyhtxx dyhtxx,String yw_key){
         //获取抵押/抵押权人
         List<SJ_Qlr_Gl> glQlrs = dyhtxx.getGlMortgagorVoList();
         List<SJ_Qlr_Gl> gldyqrs = dyhtxx.getGlMortgageHolderVoList();
@@ -365,7 +368,7 @@ public class BdcInteractService {
         //合并集合
         glQlrs.addAll(gldyqrs);
         //处理申请人
-        return ParamConvertUtil.getSqrsByQlrs(glQlrs,BDC_NEW_PLAT_YW_KEY_DY);
+        return ParamConvertUtil.getSqrsByQlrs(glQlrs,yw_key);
     }
 
     public List<Sqrxx> bdcMortDyqrToSqr(List<Sj_Info_Bdcdyxgxx> immovableCurrentMortgageInfoVoList){
@@ -462,7 +465,8 @@ public class BdcInteractService {
                     i++;
 //                }
             }
-            if(willAsynFiles.size()>0){ //启动异步传输
+            if(willAsynFiles.size()>0) { //启动异步传输
+                log.info("转内网办件附件两方异步处理开始！");
                 fileInteractComponent.AsynchTrans(willAsynFiles);
             }
             if(fjxxes.size()>0)
@@ -500,7 +504,7 @@ public class BdcInteractService {
      * 返回：List<Dyxx>
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public List<Dyxx> initDyxx(String sqbh,String yywh,String yqllx,Sj_Info_Dyhtxx dyhtxx,List<SJ_Fjfile> fileVoList) throws ParseException {
+    public List<Dyxx> initDyxx(String sqbh,String yywh,String yqllx,Sj_Info_Dyhtxx dyhtxx,List<SJ_Fjfile> fileVoList,String yw_key) throws ParseException {
         List<Dyxx> dyxxes = null;
         if(dyhtxx!=null){
             dyxxes = new ArrayList<>();
@@ -530,7 +534,7 @@ public class BdcInteractService {
                 dyxx.setZwrzjlx(zwr.getObligeeDocumentType());
                 dyxx.setZwrzjhm(zwr.getObligeeDocumentNumber());
             }
-            dyxx.setSqrxx(mortDyrsAndDyqrsToSqr(dyhtxx));
+            dyxx.setSqrxx(mortDyrsAndDyqrsToSqr(dyhtxx,yw_key));
             dyxx.setFjxx(transFjxxFromYcToBdc(fileVoList,BDC_NEW_PLAT_FLOW_KEY_DY,sqbh));
             dyxxes.add(dyxx);
         }
@@ -552,23 +556,29 @@ public class BdcInteractService {
         String remotePath = file.getFtpPath().replaceAll("\\\\","/");
         //截取文件名
         String fileName = remotePath.substring(remotePath.lastIndexOf("/") + 1);
-        if("0".equals(saveType)){ //文件保存在本地,赋值逻辑路径/设置不动产附件操作标识
-            isUseAsyn = ftpSettings.getIsDealFtp().getBdc();
-            //设置路径到不动产附件对象中
-            String logicFtpPath = ParamConvertUtil.initNeedFtpPath("BDC",lKey,fileName,sid,wwywh);
-            fjxx.setFjdz(logicFtpPath);
-        }else{      //FTP保存
-            if(ftpSettings.getIsDealFtp().getBdc()){//需要操作附件上传，从一窗受理FTP下载并上传至不动产的FTP
-                isUseAsyn = true;
+        //之前未进行过附件同步
+        if(StringUtils.isBlank(file.getBdcMappingPath())) {
+            if ("0".equals(saveType)) { //文件保存在本地,赋值逻辑路径/设置不动产附件操作标识
+                isUseAsyn = ftpSettings.getIsDealFtp().getBdc();
                 //设置路径到不动产附件对象中
-                String logicFtpPath = ParamConvertUtil.initNeedFtpPath("BDC",lKey,fileName,sid,wwywh);
+                String logicFtpPath = ParamConvertUtil.initNeedFtpPath("BDC", lKey, fileName, sid, wwywh);
                 fjxx.setFjdz(logicFtpPath);
-                //重定义标准文件FTP或本地路径
-                file.setFtpPath(remotePath);
-            }else{  //路径赋值
-                //无操作时，标准FTP路径设置
-                fjxx.setFjdz(remotePath);
+            } else {      //FTP保存
+                if (ftpSettings.getIsDealFtp().getBdc()) {//需要操作附件上传，从一窗受理FTP下载并上传至不动产的FTP
+                    isUseAsyn = true;
+                    //设置路径到不动产附件对象中
+                    String logicFtpPath = ParamConvertUtil.initNeedFtpPath("BDC", lKey, fileName, sid, wwywh);
+                    fjxx.setFjdz(logicFtpPath);
+                    //重定义标准文件FTP或本地路径
+                    file.setFtpPath(remotePath);
+                } else {  //路径赋值
+                    //无操作时，标准FTP路径设置
+                    fjxx.setFjdz(remotePath);
+                }
             }
+        } else {
+            //已异步处理过
+            fjxx.setFjdz(file.getBdcMappingPath());
         }
         return isUseAsyn;
     }

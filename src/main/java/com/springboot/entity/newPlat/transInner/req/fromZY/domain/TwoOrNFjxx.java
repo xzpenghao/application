@@ -4,6 +4,7 @@ import com.springboot.entity.SJ_Fjfile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +24,20 @@ public class TwoOrNFjxx {
     private List<TransFjxx> to;
 
     public TwoOrNFjxx initByTwo(String comeSaveType,String comeIfFtpKey,String comePath,String toSaveType,String toIfFtpKey,String toPath){
-        this.come = new TransFjxx(comeSaveType,comeIfFtpKey,comePath);
+        this.come = new TransFjxx(comeSaveType,comeIfFtpKey,comePath,null);
         List<TransFjxx> twoTo = new ArrayList<>();
-        twoTo.add(new TransFjxx(toSaveType,toIfFtpKey,toPath));
+        twoTo.add(new TransFjxx(toSaveType,toIfFtpKey,toPath,null));
         this.to = twoTo;
+        return this;
+    }
+
+    public TwoOrNFjxx initYcAndBdcByBase64(String comeBase64,String ycSaveType,String bdcSaveType,SJ_Fjfile file){
+        this.come = new TransFjxx("-1",null,null,comeBase64);
+        List<TransFjxx> threeTo = new ArrayList<>();
+        threeTo.add(new TransFjxx(ycSaveType,"ycsl",file.getFtpPath(),null));
+        if(StringUtils.isNotBlank(bdcSaveType))
+            threeTo.add(new TransFjxx(bdcSaveType,"bdc",file.getBdcMappingPath(),null));
+        this.to = threeTo;
         return this;
     }
 }

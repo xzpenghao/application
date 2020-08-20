@@ -7,8 +7,10 @@ import com.springboot.entity.newPlat.transInner.req.fromZY.domain.TransFjxx;
 import com.springboot.entity.newPlat.transInner.req.fromZY.domain.TwoOrNFjxx;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sun.misc.BASE64Decoder;
 
 import java.io.ByteArrayInputStream;
 import java.util.Date;
@@ -28,11 +30,22 @@ import java.util.concurrent.FutureTask;
 public class FileInteractComponent {
 
     @Autowired
-    private FtpSettings ftpSettings;
-    @Autowired
     private FtpFileHandleComponent ftpFileHandleComponent;
     @Autowired
     private LocalFileHandleComponent localFileHandleComponent;
+
+    /**
+     * 描述：附件传输同步处理
+     * 作者：chenb
+     * 日期：2020/8/19
+     * 参数：[willAsynFiles]
+     * 返回：void
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public void SynchTrans(List<TwoOrNFjxx> willAsynFiles){
+        //下载并上传附件
+        handleTransFiles(willAsynFiles);
+    }
 
     /**
      * 描述：附件传输异步执行线程
@@ -69,9 +82,14 @@ public class FileInteractComponent {
                 for(TwoOrNFjxx willAsynFile:willAsynFiles){
                     log.info("进入附件处理，异步处理时间是："+new Date().getTime());
                     byte[] comeBytes = null;
-                    if("0".equals(willAsynFile.getCome().getSaveType())){
+                    if("0".equals(willAsynFile.getCome().getSaveType())){   //本地加载
                         comeBytes = localFileHandleComponent.downloadFileLocal(willAsynFile.getCome().getPath());
-                    } else {
+                    } else if("-1".equals(willAsynFile.getCome().getSaveType())) {  //base64处理
+                        if(StringUtils.isNotBlank(willAsynFile.getCome().getFileBase64())) {
+                            BASE64Decoder base64Decoder = new BASE64Decoder();
+                            comeBytes = base64Decoder.decodeBuffer(willAsynFile.getCome().getFileBase64());
+                        }
+                    } else {    //ftp加载
                         FtpFileDownResult fileFtpDownResult =ftpFileHandleComponent.downFile(
                                 willAsynFile.getCome().getIfFtpKey(),
                                 willAsynFile.getCome().getPath().substring(0,willAsynFile.getCome().getPath().lastIndexOf("/")),
@@ -96,6 +114,8 @@ public class FileInteractComponent {
                                             comeBytes.length
                                     );
                                 } else {
+                                    if(toFjxx.getPath().contains("\\"))
+                                        toFjxx.setPath(toFjxx.getPath().replaceAll("\\\\","/"));
                                     ftpFileHandleComponent.uploadFile(
                                             toFjxx.getIfFtpKey(),
                                             toFjxx.getPath().substring(0, toFjxx.getPath().lastIndexOf("/")),

@@ -9,6 +9,7 @@ import com.springboot.emm.DIC_RY_ZJZL_Enums;
 import com.springboot.emm.DIC_RY_ZL_Enums;
 import com.springboot.entity.chenbin.personnel.pub_use.SJ_Sjsq_User_Ext;
 import com.springboot.entity.newPlat.jsonMap.FileNameMapping;
+import com.springboot.entity.newPlat.settingTerm.FtpSettings;
 import com.springboot.entity.newPlat.settingTerm.NewPlatSettings;
 import com.springboot.entity.newPlat.settingTerm.TurnInnerSettingsTerm;
 import com.springboot.entity.newPlat.transInner.req.fromZY.NewBdcFlowRequest;
@@ -16,9 +17,12 @@ import com.springboot.entity.newPlat.transInner.req.fromZY.domain.Fwxx;
 import com.springboot.entity.newPlat.transInner.req.fromZY.domain.Sqrxx;
 import com.springboot.popj.pub_data.*;
 import com.springboot.service.newPlat.chenbin.BdcInteractService;
+import com.springboot.util.DateUtils;
 import com.springboot.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.xml.crypto.Data;
+import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -170,6 +174,36 @@ public class ParamConvertUtil {
         newBdcFlowRequest.setFwxx(fwxx);
     }
 
+    /**
+     * 描述：从取得的不动产单元信息中整理转内网必要的FWXX
+     * 作者：chenb
+     * 日期：2020/8/18
+     * 参数：[]
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public static void fillMainHouseToReqByBdcdyxx(NewBdcFlowRequest newBdcFlowRequest,SJ_Info_Immovable immovableSelf) throws ParseException {
+        //检查传入数据
+        if(immovableSelf==null){
+            throw new ZtgeoBizException("楼盘服务数据传入为空");
+        }
+        //获取房屋主体信息
+        SJ_Bdc_Gl bdc = getMainHouse(immovableSelf.getGlImmovableVoList());
+        Fwxx fwxx = getBaseFwxx(bdc,immovableSelf.getSfyc());
+        //设置原业务号和房屋信息
+        newBdcFlowRequest.setYywh(getNullStrIfk(immovableSelf.getYywh()));
+        newBdcFlowRequest.setYqllx(immovableSelf.getYqllx());
+        newBdcFlowRequest.setFwxx(fwxx);
+    }
+
+    /**
+     * 描述：取基础房产数据
+     * 作者：chenb
+     * 日期：2020/8/18
+     * 参数：[bdc, sfyc]
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+     */
     public static Fwxx getBaseFwxx(SJ_Bdc_Gl bdc,String sfyc){
         //声明房屋主体
         Fwxx fwxx = new Fwxx();
@@ -382,6 +416,14 @@ public class ParamConvertUtil {
         return sqrzl;
     }
 
+    /**
+     * 描述：初始化需要的ftp路径
+     * 作者：chenb
+     * 日期：2020/8/19
+     * 参数：[platName, firstKey, fileName, sid, wwywh]
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+     */
     public static String initNeedFtpPath(String platName,String firstKey,String fileName,String sid,String wwywh){
         return "/"+platName.toUpperCase()
                 +"/"+firstKey.toUpperCase()
@@ -389,6 +431,26 @@ public class ParamConvertUtil {
                 +"/"+sid
                 +"/"+wwywh
                 +"/"+fileName;
+    }
+
+    /**
+     * 描述：一窗的附件上传地址生成
+     * 作者：chenb
+     * 日期：2020/8/20
+     * 参数：【ftpSettings，fileName】
+     * 返回：String
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public static String initYcslFtpPath(FtpSettings ftpSettings, String fileName){
+        if("0".equals(ftpSettings.getYcSaveSetting())){
+            return ftpSettings.getIfLocalBasePath()+fileName;
+        }
+        return File.separator
+                + DateUtils.getNowYear()
+                + File.separator
+                + DateUtils.getNowMonth()
+                + File.separator + DateUtils.getNowDay()
+                + File.separator + fileName;
     }
 
     /**

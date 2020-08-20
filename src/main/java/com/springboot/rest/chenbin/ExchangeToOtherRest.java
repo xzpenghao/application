@@ -98,19 +98,15 @@ public class ExchangeToOtherRest {
         ObjectRestResponse rv = new ObjectRestResponse<>();
         Object r = null;
         try {
-            r = exc2Web.initWebSecReg(paramBody);
+            r = exc2Web.initWebSecRegForNewPlat(paramBody);
             log.info("互联网+生成办件成功！"+r);
-            JSONObject ycslRv = JSONObject.parseObject((String)r);
-            log.info("互联网+生成办件对象成功！"+ycslRv);
-            rv.data(ycslRv.get("receiptNumber"));
+            rv.data(r);
         } catch (ZtgeoBizException e1){
             log.error("ZTGEO异常："+ErrorDealUtil.getErrorInfo(e1));
-            e1.printStackTrace();
             rv.setStatus(20500);
             rv.setMessage(e1.getMessage());
         } catch (Exception e2){
             log.error("请求出现其它运行时异常："+ErrorDealUtil.getErrorInfo(e2));
-            e2.printStackTrace();
             rv.setStatus(20500);
             rv.setMessage("请求出现其它运行时异常，请联系管理员解决");
         }

@@ -55,6 +55,8 @@ public class BdcInteractRest {
             noticeBody.checkSelfStandard();
             bdcInteractService.noticeMe(noticeBody,resp);
             log.info("BDC->YCSL：接入不动产办件节点通知模块{"+bizStamp+"},通知节点类型："+ DicConvertUtil.getKeyWordByCode(noticeBody.getJdbs(), KEY_NOTICE_CODE_Enums.values()));
+        } catch (ZtgeoBizException e){
+            throw new ZtgeoBizException("通知失败，异常信息为："+e.getMessage());
         } catch (Exception e) {
             log.error("不动产办件节点通知异常，异常信息："+ ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("通知失败，通知出现不可预知的异常，联系管理员解决");
@@ -138,4 +140,6 @@ public class BdcInteractRest {
     public ObjectRestResponse<String> creatOneAcceptProcByHistoryWord(@RequestBody BdcNoticeReq noticeBody){
         return new ObjectRestResponse<>();
     }
+
+
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Data
 public class TurnInnerSettingsTerm extends BaseTerm {
+    private String mid;
     private String sid;
     private String sname;
     private String jsrid;

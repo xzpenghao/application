@@ -11,6 +11,7 @@ public class SJ_Fjfile implements Serializable {
     private String contentType;               //实际文件类型
     private String fileSize;                  //文件大小
     private String ftpPath;                   //ftp保存路径
+    private String bdcMappingPath;            //不动产映射附件地址
     private byte[] fileContent;               //文件内容（不适用ftp模式时使用）
     private String fileStatus;                //文件当前状态
     private String fileSubmissionTime;        //文件提交时间
@@ -68,6 +69,14 @@ public class SJ_Fjfile implements Serializable {
 
     public void setFtpPath(String ftpPath) {
         this.ftpPath = ftpPath;
+    }
+
+    public String getBdcMappingPath() {
+        return bdcMappingPath;
+    }
+
+    public void setBdcMappingPath(String bdcMappingPath) {
+        this.bdcMappingPath = bdcMappingPath;
     }
 
     public byte[] getFileContent() {

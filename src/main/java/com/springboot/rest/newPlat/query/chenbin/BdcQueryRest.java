@@ -46,6 +46,9 @@ public class BdcQueryRest {
     public ObjectRestResponse<List<SJ_Info_Bdcqlxgxx>> getBdcQlInfoWithItsRights(@RequestBody ParametricData parametricData){
         try {
             return new ObjectRestResponse().data(bdcQueryService.queryQzxxWithItsRights(parametricData));
+        } catch (ZtgeoBizException e){
+            log.error("【产权证书查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
+            throw e;
         } catch (Exception e){
             log.error("【产权证书查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("查询时出现异常");
@@ -64,7 +67,10 @@ public class BdcQueryRest {
     public ObjectRestResponse<List<Sj_Info_Bdcdyxgxx>> getBdcDyInfoByZmhAndDyr(@RequestBody ParametricData2 parametricData){
         try {
             return new ObjectRestResponse().data(bdcQueryService.queryDyxxByZmhAndDyr(parametricData));
-        } catch (Exception e){
+        } catch (ZtgeoBizException e){
+            log.error("【抵押证明查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
+            throw e;
+        }  catch (Exception e){
             log.error("【抵押证明查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("查询时出现异常");
         }
@@ -82,6 +88,9 @@ public class BdcQueryRest {
     public ObjectRestResponse<List<SJ_Info_Immovable>> getBdcdyxxByDyh(@RequestParam("bdcdyh")String bdcdyh){
         try {
             return new ObjectRestResponse().data(bdcQueryService.queryBdcdyxxByDyh(bdcdyh));
+        } catch (ZtgeoBizException e){
+            log.error("【不动产单元查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
+            throw e;
         } catch (Exception e){
             log.error("【不动产单元查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("查询时出现异常");
@@ -100,6 +109,9 @@ public class BdcQueryRest {
     public ObjectRestResponse<List<PaphEntity>> getPaphMortBefore(@RequestBody PaphReqEntity paph){
         try {
             return new ObjectRestResponse().data(bdcQueryService.queryPaphMort(paph,"before"));
+        } catch (ZtgeoBizException e){
+            log.error("【银行贷前查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
+            throw e;
         } catch (Exception e){
             log.error("【银行贷前查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("查询时出现异常");
@@ -118,6 +130,9 @@ public class BdcQueryRest {
     public ObjectRestResponse<List<PaphEntity>> getPaphMortAfter(@RequestBody PaphReqEntity paph){
         try {
             return new ObjectRestResponse().data(bdcQueryService.queryPaphMort(paph,"after"));
+        } catch (ZtgeoBizException e){
+            log.error("【银行贷后查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
+            throw e;
         } catch (Exception e){
             log.error("【银行贷后查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("查询时出现异常");

@@ -1,9 +1,9 @@
 package com.springboot.util.newPlatBizUtil;
 
+import com.alibaba.fastjson.JSONArray;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
-import com.springboot.emm.DIC_BDC_ZS_TYPE_Enums;
-import com.springboot.emm.DIC_RY_ZJZL_Enums;
+import com.springboot.emm.*;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphCfxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphDjxx;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphDyxx;
@@ -21,6 +21,7 @@ import com.springboot.entity.newPlat.query.resp.*;
 import com.springboot.popj.pub_data.*;
 import com.springboot.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSON;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -99,10 +100,19 @@ public class ResultConvertUtil {
         return bdcdyxx;
     }
 
+    /**
+     * 描述：从不动产单元信息填充不动产楼盘数据（单一）
+     * 作者：chenb
+     * 日期：2020/8/18
+     * 参数：[bdcdyResponse]
+     * 返回：SJ_Info_Immovable
+     * 更新记录：更新人：{}，更新日期：{}
+     */
     public static SJ_Info_Immovable getImmovInfoByDysj(BdcdyResponse bdcdyResponse){
         bdcdyResponse.checkSelfStandard();
         SJ_Info_Immovable serviceDataInfo = new SJ_Info_Immovable();
-        serviceDataInfo.setSfczyc(bdcdyResponse.getSfczyc());
+        serviceDataInfo.setSfczyc(
+                DicConvertUtil.getKeyCodeByWord(bdcdyResponse.getSfczyc(), KEY_BOOLEAN_CODE_Enums.values()));
         if(bdcdyResponse.getBdcdyxxlb()!=null && bdcdyResponse.getBdcdyxxlb().size()>0){
             //初始化不动产调查信息
             initBdcdcxxByBdcdyxx(serviceDataInfo,bdcdyResponse.getBdcdyxxlb());
@@ -306,16 +316,32 @@ public class ResultConvertUtil {
         bdcdyxx.setGlImmovableVoList(getBdcdcxxByDcxx(fwdcxxlb,zddcxxlb,null));
     }
 
+    /**
+     * 描述：通过不动产单元信息填充房屋调查信息
+     * 作者：chenb
+     * 日期：2020/8/18
+     * 参数：SJ_Info_Immovable，List<Bdcdyxx>
+     * 返回：void
+     * 更新记录：更新人：{}，更新日期：{}
+    */
     public static void initBdcdcxxByBdcdyxx(SJ_Info_Immovable serviceDataInfo,List<Bdcdyxx> bdcdyxxlb) {
         List<SJ_Bdc_Gl> glImmovableVoList = new ArrayList<>();
+        boolean existZss = false;
         for(Bdcdyxx bdcdyxx:bdcdyxxlb) {
-            if(StringUtils.isBlank(serviceDataInfo.getSfyc())){
-                serviceDataInfo.setSfyc(bdcdyxx.getSfyc());
-            }
+            //基础信息填充
+            fillImmovBaseInfo(serviceDataInfo,bdcdyxx);
+            //声明并设置关联不动产信息
             SJ_Bdc_Gl bdcGl = new SJ_Bdc_Gl();
-            bdcGl.setImmovableType(BDC_TYPE_FD);
-
+            bdcGl.setImmovableType(DicConvertUtil.getKeyWordByCode(BDC_TYPE_FD, KEY_BDC_TYPE_Enums.values()));
+            if(!existZss) {
+                bdcGl.setSslb("Z");
+                existZss = true;
+            }
+            //填充房屋信息
+            bdcGl.setFwInfo(getFwInfoByBdcdy(bdcdyxx));
+            glImmovableVoList.add(bdcGl);
         }
+        serviceDataInfo.setGlImmovableVoList(glImmovableVoList);
     }
 
     /**
@@ -421,6 +447,74 @@ public class ResultConvertUtil {
             }
         }
         return glImmovableVoList;
+    }
+
+    /**
+     * 描述：填充楼盘的基本信息(单户)
+     * 作者：chenb
+     * 日期：2020/8/18
+     * 参数：[serviceDataInfo, bdcdyxx]
+     * 返回：void
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public static void fillImmovBaseInfo(SJ_Info_Immovable serviceDataInfo,Bdcdyxx bdcdyxx){
+        //填充是否预测
+        if(StringUtils.isBlank(serviceDataInfo.getSfyc())){
+            serviceDataInfo.setSfyc(bdcdyxx.getSfyc());
+        }
+        //填充项目名称
+        if(StringUtils.isBlank(serviceDataInfo.getXmmc())){
+            serviceDataInfo.setXmmc(bdcdyxx.getXmmc());
+        }
+        //填充楼盘名称
+        if(StringUtils.isBlank(serviceDataInfo.getLpmc())){
+            serviceDataInfo.setLpmc(bdcdyxx.getJzmc());
+        }
+        //填充幢号
+        if(StringUtils.isBlank(serviceDataInfo.getZh())){
+            serviceDataInfo.setZh(bdcdyxx.getZh());
+        }
+        //原业务号
+        if(StringUtils.isBlank(serviceDataInfo.getYywh())){
+            serviceDataInfo.setYywh(bdcdyxx.getYywh());
+        }
+        //原权利类型
+        if(StringUtils.isBlank(serviceDataInfo.getYqllx())){
+            serviceDataInfo.setYqllx(bdcdyxx.getYqllx());
+        }
+    }
+
+    /**
+     * 描述：填充房屋调查信息
+     * 作者：chenb
+     * 日期：2020/8/18
+     * 参数：[bdcdyxx]
+     * 返回：SJ_Bdc_Fw_Info
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public static SJ_Bdc_Fw_Info getFwInfoByBdcdy(Bdcdyxx bdcdyxx){
+        //声明待返回的房屋信息
+        SJ_Bdc_Fw_Info fwInfo = new SJ_Bdc_Fw_Info();
+
+        fwInfo.setImmovableUnitNumber(bdcdyxx.getBdcdyh());
+        fwInfo.setOldHouseCode(bdcdyxx.getFwdm());
+        fwInfo.setSeatNumber(bdcdyxx.getZh());
+        fwInfo.setUnitMark(bdcdyxx.getDyh());
+        fwInfo.setRoomMark(bdcdyxx.getFjh());
+        fwInfo.setHouseholdMark(bdcdyxx.getHh());
+        fwInfo.setHouseholdNumber(bdcdyxx.getHh());
+        fwInfo.setHouseLocation(bdcdyxx.getZl());
+        fwInfo.setProjectName(bdcdyxx.getXmmc());
+        fwInfo.setBuildingName(bdcdyxx.getJzmc());
+        fwInfo.setArchitecturalArea(
+                getBigDecimalNotThrowNull("<不动产关联--房屋调查信息> 建筑面积 ",bdcdyxx.getJzmj()));
+        fwInfo.setMortgageSituation(
+                DicConvertUtil.getKeyWordByCode(bdcdyxx.getDyzt(), KEY_BDC_QSZT_DYXZZT_Enums.values()));
+        fwInfo.setClosureSituation(
+                DicConvertUtil.getKeyWordByCode(bdcdyxx.getCfzt(), KEY_BDC_QSZT_DYXZZT_Enums.values()));
+        fwInfo.setObjectionSituation(
+                DicConvertUtil.getKeyWordByCode(bdcdyxx.getYyzt(), KEY_BDC_QSZT_DYXZZT_Enums.values()));
+        return fwInfo;
     }
 
     /**
@@ -751,6 +845,8 @@ public class ResultConvertUtil {
 
     public static void main(String[] args){
 //        System.out.println("是否整数："+isIntegerValue(null));
+        String testStr = "12kdj";
+        System.out.println(JSONArray.toJSONString(testStr.split(",")));
         System.out.println("保留两位小数(String)："+getStringFromBigDecimalNotThrowNull(new BigDecimal(3),"#.00"));
         System.out.println("保留两位小数(BigDecimal)："+getStringFromBigDecimalNotThrowNull(new BigDecimal(3),"#.00"));
     }
