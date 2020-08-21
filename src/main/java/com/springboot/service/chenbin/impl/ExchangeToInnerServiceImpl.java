@@ -2,6 +2,7 @@ package com.springboot.service.chenbin.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.util.StringUtil;
 import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.component.chenbin.ExchangeToInnerComponent;
 import com.springboot.component.chenbin.HttpCallComponent;
@@ -190,6 +191,10 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         params.put("obligeeName",paph.getQlrmc());
         params.put("obligeeId",paph.getQlrzjh());
         String bdczl = paph.getBdczl();
+        boolean isBlack = StringUtils.isBlank(bdczl) || StringUtils.isBlank(bdczl.replaceAll("\\$",""));
+        if(isBlack){
+            throw new ZtgeoBizException("请填入不动产坐落");
+        }
         if(StringUtils.isNotBlank(bdczl)) {
             String[] bdczls = bdczl.split("\\$");
             System.out.println("bdczls:" + bdczls + JSONObject.toJSONString(bdczls));
