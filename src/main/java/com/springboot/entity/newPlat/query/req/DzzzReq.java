@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DzzzReq {
-    private String zslbhlb;
+    private String ywh;
 }

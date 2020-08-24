@@ -9,6 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FTP_USE_FOR_BDC;
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FTP_USE_FOR_YCSL;
+
 /**
  * @author chenb
  * @version 2020/8/12
@@ -34,9 +37,9 @@ public class TwoOrNFjxx {
     public TwoOrNFjxx initYcAndBdcByBase64(String comeBase64,String ycSaveType,String bdcSaveType,SJ_Fjfile file){
         this.come = new TransFjxx("-1",null,null,comeBase64);
         List<TransFjxx> threeTo = new ArrayList<>();
-        threeTo.add(new TransFjxx(ycSaveType,"ycsl",file.getFtpPath(),null));
+        threeTo.add(new TransFjxx(ycSaveType,FTP_USE_FOR_YCSL,file.getFtpPath(),null));
         if(StringUtils.isNotBlank(bdcSaveType))
-            threeTo.add(new TransFjxx(bdcSaveType,"bdc",file.getBdcMappingPath(),null));
+            threeTo.add(new TransFjxx(bdcSaveType,FTP_USE_FOR_BDC,file.getBdcMappingPath(),null));
         this.to = threeTo;
         return this;
     }

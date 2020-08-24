@@ -48,6 +48,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FTP_USE_FOR_BDC;
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FTP_USE_FOR_YCSL;
+
 @Slf4j
 @Service("exchangeToInnerService")
 public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
@@ -319,7 +322,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         for(SynNewEcertInfoEntity elecLicenseInfo:elecLicenseInfoList){
             elecLicenseInfo.setCertificateType(getCertificateTypeMapper(elecLicenseInfo.getCertificateType()));
             if(ftpSettings.getIsDealFtp().getBdc()){//使用不同FTP
-                byte[] bytes = fromFTPDownloadComponent.downloadFile(elecLicenseInfo.getFtpPath(),"bdc");
+                byte[] bytes = fromFTPDownloadComponent.downloadFile(elecLicenseInfo.getFtpPath(),FTP_USE_FOR_BDC);
                 if(bytes!=null){
                     String date = TimeUtil.getDateString(new Date());
                     String path = "/"+date.substring(0,4)+"/"+date.substring(5,7)+"/"+date.substring(8);
@@ -328,7 +331,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
                             bytes,
                             path,
                             fileName,
-                            "ycsl"
+                            FTP_USE_FOR_YCSL
                     );
                     elecLicenseInfo.setFtpPath(StringUtils.isNotBlank(ftpPath)?ftpPath.replaceAll("/","\\\\"):(path+"/"+fileName).replaceAll("/","\\\\"));
                 }else{
@@ -348,7 +351,7 @@ public class ExchangeToInnerServiceImpl implements ExchangeToInnerService {
         List<SynNewEcertInfoEntity> elecLicenseInfoList_ = new ArrayList<SynNewEcertInfoEntity>();
         for(SynNewEcertInfoEntity elecLicenseInfo:elecLicenseInfoList){
             elecLicenseInfo.setCertificateType(getCertificateTypeMapper(elecLicenseInfo.getCertificateType()));
-            byte[] bytes = fromFTPDownloadComponent.downloadFile(elecLicenseInfo.getFtpPath(),"bdc");
+            byte[] bytes = fromFTPDownloadComponent.downloadFile(elecLicenseInfo.getFtpPath(),FTP_USE_FOR_BDC);
             if(bytes!=null) {
                 try {
                     elecLicenseInfo.setFtpPath(

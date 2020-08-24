@@ -26,6 +26,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FTP_USE_FOR_BDC;
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FTP_USE_FOR_YCSL;
+
 @Component("toFTPUploadComponent")
 @Slf4j
 public class ToFTPUploadComponent {
@@ -48,7 +51,7 @@ public class ToFTPUploadComponent {
             log.info("进入附件处理");
             int reply;
             log.info("连接ftp服务器");
-            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("ycsl");
+            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_YCSL);
             ftpClient.connect(ftpSettingTerm.getFtpAddress(), Integer.parseInt(ftpSettingTerm.getFtpPort()));// 连接FTP服务器
             log.info("登录ftp用户");
             ftpClient.login(ftpSettingTerm.getFtpUsername(), ftpSettingTerm.getFtpPassword());// 登录
@@ -127,7 +130,7 @@ public class ToFTPUploadComponent {
         ftp.setControlEncoding("GBK");
         try {
             int reply;
-            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("bdc");
+            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_BDC);
             ftp.connect(ftpSettingTerm.getFtpAddress(), Integer.parseInt(ftpSettingTerm.getFtpPort()));// 连接FTP服务器
             ftp.login(ftpSettingTerm.getFtpUsername(), ftpSettingTerm.getFtpPassword());// 登录
             ftp.enterLocalPassiveMode();      //被动模式
@@ -186,13 +189,13 @@ public class ToFTPUploadComponent {
     }
 
     public String ycslUpload(byte[] bytes, String path, String fileName, String from_){
-        FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey("ycsl");
+        FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey(FTP_USE_FOR_YCSL);
         String address = ftpSettingTermy.getFtpAddress();
         String port = ftpSettingTermy.getFtpPort();
         String username = ftpSettingTermy.getFtpUsername();
         String password = ftpSettingTermy.getFtpPassword();
-        if(from_!=null && "bdc".equals(from_)){
-            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("bdc");
+        if(from_!=null && FTP_USE_FOR_BDC.equals(from_)){
+            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_BDC);
             address = ftpSettingTerm.getFtpAddress();
             port = ftpSettingTerm.getFtpPort();
             username = ftpSettingTerm.getFtpUsername();
@@ -333,7 +336,7 @@ public class ToFTPUploadComponent {
 //            }
             //路径年/月/日/entryId名称
             String mulu = pathFold;
-            FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey("ycsl");
+            FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey(FTP_USE_FOR_YCSL);
             ftp.connect(ftpSettingTermy.getFtpAddress(), Integer.valueOf(ftpSettingTermy.getFtpPort()));
             ftp.login(ftpSettingTermy.getFtpUsername(), ftpSettingTermy.getFtpPassword());
             ftp.enterLocalPassiveMode();

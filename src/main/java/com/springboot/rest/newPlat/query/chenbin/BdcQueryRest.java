@@ -4,9 +4,11 @@ import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
+import com.springboot.entity.newPlat.query.resp.YcDzzz;
 import com.springboot.popj.pub_data.SJ_Info_Bdcqlxgxx;
 import com.springboot.popj.pub_data.SJ_Info_Immovable;
 import com.springboot.popj.pub_data.Sj_Info_Bdcdyxgxx;
+import com.springboot.popj.pub_data.Sj_Sjsq_Bdc_Mapping;
 import com.springboot.popj.warrant.ParametricData;
 import com.springboot.popj.warrant.ParametricData2;
 import com.springboot.service.newPlat.chenbin.BdcQueryService;
@@ -137,6 +139,19 @@ public class BdcQueryRest {
             log.error("【银行贷后查询】--> 查询时出现异常，记录原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("查询时出现异常");
         }
+    }
+
+    /**
+     * 描述：post方式拉取电子证照信息
+     * 作者：chenb
+     * 日期：2020/8/21
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    @RequestMapping(value = "postEcerts",method = RequestMethod.POST)
+    public ObjectRestResponse<List<YcDzzz>> postEcerts(@RequestBody List<Sj_Sjsq_Bdc_Mapping> bdcMappings){
+        return new ObjectRestResponse<List<YcDzzz>>().data(bdcQueryService.postEcerts(bdcMappings));
     }
 
 }

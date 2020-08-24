@@ -104,32 +104,44 @@ public class FileInteractComponent {
 
                     if(comeBytes!=null){
                         List<TransFjxx> toFjxxs = willAsynFile.getTo();
-                        if(toFjxxs!=null) {
-                            for(TransFjxx toFjxx:toFjxxs) {
-                                if ("0".equals(toFjxx.getSaveType())) {
-                                    localFileHandleComponent.uploadFileLocal(
-                                            new ByteArrayInputStream(comeBytes),
-                                            toFjxx.getPath().substring(0, toFjxx.getPath().lastIndexOf("\\")),
-                                            toFjxx.getPath().substring(toFjxx.getPath().lastIndexOf("\\") + 1),
-                                            comeBytes.length
-                                    );
-                                } else {
-                                    if(toFjxx.getPath().contains("\\"))
-                                        toFjxx.setPath(toFjxx.getPath().replaceAll("\\\\","/"));
-                                    ftpFileHandleComponent.uploadFile(
-                                            toFjxx.getIfFtpKey(),
-                                            toFjxx.getPath().substring(0, toFjxx.getPath().lastIndexOf("/")),
-                                            toFjxx.getPath().substring(toFjxx.getPath().lastIndexOf("/") + 1),
-                                            new ByteArrayInputStream(comeBytes)
-                                    );
-                                }
-                            }
-                        }
+                        handleUpload(comeBytes,toFjxxs);
                     }
                 }
             }
         } catch (Exception e){
             log.error("异步处理附件时，程序执行出现错误，错误信息描述："+ ErrorDealUtil.getErrorInfo(e));
+        }
+    }
+
+    /**
+     * 描述：上传的执行方法
+     * 作者：chenb
+     * 日期：2020/8/24
+     * 参数：[comeBytes, toFjxxs]
+     * 返回：void
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public void handleUpload(byte[] comeBytes,List<TransFjxx> toFjxxs){
+        if(toFjxxs!=null) {
+            for(TransFjxx toFjxx:toFjxxs) {
+                if ("0".equals(toFjxx.getSaveType())) {
+                    localFileHandleComponent.uploadFileLocal(
+                            new ByteArrayInputStream(comeBytes),
+                            toFjxx.getPath().substring(0, toFjxx.getPath().lastIndexOf("\\")),
+                            toFjxx.getPath().substring(toFjxx.getPath().lastIndexOf("\\") + 1),
+                            comeBytes.length
+                    );
+                } else {
+                    if(toFjxx.getPath().contains("\\"))
+                        toFjxx.setPath(toFjxx.getPath().replaceAll("\\\\","/"));
+                    ftpFileHandleComponent.uploadFile(
+                            toFjxx.getIfFtpKey(),
+                            toFjxx.getPath().substring(0, toFjxx.getPath().lastIndexOf("/")),
+                            toFjxx.getPath().substring(toFjxx.getPath().lastIndexOf("/") + 1),
+                            new ByteArrayInputStream(comeBytes)
+                    );
+                }
+            }
         }
     }
 }

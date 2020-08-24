@@ -51,4 +51,10 @@ public class HandleKeywordConstant {
     public final static String FTP_USE_MODE_PASSIVE = "passive";
     public final static String FTP_USE_ENV_WIN = "Win";
     public final static String FTP_USE_ENV_UNIX = "Unix";
+
+    //ftp配置关键字设置
+    public final static String FTP_USE_FOR_YCSL = "ycsl";
+    public final static String FTP_USE_FOR_BDC = "bdc";
+    public final static String FTP_USE_FOR_JHPT = "jhpt";
+
 }

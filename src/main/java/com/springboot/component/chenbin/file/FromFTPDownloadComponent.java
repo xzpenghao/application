@@ -16,6 +16,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FTP_USE_FOR_BDC;
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FTP_USE_FOR_YCSL;
+
 @Component("fromFTPDownloadComponent")
 public class FromFTPDownloadComponent {
 
@@ -26,13 +29,13 @@ public class FromFTPDownloadComponent {
     private BdcFTPDownloadComponent bdcFTPDownloadComponent;
 
     public byte[] downloadFile(String ftpPath,String from_){
-        FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey("ycsl");
+        FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey(FTP_USE_FOR_YCSL);
         String address = ftpSettingTermy.getFtpAddress();
         String port = ftpSettingTermy.getFtpPort();
         String username = ftpSettingTermy.getFtpUsername();
         String password = ftpSettingTermy.getFtpPassword();
-        if(from_!=null && "bdc".equals(from_)){
-            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("bdc");
+        if(from_!=null && FTP_USE_FOR_BDC.equals(from_)){
+            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_BDC);
             address = ftpSettingTerm.getFtpAddress();
             port = ftpSettingTerm.getFtpPort();
             username = ftpSettingTerm.getFtpUsername();
@@ -60,7 +63,7 @@ public class FromFTPDownloadComponent {
         FTPClient ftp = new FTPClient();
         try {
             int reply;
-            FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey("ycsl");
+            FtpSettingTerm ftpSettingTermy = ftpSettings.gainTermByKey(FTP_USE_FOR_YCSL);
             ftp.connect(ftpSettingTermy.getFtpAddress(), Integer.parseInt(ftpSettingTermy.getFtpPort()));
             // 如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
             ftp.login(ftpSettingTermy.getFtpUsername(), ftpSettingTermy.getFtpPassword());// 登录

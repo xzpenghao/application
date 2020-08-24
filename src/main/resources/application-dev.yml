@@ -381,3 +381,13 @@ ftp:
     ftpPassword: test
     ftpTransMode: passive   #主被动模式，passive-被动/active-主动
     env: Win                #FTP环境，Win-Windows/Unix-Unix
+dzzz:
+  ignores:
+    - 抵押注销
+    - 权属注销
+    - 查封
+    - 查封注销
+    - 异议
+    - 异议注销
+    - 预告注销
+    - 预告

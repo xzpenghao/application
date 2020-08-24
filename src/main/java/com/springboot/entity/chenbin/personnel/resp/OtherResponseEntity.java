@@ -21,10 +21,11 @@ public class OtherResponseEntity<T>{
     private String msg;
     private T data;
 
-    public void checkSelfIfBdc(String intfDescribe){
+    public OtherResponseEntity checkSelfIfBdc(String intfDescribe){
         if(BDC_INTF_HANDLE_RETURN_CODE_UNSUCCESS.equals(this.getCode()))
             throw new ZtgeoBizException(intfDescribe+"运行失败，返回异常信息："+this.getMsg());
         if(!BDC_INTF_HANDLE_RETURN_CODE_SUCCESS.equals(this.getCode()))
             throw new ZtgeoBizException(intfDescribe+"响应CODE不符合规范，取值范围是[0,1],当前响应：【"+this.getCode()+"】");
+        return this;
     }
 }

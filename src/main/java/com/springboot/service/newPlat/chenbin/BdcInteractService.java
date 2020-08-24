@@ -49,8 +49,7 @@ import java.util.concurrent.FutureTask;
 
 import static com.springboot.constant.AdminCommonConstant.BOOLEAN_NUMBER_TRUE;
 import static com.springboot.constant.chenbin.BusinessConstant.*;
-import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.BDC_DATA_TYPE_SC;
-import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FILE_DEFAULT_MAPPING_FOLDER_NAME;
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.*;
 
 /**
  * @author chenb
@@ -452,10 +451,10 @@ public class BdcInteractService {
                     //设置原路径、去向路径
                     TwoOrNFjxx twoFjxx = new TwoOrNFjxx().initByTwo(
                             file.getSaveType(),         //源文件存储方式（0-硬盘/1-ftp）
-                            "ycsl",         //源文件来源
+                            FTP_USE_FOR_YCSL,         //源文件来源
                             file.getFtpPath(),              //源文件存放地址
                             "1",                //将生成的目标文件存储方式（0-硬盘/1-ftp）
-                            "bdc",              //将生成的目标文件key
+                            FTP_USE_FOR_BDC,              //将生成的目标文件key
                             fjxx.getFjdz()                      //将生成的目标文件存放地址
                     );
                     willAsynFiles.add(twoFjxx);
@@ -633,6 +632,8 @@ public class BdcInteractService {
             params.put("isSuccess","success");
             for(Sj_Sjsq_Bdc_Mapping bdcMapping : bdcMappingVoList){
                 for(NewBdcFlowRespData bdcCreatRes:bdcCreatResult){
+                    //数据自检
+                    bdcCreatRes.checkSelfStandard();
                     if(bdcMapping.getSid().equals(bdcCreatRes.getSid())){
                         bdcMapping.setBdcywh(bdcCreatRes.getYwh());
                         bdcMapping.setBdcywlx(bdcCreatRes.getYwlx());

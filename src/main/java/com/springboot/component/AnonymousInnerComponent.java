@@ -42,6 +42,8 @@ import java.io.OutputStream;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.*;
+
 @Component
 @Slf4j
 public class AnonymousInnerComponent {
@@ -132,7 +134,7 @@ public class AnonymousInnerComponent {
             log.info("sjsq"+mapParmeter.get("SJ_Sjsq"));
             log.info("modelId"+mapParmeter.get("modelId"));
             String path=DateUtils.getNowYear() + File.separator + DateUtils.getNowMonth() + File.separator + DateUtils.getNowDay();
-            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("bdc");
+            FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_BDC);
             getProcessingAnnex(
                     zyxxObject,mapParmeter,null,
                     ftpSettingTerm.getFtpAddress(),
@@ -275,7 +277,7 @@ public class AnonymousInnerComponent {
                 //权属信息
                 List<SJ_Info_Bdcqlxgxx> bdcqlxgxxList=exchangeToInnerComponent.getBdcQlInfoWithItsRights(parametricData);
                 log.info("获得权属信息为："+ com.alibaba.fastjson.JSONArray.toJSONString(bdcqlxgxxList));
-                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("bdc");
+                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_BDC);
                 HandleAttachementDiagram(
                         bdcqlxgxxList,jsonObject,registerNumber,
                         ftpSettingTerm.getFtpAddress(),
@@ -400,7 +402,7 @@ public class AnonymousInnerComponent {
                         StrUtil.getFTPFileNameByFTPPath(fileAddress),
                         null, address, port, username, password
                 );//连接一窗受理平台ftp
-                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("jhpt");
+                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_JHPT);
                 uploadObject = toFTPUploadComponent.ycslUpload(
                         bytes,
                         DateUtils.getNowYear() + DateUtils.getNowMonth() + DateUtils.getNowDay() + IDUtil.getUUId()+"."+fileType,
@@ -451,7 +453,7 @@ public class AnonymousInnerComponent {
                                 StrUtil.getFTPRemotePathByFTPPath(fileAddress),
                                 StrUtil.getFTPFileNameByFTPPath(fileAddress),
                                 null, address, port, username, password);//连接一窗受理平台ftp
-                        FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("ycsl");
+                        FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_YCSL);
                         uploadObject = toFTPUploadComponent.ycslUpload(
                                 bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType, path,
                                 ftpSettingTerm.getFtpAddress(),
@@ -492,7 +494,7 @@ public class AnonymousInnerComponent {
                         StrUtil.getFTPFileNameByFTPPath(fileAddress),
                         null, address, port, username, password
                 );//连接一窗受理平台ftp
-                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("ycsl");
+                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_YCSL);
                 uploadObject = toFTPUploadComponent.ycslUpload(
                         bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType, path,
                         ftpSettingTerm.getFtpAddress(),
@@ -559,7 +561,7 @@ public class AnonymousInnerComponent {
                         StrUtil.getFTPFileNameByFTPPath(fileAddress),
                         null, address, port, username, password
                 );//连接一窗受理平台ftp
-                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("ycsl");
+                FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_YCSL);
                 uploadObject = toFTPUploadComponent.ycslUpload(
                         bytes, StrUtil.getFTPFileNameByFTPPath(fileAddress), fileType,path,
                         ftpSettingTerm.getFtpAddress(),

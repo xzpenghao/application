@@ -18,7 +18,10 @@ import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Djxx;
 import com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Qlr;
 import com.springboot.entity.newPlat.query.bizData.fromSY.cqzs.Yyxx;
 import com.springboot.entity.newPlat.query.resp.*;
+import com.springboot.entity.newPlat.settingTerm.DzzzSetting;
+import com.springboot.entity.newPlat.settingTerm.FtpSettings;
 import com.springboot.popj.pub_data.*;
+import com.springboot.util.Base64Util;
 import com.springboot.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSON;
@@ -629,6 +632,53 @@ public class ResultConvertUtil {
             pdjxxs.add(pdjxx);
         }
         return pdjxxs;
+    }
+
+    /**
+     * 描述：处理一窗电子证照并返回
+     * 作者：chenb
+     * 日期：2020/8/21
+     * 参数：[bdcMappings,bdcDzzzs]
+     * 返回：List<YcDzzz>，含有处理过的byte[]数组
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public static List<YcDzzz> getYcdzzzFromBdcResp(List<Sj_Sjsq_Bdc_Mapping> bdcMappings, List<Dzzzxx> bdcDzzzs, DzzzSetting dzzzSetting, FtpSettings ftpSettings){
+        //一窗电子证照集合
+        List<YcDzzz> ycDzzzes = new ArrayList<>();
+        //遍历从不动产处拉取的
+        for(Dzzzxx bdcDzzz:bdcDzzzs){
+            //电子证照自检
+            bdcDzzz.checkSelfStandard();
+            //拉取的base64
+            if(StringUtils.isNotBlank(bdcDzzz.getDzzzwj())){
+                YcDzzz ycDzzz = null;
+                //遍历不动产拉取的电子证照数据
+                for(Sj_Sjsq_Bdc_Mapping bdcMapping:bdcMappings){
+                    //业务号匹配
+                    if(bdcDzzz.getYwbh().equals(bdcMapping.getBdcywh())){
+                        //预处理标识
+                        boolean preDeal = true;
+                        //忽略设置加载
+                        if(dzzzSetting.getIgnores().contains(bdcMapping.getBdcywlx())){
+                            preDeal = false;
+                        }
+                        //预处理生效
+                        if(preDeal) {
+                            //不动产电子证照产生一窗电子证照
+                            ycDzzz = new YcDzzz().initByParent(bdcDzzz);
+                            ycDzzz.setSqbh(bdcMapping.getSqbh());
+                            ycDzzz.setBdcywlx(bdcMapping.getBdcywlx());
+                            break;
+                        }
+                    }
+                }
+                if(ycDzzz!=null) {
+                    ycDzzz.setFjlj(ParamConvertUtil.initYcslFtpPath(ftpSettings,ycDzzz.getDzzzfjxx()));
+                    ycDzzzes.add(ycDzzz);
+                }
+            }
+        }
+        return ycDzzzes;
     }
 
     /**

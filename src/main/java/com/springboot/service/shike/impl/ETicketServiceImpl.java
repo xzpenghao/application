@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FTP_USE_FOR_YCSL;
 import static com.springboot.util.Base64Util.base64ToPdf;
 
 /**
@@ -118,7 +119,7 @@ public class ETicketServiceImpl implements ETicketService {
                                 base64Byte,
                                 path,
                                 fileName,
-                                "ycsl"
+                                FTP_USE_FOR_YCSL
                         ).replaceAll("/", "\\\\");
                         dzspList.add(new TaxAttachment.ETax(eTax,ftpPath,"1",base64Byte.length));
                     }else{

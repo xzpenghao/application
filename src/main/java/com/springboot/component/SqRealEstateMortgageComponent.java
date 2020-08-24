@@ -49,6 +49,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
+import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.FTP_USE_FOR_JHPT;
+
 /**
  * 针对于宿迁流程Component
  */
@@ -120,7 +122,7 @@ public class SqRealEstateMortgageComponent {
                 try {
                     if (null != revokeRegistrationRespVo.getFileInfoVoList() && revokeRegistrationRespVo.getFileInfoVoList().size() != 0) {
                         String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(revokeRegistrationRespVo.getFileInfoVoList().get(0).getFileAdress()));
-                        FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("jhpt");
+                        FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_JHPT);
                         anonymousInnerComponent.getProcessingAnnex(
                                 null, mapParmeter, revokeRegistrationRespVo.getFileInfoVoList(),
                                 ftpSettingTerm.getFtpAddress(),
@@ -314,7 +316,7 @@ public class SqRealEstateMortgageComponent {
                 try {
                     if (null != mortgageRegistrationReqVo.getFileInfoVoList() && mortgageRegistrationReqVo.getFileInfoVoList().size() != 0) {
                         String path = StrUtil.getFTPUrl(StrUtil.getFTPRemotePathByFTPPath(mortgageRegistrationReqVo.getFileInfoVoList().get(0).getFileAdress()));
-                        FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey("jhpt");
+                        FtpSettingTerm ftpSettingTerm = ftpSettings.gainTermByKey(FTP_USE_FOR_JHPT);
                         anonymousInnerComponent.getProcessingAnnex(
                                 null, mapParmeter, mortgageRegistrationReqVo.getFileInfoVoList(),
                                 ftpSettingTerm.getFtpAddress(),
