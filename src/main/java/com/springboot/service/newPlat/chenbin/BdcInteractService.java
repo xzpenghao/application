@@ -435,11 +435,11 @@ public class BdcInteractService {
 
                 Fjxx fjxx = new Fjxx();
                 //文件名称
+                String fileName = file.getFileName();
                 if (file.getFileName().lastIndexOf(".") > 0) {
-                    fjxx.setWjmc(file.getFileName().substring(0, file.getFileName().lastIndexOf(".")));
-                } else {
-                    fjxx.setWjmc(file.getFileName());
+                    fileName = file.getFileName().substring(0, file.getFileName().lastIndexOf("."));
                 }
+                fjxx.setWjmc(fileName+"."+file.getFileExt());
                 //文件扩展名
                 fjxx.setWjlx(file.getFileExt());
                 //文件夹名称

@@ -151,6 +151,7 @@ public class BdcQueryRest {
     */
     @RequestMapping(value = "postEcerts",method = RequestMethod.POST)
     public ObjectRestResponse<List<YcDzzz>> postEcerts(@RequestBody List<Sj_Sjsq_Bdc_Mapping> bdcMappings){
+        log.info("开始拉取电子证照");
         return new ObjectRestResponse<List<YcDzzz>>().data(bdcQueryService.postEcerts(bdcMappings));
     }
 

@@ -1,6 +1,7 @@
 package com.springboot.entity.newPlat.transInner.req.fromZY.domain;
 
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.emm.KEY_YWLX_GLH_Enums;
 import com.springboot.util.newPlatBizUtil.DicConvertUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +31,7 @@ public class NewBdcFlowRespData {
             throw new ZtgeoBizException("转内网接口创建返回ywh为空");
         if(StringUtils.isBlank(this.ywlx))
             throw new ZtgeoBizException("转内网接口创建返回ywlx为空");
-        if(StringUtils.isBlank(DicConvertUtil.getKeyCodeByWord(this.ywlx)))
+        if(StringUtils.isBlank(DicConvertUtil.getKeyCodeByWord(this.ywlx, KEY_YWLX_GLH_Enums.values())))
             throw new ZtgeoBizException("转内网接口创建返回ywlx不在规范范围内");
     }
 }
