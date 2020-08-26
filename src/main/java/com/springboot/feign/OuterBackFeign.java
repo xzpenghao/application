@@ -48,6 +48,9 @@ public interface OuterBackFeign {
     //插入访问异常信息
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter9", method = RequestMethod.POST,consumes = "application/json")
     ObjectRestResponse<String> DealRecieveFromOuter9(@RequestHeader(name = "Authorization") String token,SJ_Exception_Record exc);
+    //插入访问异常信息,无TASKID
+    @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter9_2", method = RequestMethod.POST,consumes = "application/json")
+    public ObjectRestResponse<String> DealRecieveFromOuter9_2(@RequestHeader(name = "Authorization") String token,SJ_Exception_Record exc);
 
     //异常外部处理
     @RequestMapping(value = "api/biz/RecService/DealRecieveFromOuter10", method = RequestMethod.POST,consumes = "application/json")

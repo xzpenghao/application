@@ -9,10 +9,7 @@ import com.springboot.component.fileMapping.FileNameConfigService;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
 import com.springboot.entity.newPlat.jsonMap.FileNameMapping;
-import com.springboot.entity.newPlat.settingTerm.DzzzSetting;
-import com.springboot.entity.newPlat.settingTerm.FtpSettings;
-import com.springboot.entity.newPlat.settingTerm.NewPlatSettings;
-import com.springboot.entity.newPlat.settingTerm.TurnInnerSettingsTerm;
+import com.springboot.entity.newPlat.settingTerm.*;
 import com.springboot.feign.OuterBackFeign;
 import com.springboot.popj.registration.ImmovableFile;
 import com.springboot.service.chenbin.other.ExchangeInterfaceService;
@@ -49,6 +46,8 @@ public class TestRest {
     private FtpSettings ftpSettings;
     @Autowired
     private DzzzSetting dzzzSetting;
+    @Autowired
+    private NoticeSettings noticeSettings;
     @Autowired
     private FileNameConfigService fileNameConfigService;
 
@@ -107,6 +106,7 @@ public class TestRest {
         log.info("转内网配置："+JSONObject.toJSONString(newPlatSettings));
         log.info("FTP配置："+JSONObject.toJSONString(ftpSettings));
         log.info("电子证照忽略配置："+JSONObject.toJSONString(dzzzSetting));
+        log.info("通知类设置："+JSONObject.toJSONString(noticeSettings));
         return new ObjectRestResponse<FileNameMapping>().data(fileNameConfigService.getFileMapConfigInfo().get(3));
     }
 }

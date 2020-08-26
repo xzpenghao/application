@@ -225,8 +225,8 @@ public class BdcQueryService {
                 .collect(Collectors.joining(","));
         DzzzReq dzzzReq = new DzzzReq(ywh);
         //调用接口,获取电子证照
-//        OtherResponseEntity<List<Dzzzxx>> respDzzzs = bdcQueryFeign.dzzzcx(dzzzReq).checkSelfIfBdc("电子证照查询接口");
-        OtherResponseEntity<List<Dzzzxx>> respDzzzs = TestRun.mockDzzz(ywh).checkSelfIfBdc("电子证照查询接口");
+        OtherResponseEntity<List<Dzzzxx>> respDzzzs = bdcQueryFeign.dzzzcx(dzzzReq).checkSelfIfBdc("电子证照查询接口");
+//        OtherResponseEntity<List<Dzzzxx>> respDzzzs = TestRun.mockDzzz(ywh).checkSelfIfBdc("电子证照查询接口");
                 //处理一窗期望的电子证照结果
         List<YcDzzz> ycDzzzes = ResultConvertUtil.getYcdzzzFromBdcResp(bdcMappings,respDzzzs.getData(),dzzzSetting,ftpSettings);
         //声明待操作的文件集合

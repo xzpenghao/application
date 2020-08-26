@@ -15,6 +15,8 @@ import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import com.springboot.entity.newPlat.jsonMap.FileNameMapping;
 import com.springboot.entity.newPlat.settingTerm.FtpSettings;
 import com.springboot.entity.newPlat.settingTerm.NewPlatSettings;
+import com.springboot.entity.newPlat.settingTerm.NoticeSettingTermChild;
+import com.springboot.entity.newPlat.settingTerm.NoticeSettings;
 import com.springboot.entity.newPlat.transInner.req.BdcNoticeReq;
 import com.springboot.entity.newPlat.transInner.req.NewBdcFlowCheckReq;
 import com.springboot.entity.newPlat.transInner.req.fromZY.NewBdcFlowRequest;
@@ -49,6 +51,8 @@ import java.util.concurrent.FutureTask;
 
 import static com.springboot.constant.AdminCommonConstant.BOOLEAN_NUMBER_TRUE;
 import static com.springboot.constant.chenbin.BusinessConstant.*;
+import static com.springboot.constant.chenbin.KeywordConstant.EXC_DIRECTION_INNER;
+import static com.springboot.constant.chenbin.KeywordConstant.EXC_DIRECTION_OUTER;
 import static com.springboot.constant.newPlat.chenbin.HandleKeywordConstant.*;
 
 /**
@@ -93,20 +97,26 @@ public class BdcInteractService {
     private NewPlatSettings newPlatSettings;
 
     @Autowired
+    private NoticeSettings noticeSettings;
+
+    @Autowired
     private FileNameConfigService fileNameConfigService;
 
     @Autowired
     private FileInteractComponent fileInteractComponent;
 
     /**
-     * 描述：通知的异步处理模块
+     * 描述：通知的异步处理模块（不动产）
      * 作者：chenb
      * 日期：2020/8/3
      * 参数：[bizStamp, noticeBody, resp]
      * 返回：void
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public void noticeMe(BdcNoticeReq noticeBody, HttpServletResponse resp){
+    public void noticeMe(BdcNoticeReq noticeBody,String uri,HttpServletResponse resp){
+        /**
+         * 响应对通知接口的调用
+         */
         log.info("BDC->YCSL：【"+noticeBody.getWsywh()+"】接入不动产办件节点通知模块,主线程(节点通知响应线程)执行！");
         try {
             resp.setContentType("application/json;charset=UTF-8");
@@ -119,15 +129,21 @@ public class BdcInteractService {
             throw new ZtgeoBizException("通知失败，出现IO异常，请知悉");
         }
 
+        /**
+         * 启动线程处理通知
+         */
         log.info("=================BDC->YCSL：【"+noticeBody.getWsywh()+"】接入不动产办件节点通知模块：分割线（之后的异常将不会再抛出）=================");
-        //声明token信息
-        String token = null;
-        try {
-            token = backFeign.getToken(new JwtAuthenticationRequest(bsryname, bsrypassword)).getData();
-        } catch (Exception e){
-            log.error("BDC->YCSL：【"+noticeBody.getWsywh()+"】接入不动产办件节点通知模块,获取通知处理用户时出现错误，错误信息为："
-                    +ErrorDealUtil.getErrorInfo(e));
+        //处理token信息
+        String token = noticeBody.getReqKey();
+        if(StringUtils.isBlank(token)) {
+            try {
+                token = backFeign.getToken(new JwtAuthenticationRequest(bsryname, bsrypassword)).getData();
+            } catch (Exception e) {
+                log.error("BDC->YCSL：【" + noticeBody.getWsywh() + "】接入不动产办件节点通知模块,获取通知处理用户时出现错误，错误信息为："
+                        + ErrorDealUtil.getErrorInfo(e));
+            }
         }
+        //设置通知线程任务并执行
         if(StringUtils.isNotBlank(token)) {
             String useToken = token;
             //实例化分支线程的执行容器
@@ -146,7 +162,7 @@ public class BdcInteractService {
             //处理分支返回结果
             try {
                 // 创建数据
-                String result = future.get(); //取得结果，同时设置超时执行时间为5秒。
+                String result = future.get(); //取得结果
                 log.info("BDC->YCSL：【" + noticeBody.getWsywh() + "】接入不动产办件节点通知模块,通知执行结果：" + result);
             } catch (Exception e) {
                 log.info("BDC->YCSL：【" + noticeBody.getWsywh() + "】接入不动产办件节点通知模块,“节点通知处理线程”捕获到执行异常");
@@ -154,7 +170,7 @@ public class BdcInteractService {
                 //这里做异常处理(分支线程产生的)
                 e = ErrorDealUtil.OnlineErrorTrans(e);
                 //调用回写异常信息(通知类异常)进Rec（暂未完成）
-
+                dealNoticeException(token,noticeBody,uri,e.getMessage());
             } finally {
                 executor.shutdown();
             }
@@ -243,7 +259,7 @@ public class BdcInteractService {
                 LZDZ_LDKQ                           //领证地址
         );
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
-        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList(),BDC_DATA_TYPE_SC);
+        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList(),sjsq.getTransactionContractInfo().getContractAmount(),BDC_DATA_TYPE_SC);
         //补全申请人信息
         newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo(),BDC_NEW_PLAT_YW_KEY_QL));
         //补全附件列表信息
@@ -270,7 +286,7 @@ public class BdcInteractService {
                 LZDZ_LDKQ                           //领证地址
         );
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
-        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList(),BDC_DATA_TYPE_SC);
+        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList(),sjsq.getTransactionContractInfo().getContractAmount(),BDC_DATA_TYPE_SC);
         //补全申请人信息
         newBdcFlowRequest.setSqrxx(transSellersAndBuyersToSqr(sjsq.getTransactionContractInfo(),BDC_NEW_PLAT_YW_KEY_QL));
         //补全附件列表信息
@@ -643,5 +659,48 @@ public class BdcInteractService {
             }
             params.put("bdcMappingVoList", JSONArray.toJSONString(bdcMappingVoList));
         }
+    }
+
+    /**
+     * 描述：不动产节点通知异常的后续处理方法
+     * 作者：chenb
+     * 日期：2020/8/26
+     * 参数：[
+     *          token,              --reqKey
+     *          noticeBody,         --通知主体
+     *          uri,                --执行URI
+     *          excMsg              --异常信息
+     *      ]
+     * 返回：void
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public void dealNoticeException(String token,BdcNoticeReq noticeBody,String uri,String excMsg){
+        //取不动产通知设置
+        NoticeSettingTermChild bdcNoticeSetting =
+                noticeSettings.gainTermByKey(NOTICE_OF_BDC).getBdcSettings().gainTermByKey(noticeBody.getJdbs());
+        if(bdcNoticeSetting==null){
+            log.error("BDC->YCSL：【" + noticeBody.getWsywh() + "】接入不动产办件节点通知时异常，在处理异常时发现未设置不动产通知各项配置参数");
+            return;
+        }
+        //初始化通知类异常
+        SJ_Exception_Record exceptionRecord
+                = new SJ_Exception_Record()
+                .initNewExcp(
+                        StringUtils.isNotBlank(noticeBody.getTaskId())?noticeBody.getTaskId():null,
+                        excMsg,
+                        noticeBody.getWsywh(),
+                        noticeBody.getWsywh()+"号办件",
+                        EXC_DIRECTION_INNER)
+                .transitThisToNotice(
+                        JSONObject.toJSONString(noticeBody),
+                        bdcNoticeSetting.getNoticeType(),
+                        uri,
+                        bdcNoticeSetting.getNoticeText()
+                );
+        //向主程序发异常信息
+        backFeign.DealRecieveFromOuter9_2(
+                token,
+                exceptionRecord
+        );
     }
 }

@@ -57,4 +57,8 @@ public class HandleKeywordConstant {
     public final static String FTP_USE_FOR_BDC = "bdc";
     public final static String FTP_USE_FOR_JHPT = "jhpt";
 
+    //通知设置关键字
+    public final static String NOTICE_OF_BDC = "bdc";
+    public final static String NOTICE_OF_ZJ = "zj";
+    public final static String NOTICE_OF_SW= "sw";
 }

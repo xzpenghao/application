@@ -69,7 +69,7 @@ public class BdcTransToInterService {
                 LZDZ_LDKQ                           //领证地址
         );
         //补全房屋主体信息并补原业务号进转内网主体--根据权属数据
-        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList(),BDC_DATA_TYPE_SC);
+        ParamConvertUtil.fillMainHouseToReqByQlxx(newBdcFlowRequest,sjsq.getImmovableRightInfoVoList(),null,BDC_DATA_TYPE_SC);
         //补全抵押信息
         newBdcFlowRequest.setDyxx(bdcInteractService.initDyxx(
                 sjsq.getReceiptNumber(),

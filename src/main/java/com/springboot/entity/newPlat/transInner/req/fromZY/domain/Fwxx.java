@@ -31,6 +31,7 @@ public class Fwxx {
     private String ghyt;                //规划用途
     private String myc;                 //名义层
     private String sjc;                 //实际层
+    private BigDecimal qdjg;            //取得价格（单位：万元）
     private BigDecimal jzmj;                //建筑面积
     private BigDecimal dyjzmj;              //独用建筑面积
     private BigDecimal tnjzmj;              //套内建筑面积

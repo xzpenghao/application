@@ -7,21 +7,17 @@ import com.springboot.component.AnonymousInnerComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.chenbin.personnel.other.web.RequestParamBody;
 import com.springboot.entity.chenbin.personnel.pub_use.FileEntityForOther;
-import com.springboot.entity.chenbin.personnel.tax.TaxRespBody;
 import com.springboot.entity.chenbin.personnel.tra.TraRespBody;
 import com.springboot.popj.GetReceiving;
-import com.springboot.popj.pub_data.Sj_Info_Qsxx;
 import com.springboot.service.chenbin.ExchangeToTaxService;
 import com.springboot.service.chenbin.ExchangeToTransactionService;
 import com.springboot.service.chenbin.ExchangeToWebService;
 import com.springboot.service.chenbin.other.ExchangeCommonService;
-import com.springboot.service.chenbin.other.ExchangeInterfaceService;
 import com.springboot.util.chenbin.BusinessDealBaseUtil;
 import com.springboot.util.chenbin.ErrorDealUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
@@ -118,7 +114,7 @@ public class ExchangeToOtherRest {
     @RequestMapping(value = "examineSuccess/jy", method = RequestMethod.POST)
     @ApiOperation(value = "网签备案成功通知",
             notes = "模拟交易审核网签备案成功后返回数据并驱动一窗受理平台流程继续。")
-    public ObjectRestResponse<String> examineSuccess4(@RequestBody Map<String,String> respMap ){
+    public ObjectRestResponse<String> examineSuccess4(@RequestBody Map<String,String> respMap){
         System.out.println("进入网签备案结果回推");
         log.info("进入网签备案结果回推");
         TraRespBody traRespBody = JSONObject.parseObject(respMap.get("data"),TraRespBody.class);
@@ -128,7 +124,7 @@ public class ExchangeToOtherRest {
     @RequestMapping(value = "examineSuccess/qs", method = RequestMethod.POST)
     @ApiOperation(value = "核税成功通知",
             notes = "模拟税务局核税成功后返回数据并驱动一窗受理平台流程继续。")
-    public ObjectRestResponse<List<ObjectRestResponse>> examineSuccess2(@RequestBody Map<String,String> respMap ){
+    public ObjectRestResponse<List<ObjectRestResponse>> examineSuccess2(@RequestBody Map<String,String> respMap){
         log.info("进入税务完税结果回推");
         log.info("交换平台处理所得完税结果："+JSONObject.toJSONString(respMap));
         log.info("截取推入结果为："+respMap.get("data"));

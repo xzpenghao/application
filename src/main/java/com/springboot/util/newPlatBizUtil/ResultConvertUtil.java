@@ -209,8 +209,28 @@ public class ResultConvertUtil {
             bdcdyxx.setRegistrationDate(TimeUtil.getTimeFromString(dyzm.getDjrq()));
             bdcdyxx.setMortgageMode(dyzm.getDyfs());
             bdcdyxx.setMortgageArea(getBigDecimalNotThrowNull("<抵押证明--抵押证明信息> 抵押面积 ",dyzm.getDymj()));
-            bdcdyxx.setCreditAmount(getBigDecimalNotThrowNull("<抵押证明--抵押证明信息> 债权数额 ",dyzm.getZqje()));
-            bdcdyxx.setMortgageAmount(getBigDecimalNotThrowNull("<抵押证明--抵押证明信息> 抵押金额 ",dyzm.getDyje()));
+            if(StringUtils.isNotBlank(dyzm.getZqje())) {
+                bdcdyxx.setCreditAmount(
+                        getBigDecimalNotThrowNull(
+                                "<抵押证明--抵押证明信息> 债权数额 ",
+                                getStringFromBigDecimalNotThrowNull(
+                                        new BigDecimal(Double.parseDouble(dyzm.getZqje()) * 10000),
+                                        "#.00"
+                                )
+                        )
+                );
+            }
+            if(StringUtils.isNotBlank(dyzm.getDyje())) {
+                bdcdyxx.setMortgageAmount(
+                        getBigDecimalNotThrowNull(
+                                "<抵押证明--抵押证明信息> 抵押金额 ",
+                                getStringFromBigDecimalNotThrowNull(
+                                        new BigDecimal(Double.parseDouble(dyzm.getDyje()) * 10000),
+                                        "#.00"
+                                )
+                        )
+                );
+            }
             bdcdyxx.setValuationValue(getBigDecimalNotThrowNull("<抵押证明--抵押证明信息> 评估价值 ",dyzm.getPgjz()));
             bdcdyxx.setMortgagePeriod(dyzm.getDyqx());
             bdcdyxx.setMortgageStartingDate(TimeUtil.getDateFromString(dyzm.getDyqssj()));

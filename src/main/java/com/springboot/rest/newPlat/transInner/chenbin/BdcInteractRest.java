@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
@@ -45,7 +46,7 @@ public class BdcInteractRest {
      * 更新记录：更新人：{}，更新日期：{}
      */
     @RequestMapping(value = "notice",method = RequestMethod.POST)
-    public void noticeMe(@RequestBody BdcNoticeReq noticeBody, HttpServletResponse resp) throws IOException {
+    public void noticeMe(@RequestBody BdcNoticeReq noticeBody, HttpServletRequest request, HttpServletResponse resp) throws IOException {
         String bizStamp = "【" + new Date().getTime() + "】"+" 批次节点通知";
         try {
             log.debug("BDC->YCSL：接入不动产办件节点通知模块{"+bizStamp+"},数据解析："+ JSONObject.toJSONString(noticeBody));
@@ -53,7 +54,7 @@ public class BdcInteractRest {
                 throw new ZtgeoBizException("通知失败，参数校验失败，传入参数为空");
             }
             noticeBody.checkSelfStandard();
-            bdcInteractService.noticeMe(noticeBody,resp);
+            bdcInteractService.noticeMe(noticeBody,request.getRequestURI(),resp);
             log.info("BDC->YCSL：接入不动产办件节点通知模块{"+bizStamp+"},通知节点类型："+ DicConvertUtil.getKeyWordByCode(noticeBody.getJdbs(), KEY_NOTICE_CODE_Enums.values()));
         } catch (ZtgeoBizException e){
             throw new ZtgeoBizException("通知失败，异常信息为："+e.getMessage());

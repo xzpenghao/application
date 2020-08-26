@@ -1,6 +1,7 @@
 package com.springboot.entity.newPlat.transInner.req;
 
 import com.springboot.config.ZtgeoBizException;
+import com.springboot.emm.KEY_NOTICE_CODE_Enums;
 import com.springboot.util.newPlatBizUtil.DicConvertUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BdcNoticeReq {
+    private String reqKey;          //再次提交时，可能会被传入
+    private String taskId;          //补入的taskId
     private String jdbs;            //节点标识（受理通知acceptNotice & 审核通知verifyNotice & 登簿通知resultNotice & 废弃通知 ）
     private List<String> ywhlb;     //业务列表
     private String wsywh;           //网申业务号（这里是一窗的收件申请编号）
@@ -35,7 +38,7 @@ public class BdcNoticeReq {
         if(StringUtils.isBlank(this.getJdbs())){
             throw new ZtgeoBizException("通知失败，参数校验失败，传入节点标识为空");
         }
-        if(StringUtils.isBlank(DicConvertUtil.getKeyWordByCode(this.getJdbs()))){
+        if(StringUtils.isBlank(DicConvertUtil.getKeyWordByCode(this.getJdbs(), KEY_NOTICE_CODE_Enums.values()))){
             throw new ZtgeoBizException("通知失败，参数校验失败，传入节点标识超出定义");
         }
         if(StringUtils.isBlank(this.wsywh)){

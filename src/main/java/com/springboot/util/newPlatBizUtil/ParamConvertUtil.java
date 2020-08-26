@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.xml.crypto.Data;
 import java.io.File;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -122,7 +123,7 @@ public class ParamConvertUtil {
      * 返回：void
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public static void fillMainHouseToReqByQlxx(NewBdcFlowRequest newBdcFlowRequest,List<SJ_Info_Bdcqlxgxx> qlxxVoList,String sfyc) throws ParseException {
+    public static void fillMainHouseToReqByQlxx(NewBdcFlowRequest newBdcFlowRequest, List<SJ_Info_Bdcqlxgxx> qlxxVoList, BigDecimal qdjg, String sfyc) throws ParseException {
 
         //获取主要不动产权属
         SJ_Info_Bdcqlxgxx qlxxzt = getMainHouseQlxx(qlxxVoList);
@@ -140,6 +141,16 @@ public class ParamConvertUtil {
         fwxx.setTdftmj(qlxxzt.getShareLandArea());
         fwxx.setTdsyqmj(qlxxzt.getCommonLandArea());
         fwxx.setTdyt(getNullStrIfk(qlxxzt.getLandPurpose()));
+        //取得价格设置
+        if(qdjg!=null){
+            fwxx.setQdjg(ResultConvertUtil.getBigDecimalNotThrowNull(
+                    "转内网-不动产交易取得价格",
+                    ResultConvertUtil.getStringFromBigDecimalNotThrowNull(
+                            qdjg.divide(new BigDecimal("10000")),
+                            "#.00"
+                    )
+            ));
+        }
 
         //设置原业务号和房屋信息
         newBdcFlowRequest.setYywh(getNullStrIfk(qlxxzt.getAcceptanceNumber()));//原业务号

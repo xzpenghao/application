@@ -8,7 +8,8 @@ package com.springboot.emm;
 public enum KEY_NOTICE_CODE_Enums {
     SLJD("受理通知","acceptNotice"),
     SHJD("审核通知","verifyNotice"),
-    DBJD("登簿通知","resultNotice");
+    DBJD("登簿通知","resultNotice"),
+    FQJD("废弃通知","discardNotice");
 
     private String keyWord;
     private String keyCode;
