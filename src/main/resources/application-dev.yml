@@ -285,9 +285,9 @@ bdc:
   old:
     url: http://192.168.30.16:12201/
   cx: #查询
-    url: http://192.168.30.14:8099/
+    url: http://172.22.226.12:8099/
   jh: #交互
-    url: http://192.168.30.23:8099/
+    url: http://172.22.220.10:8099/
 
 other:
   url: http://localhost:7780/
@@ -357,14 +357,14 @@ ftp:
   ycSaveSetting: 1        #一窗使用本地或Ftp存储附件（1-FTP/0-本地）
   ifLocalBasePath: D:\ycsl\process\file\    #如果本地存储使用的基础路径，供本地存储模式下，外部向一窗受理发送附件使用
   isDealFtp:
-    bdc: false #true
+    bdc: true #true
     jhpt: false
   settings:
   - key: ycsl
-    ftpAddress: 192.168.30.18    #一窗受理ftp
+    ftpAddress: 127.0.0.1    #一窗受理ftp
     ftpPort: 21
-    ftpUsername: ftpsvr
-    ftpPassword: 123qwe!@#
+    ftpUsername: test
+    ftpPassword: test
     ftpTransMode: passive   #主被动模式，passive-被动/active-主动
     env: Win                #FTP环境，Win-Windows/Unix-Unix
   - key: bdc
@@ -391,3 +391,34 @@ dzzz:
     - 异议注销
     - 预告注销
     - 预告
+notice:
+  settings:
+  - key: bdc  #不动产
+    userName: sqbdc
+    password: 123456
+    bdcSettings:
+      settings:
+      - key: acceptNotice
+        noticeType: BDCAcceptNotice #不动产受理通知
+        noticeText: 不动产受理回推通知，通知一窗系统，不动产受理已通过，驱动一窗对应的受理步骤自动提交
+      - key: verifyNotice
+        noticeType: BDCVerifyNotice #不动产审核通知
+        noticeText: 不动产审核回推通知，通知一窗系统，不动产审核已通过，驱动一窗对应的审核步骤自动提交
+      - key: resultNotice
+        noticeType: BDCResultNotice #不动产登簿通知
+        noticeText: 不动产登簿回推通知，通知一窗系统，不动产已成功登簿，驱动一窗对应的登簿步骤自动提交，同时回填登簿相关服务数据
+      - key: discardNotice
+        noticeType: BDCDiscardNotice #不动产作废通知
+        noticeText: 不动产作废回推通知，通知一窗系统，不动产已作废办件，驱动一窗对应流程做出调整
+  - key: zj   #住建
+    userName: testfg
+    password: 123456
+    noticeSetting:
+      noticeType: ZJExamineNotice #住建执行通知
+      noticeText: 住建侧针对一窗系统推送的交易信息，进行网签交易合同，该通知则是通知一窗系统-网签合同的执行情况
+  - key: sw   #税务
+    userName: testsw
+    password: 123456
+    noticeSetting:
+      noticeType: SWExamineNotice #税务执行通知
+      noticeText: 税务侧针对一窗系统推送的不动产转移信息，进行税务核/完税操作，该通知则是通知一窗系统-税务核/完税的执行情况
