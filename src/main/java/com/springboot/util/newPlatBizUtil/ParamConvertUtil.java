@@ -19,6 +19,7 @@ import com.springboot.popj.pub_data.*;
 import com.springboot.service.newPlat.chenbin.BdcInteractService;
 import com.springboot.util.DateUtils;
 import com.springboot.util.TimeUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.xml.crypto.Data;
@@ -40,6 +41,7 @@ import static com.springboot.constant.penghao.BizOrBizExceptionConstant.*;
  * @version 2020/8/7
  * description：参数处理工具类
  */
+@Slf4j
 public class ParamConvertUtil {
 
     /**
@@ -267,7 +269,18 @@ public class ParamConvertUtil {
                     DIC_RY_ZL_Enums.values()
             );
             sqrxx.setQlrmc(qlr.getObligeeName());
-            sqrxx.setQlrzjlx(DicConvertUtil.getDicValByName(qlr.getObligeeDocumentType(), DIC_RY_ZJZL_Enums.values()));
+            String qlrzjlx = DicConvertUtil.getDicValByName(qlr.getObligeeDocumentType(), DIC_RY_ZJZL_Enums.values());
+            if(StringUtils.isBlank(qlrzjlx)){
+                if("统一社会信用代码".equals(qlr.getObligeeDocumentType())) {
+                    qlr.setObligeeDocumentType("统一社会信用代码证");
+                }
+                qlrzjlx = DicConvertUtil.getDicValByName(qlr.getObligeeDocumentType(), DIC_RY_ZJZL_Enums.values());
+                if(StringUtils.isBlank(qlrzjlx)){
+                    log.warn("【"+qlr.getObligeeName()+"】证件号码映射字典失败，传入的证件类型是："
+                            +qlr.getObligeeDocumentType()+"；这可能对后续的登记结果通知与回推造成麻烦");
+                }
+            }
+            sqrxx.setQlrzjlx(qlrzjlx);
             sqrxx.setQlrzjhm(qlr.getObligeeDocumentNumber());
             sqrxx.setQlrzl(qlrzl);
             sqrxx.setLxdh(getNullStrIfk(qlr.getDh()));

@@ -170,10 +170,10 @@ public class BdcInteractComponent {
                     serviceData = initBdcygxxService(ywh,dbjglb);
                     break;
                 case BDC_YWLX_NAME_QSZX:
-                    serviceData = initBdcqlzxxxService(ywh,wsywh,dbjglb);
+                    serviceData = initBdcqlzxxxService(token,ywh,wsywh,dbjglb);
                     break;
                 case BDC_YWLX_NAME_DYZX:
-                    serviceData = initBdcdyzxxxService(ywh,wsywh,dbjglb);
+                    serviceData = initBdcdyzxxxService(token,ywh,wsywh,dbjglb);
                     break;
                 case BDC_YWLX_NAME_YGZX:
                     serviceData = initBdcygzxxxService(ywh,wsywh,dbjglb);
@@ -198,7 +198,8 @@ public class BdcInteractComponent {
 //            sjsqMap.put("bdcMappingVoList", JSONArray.toJSONString(bdcMappings));
 //        }
         //调用rec程序保存对应登簿结果服务数据并提交对应流程
-        backFeign.DealRecieveFromOuter2(token,sjsqMap);
+        ObjectRestResponse<String> submitResp = backFeign.DealRecieveFromOuter2(token,sjsqMap);
+        ResultConvertUtil.checkYcResult(submitResp,"外部保存提交一窗任务接口");
     }
 
     /**
@@ -247,6 +248,8 @@ public class BdcInteractComponent {
                 List<SJ_Info_Bdcqlxgxx> qzxxs = bdcQueryService.queryQzxxWithItsRights(parametricData);
                 if(qzxxs.size()!=1)
                     throw new ZtgeoBizException("不动产权证号全证号【"+dbjg.getBdczh()+"】精确匹配结果不唯一，请联系管理员解决");
+                //登簿回推时，去除他项权验证
+                qzxxs.get(0).setItsRightVoList(null);
                 qzVoList.add(qzxxs.get(0));
             } catch (ParseException e) {
                 log.error("【不动产权属登簿】结果转换异常，json数据格式异常，异常详情："+ ErrorDealUtil.getErrorInfo(e));
@@ -316,11 +319,11 @@ public class BdcInteractComponent {
      * 返回：RespServiceData
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public RespServiceData initBdcqlzxxxService(String ywh,String wsywh,List<Dbjgxx> dbjglb){
+    public RespServiceData initBdcqlzxxxService(String token,String ywh,String wsywh,List<Dbjgxx> dbjglb){
         //注销类登簿结果检查，可填充统一校验的内容
         ResultConvertUtil.checkZxldbjg(dbjglb);
         //组织结果并形成标准服务数据
-        return initZxlService(wsywh,YCSL_SERVICE_CODE_BDCQZZXJG,YCSL_SERVICE_CODE_BDCQLSJ);
+        return initZxlService(token,wsywh,YCSL_SERVICE_CODE_BDCQZZXJG,YCSL_SERVICE_CODE_BDCQLSJ);
     }
 
     /**
@@ -331,11 +334,11 @@ public class BdcInteractComponent {
      * 返回：RespServiceData
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public RespServiceData initBdcdyzxxxService(String ywh,String wsywh,List<Dbjgxx> dbjglb){
+    public RespServiceData initBdcdyzxxxService(String token,String ywh,String wsywh,List<Dbjgxx> dbjglb){
         //注销类登簿结果检查，可填充统一校验的内容
         ResultConvertUtil.checkZxldbjg(dbjglb);
         //组织结果并形成标准服务数据
-        return initZxlService(wsywh,YCSL_SERVICE_CODE_BDCDYZXJG,YCSL_SERVICE_CODE_BDCDYSJ);
+        return initZxlService(token,wsywh,YCSL_SERVICE_CODE_BDCDYZXJG,YCSL_SERVICE_CODE_BDCDYSJ);
     }
 
     /**
@@ -372,7 +375,7 @@ public class BdcInteractComponent {
         ObjectRestResponse<Sj_Sjsq_Bdc_Mapping> bdcMapResp = backFeign.DealRecieveFromOuter17(
                 token,new Sj_Sjsq_Bdc_Mapping(null,sqbh,null,ywh));
         //核验挂接关系
-        ResultConvertUtil.checkYcResult(bdcMapResp);
+        ResultConvertUtil.checkYcResult(bdcMapResp,"取一窗-不动产业务映射信息接口");
         Sj_Sjsq_Bdc_Mapping bdcMapping = bdcMapResp.getData();
         if(bdcMapping==null){
             throw new ZtgeoBizException("通知不动产登簿数据时，查询不动产业务与一窗业务号挂接关系失败，" +
@@ -411,12 +414,12 @@ public class BdcInteractComponent {
      * 返回：RespServiceData
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public RespServiceData initZxlService(String wsywh,String serviceCode,String sourceSvrCode){
+    public RespServiceData initZxlService(String token,String wsywh,String serviceCode,String sourceSvrCode){
         //组织结果并形成标准服务数据
         RespServiceData serviceData = new RespServiceData();
         serviceData.setServiceCode(serviceCode);
-        ObjectRestResponse<SJ_Sjsq> sjsqResp = backFeign.getReceiptData(wsywh,null,sourceSvrCode,null);
-        ResultConvertUtil.checkYcResult(sjsqResp);
+        ObjectRestResponse<SJ_Sjsq> sjsqResp = backFeign.getReceiptData(token,wsywh,null,sourceSvrCode,null);
+        ResultConvertUtil.checkYcResult(sjsqResp,"取收件数据接口");
         List<RespServiceData> sjSvrs = sjsqResp.getData().getServiceDatas();
         if(sjSvrs.size()!=1){
             throw new ZtgeoBizException("注销服务数据条数返回异常");

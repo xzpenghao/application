@@ -857,9 +857,9 @@ public class ResultConvertUtil {
         return decimalVal.scale() <= 0 || decimalVal.stripTrailingZeros().scale() <= 0;
     }
 
-    public static void checkYcResult(ObjectRestResponse yczxjg){
+    public static void checkYcResult(ObjectRestResponse yczxjg,String desible){
         if(yczxjg.getStatus()!=200){
-            throw new ZtgeoBizException(yczxjg.getMessage());
+            throw new ZtgeoBizException(desible+"执行异常,"+yczxjg.getMessage());
         }
     }
 

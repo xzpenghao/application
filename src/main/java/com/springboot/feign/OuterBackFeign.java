@@ -77,10 +77,13 @@ public interface OuterBackFeign {
 
     //获取服务数据
     @RequestMapping(value = "api/biz/RecDataBusi/getReceiptData",method = RequestMethod.GET)
-    ObjectRestResponse<SJ_Sjsq> getReceiptData(@RequestParam("sqbh") String sqbh,
-                                                      @RequestParam(name = "taskId",required = false) String taskId,
-                                                      @RequestParam(name = "serviceCode",required = false)String serviceCode,
-                                                      @RequestParam(name = "serviceDataTo",required = false)String serviceDataTo);
+    ObjectRestResponse<SJ_Sjsq> getReceiptData(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestParam("sqbh") String sqbh,
+            @RequestParam(name = "taskId",required = false) String taskId,
+            @RequestParam(name = "serviceCode",required = false)String serviceCode,
+            @RequestParam(name = "serviceDataTo",required = false)String serviceDataTo
+    );
 
     @RequestMapping(value = "api/test/test",method = RequestMethod.POST)
     ObjectRestResponse<Object> test(@RequestParam("paramsss") String paramsss);

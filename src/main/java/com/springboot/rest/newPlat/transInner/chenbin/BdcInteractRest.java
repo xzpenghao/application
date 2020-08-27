@@ -49,7 +49,7 @@ public class BdcInteractRest {
     public void noticeMe(@RequestBody BdcNoticeReq noticeBody, HttpServletRequest request, HttpServletResponse resp) throws IOException {
         String bizStamp = "【" + new Date().getTime() + "】"+" 批次节点通知";
         try {
-            log.debug("BDC->YCSL：接入不动产办件节点通知模块{"+bizStamp+"},数据解析："+ JSONObject.toJSONString(noticeBody));
+            log.debug("BDC->YCSL：接入不动产办件节点通知模块{"+bizStamp+"},通知节点类型【"+noticeBody.getJdbs()+"】数据解析："+ JSONObject.toJSONString(noticeBody));
             if(noticeBody==null){
                 throw new ZtgeoBizException("通知失败，参数校验失败，传入参数为空");
             }
