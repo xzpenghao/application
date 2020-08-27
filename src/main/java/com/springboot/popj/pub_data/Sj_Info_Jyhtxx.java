@@ -34,6 +34,7 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
     private List<SJ_Qlr_Gl> glAgentSellerVoList;                 //关联的卖方代理人数据
 
     private SJ_Jyht_Detail htDetail;                        //合同细节数据
+    private SJ_Jyht_Bcywy htbcywy;                          //合同补充条款与违约说明
 
     private String registrationSubclass;                       //登记小类
     private String registrationReason;                         //登记原因
@@ -253,5 +254,13 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
 
     public void setDeliveryMode(String deliveryMode) {
         this.deliveryMode = deliveryMode;
+    }
+
+    public SJ_Jyht_Bcywy getHtbcywy() {
+        return htbcywy;
+    }
+
+    public void setHtbcywy(SJ_Jyht_Bcywy htbcywy) {
+        this.htbcywy = htbcywy;
     }
 }

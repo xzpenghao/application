@@ -247,12 +247,16 @@ public class SysPubDataDealUtil {
             String JSON_glAgentVoList = jyhtxx.getGlAgentVoList();
             String JSON_glAgentSellerVoList = jyhtxx.getGlAgentSellerVoList();
             String JSON_htDetail = jyhtxx.getHtDetail();
+            String JSON_htBcywy = jyhtxx.getHtbcywy();
+
             jyhtxx.setGlHouseBuyerVoList(null);
             jyhtxx.setGlHouseSellerVoList(null);
             jyhtxx.setGlImmovableVoList(null);
             jyhtxx.setGlAgentVoList(null);
             jyhtxx.setGlAgentSellerVoList(null);
             jyhtxx.setHtDetail(null);
+            jyhtxx.setHtbcywy(null);
+
             //反转出合同信息
             Sj_Info_Jyhtxx sj_jyhtxx = JSON.parseObject(JSON.toJSONString(jyhtxx), Sj_Info_Jyhtxx.class);
             baseSetting(sj_jyhtxx, serviceCode, sjsq.getReceiptNumber());
@@ -271,6 +275,27 @@ public class SysPubDataDealUtil {
             if(StringUtils.isNotBlank(JSON_htDetail)) {
                 SJ_Jyht_Detail sjJyhtDetail = JSON.parseObject(JSON_htDetail, SJ_Jyht_Detail.class);
                 sj_jyhtxx.setHtDetail(sjJyhtDetail);
+            }
+            //合同补充条款与违约说明
+            if(StringUtils.isNotBlank(JSON_htBcywy)){
+                //交易合同信息补充与违约自定义JSON对象
+                JSONJyhtxxBcywy jyhtxxBcywy = JSONObject.parseObject(JSON_htBcywy,JSONJyhtxxBcywy.class);
+                //获取并清理补充与违约明细字符串
+                String JSON_htBcMxes = jyhtxxBcywy.getBcmxes();
+                jyhtxxBcywy.setBcmxes(null);
+                String JSON_htWyMxes = jyhtxxBcywy.getWymxes();
+                jyhtxxBcywy.setWymxes(null);
+                //解析补充与违约
+                SJ_Jyht_Bcywy sjJyhtBcywy = JSONObject.parseObject(JSONObject.toJSONString(jyhtxxBcywy),SJ_Jyht_Bcywy.class);
+                //解析补充与违约明细并设置到补充与违约
+                if(StringUtils.isNotBlank(JSON_htBcMxes)){
+                    sjJyhtBcywy.setBcmxes(JSONArray.parseArray(JSON_htBcMxes,SJ_Jyht_Bcywymx.class));
+                }
+                if(StringUtils.isNotBlank(JSON_htWyMxes)){
+                    sjJyhtBcywy.setWymxes(JSONArray.parseArray(JSON_htWyMxes,SJ_Jyht_Bcywymx.class));
+                }
+                //设置补充与违约到交易合同信息中
+                sj_jyhtxx.setHtbcywy(sjJyhtBcywy);
             }
             /*
              *  卖方代理人关联信息处理

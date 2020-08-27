@@ -43,6 +43,7 @@ public class JSONJyhtxx implements Serializable {
     private String glAgentSellerVoList;                 //关联的卖方代理人数据
 
     private String htDetail;                        //合同细节数据
+    private String htbcywy;                          //合同补充条款与违约说明
 
     private String registrationSubclass;                       //登记小类
     private String registrationReason;                         //登记原因
@@ -325,5 +326,13 @@ public class JSONJyhtxx implements Serializable {
 
     public void setDeliveryMode(String deliveryMode) {
         this.deliveryMode = deliveryMode;
+    }
+
+    public String getHtbcywy() {
+        return htbcywy;
+    }
+
+    public void setHtbcywy(String htbcywy) {
+        this.htbcywy = htbcywy;
     }
 }

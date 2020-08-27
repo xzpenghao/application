@@ -27,6 +27,8 @@ public class TraParamBody implements Serializable {
     private List<JYQLRXX> JYDLRXX;
     @JsonProperty("FJXX")
     private List<com.springboot.entity.chenbin.personnel.pub_use.FJXX> FJXX;
+    @JsonProperty("HTBCXX")
+    private HTBCXX HTBCXX;
 
     public String getDYZT() {
         return DYZT;
@@ -108,5 +110,14 @@ public class TraParamBody implements Serializable {
     @JsonIgnore
     public void setFJXX(List<com.springboot.entity.chenbin.personnel.pub_use.FJXX> FJXX) {
         this.FJXX = FJXX;
+    }
+
+    public com.springboot.entity.chenbin.personnel.pub_use.HTBCXX getHTBCXX() {
+        return HTBCXX;
+    }
+
+    @JsonIgnore
+    public void setHTBCXX(com.springboot.entity.chenbin.personnel.pub_use.HTBCXX HTBCXX) {
+        this.HTBCXX = HTBCXX;
     }
 }

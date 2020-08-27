@@ -549,7 +549,67 @@ public class BusinessDealBaseUtil {
         traParam.setQSXX(taxParam.getQSXX());
         traParam.setYCSLXX(taxParam.getYCSLXX());
         traParam.setYYZT(taxParam.getYYZT());
+        traParam.setHTBCXX(getHtbcxx(sjsq.getTransactionContractInfo().getHtbcywy()));
         return traParam;
+    }
+
+    /**
+     * 描述：初始化合同补充信息
+     * 作者：chenb
+     * 日期：2020/8/27
+     * 参数：[bcywy]
+     * 返回：HTBCXX
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public static HTBCXX getHtbcxx(SJ_Jyht_Bcywy bcywy){
+        HTBCXX htbcxx = null;
+        if(bcywy!=null){
+            htbcxx = new HTBCXX();
+            htbcxx.setYDLXTK(bcywy.getYdlxtk());    //应当履行条款
+            htbcxx.setYDLXTKXQ(getTkxq(bcywy.getBcmxes()));          //条款详情
+            htbcxx.setWYSM(getWysm(bcywy));         //违约说明
+        }
+        return htbcxx;
+    }
+
+    /**
+     * 描述：初始化违约信息
+     * 作者：chenb
+     * 日期：2020/8/27
+     * 参数：[bcywy]
+     * 返回：WYSM
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public static WYSM getWysm(SJ_Jyht_Bcywy bcywy){
+        WYSM wysm = new WYSM();
+        wysm.setJFWYZFQX(bcywy.getJfwyzfqx());  //甲方违约支付期限
+        wysm.setJFWYTHQX(bcywy.getJfdmcftkqx());//甲方多卖退款期限
+        wysm.setJFWYLXZFFE(bcywy.getJfdmcflxzffe());//甲方多卖利息支付份额
+        wysm.setYFWYZNFE(bcywy.getSfwyznjfe()); //双方违约滞纳份额
+        return wysm;
+    }
+
+    /**
+     * 描述：初始化条款详情信息
+     * 作者：chenb
+     * 日期：2020/8/27
+     * 参数：[bcywymxes]
+     * 返回：List<YDLXTKXQ>
+     * 更新记录：更新人：{}，更新日期：{}
+     */
+    public static List<YDLXTKXQ> getTkxq(List<SJ_Jyht_Bcywymx> bcywymxes){
+        List<YDLXTKXQ> lxtkxqs = new ArrayList<>();
+        if(bcywymxes!=null){
+            for(SJ_Jyht_Bcywymx bcywymx:bcywymxes){
+                if("BC".equals(bcywymx.getMxlx())) {
+                    YDLXTKXQ lxtkxq = new YDLXTKXQ();
+                    lxtkxq.setTKXH(bcywymx.getXh());
+                    lxtkxq.setTKNR(bcywymx.getMx());
+                    lxtkxqs.add(lxtkxq);
+                }
+            }
+        }
+        return lxtkxqs;
     }
 
     public static JYQLRXX getJyqlr(SJ_Qlr_Gl qlrgl){
