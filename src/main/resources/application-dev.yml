@@ -328,6 +328,7 @@ Feign:
 newplat:
   settings:                              #转内网保险机制，配置默认执行配置（当转内网时下述项未传入时使用）
   - key: esfzy                                #二手房转移
+    mid: 977759
     sid: 167090000120
     sname: 存量房转移
     jsrid: Qo92Bsh5d2mOtWBzgDu

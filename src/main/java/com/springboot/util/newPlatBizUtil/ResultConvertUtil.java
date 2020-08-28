@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.emm.*;
-import com.springboot.entity.chenbin.personnel.other.paph.PaphCfxx;
-import com.springboot.entity.chenbin.personnel.other.paph.PaphDjxx;
-import com.springboot.entity.chenbin.personnel.other.paph.PaphDyxx;
-import com.springboot.entity.chenbin.personnel.other.paph.PaphEntity;
+import com.springboot.entity.chenbin.personnel.other.paph.*;
 import com.springboot.entity.chenbin.personnel.req.PaphReqEntity;
 import com.springboot.entity.newPlat.query.bizData.Dbjgxx;
 import com.springboot.entity.newPlat.query.bizData.Shxx;
@@ -134,31 +131,52 @@ public class ResultConvertUtil {
     public static PaphEntity getPaphEntity(DjzlResponse djzl, String key, PaphReqEntity paph){
         //核验接口数据，做基础自检
         djzl.checkSelfStandard();
+        //解析抵押数据，区分贷前和贷后
+        List<com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx> dyxxs = djzl.getDyxxs();
+        //产生主体信息标识
+        boolean initPaEntity;
         //登记资料解析基础金融端需求的数据
         PaphEntity paphEntity = getBasePaphEntity(djzl);
-        if(paphEntity!=null){
+        //登记资料查询不为空
+        if(paphEntity!=null) {
+            //声明风控抵押类结果对象
+            PaphDyjg paphDyjg;
+            if("before".equals(key)) {              //执行贷前
+                //贷前结果处理
+                paphDyjg = getBeforeDyxxs(dyxxs);
+                if(paphDyjg.getPdyxxs().size()>0) {
+                    paphEntity.setSfdy("是");
+                }else{
+                    paphEntity.setSfdy("否");
+                }
+                paphEntity.setDyxxs(paphDyjg.getPdyxxs());
+            } else if("after".equals(key)) {        //执行贷后
+                //贷后结果处理
+                paphDyjg = getAfterDyxxs(dyxxs,paph);
+                setPaphQtdy(paphDyjg.getPdyxxs(), paphEntity);
+            } else {
+                throw new ZtgeoBizException("查询场景设置异常！");
+            }
+            initPaEntity = paphDyjg.isCanSee();
+            //产生标识false时，不做处理返回
+            if(!initPaEntity){
+                return null;
+            }
             //解析查封数据
             List<Cfxx> cfxxs = djzl.getCfxxs();
-            if(cfxxs!=null && cfxxs.size()>0){
+            if (cfxxs != null && cfxxs.size() > 0) {
                 paphEntity.setSfcf("是");
                 paphEntity.setCfxxs(getPaphCfsByDjzlCf(cfxxs));
+            }else{
+                paphEntity.setSfcf("否");
             }
             //解析冻结信息
             List<Djxx> djxxs = djzl.getDjxxlb();
-            if(djxxs!=null && djxxs.size()>0){
+            if (djxxs != null && djxxs.size() > 0) {
                 paphEntity.setSfdj("是");
                 paphEntity.setDjxxs(getPaphDjsByDjzlDj(djxxs));
-            }
-            //解析抵押数据，区分贷前和贷后
-            List<com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx> dyxxs = djzl.getDyxxs();
-            if(dyxxs!=null && dyxxs.size()>0){
-                if("before".equals(key)){
-                    paphEntity.setSfdy("是");
-                    paphEntity.setDyxxs(getBeforeDyxxs(dyxxs));
-                }else if("after".equals(key)){
-                    List<PaphDyxx> pdyxxs = getAfterDyxxs(dyxxs,paph);
-                    setPaphQtdy(pdyxxs,paphEntity);
-                }
+            }else{
+                paphEntity.setSfcf("否");
             }
         }
         return paphEntity;
@@ -709,22 +727,27 @@ public class ResultConvertUtil {
      * 返回：List<PaphDyxx>
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public static List<PaphDyxx> getBeforeDyxxs(List<com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx> dyxxs){
+    public static PaphDyjg getBeforeDyxxs(List<com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx> dyxxs){
+        PaphDyjg paphDyjg = new PaphDyjg();
+        paphDyjg.setCanSee(true);
         List<PaphDyxx> pdyxxs = new ArrayList<PaphDyxx>();
-        for(int i=0;i<dyxxs.size();i++){
-            com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx dyxx = dyxxs.get(i);
-            if(dyxx!=null) {
-                PaphDyxx pdyxx = new PaphDyxx().initByDjzlDy(dyxx);
-                if(StringUtils.isNotBlank(dyxx.getDyqr())){
-                    if(dyxx.getDyqr().contains("银行"))
-                        pdyxx.setDyqr("银行");
-                    else
-                        pdyxx.setDyqr("其它");
+        if(dyxxs!=null && dyxxs.size()>0) {
+            for (int i = 0; i < dyxxs.size(); i++) {
+                com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx dyxx = dyxxs.get(i);
+                if (dyxx != null) {
+                    PaphDyxx pdyxx = new PaphDyxx().initByDjzlDy(dyxx);
+                    if (StringUtils.isNotBlank(dyxx.getDyqr())) {
+                        if (dyxx.getDyqr().contains("银行"))
+                            pdyxx.setDyqr("银行");
+                        else
+                            pdyxx.setDyqr("其它");
+                    }
+                    pdyxxs.add(pdyxx);
                 }
-                pdyxxs.add(pdyxx);
             }
         }
-        return pdyxxs;
+        paphDyjg.setPdyxxs(pdyxxs);
+        return paphDyjg;
     }
 
     /**
@@ -735,7 +758,9 @@ public class ResultConvertUtil {
      * 返回：List<PaphDyxx>
      * 更新记录：更新人：{}，更新日期：{}
      */
-    public static List<PaphDyxx> getAfterDyxxs(List<com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx> dyxxs,PaphReqEntity paph){
+    public static PaphDyjg getAfterDyxxs(List<com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx> dyxxs,PaphReqEntity paph){
+        PaphDyjg paphDyjg = new PaphDyjg();
+        boolean isExistSelfDy = false;
         List<PaphDyxx> pdyxxs = new ArrayList<>();
         for(com.springboot.entity.newPlat.query.bizData.fromSY.djzl.Dyxx dyxx:dyxxs) {
             if(dyxx!=null) {
@@ -748,11 +773,15 @@ public class ResultConvertUtil {
                             pdyxx.setDyqr("其它");
                         }
                         pdyxxs.add(pdyxx);
+                    }else{
+                        isExistSelfDy = true;
                     }
                 }
             }
         }
-        return pdyxxs;
+        paphDyjg.setCanSee(isExistSelfDy);
+        paphDyjg.setPdyxxs(pdyxxs);
+        return paphDyjg;
     }
 
     /**
@@ -780,8 +809,10 @@ public class ResultConvertUtil {
     public static void setPaphQtdy(List<PaphDyxx> pdyxxs,PaphEntity paphEntity){
         if(pdyxxs!=null && pdyxxs.size()>0){
             paphEntity.setSfqtdy("是");
-            paphEntity.setDyxxs(pdyxxs);
+        } else {
+            paphEntity.setSfqtdy("否");
         }
+        paphEntity.setDyxxs(pdyxxs);
     }
 
     /**

@@ -231,10 +231,10 @@ public class BdcInteractService {
             return back;
         } catch (ZtgeoBizException e){
             throw e;
-        }catch (Exception e){
+        } catch (Exception e){
             log.error("内网办件出现异常，异常详情信息："+ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("转内网办件出现异常,联系管理员");
-        }finally {
+        } finally {
             //签收办件
             otherComponent.signPro(token,bsryname,bsrypassword,sjsq.getReceiptNumber(),params);
         }
@@ -629,6 +629,7 @@ public class BdcInteractService {
         params.put("receiptNumber", sqbh);
         NewBdcFlowCheckReq wwywh = new NewBdcFlowCheckReq(sqbh);
         OtherResponseEntity<List<NewBdcFlowRespData>> checkResult = bdcInteractFeign.wsjgjc(wwywh);
+        log.info("【"+sqbh+"】号不动产办件创建预检查结果："+JSONObject.toJSONString(checkResult));
         checkResult.checkSelfIfBdc("不动产业务创建检查接口");
         dealBdcCreatResult(checkResult.getData(),bdcMappingVoList,params);
     }

@@ -205,6 +205,9 @@ public class BdcQueryService {
         }else{
             log.warn("【登记资料查询】--> 登记资料查询，返回了null值，这在设计上是超出规范的，请知悉");
         }
+        if("after".equals(key) && paphEntitys.size()<1){
+            throw new ZtgeoBizException("您所查询的权利人【"+paph.getDyrmc()+"】，未在您所在的单位办理过房产抵押业务！");
+        }
         //5. 返回结果集
         return paphEntitys;
     }
