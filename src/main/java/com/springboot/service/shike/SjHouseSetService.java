@@ -33,4 +33,6 @@ public interface SjHouseSetService {
      * 更新记录：更新人：{}，更新日期：{}
      */
     BaseResponse taxPush(Map<String,String> taxPushMap);
+
+    List<SJHouseSet> queryZjHouseSetByObligeeList(List<Obligee> obligeeList);
 }

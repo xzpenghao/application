@@ -312,4 +312,5 @@ Feign:
 
 HouseSet:
   Bdc: http://10.13.3.239:23335/api/services/app/bdcQuery/GetHouseInfoByMember
+  Zj: http://39.100.117.179:8101/mock/46/syapi/zjxx
   taxPush: http://172.22.191.15:9011/dataFwtcSuyAction.do

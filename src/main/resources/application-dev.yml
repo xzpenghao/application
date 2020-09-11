@@ -40,7 +40,7 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://192.168.0.108:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://172.16.100.13:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
 #          url: jdbc:mysql://10.3.0.156:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
@@ -120,7 +120,7 @@ glHouseBuyer:
   obligeeZwr: 债务人
 httpclient:
   seam: 23335       #杨智昊程序端口
-  ip: 10.3.0.149
+  ip: 172.16.100.149
   #10.3.2.147    #登记平台ip
   windowAcceptanceIp: localhost   #一窗受理ip
   windowAcceptanceSeam: 7780      #一窗受理接口
@@ -147,7 +147,7 @@ webplus:
   ftpUsername: forftp
   ftpPassword: 123456
 
-  ftpAddressBdc: 10.3.0.149    #不动产登记平台
+  ftpAddressBdc: 172.16.100.149   #不动产登记平台
   ftpPortBdc: 54111
   ftpUsernameBdc: ftp
   ftpPasswordBdc: 123456
@@ -298,7 +298,7 @@ gxjhpt:
   url: http://127.0.0.1:7780/
 
 bdccx:
-  url: http://10.3.0.149:23335/
+  url: http://172.16.100.149:23335/
 #  url: http://172.22.226.172:12201/
 ycsl:
   url: http://localhost:7780/
@@ -308,9 +308,9 @@ other:
 
 
 PublicInspect:
-  BDCZHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
-  DYZMHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByDYZMH?DYZMH=%s
-  YGZMHURL: http://10.3.0.149:23335/api/services/app/BdcQuery/GetBdcInfoByYGZMH?YGZMH=%s
+  BDCZHURL: http://172.16.100.149:23335/api/services/app/BdcQuery/GetBdcInfoByBDCZH?BDCZH=%s
+  DYZMHURL: http://172.16.100.149:23335/api/services/app/BdcQuery/GetBdcInfoByDYZMH?DYZMH=%s
+  YGZMHURL: http://172.16.100.149:23335/api/services/app/BdcQuery/GetBdcInfoByYGZMH?YGZMH=%s
 
 
 ETicket:
@@ -324,5 +324,6 @@ Feign:
   Electric: api/test/testElec
 
 HouseSet:
-  Bdc: http://10.3.0.149:23335/api/services/app/bdcQuery/GetHouseInfoByMember
+  Bdc: http://172.16.100.149:23335/api/services/app/bdcQuery/GetHouseInfoByMember
+  Zj: http://39.100.117.179:8101/mock/46/syapi/zjxx
   taxPush: http://localhost:7777/sjHouseSet/mockTax

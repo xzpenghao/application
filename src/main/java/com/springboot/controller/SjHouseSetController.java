@@ -1,5 +1,6 @@
 package com.springboot.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.github.wxiaoqi.security.common.msg.BaseResponse;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.entity.SJHouseSet;
@@ -34,6 +35,12 @@ public class SjHouseSetController {
         return new ObjectRestResponse<List<SJHouseSet>>().data(sjHouseSetService.queryBdcHouseSetByObligeeList(obligeeList));
     }
 
+    @RequestMapping(value = "/queryZjHouseSet", method = RequestMethod.POST)
+    @ApiOperation("获取住建房屋套次信息")
+    public ObjectRestResponse queryZjHouseSetByObligeeList(@RequestBody List<Obligee> obligeeList){
+        return new ObjectRestResponse<List<SJHouseSet>>().data(sjHouseSetService.queryZjHouseSetByObligeeList(obligeeList));
+    }
+
     @RequestMapping(value = "/taxPush", method = RequestMethod.POST)
     @ApiOperation("税务推送")
     public BaseResponse taxPush(@RequestBody Map<String,String> taxPushMap){
@@ -43,7 +50,7 @@ public class SjHouseSetController {
     @RequestMapping(value = "/mockTax", method = RequestMethod.POST)
     @ApiOperation("mock税务响应")
     public ObjectRestResponse mockTax(@RequestBody String data){
-        log.info(data);
+        log.info("mock税务响应:{}", JSON.toJSONString(data));
         ObjectRestResponse response = new ObjectRestResponse();
         response.setMessage("操作成功");
         return response;

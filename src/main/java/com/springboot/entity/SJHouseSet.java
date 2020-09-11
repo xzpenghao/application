@@ -1,9 +1,17 @@
 package com.springboot.entity;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.springboot.vo.Obligee;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import static com.springboot.service.shike.impl.SjHouseSetServiceImpl.LX_QLR;
+import static com.springboot.service.shike.impl.SjHouseSetServiceImpl.LX_YWR;
 
 /**
  * @author sk
@@ -43,4 +51,35 @@ public class SJHouseSet {
     /** 债权人类型 0 卖方（义务人），1买方（权利人） */
     private String obligeeType;
 
+    /**
+     * 描述：住建构造参数
+     * 作者：sk
+     * 日期：2020/9/9
+     * 参数：
+     * 返回：
+     * 更新记录：更新人：{}，更新日期：{}
+    */
+    public SJHouseSet(Object data,String qlrlx) {
+        JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(data));
+        this.sit = jsonObject.getString("fwdz");
+        this.houseRightNature = jsonObject.getString("fwxz");
+        this.plannedUsage = jsonObject.getString("fwyt");
+        this.architectureArea = jsonObject.getString("zfmj");
+        this.floor = jsonObject.getString("szlc");
+        this.totalFloor = jsonObject.getString("lczs");
+        String zjlx = "";
+        if (LX_QLR.equals(qlrlx)){
+            zjlx = jsonObject.getString("gmfzjlx");
+        }else if (LX_YWR.equals(qlrlx)){
+            zjlx = jsonObject.getString("mfzjlx");
+        }
+        List<Obligee> obligeeList = new ArrayList<>();
+        Obligee obligee = new Obligee();
+        obligee.setObligeeName(jsonObject.getString("gmfxm"));
+        obligee.setObligeeId(jsonObject.getString("gmfzjhm"));
+        obligee.setObligeeIdType(zjlx);
+        obligeeList.add(obligee);
+        this.obligeeInfoVoList = JSON.toJSONString(obligeeList);
+
+    }
 }
