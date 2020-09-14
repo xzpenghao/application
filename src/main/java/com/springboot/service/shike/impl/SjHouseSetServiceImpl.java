@@ -12,6 +12,7 @@ import com.github.wxiaoqi.security.common.msg.BaseResponse;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJHouseSet;
 import com.springboot.service.shike.SjHouseSetService;
+import com.springboot.util.chenbin.ErrorDealUtil;
 import com.springboot.vo.Obligee;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -291,14 +292,15 @@ public class SjHouseSetServiceImpl implements SjHouseSetService {
         BaseResponse response;
         //2.2   发送请求 捕获异常
         try {
-            result = HttpUtil.post(taxPushUrl,taxPushParams);
+            result = HttpUtil.post(taxPushUrl,JSONObject.toJSONString(taxPushParams));
+            log.info("套次数据税务推送响应结果："+result);
             response = JSON.parseObject(result,BaseResponse.class);
             if (response.getStatus() != HttpStatus.HTTP_OK){
                 throw new ZtgeoBizException(StrUtil.isBlank(response.getMessage())? "不动产套次信息推送税务服务失败" : response.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("税务推送失败,请求参数为:{}",JSON.toJSONString(taxPushParams));
+            log.error("原始异常信息："+ ErrorDealUtil.getErrorInfo(e));
             throw new ZtgeoBizException("不动产套次信息推送税务服务失败");
         }
 

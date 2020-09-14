@@ -592,6 +592,7 @@ public class AnonymousInnerComponent {
 
     public void GetReceiving(GetReceiving getReceiving, OutputStream outputStream) throws IOException {
         log.info("BDC->YCSL：开始执行不动产数据向一窗同步");
+        log.info("BDC->YCSL：同步传入的数据："+ com.alibaba.fastjson.JSONObject.toJSONString(getReceiving));
         ExecutorService executor = Executors.newCachedThreadPool();
         ReturnVo returnVo = new ReturnVo();
         Map<String, String> mapParmeter = new HashMap<>();
