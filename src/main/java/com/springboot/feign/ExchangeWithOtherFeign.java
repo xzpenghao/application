@@ -13,7 +13,7 @@ import java.util.Map;
 @FeignClient(name = "otherFeign", url = "${other.url}")
 public interface ExchangeWithOtherFeign {
 
-    @RequestMapping(value = "${Feign.Tax}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=dWYiasy7","from_user=1"})
+    @RequestMapping(value = "${Feign.Tax}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=nTCznNxC","from_user=1"})
     ObjectRestResponse<String> testTax(Map<String,Object> taxParamBody);
 
     @RequestMapping(value = "${Feign.Tra}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=dWYiasy7","from_user=1"})

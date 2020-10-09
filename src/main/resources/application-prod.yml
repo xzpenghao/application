@@ -317,7 +317,7 @@ ETicket:
   LocalPath: E:/ETicket/
 
 Feign:
-  Tax: dataShareAction.do
+  Tax: dataShareSihAction.do
   Tra: sqservice/bdc/getOneAcceptInfo
   ETicket: getDzspAction.do
   Electric: share/electric/electric_lmgh_apply_api.action
