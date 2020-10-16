@@ -43,10 +43,29 @@ public class FWXX implements Serializable {
     private String ZCS;     //总层数
     @JsonProperty("SZC")
     private String SZC;     //所在层
+    /*
+        10/16 泗洪住建新增字段
+     */
+    /**
+     * 数据提供单位
+     */
+    @JsonProperty("provideUnit")
+    private String provideUnit;
+    /**
+     * 登记日期
+     */
+    @JsonProperty("registrationDate")
+    private String registrationDate;
+    /**
+     * 房屋权利性质
+     */
+    @JsonProperty("houseRightNature")
+    private String houseRightNature;
 
     public String getBDCDYH() {
         return BDCDYH;
     }
+
     @JsonIgnore
     public void setBDCDYH(String BDCDYH) {
         this.BDCDYH = BDCDYH;
@@ -55,6 +74,7 @@ public class FWXX implements Serializable {
     public String getZL() {
         return ZL;
     }
+
     @JsonIgnore
     public void setZL(String ZL) {
         this.ZL = ZL;
@@ -63,6 +83,7 @@ public class FWXX implements Serializable {
     public String getYT() {
         return YT;
     }
+
     @JsonIgnore
     public void setYT(String YT) {
         this.YT = YT;
@@ -71,6 +92,7 @@ public class FWXX implements Serializable {
     public String getXMMC() {
         return XMMC;
     }
+
     @JsonIgnore
     public void setXMMC(String XMMC) {
         this.XMMC = XMMC;
@@ -79,6 +101,7 @@ public class FWXX implements Serializable {
     public String getYFCBH() {
         return YFCBH;
     }
+
     @JsonIgnore
     public void setYFCBH(String YFCBH) {
         this.YFCBH = YFCBH;
@@ -87,9 +110,10 @@ public class FWXX implements Serializable {
     public BigDecimal getTNMJ() {
         return TNMJ;
     }
+
     @JsonIgnore
     public void setTNMJ(BigDecimal TNMJ) {
-        if(TNMJ==null){
+        if (TNMJ == null) {
             TNMJ = new BigDecimal(-999);
         }
         this.TNMJ = TNMJ;
@@ -98,9 +122,10 @@ public class FWXX implements Serializable {
     public BigDecimal getJZMJ() {
         return JZMJ;
     }
+
     @JsonIgnore
     public void setJZMJ(BigDecimal JZMJ) {
-        if(JZMJ==null){
+        if (JZMJ == null) {
             JZMJ = new BigDecimal(-999);
         }
         this.JZMJ = JZMJ;
@@ -109,9 +134,10 @@ public class FWXX implements Serializable {
     public BigDecimal getFTMJ() {
         return FTMJ;
     }
+
     @JsonIgnore
     public void setFTMJ(BigDecimal FTMJ) {
-        if(FTMJ==null){
+        if (FTMJ == null) {
             FTMJ = new BigDecimal(-999);
         }
         this.FTMJ = FTMJ;
@@ -120,6 +146,7 @@ public class FWXX implements Serializable {
     public String getFWDY() {
         return FWDY;
     }
+
     @JsonIgnore
     public void setFWDY(String FWDY) {
         this.FWDY = FWDY;
@@ -128,6 +155,7 @@ public class FWXX implements Serializable {
     public String getFWFH() {
         return FWFH;
     }
+
     @JsonIgnore
     public void setFWFH(String FWFH) {
         this.FWFH = FWFH;
@@ -136,6 +164,7 @@ public class FWXX implements Serializable {
     public String getFWJG() {
         return FWJG;
     }
+
     @JsonIgnore
     public void setFWJG(String FWJG) {
         this.FWJG = FWJG;
@@ -144,6 +173,7 @@ public class FWXX implements Serializable {
     public String getFWLX() {
         return FWLX;
     }
+
     @JsonIgnore
     public void setFWLX(String FWLX) {
         this.FWLX = FWLX;
@@ -152,6 +182,7 @@ public class FWXX implements Serializable {
     public String getFWXZ() {
         return FWXZ;
     }
+
     @JsonIgnore
     public void setFWXZ(String FWXZ) {
         this.FWXZ = FWXZ;
@@ -160,6 +191,7 @@ public class FWXX implements Serializable {
     public String getFWZL() {
         return FWZL;
     }
+
     @JsonIgnore
     public void setFWZL(String FWZL) {
         this.FWZL = FWZL;
@@ -168,6 +200,7 @@ public class FWXX implements Serializable {
     public String getZCS() {
         return ZCS;
     }
+
     @JsonIgnore
     public void setZCS(String ZCS) {
         this.ZCS = ZCS;
@@ -176,8 +209,36 @@ public class FWXX implements Serializable {
     public String getSZC() {
         return SZC;
     }
+
     @JsonIgnore
     public void setSZC(String SZC) {
         this.SZC = SZC;
+    }
+
+    public String getProvideUnit() {
+        return provideUnit;
+    }
+
+    @JsonIgnore
+    public void setProvideUnit(String provideUnit) {
+        this.provideUnit = provideUnit;
+    }
+
+    public String getRegistrationDate() {
+        return registrationDate;
+    }
+
+    @JsonIgnore
+    public void setRegistrationDate(String registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
+    public String getHouseRightNature() {
+        return houseRightNature;
+    }
+
+    @JsonIgnore
+    public void setHouseRightNature(String houseRightNature) {
+        this.houseRightNature = houseRightNature;
     }
 }

@@ -29,6 +29,16 @@ public class QSXX implements Serializable {
     @JsonProperty("FWXX")
     private List<FWXX> FWXX;
 
+    /*
+        10/16 泗洪住建新增字段
+     */
+    /** 土地证号 */
+    @JsonProperty("TDZH")
+    private String TDZH;
+    /** 土地权利信息 */
+    @JsonProperty("TDQLXX")
+    private String TDQLXX;
+
     public String getBDCZH() {
         return BDCZH;
     }
@@ -99,5 +109,21 @@ public class QSXX implements Serializable {
         if(TDHQFS!=null) {
             this.TDHQFS = TDHQFS;
         }
+    }
+
+    public String getTDZH() {
+        return TDZH;
+    }
+    @JsonIgnore
+    public void setTDZH(String TDZH) {
+        this.TDZH = TDZH;
+    }
+
+    public String getTDQLXX() {
+        return TDQLXX;
+    }
+    @JsonIgnore
+    public void setTDQLXX(String TDQLXX) {
+        this.TDQLXX = TDQLXX;
     }
 }

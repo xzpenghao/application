@@ -402,6 +402,16 @@ public class BusinessDealBaseUtil {
                 }
             }
 
+             /*
+                10/16 泗洪住建新增字段
+             */
+             if (bdcql.getCertificateType().equals("土地证")){
+                 //  设置土地证号
+                 qsxx.setTDZH(bdcql.getImmovableCertificateNo());
+                 //  设置土地权属信息
+                 qsxx.setTDQLXX(bdcql.getLandRightNature());
+             }
+
             if (
                     StringUtils.isNotBlank(bdcql.getDataType())
                     && "主设施".equals(bdcql.getDataType())
@@ -642,6 +652,16 @@ public class BusinessDealBaseUtil {
         fwxx.setZL(fw.getHouseLocation());
         fwxx.setZCS(fw.getTotalStorey());
         fwxx.setSZC(fw.getLocationStorey());
+        /*
+            10/16 泗洪住建新增字段
+         */
+        //  数据提供单位
+        fwxx.setProvideUnit(bdcql.getProvideUnit());
+        //  登记日期
+        fwxx.setRegistrationDate(bdcql.getRegistrationDate());
+        //  房屋权利性质
+        fwxx.setHouseRightNature(bdcql.getHouseRightNature());
+
         return fwxx;
     }
 
