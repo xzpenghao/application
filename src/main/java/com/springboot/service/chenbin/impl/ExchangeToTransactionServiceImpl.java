@@ -1,5 +1,6 @@
 package com.springboot.service.chenbin.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -66,6 +67,7 @@ public class ExchangeToTransactionServiceImpl implements ExchangeToTransactionSe
     @Override
     public String deal2Tra(String commonInterfaceAttributer) throws ParseException {
         log.info("开始发送");
+        log.info("原始数据：{}", JSON.toJSONString(commonInterfaceAttributer));
         String result = "处理成功";
         //token
         String token = backFeign.getToken(new JwtAuthenticationRequest(username,password)).getData();

@@ -13,9 +13,19 @@ import java.util.Map;
 @FeignClient(name = "otherFeign", url = "${other.url}")
 public interface ExchangeWithOtherFeign {
 
+    /**
+     * 税务
+     * @param taxParamBody 税务参数体
+     * @return 推送结果
+     */
     @RequestMapping(value = "${Feign.Tax}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=nTCznNxC","from_user=1"})
     ObjectRestResponse<String> testTax(Map<String,Object> taxParamBody);
 
+    /**
+     * 住建
+     * @param TraParamBody 住建参数体
+     * @return 推送结果
+     */
     @RequestMapping(value = "${Feign.Tra}",method = RequestMethod.POST,produces = "application/json",consumes = "application/json;charset=UTF-8",headers = {"api_id=dWYiasy7","from_user=1"})
     ObjectRestResponse<String> testTra(Map<String,Object> TraParamBody);
 

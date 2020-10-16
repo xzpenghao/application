@@ -2,7 +2,8 @@ package com.springboot.entity.chenbin.personnel.tra;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.springboot.entity.chenbin.personnel.pub_use.*;
+import com.springboot.entity.chenbin.personnel.pub_use.HTBCXX;
+import com.springboot.entity.chenbin.personnel.pub_use.JYQLRXX;
 
 import java.io.Serializable;
 import java.util.List;
