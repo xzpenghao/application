@@ -1,5 +1,6 @@
 package com.springboot.util.chenbin;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -374,6 +375,7 @@ public class BusinessDealBaseUtil {
     }
 
     public static TaxParamBody dealParamForTax(SJ_Sjsq sjsq) throws ParseException {
+        log.info("dealParamForTax -> 收件申请数据:{}", JSON.toJSONString(sjsq));
         TaxParamBody taxParam = new TaxParamBody();
         List<SJ_Info_Bdcqlxgxx> bdcqls =  sjsq.getImmovableRightInfoVoList();
 
@@ -405,11 +407,13 @@ public class BusinessDealBaseUtil {
              /*
                 10/16 泗洪住建新增字段
              */
-             if (bdcql.getCertificateType().equals("土地证")){
+             if ("土地证".equals(bdcql.getCertificateType())){
                  //  设置土地证号
                  qsxx.setTDZH(bdcql.getImmovableCertificateNo());
                  //  设置土地权属信息
                  qsxx.setTDQLXX(bdcql.getLandRightNature());
+                 // 设置土地填发单位
+                 qsxx.setProvideUnit(bdcql.getProvideUnit());
              }
 
             if (

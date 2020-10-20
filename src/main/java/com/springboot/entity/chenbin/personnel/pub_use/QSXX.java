@@ -38,6 +38,9 @@ public class QSXX implements Serializable {
     /** 土地权利信息 */
     @JsonProperty("TDQLXX")
     private String TDQLXX;
+    /** 数据提供单位 */
+    @JsonProperty("provideUnit")
+    private String provideUnit;
 
     public String getBDCZH() {
         return BDCZH;
@@ -125,5 +128,14 @@ public class QSXX implements Serializable {
     @JsonIgnore
     public void setTDQLXX(String TDQLXX) {
         this.TDQLXX = TDQLXX;
+    }
+
+    public String getProvideUnit() {
+        return provideUnit;
+    }
+
+    @JsonIgnore
+    public void setProvideUnit(String provideUnit) {
+        this.provideUnit = provideUnit;
     }
 }
