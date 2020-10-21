@@ -432,6 +432,11 @@ public class BusinessDealBaseUtil {
                 qsxx.setZL(bdcql.getImmovableSite());
                 qsxx.setTDSYQR(bdcql.getLandUseRightOwner());
                 qsxx.setTDHQFS(bdcql.getLandObtainWay());
+                /*
+                    10/16 泗洪住建新增字段
+                 */
+                qsxx.setTDQLXX(bdcql.getLandRightNature());
+
                 List<SJ_Bdc_Gl> bdcgls = bdcql.getGlImmovableVoList();
                 if (bdcgls != null) {
                     for (SJ_Bdc_Gl bdcgl : bdcgls) {
