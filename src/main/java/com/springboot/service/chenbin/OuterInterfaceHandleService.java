@@ -8,4 +8,7 @@ import java.util.List;
 
 public interface OuterInterfaceHandleService {
     Object getPersonnelUnits(PersonnelUnitReqEntity personnelUnitReq) throws UnsupportedEncodingException;
+
+
+    Object getContractRecordxx(String keyCode,String qyslh);
 }

@@ -16,9 +16,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.ArrayList;
 import java.util.List;
-
-@Configuration
 @EnableSwagger2
+@Configuration
 public class Swagger2Config {
 
     @Bean
@@ -27,6 +26,7 @@ public class Swagger2Config {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
+                .apis(RequestHandlerSelectors.basePackage("com.springboot"))
                 .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
                 .paths(PathSelectors.any())
                 .build()

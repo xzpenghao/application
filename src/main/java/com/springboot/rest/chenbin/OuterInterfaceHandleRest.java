@@ -29,6 +29,14 @@ public class OuterInterfaceHandleRest {
     @Autowired
     private OuterInterfaceHandleService outerIntfService;
 
+
+    @RequestMapping(value = "/getContractRecordxx",method = RequestMethod.POST)
+    public ObjectRestResponse<Object> qyslhfrdbaxx(String keyCode,String qyslh){
+        ObjectRestResponse<Object> rv = new ObjectRestResponse<Object>();
+        return rv.data(outerIntfService.getContractRecordxx(keyCode,qyslh));
+    }
+
+
     @RequestMapping(value = "/checkPersonnelUnit",method = RequestMethod.POST)
     public ObjectRestResponse<Object> checkPersonnelUnit(@RequestBody PersonnelUnitReqEntity personnelUnit){
         ObjectRestResponse<Object> rv = new ObjectRestResponse<Object>();

@@ -1,7 +1,12 @@
 package com.springboot.service.chenbin.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.http.HttpStatus;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.google.common.collect.Maps;
 import com.springboot.component.chenbin.file.FromFTPDownloadComponent;
 import com.springboot.config.ZtgeoBizException;
 import com.springboot.entity.SJ_Fjfile;
@@ -17,6 +22,8 @@ import com.springboot.entity.chenbin.personnel.resp.PersonnelResponseListEntity;
 import com.springboot.entity.chenbin.personnel.resp.PersonnelResponseSingleEntity;
 import com.springboot.feign.ExchangeWithOuterFeign;
 import com.springboot.service.chenbin.OuterInterfaceHandleService;
+import com.springboot.vo.ContractQueryVo;
+import com.springboot.vo.TaxAttachment;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,6 +139,29 @@ public class OuterInterfaceHandleServiceImpl implements OuterInterfaceHandleServ
         }else{
             throw new ZtgeoBizException("证件类型不可为空");
         }
+    }
+
+    @Override
+    public Object getContractRecordxx(String keycode, String qyslh) {
+        Map<String,Object> params = Maps.newHashMap();
+        params.put("keycode",keycode);
+        params.put("qyslh",qyslh);
+        Map<String,Object> map = exchangeFeign.qyslhfrdbaxx(params); //契约号获取契约备案号
+        log.info("查询参数:{}", JSON.toJSONString(map));
+        if (null == map){
+            throw new ZtgeoBizException("查询无响应");
+        }
+        log.info("查询结果:{}",JSON.toJSONString(map));
+
+        //处理交易返回数据
+        if (map.get("statusCode").toString().equals("-1")){
+            throw new ZtgeoBizException("查询信息异常："+map.get("msg"));
+        }
+        ContractQueryVo contractQueryVo = JSONObject.parseObject(JSONObject.toJSONString(map.get("data")),ContractQueryVo.class);
+        if (null == contractQueryVo){
+            throw new ZtgeoBizException("查询数据为空");
+        }
+        return  contractQueryVo;
     }
 
     public void dododod(){

@@ -1,5 +1,6 @@
 package com.springboot.feign;
 
+import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.entity.chenbin.personnel.punit.GSCommonCheckEntity;
 import com.springboot.entity.chenbin.personnel.punit.GSCommonEntity;
 import com.springboot.entity.chenbin.personnel.punit.PersonCheckEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.rmi.MarshalledObject;
 import java.util.Map;
 
 @FeignClient(name = "exchangeFeign", url = "${gxjhpt.url}")
@@ -38,5 +40,10 @@ public interface ExchangeWithOuterFeign {
     //基金会
     @RequestMapping(value="share/jjhfrdjzscx",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
     Map<String,Object> jjhfrdjzscx(Map<String,Object> params);
+    //通过契约受理号获取备案信息接口
+    @RequestMapping(value="mock/60/ycsl/gxpt/ashx/ty",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
+//    @RequestMapping(value="mock/60/ycsl/gxpt/ashx/ty",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=gHRZkzHc","from_user=1"})
+    Map<String,Object> qyslhfrdbaxx(Map<String,Object> params);
+
 
 }
