@@ -30,7 +30,7 @@ public class DateUtils {
     public static final String ENG_DATE_FROMAT = "EEE, d MMM yyyy HH:mm:ss z";
     public static final String JAVA_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     public static final String JAVA_YYYY_MM_DD_HH_MM = "yyyy-MM-dd HH:mm";
-    public static final String JAVA_YYYY_MM_DD = "yyyy-MM-dd";
+    public static final String JAVA_YYYY_MM_DD = "YYYY-MM-dd";
     public static final String JAVA_YYYYMMDD = "yyyyMMdd";
     public static final String JAVA_YYYYMMDD_CH = "yyyy年MM月dd日";
     public static final String JAVA_YYYY_MM = "YYYY-MM";

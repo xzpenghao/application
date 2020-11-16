@@ -6,8 +6,10 @@ import com.springboot.entity.chenbin.personnel.PersonnelUnitEntity;
 import com.springboot.entity.chenbin.personnel.req.PersonnelUnitReqEntity;
 import com.springboot.service.chenbin.OuterInterfaceHandleService;
 import com.springboot.util.chenbin.ErrorDealUtil;
+import feign.Param;
 import feign.codec.DecodeException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.SocketTimeoutException;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Api(tags = "其它外部接口api")
@@ -30,10 +33,12 @@ public class OuterInterfaceHandleRest {
     private OuterInterfaceHandleService outerIntfService;
 
 
+
     @RequestMapping(value = "/getContractRecordxx",method = RequestMethod.POST)
-    public ObjectRestResponse<Object> qyslhfrdbaxx(String keyCode,String qyslh){
+    @ApiOperation("交易合同备案号获取")
+    public ObjectRestResponse<Object> getContractRecordxx(@RequestBody Map<String,String> params){
         ObjectRestResponse<Object> rv = new ObjectRestResponse<Object>();
-        return rv.data(outerIntfService.getContractRecordxx(keyCode,qyslh));
+        return rv.data(outerIntfService.getContractRecordxx(params));
     }
 
 

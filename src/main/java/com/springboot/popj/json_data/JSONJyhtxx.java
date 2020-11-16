@@ -26,6 +26,8 @@ public class JSONJyhtxx implements Serializable {
     private String deliveryDays;                                      //交付天数
     private Date deliveryDate;                                      //交付日期
     private String oldHouseCode;                                    //原房产户编码
+    private String registrationNumber;       //契约受理号
+    private String auditStatus;              //审核状态
     private String dataJson;                           //原始查询数据
     private String dataComeFromMode;                //数据获取方式
     private String preservationMan;                 //数据提交人
@@ -47,6 +49,22 @@ public class JSONJyhtxx implements Serializable {
 
     private String registrationSubclass;                       //登记小类
     private String registrationReason;                         //登记原因
+
+    public String getRegistrationNumber() {
+        return registrationNumber;
+    }
+
+    public void setRegistrationNumber(String registrationNumber) {
+        this.registrationNumber = registrationNumber;
+    }
+
+    public String getAuditStatus() {
+        return auditStatus;
+    }
+
+    public void setAuditStatus(String auditStatus) {
+        this.auditStatus = auditStatus;
+    }
 
     public String getInfoId() {
         return infoId;

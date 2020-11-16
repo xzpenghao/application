@@ -5,6 +5,8 @@ server:
 spring:
   redis:
     password: ztgeoredis
+    host: 127.0.0.1
+    port: 6379
   autoconfigure:
     exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   application:
@@ -294,7 +296,7 @@ tra:
   bsrypassword: 123456
 
 gxjhpt:
-  url: http://10.13.0.240:8001/
+  url: http://39.100.117.179:8101/
 
 bdccx:
   url: http://172.16.100.149:23335/

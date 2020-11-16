@@ -15,6 +15,8 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
     private String contractSignTime;                   //合同签订时间
     private BigDecimal contractAmount;                     //合同金额
     private String isReal;                             //合同是否有效
+    private String registrationNumber;       //契约受理号
+    private String auditStatus;              //审核状态
     private String holdingDifferent;                                   //分别持证
     private String fundTrusteeship;                                    //资金托管
     private String paymentMethod;                                     //支付方式
@@ -38,6 +40,22 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
 
     private String registrationSubclass;                       //登记小类
     private String registrationReason;                         //登记原因
+
+    public String getRegistrationNumber() {
+        return registrationNumber;
+    }
+
+    public void setRegistrationNumber(String registrationNumber) {
+        this.registrationNumber = registrationNumber;
+    }
+
+    public String getAuditStatus() {
+        return auditStatus;
+    }
+
+    public void setAuditStatus(String auditStatus) {
+        this.auditStatus = auditStatus;
+    }
 
     public String getContractId() {
         return contractId;

@@ -43,7 +43,7 @@ public interface ExchangeWithOuterFeign {
     //通过契约受理号获取备案信息接口
     @RequestMapping(value="mock/60/ycsl/gxpt/ashx/ty",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
 //    @RequestMapping(value="mock/60/ycsl/gxpt/ashx/ty",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=gHRZkzHc","from_user=1"})
-    Map<String,Object> qyslhfrdbaxx(Map<String,Object> params);
+    Map<String,Object> qyslhfrdbaxx(Map<String,String> params);
 
 
 }
