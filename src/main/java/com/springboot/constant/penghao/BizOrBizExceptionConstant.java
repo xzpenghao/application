@@ -17,7 +17,9 @@ public class BizOrBizExceptionConstant {
     public final static String IMMOVABLE_MORTGAGE_RECEIPT_SERVICE = "bdcdyxgxx";
     public final static String TRANSACTION_CONTRACT_RECEIPT_SERVICE = "jyhtxx";
     public final static String MORTGAGE_CONTRACT_RECEIPT_SERVICE = "dyhtxx";
+    public final static String IMMOVEABLE_BUILDING_SERVICE = "lpfwb";
     public final static String TAXATION_RECEIPT_SERVICE = "qsxx";
+    public final static String IMMOVABLE_CONTACTRE_CORD_SERVICE="qyjyxx";
     public final static String HANDLE_RESULT_SERVICE = "handleResult";
     public final static String SDQG_SERVICE = "sdqgxx";
     public final static String IMMOVABLE_TYPE_OF_FD = "房地";

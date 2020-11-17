@@ -80,6 +80,9 @@ public class SysPubDataDealUtil {
                     case BizOrBizExceptionConstant.IMMOVABLE_MORTGAGE_RECEIPT_SERVICE:
                         dealBdcdyxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
                         break;
+                    case BizOrBizExceptionConstant.IMMOVABLE_CONTACTRE_CORD_SERVICE:
+                        dealJyhtxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
+                        break;
                     case BizOrBizExceptionConstant.TRANSACTION_CONTRACT_RECEIPT_SERVICE:
                         dealJyhtxxInfos(JSON_serviceDataInfos, sjsq, serviceCode);
                         break;
