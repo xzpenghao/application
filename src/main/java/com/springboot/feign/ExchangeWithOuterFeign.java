@@ -41,7 +41,7 @@ public interface ExchangeWithOuterFeign {
     @RequestMapping(value="share/jjhfrdjzscx",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=xxx","from_user=0b6c220cdfc54288b6630eb1a7fa612f"})
     Map<String,Object> jjhfrdjzscx(Map<String,Object> params);
     //通过契约受理号获取备案信息接口
-    @RequestMapping(value="mock/60/ycsl/gxpt/ashx/ty",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
+    @RequestMapping(value="gxpt/ashx/ty",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=gHRZkzHc","from_user=1"})
 //    @RequestMapping(value="mock/60/ycsl/gxpt/ashx/ty",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=gHRZkzHc","from_user=1"})
     Map<String,Object> qyslhfrdbaxx(Map<String,String> params);
 
