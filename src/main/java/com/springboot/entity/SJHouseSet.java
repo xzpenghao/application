@@ -51,6 +51,22 @@ public class SJHouseSet {
     /** 债权人类型 0 卖方（义务人），1买方（权利人） */
     private String obligeeType;
 
+    /* 11/16 沭阳新增需求,增加字段: 1.不动产单元号 2.证书状态 抵押>查封>异议 */
+    /** 不动产单元号 */
+    private String immovableUnicode;
+    /** 不动产单元号列表 */
+    private List<String> realEstateUnitIdList;
+    /** 证书状态 */
+    private String status;
+    /** 是否抵押 */
+    private String isMortgage;
+    /** 是否查封 */
+    private String isAttach;
+    /** 是否异议 */
+    private String isDissent;
+    /** 预告证明号 */
+    private String vormerkungId;
+
     /**
      * 描述：住建构造参数
      * 作者：sk

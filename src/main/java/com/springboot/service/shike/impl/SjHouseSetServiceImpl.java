@@ -199,6 +199,7 @@ public class SjHouseSetServiceImpl implements SjHouseSetService {
         //2.3   发送请求 捕获异常
         try {
             result = HttpUtil.post(houseSetBdc,formatParams);
+            log.error("不动产套次查询结果：{}",result);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("不动产套次查询失败，权利人集合：{}",obligeeList);
@@ -216,6 +217,26 @@ public class SjHouseSetServiceImpl implements SjHouseSetService {
                 SJHouseSet sjHouseSet = JSON.parseObject(JSON.toJSONString(data),SJHouseSet.class);
                 sjHouseSet.setObligeeInfoVoList(JSON.toJSONString(sjHouseSet.getObligeeInfoVoList()));
                 sjHouseSet.setObligeeType(obligeeList.get(0).getObligeeType());
+                // 11/16 沭阳新增需求
+                //  不动产单元号列表 -> 不动产单元号
+                if (CollUtil.isNotEmpty(sjHouseSet.getRealEstateUnitIdList())){
+                    sjHouseSet.setImmovableUnicode(JSONArray.toJSONString(sjHouseSet.getRealEstateUnitIdList()));
+                }
+                //  房屋状态
+                if ("true".equals(sjHouseSet.getIsMortgage())){
+                    sjHouseSet.setStatus("已抵押");
+                }else if ("true".equals(sjHouseSet.getIsAttach())){
+                    sjHouseSet.setStatus("已查封");
+                }else if ("true".equals(sjHouseSet.getIsDissent())){
+                    sjHouseSet.setStatus("已异议");
+                }else {
+                    sjHouseSet.setStatus("正常");
+                }
+                //  当不动产证号不存在时,取预告证明号为不动产证号
+                if (StrUtil.isBlank(sjHouseSet.getRealEstateId())){
+                    sjHouseSet.setRealEstateId(sjHouseSet.getVormerkungId());
+                }
+
                 sjHouseSets.add(sjHouseSet);
             }
         }
