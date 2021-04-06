@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @Slf4j
@@ -231,12 +232,16 @@ public class ExchangeToInnerComponent {
                         fw.setRoomMark(getNotNullData(estateObj.getString("roomId")));           //房间号
                         fw.setUnitMark(getNotNullData(estateObj.getString("unitId")));           //单元号
                         fw.setLocationStorey(getNotNullData(estateObj.getString("floor")));      //所在层
+                        fw.setNominalFloor(getNotNullData(estateObj.getString("nominalFloor"))); //名义层
                         fw.setTotalStorey(getNotNullData(estateObj.getString("totalFloor")));         //总层数
                         fw.setProjectName(getNotNullData(estateObj.getString("projectName")));        //项目名称
                         fw.setBuildingName(getNotNullData(estateObj.getString("architectureName")));       //建筑名称
                         String hjzmj = getNotNullData(estateObj.getString("architectureArea"));
                         String htnmj = getNotNullData(estateObj.getString("innerArchitectureArea"));
                         String hftmj = getNotNullData(estateObj.getString("sharedArchitectureArea"));
+                        if (Objects.isNull(bdcqlxgxx.getHouseRightNature())){
+                            bdcqlxgxx.setHouseRightNature(estateObj.getString("houseRightNature"));  //房屋权利性质
+                        }
                         fw.setArchitecturalArea(StringUtils.isNotBlank(hjzmj)?new BigDecimal(hjzmj):null);  //建筑面积
                         fw.setHouseArchitecturalArea(StringUtils.isNotBlank(htnmj)?new BigDecimal(htnmj):null); //套内建筑面积
                         fw.setApportionmentArchitecturalArea(StringUtils.isNotBlank(hftmj)?new BigDecimal(hftmj):null);//分摊建筑面积

@@ -57,7 +57,7 @@ spring:
 #            initial-size: 6
       primary: admin
   jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
+    date-format: yyyy-MM-dd
     time-zone: GMT+8
     default-property-inclusion: non_null
 
@@ -296,7 +296,8 @@ tra:
   bsrypassword: 123456
 
 gxjhpt:
-  url: http://39.100.117.179:8101/
+   url: http://172.16.100.116:3000/
+ # url: http://39.100.117.179:8101/
 
 bdccx:
   url: http://172.16.100.149:23335/

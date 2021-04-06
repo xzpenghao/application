@@ -2,6 +2,7 @@ package com.springboot.controller;
 
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.springboot.component.HTSoapAnalyzeComponent;
+import com.springboot.popj.pub_data.Sj_Info_Jyhtxx;
 import com.springboot.util.NetSignUtils;
 import com.springboot.util.ParseXML;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +26,17 @@ public class HTInfoGetController {
     private HTSoapAnalyzeComponent htSoapAnalyzeComponent;
     @Autowired
     private NetSignUtils netSignUtils;
+
+
+    @RequestMapping(value = "/getTransactionContract",method = RequestMethod.POST)
+    @ApiOperation("存量房交易合同信息获取")
+    public ObjectRestResponse getTransactionContract(@RequestParam(value = "registrationNumber", required = false) String registrationNumber,
+                                                     @RequestParam(value = "obligeeName", required = false) String obligeeName,
+                                                     @RequestParam(value = "obligeeDocumentNumber", required = false) String obligeeDocumentNumber){
+        return new ObjectRestResponse<Sj_Info_Jyhtxx>().data(htSoapAnalyzeComponent.getTransactionContract(registrationNumber,obligeeName,obligeeDocumentNumber)) ;
+    }
+
+
 
 
     @RequestMapping(value = "/getSecondhandRoom", method = RequestMethod.GET)

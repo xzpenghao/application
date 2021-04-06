@@ -6,8 +6,10 @@ import com.springboot.entity.chenbin.personnel.punit.GSCommonEntity;
 import com.springboot.entity.chenbin.personnel.punit.PersonCheckEntity;
 import com.springboot.entity.chenbin.personnel.punit.PersonEntity;
 import com.springboot.entity.chenbin.personnel.resp.JDPersonnelUnitEntity;
+import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
 import com.springboot.entity.chenbin.personnel.resp.PersonnelResponseListEntity;
 import com.springboot.entity.chenbin.personnel.resp.PersonnelResponseSingleEntity;
+import com.springboot.popj.pub_data.Sj_Info_Jyhtxx;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,5 +47,6 @@ public interface ExchangeWithOuterFeign {
 //    @RequestMapping(value="mock/60/ycsl/gxpt/ashx/ty",method = RequestMethod.POST,produces = "application/json",consumes = "application/json",headers = {"api_id=gHRZkzHc","from_user=1"})
     Map<String,Object> qyslhfrdbaxx(Map<String,String> params);
 
-
+    @RequestMapping(value = "/mock/26/ycsl/secondInfo",method = RequestMethod.POST,produces = "application/json",consumes = "application/json")
+    OtherResponseEntity<Sj_Info_Jyhtxx> jyhtxxcx(Map<String,String> params);
 }

@@ -20,6 +20,7 @@ public class SJ_Bdc_Fw_Info implements Serializable {
     private String unitMark;                                    //单元号
     private String totalStorey;                                 //总层数
     private String locationStorey;                              //所在层
+    private String nominalFloor;                                //名义层
     private String projectName;                                 //项目名称
     private BigDecimal architecturalArea;                           //建筑面积
     private BigDecimal houseArchitecturalArea;                      //套内建筑面积
@@ -37,6 +38,14 @@ public class SJ_Bdc_Fw_Info implements Serializable {
     private String houseNature;                                 //性质
     private String houseStructure;                              //结构
     private String oldHouseCode;
+
+    public String getNominalFloor() {
+        return nominalFloor;
+    }
+
+    public void setNominalFloor(String nominalFloor) {
+        this.nominalFloor = nominalFloor;
+    }
 
     public String getHouseId() {
         return houseId;

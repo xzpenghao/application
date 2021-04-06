@@ -1,13 +1,21 @@
 package com.springboot.component;
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSON;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
+import com.google.common.collect.Maps;
 import com.springboot.config.Msgagger;
+import com.springboot.config.ZtgeoBizException;
+import com.springboot.entity.chenbin.personnel.resp.OtherResponseEntity;
+import com.springboot.feign.ExchangeWithOuterFeign;
 import com.springboot.popj.FwInfo;
 import com.springboot.popj.GlImmovable;
 import com.springboot.popj.RelatedPerson;
 import com.springboot.popj.netSign.BusinessContract;
 import com.springboot.popj.netSign.GlHouseBuyer;
 import com.springboot.popj.netSign.GlHouseSeller;
+import com.springboot.popj.pub_data.SJ_Bdc_Gl;
+import com.springboot.popj.pub_data.Sj_Info_Jyhtxx;
 import com.springboot.util.ParseXML;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -19,10 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component("htSoapAnalyzeComp")
@@ -37,6 +44,48 @@ public class HTSoapAnalyzeComponent {
 
     @Autowired
     private RealEstateMortgageComponent realEstateMortgageComponent;
+    @Autowired
+    private ExchangeWithOuterFeign withOuterFeign;
+
+    /**
+     * 功能描述: <br>
+     * 〈〉 通过合同契约号或合同备案号获取交易合同信息
+     * @Param: [htqyh, htbah]
+     * @Return: com.springboot.popj.pub_data.Sj_Info_Jyhtxx
+     * @Author: Peng Hao
+     * @Date: 2021/4/2 11:14
+     */
+    public Sj_Info_Jyhtxx getTransactionContract(String registrationNumber,String obligeeName,String obligeeDocumentNumber) {
+        Map<String, String> paramMap = Maps.newHashMap();
+        if (StringUtils.isEmpty(registrationNumber)) {
+            throw new ZtgeoBizException("缺少合同契约号");
+        }
+        // 1.1 记录传入参数
+        log.info("合同契约号:{},权利人:{},权利人证件号码:{}", registrationNumber,obligeeName,obligeeDocumentNumber);
+        paramMap.put("registrationNumber", registrationNumber);
+        paramMap.put("obligeeName", obligeeName);
+        paramMap.put("obligeeDocumentNumber", obligeeDocumentNumber);
+        // 1.2 查询交易合同信息接口
+        OtherResponseEntity<Sj_Info_Jyhtxx> entity = withOuterFeign.jyhtxxcx(paramMap);
+        // 1.3 记录返回数据
+        log.info("接口返回值:{}", JSON.toJSONString(entity));
+        if (Objects.isNull(entity) || "0".equals(entity.getCode())) {
+            throw new ZtgeoBizException("接口请求失败");
+        }
+        if (Objects.isNull(entity.getData())) {
+            throw new ZtgeoBizException("接口返回的数据为空");
+        }
+        Sj_Info_Jyhtxx jyhtxx = entity.getData();
+        List<SJ_Bdc_Gl> bdc_gls =  jyhtxx.getGlImmovableVoList();
+        if (Objects.isNull(bdc_gls.stream().findFirst().get().getFwInfo())){
+            throw new ZtgeoBizException("接口返回数据不符合要求,没有房屋信息");
+        }
+        bdc_gls.stream().forEach(bdcGl -> bdcGl.setImmovableType(Msgagger.FANGDI));
+        jyhtxx.setGlImmovableVoList(bdc_gls);
+        // 存入前端需求值
+        return jyhtxx;
+    }
+
 
 
     public ObjectRestResponse ersxxSoap(String clhtbah, String htbah) throws DocumentException {

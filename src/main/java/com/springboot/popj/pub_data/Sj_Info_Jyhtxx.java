@@ -103,7 +103,7 @@ public class Sj_Info_Jyhtxx extends SJ_Information {
     }
 
     public void setContractSignTime(Date contractSignTime) {
-        this.contractSignTime = TimeUtil.getTimeString(contractSignTime);
+        this.contractSignTime = TimeUtil.getDateString(contractSignTime);
     }
 
     public BigDecimal getContractAmount() {
